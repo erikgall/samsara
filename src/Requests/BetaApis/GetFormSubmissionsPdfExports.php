@@ -35,9 +35,7 @@ class GetFormSubmissionsPdfExports extends Request
     /**
      * @param  string  $pdfId  ID of the form submission PDF export.
      */
-    public function __construct(
-        protected string $pdfId,
-    ) {}
+    public function __construct(protected string $pdfId) {}
 
     public function defaultQuery(): array
     {

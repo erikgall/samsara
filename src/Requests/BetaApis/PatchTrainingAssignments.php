@@ -41,10 +41,7 @@ class PatchTrainingAssignments extends Request implements HasBody
      * @param  array  $ids  String of comma separated assignments IDs. Max value for this value is 100 objects .Example: `ids=a4db8702-79d5-4396-a717-e301d52ecc11,c6490f6a-d84e-49b5-b0ad-b6baae304075`
      * @param  string  $dueAtTime  Due date of the training assignment in RFC 3339 format. Millisecond precision and timezones are supported.
      */
-    public function __construct(
-        protected array $ids,
-        protected string $dueAtTime,
-    ) {}
+    public function __construct(protected array $ids, protected string $dueAtTime) {}
 
     public function defaultQuery(): array
     {

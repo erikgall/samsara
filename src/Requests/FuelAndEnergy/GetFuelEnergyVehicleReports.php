@@ -43,7 +43,7 @@ class GetFuelEnergyVehicleReports extends Request
         protected ?string $vehicleIds = null,
         protected ?string $energyType = null,
         protected ?string $tagIds = null,
-        protected ?string $parentTagIds = null,
+        protected ?string $parentTagIds = null
     ) {}
 
     public function defaultQuery(): array

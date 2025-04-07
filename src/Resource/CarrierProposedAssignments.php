@@ -28,8 +28,13 @@ class CarrierProposedAssignments extends Resource
      * @param  array  $driverIds  A filter on the data based on this comma-separated list of driver IDs and externalIds. Example: `driverIds=1234,5678,payroll:4841`
      * @param  string  $activeTime  If specified, shows assignments that will be active at this time. Defaults to now, which would show current active assignments. In RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
      */
-    public function listCarrierProposedAssignments(?int $limit = null, ?array $driverIds = null, ?string $activeTime = null): Response
-    {
-        return $this->connector->send(new ListCarrierProposedAssignments($limit, $driverIds, $activeTime));
+    public function listCarrierProposedAssignments(
+        ?int $limit = null,
+        ?array $driverIds = null,
+        ?string $activeTime = null
+    ): Response {
+        return $this->connector->send(
+            new ListCarrierProposedAssignments($limit, $driverIds, $activeTime)
+        );
     }
 }

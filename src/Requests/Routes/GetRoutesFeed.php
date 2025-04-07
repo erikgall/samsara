@@ -39,9 +39,7 @@ class GetRoutesFeed extends Request
      *
      * Valid value: `route`  Valid values: `route`
      */
-    public function __construct(
-        protected ?string $expand = null,
-    ) {}
+    public function __construct(protected ?string $expand = null) {}
 
     public function defaultQuery(): array
     {

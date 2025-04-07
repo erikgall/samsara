@@ -20,10 +20,12 @@ class TrailerAssignments extends Resource
         ?int $startMs,
         ?int $endMs,
         float|int|null $limit,
-        ?string $startingAfter,
-        ?string $endingBefore,
+        ?string $startingAfter = null,
+        ?string $endingBefore = null
     ): Response {
-        return $this->connector->send(new V1getAllTrailerAssignments($startMs, $endMs, $limit, $startingAfter, $endingBefore));
+        return $this->connector->send(
+            new V1getAllTrailerAssignments($startMs, $endMs, $limit, $startingAfter, $endingBefore)
+        );
     }
 
     /**
@@ -31,8 +33,13 @@ class TrailerAssignments extends Resource
      * @param  int  $startMs  Timestamp in Unix epoch milliseconds representing the start of the period to fetch. Omitting both startMs and endMs only returns current assignments.
      * @param  int  $endMs  Timestamp in Unix epoch milliseconds representing the end of the period to fetch. Omitting endMs sets endMs as the current time
      */
-    public function v1getFleetTrailerAssignments(int $trailerId, ?int $startMs, ?int $endMs): Response
-    {
-        return $this->connector->send(new V1getFleetTrailerAssignments($trailerId, $startMs, $endMs));
+    public function v1getFleetTrailerAssignments(
+        int $trailerId,
+        ?int $startMs = null,
+        ?int $endMs = null
+    ): Response {
+        return $this->connector->send(
+            new V1getFleetTrailerAssignments($trailerId, $startMs, $endMs)
+        );
     }
 }

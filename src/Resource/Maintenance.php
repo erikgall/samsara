@@ -23,7 +23,7 @@ class Maintenance extends Resource
      * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      * @param  array  $ids  A filter on the data based on this comma-separated list of defect type IDs.
      */
-    public function getDefectTypes(?int $limit, ?array $ids): Response
+    public function getDefectTypes(?int $limit = null, ?array $ids = null): Response
     {
         return $this->connector->send(new GetDefectTypes($limit, $ids));
     }
@@ -39,10 +39,12 @@ class Maintenance extends Resource
         ?int $limit,
         ?bool $includeExternalIds,
         string $startTime,
-        ?string $endTime,
-        ?array $safetyStatus,
+        ?string $endTime = null,
+        ?array $safetyStatus = null
     ): Response {
-        return $this->connector->send(new GetDvirs($limit, $includeExternalIds, $startTime, $endTime, $safetyStatus));
+        return $this->connector->send(
+            new GetDvirs($limit, $includeExternalIds, $startTime, $endTime, $safetyStatus)
+        );
     }
 
     /**
@@ -55,11 +57,13 @@ class Maintenance extends Resource
     public function streamDefects(
         ?int $limit,
         string $startTime,
-        ?string $endTime,
-        ?bool $includeExternalIds,
-        ?bool $isResolved,
+        ?string $endTime = null,
+        ?bool $includeExternalIds = null,
+        ?bool $isResolved = null
     ): Response {
-        return $this->connector->send(new StreamDefects($limit, $startTime, $endTime, $includeExternalIds, $isResolved));
+        return $this->connector->send(
+            new StreamDefects($limit, $startTime, $endTime, $includeExternalIds, $isResolved)
+        );
     }
 
     /**

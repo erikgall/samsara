@@ -37,10 +37,7 @@ class V1getVisionRuns extends Request
      * @param  int  $durationMs  DurationMs is a required param. This works with the EndMs parameter. Indicates the duration in which the visionRuns will be fetched
      * @param  int|null  $endMs  EndMs is an optional param. It will default to the current time.
      */
-    public function __construct(
-        protected int $durationMs,
-        protected ?int $endMs = null,
-    ) {}
+    public function __construct(protected int $durationMs, protected ?int $endMs = null) {}
 
     public function defaultQuery(): array
     {

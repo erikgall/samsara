@@ -40,7 +40,7 @@ class GetDocuments extends Request
         protected string $startTime,
         protected string $endTime,
         protected ?string $documentTypeId = null,
-        protected ?string $queryBy = null,
+        protected ?string $queryBy = null
     ) {}
 
     public function defaultQuery(): array

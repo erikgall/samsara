@@ -30,10 +30,7 @@ class GetAttribute extends Request
      * @param  string  $id  Samsara-provided UUID of the attribute.
      * @param  string  $entityType  Denotes the type of entity, driver or asset.
      */
-    public function __construct(
-        protected string $id,
-        protected string $entityType,
-    ) {}
+    public function __construct(protected string $id, protected string $entityType) {}
 
     public function defaultQuery(): array
     {

@@ -28,9 +28,7 @@ class ListContacts extends Request
     /**
      * @param  int|null  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      */
-    public function __construct(
-        protected ?int $limit = null,
-    ) {}
+    public function __construct(protected ?int $limit = null) {}
 
     public function defaultQuery(): array
     {

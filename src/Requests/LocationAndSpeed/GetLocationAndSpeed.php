@@ -53,7 +53,7 @@ class GetLocationAndSpeed extends Request
         protected ?bool $includeSpeed = null,
         protected ?bool $includeReverseGeo = null,
         protected ?bool $includeGeofenceLookup = null,
-        protected ?bool $includeExternalIds = null,
+        protected ?bool $includeExternalIds = null
     ) {}
 
     public function defaultQuery(): array

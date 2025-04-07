@@ -22,12 +22,23 @@ class Idling extends Resource
         ?int $limit,
         string $startTime,
         string $endTime,
-        ?string $vehicleIds,
-        ?string $tagIds,
-        ?string $parentTagIds,
-        ?bool $isPtoActive,
-        ?int $minIdlingDurationMinutes,
+        ?string $vehicleIds = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null,
+        ?bool $isPtoActive = null,
+        ?int $minIdlingDurationMinutes = null
     ): Response {
-        return $this->connector->send(new GetVehicleIdlingReports($limit, $startTime, $endTime, $vehicleIds, $tagIds, $parentTagIds, $isPtoActive, $minIdlingDurationMinutes));
+        return $this->connector->send(
+            new GetVehicleIdlingReports(
+                $limit,
+                $startTime,
+                $endTime,
+                $vehicleIds,
+                $tagIds,
+                $parentTagIds,
+                $isPtoActive,
+                $minIdlingDurationMinutes
+            )
+        );
     }
 }

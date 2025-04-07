@@ -37,12 +37,16 @@ class GetDriverCoachAssignment extends Request
     public function __construct(
         protected ?array $driverIds = null,
         protected ?array $coachIds = null,
-        protected ?bool $includeExternalIds = null,
+        protected ?bool $includeExternalIds = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['driverIds' => $this->driverIds, 'coachIds' => $this->coachIds, 'includeExternalIds' => $this->includeExternalIds]);
+        return array_filter([
+            'driverIds'          => $this->driverIds,
+            'coachIds'           => $this->coachIds,
+            'includeExternalIds' => $this->includeExternalIds,
+        ]);
     }
 
     public function resolveEndpoint(): string

@@ -20,11 +20,13 @@ class FuelAndEnergy extends Resource
     public function getFuelEnergyDriverReports(
         string $startDate,
         string $endDate,
-        ?array $driverIds,
-        ?string $tagIds,
-        ?string $parentTagIds,
+        ?array $driverIds = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null
     ): Response {
-        return $this->connector->send(new GetFuelEnergyDriverReports($startDate, $endDate, $driverIds, $tagIds, $parentTagIds));
+        return $this->connector->send(
+            new GetFuelEnergyDriverReports($startDate, $endDate, $driverIds, $tagIds, $parentTagIds)
+        );
     }
 
     /**
@@ -38,12 +40,21 @@ class FuelAndEnergy extends Resource
     public function getFuelEnergyVehicleReports(
         string $startDate,
         string $endDate,
-        ?string $vehicleIds,
-        ?string $energyType,
-        ?string $tagIds,
-        ?string $parentTagIds,
+        ?string $vehicleIds = null,
+        ?string $energyType = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null
     ): Response {
-        return $this->connector->send(new GetFuelEnergyVehicleReports($startDate, $endDate, $vehicleIds, $energyType, $tagIds, $parentTagIds));
+        return $this->connector->send(
+            new GetFuelEnergyVehicleReports(
+                $startDate,
+                $endDate,
+                $vehicleIds,
+                $energyType,
+                $tagIds,
+                $parentTagIds
+            )
+        );
     }
 
     public function postFuelPurchase(): Response

@@ -99,7 +99,7 @@ class GetTrailerStatsHistory extends Request
         protected ?string $tagIds = null,
         protected ?string $parentTagIds = null,
         protected ?string $trailerIds = null,
-        protected ?string $decorations = null,
+        protected ?string $decorations = null
     ) {}
 
     public function defaultQuery(): array

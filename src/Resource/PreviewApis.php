@@ -21,12 +21,21 @@ class PreviewApis extends Resource
     public function getDriverEfficiencyByDrivers(
         string $startTime,
         string $endTime,
-        ?array $driverIds,
-        ?array $dataFormats,
-        ?string $tagIds,
-        ?string $parentTagIds,
+        ?array $driverIds = null,
+        ?array $dataFormats = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null
     ): Response {
-        return $this->connector->send(new GetDriverEfficiencyByDrivers($startTime, $endTime, $driverIds, $dataFormats, $tagIds, $parentTagIds));
+        return $this->connector->send(
+            new GetDriverEfficiencyByDrivers(
+                $startTime,
+                $endTime,
+                $driverIds,
+                $dataFormats,
+                $tagIds,
+                $parentTagIds
+            )
+        );
     }
 
     /**
@@ -40,18 +49,27 @@ class PreviewApis extends Resource
     public function getDriverEfficiencyByVehicles(
         string $startTime,
         string $endTime,
-        ?string $vehicleIds,
-        ?array $dataFormats,
-        ?string $tagIds,
-        ?string $parentTagIds,
+        ?string $vehicleIds = null,
+        ?array $dataFormats = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null
     ): Response {
-        return $this->connector->send(new GetDriverEfficiencyByVehicles($startTime, $endTime, $vehicleIds, $dataFormats, $tagIds, $parentTagIds));
+        return $this->connector->send(
+            new GetDriverEfficiencyByVehicles(
+                $startTime,
+                $endTime,
+                $vehicleIds,
+                $dataFormats,
+                $tagIds,
+                $parentTagIds
+            )
+        );
     }
 
     /**
      * @param  array  $ids  A comma-separated list containing up to 100 template IDs to filter on.
      */
-    public function getFormTemplates(?array $ids): Response
+    public function getFormTemplates(?array $ids = null): Response
     {
         return $this->connector->send(new GetFormTemplates($ids));
     }

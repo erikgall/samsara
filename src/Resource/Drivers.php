@@ -40,9 +40,19 @@ class Drivers extends Resource
         ?array $tagIds = null,
         ?array $attributeValueIds = null,
         ?string $updatedAfterTime = null,
-        ?string $createdAfterTime = null,
+        ?string $createdAfterTime = null
     ): Response {
-        return $this->connector->send(new ListDrivers($driverActivationStatus, $limit, $parentTagIds, $tagIds, $attributeValueIds, $updatedAfterTime, $createdAfterTime));
+        return $this->connector->send(
+            new ListDrivers(
+                $driverActivationStatus,
+                $limit,
+                $parentTagIds,
+                $tagIds,
+                $attributeValueIds,
+                $updatedAfterTime,
+                $createdAfterTime
+            )
+        );
     }
 
     /**

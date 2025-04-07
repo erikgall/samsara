@@ -42,12 +42,16 @@ class V1getFleetTrips extends Request
     public function __construct(
         protected int $vehicleId,
         protected int $startMs,
-        protected int $endMs,
+        protected int $endMs
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['vehicleId' => $this->vehicleId, 'startMs' => $this->startMs, 'endMs' => $this->endMs]);
+        return array_filter([
+            'vehicleId' => $this->vehicleId,
+            'startMs'   => $this->startMs,
+            'endMs'     => $this->endMs,
+        ]);
     }
 
     public function resolveEndpoint(): string

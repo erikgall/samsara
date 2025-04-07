@@ -41,7 +41,7 @@ class GetDvirHistory extends Request
         protected ?array $parentTagIds,
         protected ?array $tagIds,
         protected string $startTime,
-        protected string $endTime,
+        protected string $endTime
     ) {}
 
     public function defaultQuery(): array

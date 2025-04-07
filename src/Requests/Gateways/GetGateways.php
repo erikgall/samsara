@@ -32,9 +32,7 @@ class GetGateways extends Request
     /**
      * @param  array|null  $models  Filter by a comma separated list of gateway models.
      */
-    public function __construct(
-        protected ?array $models = null,
-    ) {}
+    public function __construct(protected ?array $models = null) {}
 
     public function defaultQuery(): array
     {

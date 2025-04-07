@@ -28,9 +28,7 @@ class GetDocumentPdf extends Request
     /**
      * @param  string  $id  ID of the pdf.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function resolveEndpoint(): string
     {

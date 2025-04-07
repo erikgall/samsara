@@ -147,7 +147,7 @@ class GetVehicleStatsHistory extends Request
         protected ?array $tagIds,
         protected ?array $vehicleIds,
         protected array $types,
-        protected ?array $decorations = null,
+        protected ?array $decorations = null
     ) {}
 
     public function defaultQuery(): array

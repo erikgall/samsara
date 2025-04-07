@@ -31,9 +31,7 @@ class DeleteTrailer extends Request
     /**
      * @param  string  $id  Unique identifier for the trailer to delete.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function resolveEndpoint(): string
     {

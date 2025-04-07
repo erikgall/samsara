@@ -40,7 +40,7 @@ class GetDvirDefects extends Request
         protected ?int $limit,
         protected string $startTime,
         protected string $endTime,
-        protected ?bool $isResolved = null,
+        protected ?bool $isResolved = null
     ) {}
 
     public function defaultQuery(): array

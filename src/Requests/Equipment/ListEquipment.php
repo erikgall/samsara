@@ -36,12 +36,16 @@ class ListEquipment extends Request
     public function __construct(
         protected ?int $limit = null,
         protected ?array $parentTagIds = null,
-        protected ?array $tagIds = null,
+        protected ?array $tagIds = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['limit' => $this->limit, 'parentTagIds' => $this->parentTagIds, 'tagIds' => $this->tagIds]);
+        return array_filter([
+            'limit'        => $this->limit,
+            'parentTagIds' => $this->parentTagIds,
+            'tagIds'       => $this->tagIds,
+        ]);
     }
 
     public function resolveEndpoint(): string

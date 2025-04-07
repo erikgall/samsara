@@ -38,7 +38,7 @@ class V1getVisionLatestRunCamera extends Request
         protected ?int $programId = null,
         protected ?int $startedAtMs = null,
         protected ?string $include = null,
-        protected ?int $limit = null,
+        protected ?int $limit = null
     ) {}
 
     public function defaultQuery(): array

@@ -32,9 +32,7 @@ class DeleteGateway extends Request
     /**
      * @param  string  $id  Gateway serial number
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function resolveEndpoint(): string
     {

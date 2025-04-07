@@ -35,7 +35,7 @@ class GetIndustrialAssets extends Request
         protected ?int $limit = null,
         protected ?array $parentTagIds = null,
         protected ?array $tagIds = null,
-        protected ?array $assetIds = null,
+        protected ?array $assetIds = null
     ) {}
 
     public function defaultQuery(): array

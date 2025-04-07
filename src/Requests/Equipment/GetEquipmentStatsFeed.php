@@ -64,7 +64,7 @@ class GetEquipmentStatsFeed extends Request
         protected ?array $parentTagIds,
         protected ?array $tagIds,
         protected ?array $equipmentIds,
-        protected array $types,
+        protected array $types
     ) {}
 
     public function defaultQuery(): array

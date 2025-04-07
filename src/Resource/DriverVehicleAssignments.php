@@ -39,9 +39,20 @@ class DriverVehicleAssignments extends Resource
         ?array $vehicleIds = null,
         ?string $driverTagIds = null,
         ?string $vehicleTagIds = null,
-        ?string $assignmentType = null,
+        ?string $assignmentType = null
     ): Response {
-        return $this->connector->send(new GetDriverVehicleAssignments($filterBy, $startTime, $endTime, $driverIds, $vehicleIds, $driverTagIds, $vehicleTagIds, $assignmentType));
+        return $this->connector->send(
+            new GetDriverVehicleAssignments(
+                $filterBy,
+                $startTime,
+                $endTime,
+                $driverIds,
+                $vehicleIds,
+                $driverTagIds,
+                $vehicleTagIds,
+                $assignmentType
+            )
+        );
     }
 
     public function updateDriverVehicleAssignment(): Response

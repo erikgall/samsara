@@ -21,7 +21,7 @@ class Gateways extends Resource
     /**
      * @param  array  $models  Filter by a comma separated list of gateway models.
      */
-    public function getGateways(?array $models): Response
+    public function getGateways(?array $models = null): Response
     {
         return $this->connector->send(new GetGateways($models));
     }

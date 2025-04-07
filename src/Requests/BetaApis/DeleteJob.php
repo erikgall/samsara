@@ -28,9 +28,7 @@ class DeleteJob extends Request
     /**
      * @param  string  $id  A jobId or uuid in STRING format. JobId must be prefixed with `jobId:`(Examples: `"8d218e6c-7a16-4f9f-90f7-cc1d93b9e596"`, `"jobId:98765"`).
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function defaultQuery(): array
     {

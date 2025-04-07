@@ -38,7 +38,7 @@ class GetEquipmentLocationsHistory extends Request
         protected string $endTime,
         protected ?array $parentTagIds = null,
         protected ?array $tagIds = null,
-        protected ?array $equipmentIds = null,
+        protected ?array $equipmentIds = null
     ) {}
 
     public function defaultQuery(): array

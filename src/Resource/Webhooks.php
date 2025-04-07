@@ -32,7 +32,7 @@ class Webhooks extends Resource
      * @param  string  $ids  A filter on the data based on this comma-separated list of webhook IDs. Example: `ids=49412323223,49412329928`
      * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      */
-    public function listWebhooks(?string $ids, ?int $limit): Response
+    public function listWebhooks(?string $ids = null, ?int $limit = null): Response
     {
         return $this->connector->send(new ListWebhooks($ids, $limit));
     }

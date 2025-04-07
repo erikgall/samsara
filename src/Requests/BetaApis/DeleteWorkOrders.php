@@ -31,9 +31,7 @@ class DeleteWorkOrders extends Request
     /**
      * @param  string  $id  The unique id of the work order.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function defaultQuery(): array
     {

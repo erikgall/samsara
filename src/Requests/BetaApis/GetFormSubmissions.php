@@ -37,10 +37,7 @@ class GetFormSubmissions extends Request
      * @param  array  $ids  A comma-separated list containing up to 100 form submission IDs to filter on. Can be either a unique Samsara ID or an [external ID](https://developers.samsara.com/docs/external-ids) for the form submission.
      * @param  array|null  $include  A comma-separated list of strings indicating whether to return additional information. Valid values: `externalIds`, `fieldLabels`
      */
-    public function __construct(
-        protected array $ids,
-        protected ?array $include = null,
-    ) {}
+    public function __construct(protected array $ids, protected ?array $include = null) {}
 
     public function defaultQuery(): array
     {

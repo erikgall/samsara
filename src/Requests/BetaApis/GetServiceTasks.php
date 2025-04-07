@@ -34,7 +34,7 @@ class GetServiceTasks extends Request
      */
     public function __construct(
         protected ?array $ids = null,
-        protected ?bool $includeArchived = null,
+        protected ?bool $includeArchived = null
     ) {}
 
     public function defaultQuery(): array

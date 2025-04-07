@@ -37,9 +37,7 @@ class UpdateEngineImmobilizerState extends Request implements HasBody
     /**
      * @param  int  $id  Vehicle ID
      */
-    public function __construct(
-        protected int $id,
-    ) {}
+    public function __construct(protected int $id) {}
 
     public function resolveEndpoint(): string
     {

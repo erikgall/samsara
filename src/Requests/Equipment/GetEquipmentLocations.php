@@ -34,12 +34,16 @@ class GetEquipmentLocations extends Request
     public function __construct(
         protected ?array $parentTagIds = null,
         protected ?array $tagIds = null,
-        protected ?array $equipmentIds = null,
+        protected ?array $equipmentIds = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['parentTagIds' => $this->parentTagIds, 'tagIds' => $this->tagIds, 'equipmentIds' => $this->equipmentIds]);
+        return array_filter([
+            'parentTagIds' => $this->parentTagIds,
+            'tagIds'       => $this->tagIds,
+            'equipmentIds' => $this->equipmentIds,
+        ]);
     }
 
     public function resolveEndpoint(): string

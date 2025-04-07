@@ -20,14 +20,23 @@ class LegacyApis extends Resource
      * @param  string  $driverActivationStatus  If value is `deactivated`, only drivers that are deactivated will appear in the response. This parameter will default to `active` if not provided (fetching only active drivers).  Valid values: `active`, `deactivated`
      */
     public function getDriversVehicleAssignments(
-        ?array $driverIds,
-        ?string $startTime,
-        ?string $endTime,
-        ?string $tagIds,
-        ?string $parentTagIds,
-        ?string $driverActivationStatus,
+        ?array $driverIds = null,
+        ?string $startTime = null,
+        ?string $endTime = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null,
+        ?string $driverActivationStatus = null
     ): Response {
-        return $this->connector->send(new GetDriversVehicleAssignments($driverIds, $startTime, $endTime, $tagIds, $parentTagIds, $driverActivationStatus));
+        return $this->connector->send(
+            new GetDriversVehicleAssignments(
+                $driverIds,
+                $startTime,
+                $endTime,
+                $tagIds,
+                $parentTagIds,
+                $driverActivationStatus
+            )
+        );
     }
 
     /**
@@ -36,9 +45,15 @@ class LegacyApis extends Resource
      * @param  string  $endTime  An end time in RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00). *The maximum time period you can query for is 30 days.*
      * @param  bool  $isResolved  A filter on the data based on resolution status. Example: `isResolved=true`
      */
-    public function getDvirDefects(?int $limit, string $startTime, string $endTime, ?bool $isResolved): Response
-    {
-        return $this->connector->send(new GetDvirDefects($limit, $startTime, $endTime, $isResolved));
+    public function getDvirDefects(
+        ?int $limit,
+        string $startTime,
+        string $endTime,
+        ?bool $isResolved = null
+    ): Response {
+        return $this->connector->send(
+            new GetDvirDefects($limit, $startTime, $endTime, $isResolved)
+        );
     }
 
     /**
@@ -53,9 +68,11 @@ class LegacyApis extends Resource
         ?array $parentTagIds,
         ?array $tagIds,
         string $startTime,
-        string $endTime,
+        string $endTime
     ): Response {
-        return $this->connector->send(new GetDvirHistory($limit, $parentTagIds, $tagIds, $startTime, $endTime));
+        return $this->connector->send(
+            new GetDvirHistory($limit, $parentTagIds, $tagIds, $startTime, $endTime)
+        );
     }
 
     /**
@@ -66,12 +83,20 @@ class LegacyApis extends Resource
      * @param  string  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
      */
     public function getVehiclesDriverAssignments(
-        ?string $startTime,
-        ?string $endTime,
-        ?string $vehicleIds,
-        ?string $tagIds,
-        ?string $parentTagIds,
+        ?string $startTime = null,
+        ?string $endTime = null,
+        ?string $vehicleIds = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null
     ): Response {
-        return $this->connector->send(new GetVehiclesDriverAssignments($startTime, $endTime, $vehicleIds, $tagIds, $parentTagIds));
+        return $this->connector->send(
+            new GetVehiclesDriverAssignments(
+                $startTime,
+                $endTime,
+                $vehicleIds,
+                $tagIds,
+                $parentTagIds
+            )
+        );
     }
 }

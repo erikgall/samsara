@@ -42,7 +42,7 @@ class ListVehicles extends Request
         protected ?string $tagIds = null,
         protected ?string $attributeValueIds = null,
         protected ?string $updatedAfterTime = null,
-        protected ?string $createdAfterTime = null,
+        protected ?string $createdAfterTime = null
     ) {}
 
     public function defaultQuery(): array

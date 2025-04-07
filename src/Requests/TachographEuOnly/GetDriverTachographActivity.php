@@ -38,7 +38,7 @@ class GetDriverTachographActivity extends Request
         protected string $endTime,
         protected ?array $driverIds = null,
         protected ?array $parentTagIds = null,
-        protected ?array $tagIds = null,
+        protected ?array $tagIds = null
     ) {}
 
     public function defaultQuery(): array

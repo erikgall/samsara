@@ -40,7 +40,7 @@ class StreamWorkOrders extends Request
         protected ?string $endTime = null,
         protected ?array $workOrderStatuses = null,
         protected ?array $assetIds = null,
-        protected ?array $assignedUserIds = null,
+        protected ?array $assignedUserIds = null
     ) {}
 
     public function defaultQuery(): array

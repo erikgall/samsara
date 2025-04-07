@@ -50,7 +50,7 @@ class GetHosLogs extends Request
         protected ?array $parentTagIds = null,
         protected ?array $driverIds = null,
         protected ?string $startTime = null,
-        protected ?string $endTime = null,
+        protected ?string $endTime = null
     ) {}
 
     public function defaultQuery(): array

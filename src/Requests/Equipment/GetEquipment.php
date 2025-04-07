@@ -28,9 +28,7 @@ class GetEquipment extends Request
     /**
      * @param  string  $id  Samsara ID of the Equipment.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function resolveEndpoint(): string
     {

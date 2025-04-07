@@ -38,8 +38,11 @@ class Trailers extends Resource
      * @param  string  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
      * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      */
-    public function listTrailers(?string $tagIds, ?string $parentTagIds, ?int $limit): Response
-    {
+    public function listTrailers(
+        ?string $tagIds = null,
+        ?string $parentTagIds = null,
+        ?int $limit = null
+    ): Response {
         return $this->connector->send(new ListTrailers($tagIds, $parentTagIds, $limit));
     }
 

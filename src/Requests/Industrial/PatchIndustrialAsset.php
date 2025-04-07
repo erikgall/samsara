@@ -32,9 +32,7 @@ class PatchIndustrialAsset extends Request implements HasBody
     /**
      * @param  string  $id  Id of the asset to be updated
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function resolveEndpoint(): string
     {

@@ -45,12 +45,16 @@ class PostTrainingAssignments extends Request implements HasBody
     public function __construct(
         protected string $courseId,
         protected string $dueAtTime,
-        protected array $learnerIds,
+        protected array $learnerIds
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['courseId' => $this->courseId, 'dueAtTime' => $this->dueAtTime, 'learnerIds' => $this->learnerIds]);
+        return array_filter([
+            'courseId'   => $this->courseId,
+            'dueAtTime'  => $this->dueAtTime,
+            'learnerIds' => $this->learnerIds,
+        ]);
     }
 
     public function resolveEndpoint(): string

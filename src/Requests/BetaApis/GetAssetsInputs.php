@@ -51,7 +51,7 @@ class GetAssetsInputs extends Request
         protected ?string $endTime = null,
         protected ?bool $includeExternalIds = null,
         protected ?bool $includeTags = null,
-        protected ?bool $includeAttributes = null,
+        protected ?bool $includeAttributes = null
     ) {}
 
     public function defaultQuery(): array

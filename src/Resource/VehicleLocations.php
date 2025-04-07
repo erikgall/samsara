@@ -17,12 +17,14 @@ class VehicleLocations extends Resource
      * @param  array  $vehicleIds  A filter on the data based on this comma-separated list of vehicle IDs. Example: `vehicleIds=1234,5678`
      */
     public function getVehicleLocations(
-        ?string $time,
-        ?array $parentTagIds,
-        ?array $tagIds,
-        ?array $vehicleIds,
+        ?string $time = null,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $vehicleIds = null
     ): Response {
-        return $this->connector->send(new GetVehicleLocations($time, $parentTagIds, $tagIds, $vehicleIds));
+        return $this->connector->send(
+            new GetVehicleLocations($time, $parentTagIds, $tagIds, $vehicleIds)
+        );
     }
 
     /**
@@ -30,9 +32,14 @@ class VehicleLocations extends Resource
      * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
      * @param  array  $vehicleIds  A filter on the data based on this comma-separated list of vehicle IDs. Example: `vehicleIds=1234,5678`
      */
-    public function getVehicleLocationsFeed(?array $parentTagIds, ?array $tagIds, ?array $vehicleIds): Response
-    {
-        return $this->connector->send(new GetVehicleLocationsFeed($parentTagIds, $tagIds, $vehicleIds));
+    public function getVehicleLocationsFeed(
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $vehicleIds = null
+    ): Response {
+        return $this->connector->send(
+            new GetVehicleLocationsFeed($parentTagIds, $tagIds, $vehicleIds)
+        );
     }
 
     /**
@@ -45,10 +52,18 @@ class VehicleLocations extends Resource
     public function getVehicleLocationsHistory(
         string $startTime,
         string $endTime,
-        ?array $parentTagIds,
-        ?array $tagIds,
-        ?array $vehicleIds,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $vehicleIds = null
     ): Response {
-        return $this->connector->send(new GetVehicleLocationsHistory($startTime, $endTime, $parentTagIds, $tagIds, $vehicleIds));
+        return $this->connector->send(
+            new GetVehicleLocationsHistory(
+                $startTime,
+                $endTime,
+                $parentTagIds,
+                $tagIds,
+                $vehicleIds
+            )
+        );
     }
 }

@@ -38,10 +38,7 @@ class V1getVehicleHarshEvent extends Request
      * @param  int  $vehicleId  ID of the vehicle. Must contain only digits 0-9.
      * @param  int  $timestamp  Timestamp in milliseconds representing the timestamp of a harsh event.
      */
-    public function __construct(
-        protected int $vehicleId,
-        protected int $timestamp,
-    ) {}
+    public function __construct(protected int $vehicleId, protected int $timestamp) {}
 
     public function defaultQuery(): array
     {

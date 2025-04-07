@@ -44,7 +44,7 @@ class GetTrips extends Request
         protected string $startTime,
         protected ?string $endTime,
         protected ?string $queryBy,
-        protected array $ids,
+        protected array $ids
     ) {}
 
     public function defaultQuery(): array

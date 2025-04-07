@@ -41,7 +41,7 @@ class GetVisionRunsByCamera extends Request
     public function __construct(
         protected int $cameraId,
         protected int $durationMs,
-        protected ?int $endMs = null,
+        protected ?int $endMs = null
     ) {}
 
     public function defaultQuery(): array

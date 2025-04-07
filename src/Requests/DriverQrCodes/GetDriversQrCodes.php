@@ -32,9 +32,7 @@ class GetDriversQrCodes extends Request
     /**
      * @param  array  $driverIds  String of comma separated driver IDs. List of driver - QR codes for specified driver(s) will be returned.
      */
-    public function __construct(
-        protected array $driverIds,
-    ) {}
+    public function __construct(protected array $driverIds) {}
 
     public function defaultQuery(): array
     {

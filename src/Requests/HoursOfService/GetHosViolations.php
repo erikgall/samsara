@@ -65,7 +65,7 @@ class GetHosViolations extends Request
         protected ?string $endTime = null,
         protected ?string $tagIds = null,
         protected ?string $parentTagIds = null,
-        protected ?array $types = null,
+        protected ?array $types = null
     ) {}
 
     public function defaultQuery(): array

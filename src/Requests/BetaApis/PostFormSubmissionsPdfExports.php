@@ -39,9 +39,7 @@ class PostFormSubmissionsPdfExports extends Request implements HasBody
     /**
      * @param  string  $id  ID of the form submission to create a PDF export from.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function defaultQuery(): array
     {

@@ -39,12 +39,16 @@ class GetTrainingCourses extends Request
     public function __construct(
         protected ?array $courseIds = null,
         protected ?array $categoryIds = null,
-        protected ?array $status = null,
+        protected ?array $status = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['courseIds' => $this->courseIds, 'categoryIds' => $this->categoryIds, 'status' => $this->status]);
+        return array_filter([
+            'courseIds'   => $this->courseIds,
+            'categoryIds' => $this->categoryIds,
+            'status'      => $this->status,
+        ]);
     }
 
     public function resolveEndpoint(): string

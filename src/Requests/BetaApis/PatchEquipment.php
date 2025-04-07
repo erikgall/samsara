@@ -41,9 +41,7 @@ class PatchEquipment extends Request implements HasBody
     /**
      * @param  string  $id  The unique Samsara ID of the Equipment. This is automatically generated when the Equipment object is created. It cannot be changed.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function resolveEndpoint(): string
     {

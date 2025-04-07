@@ -15,7 +15,7 @@ class Safety extends Resource
     /**
      * @param  string  $startTime  A start time in RFC 3339 format. Defaults to now if not provided. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
      */
-    public function getSafetyActivityEventFeed(?string $startTime): Response
+    public function getSafetyActivityEventFeed(?string $startTime = null): Response
     {
         return $this->connector->send(new GetSafetyActivityEventFeed($startTime));
     }
@@ -30,11 +30,13 @@ class Safety extends Resource
     public function getSafetyEvents(
         string $startTime,
         string $endTime,
-        ?array $tagIds,
-        ?array $parentTagIds,
-        ?array $vehicleIds,
+        ?array $tagIds = null,
+        ?array $parentTagIds = null,
+        ?array $vehicleIds = null
     ): Response {
-        return $this->connector->send(new GetSafetyEvents($startTime, $endTime, $tagIds, $parentTagIds, $vehicleIds));
+        return $this->connector->send(
+            new GetSafetyEvents($startTime, $endTime, $tagIds, $parentTagIds, $vehicleIds)
+        );
     }
 
     /**

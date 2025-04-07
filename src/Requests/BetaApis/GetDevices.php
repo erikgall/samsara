@@ -43,7 +43,7 @@ class GetDevices extends Request
         protected ?array $models = null,
         protected ?array $healthStatuses = null,
         protected ?bool $includeHealth = null,
-        protected ?int $limit = null,
+        protected ?int $limit = null
     ) {}
 
     public function defaultQuery(): array

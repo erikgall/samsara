@@ -38,12 +38,16 @@ class GetEngineImmobilizerStates extends Request
     public function __construct(
         protected string $vehicleIds,
         protected string $startTime,
-        protected ?string $endTime = null,
+        protected ?string $endTime = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['vehicleIds' => $this->vehicleIds, 'startTime' => $this->startTime, 'endTime' => $this->endTime]);
+        return array_filter([
+            'vehicleIds' => $this->vehicleIds,
+            'startTime'  => $this->startTime,
+            'endTime'    => $this->endTime,
+        ]);
     }
 
     public function resolveEndpoint(): string

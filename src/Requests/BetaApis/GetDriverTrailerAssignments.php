@@ -35,12 +35,15 @@ class GetDriverTrailerAssignments extends Request
      */
     public function __construct(
         protected array $driverIds,
-        protected ?bool $includeExternalIds = null,
+        protected ?bool $includeExternalIds = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['driverIds' => $this->driverIds, 'includeExternalIds' => $this->includeExternalIds]);
+        return array_filter([
+            'driverIds'          => $this->driverIds,
+            'includeExternalIds' => $this->includeExternalIds,
+        ]);
     }
 
     public function resolveEndpoint(): string

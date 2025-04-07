@@ -45,7 +45,7 @@ class V1getDriverSafetyScore extends Request
     public function __construct(
         protected int $driverId,
         protected int $startMs,
-        protected int $endMs,
+        protected int $endMs
     ) {}
 
     public function defaultQuery(): array

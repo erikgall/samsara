@@ -50,9 +50,7 @@ class SetCurrentDutyStatus extends Request implements HasBody
     /**
      * @param  int  $driverId  ID of the driver for whom the duty status is being set.
      */
-    public function __construct(
-        protected int $driverId,
-    ) {}
+    public function __construct(protected int $driverId) {}
 
     public function resolveEndpoint(): string
     {

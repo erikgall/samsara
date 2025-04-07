@@ -47,7 +47,7 @@ class GetSpeedingIntervals extends Request
         protected ?string $queryBy = null,
         protected ?bool $includeAsset = null,
         protected ?bool $includeDriverId = null,
-        protected ?array $severityLevels = null,
+        protected ?array $severityLevels = null
     ) {}
 
     public function defaultQuery(): array

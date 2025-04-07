@@ -37,12 +37,16 @@ class GetIncidents extends Request
     public function __construct(
         protected string $startTime,
         protected array $configurationIds,
-        protected ?string $endTime = null,
+        protected ?string $endTime = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['startTime' => $this->startTime, 'configurationIds' => $this->configurationIds, 'endTime' => $this->endTime]);
+        return array_filter([
+            'startTime'        => $this->startTime,
+            'configurationIds' => $this->configurationIds,
+            'endTime'          => $this->endTime,
+        ]);
     }
 
     public function resolveEndpoint(): string

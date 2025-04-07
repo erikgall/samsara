@@ -25,8 +25,11 @@ class Alerts extends Resource
      * @param  string  $status  The status of the alert configuration.  Valid values: `all`, `enabled`, `disabled`
      * @param  bool  $includeExternalIds  Optional boolean indicating whether to return external IDs on supported entities
      */
-    public function getConfigurations(?array $ids, ?string $status, ?bool $includeExternalIds): Response
-    {
+    public function getConfigurations(
+        ?array $ids = null,
+        ?string $status = null,
+        ?bool $includeExternalIds = null
+    ): Response {
         return $this->connector->send(new GetConfigurations($ids, $status, $includeExternalIds));
     }
 
@@ -35,8 +38,11 @@ class Alerts extends Resource
      * @param  array  $configurationIds  Required array of alert configuration ids to return incident data for.
      * @param  string  $endTime  Optional RFC 3339 timestamp to stop receiving data. Defaults to now if not provided. This will be based on updatedAtTime.
      */
-    public function getIncidents(string $startTime, array $configurationIds, ?string $endTime = null): Response
-    {
+    public function getIncidents(
+        string $startTime,
+        array $configurationIds,
+        ?string $endTime = null
+    ): Response {
         return $this->connector->send(new GetIncidents($startTime, $configurationIds, $endTime));
     }
 

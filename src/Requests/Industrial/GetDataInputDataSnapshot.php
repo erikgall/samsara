@@ -36,7 +36,7 @@ class GetDataInputDataSnapshot extends Request
         protected ?array $parentTagIds = null,
         protected ?array $tagIds = null,
         protected ?array $dataInputIds = null,
-        protected ?array $assetIds = null,
+        protected ?array $assetIds = null
     ) {}
 
     public function defaultQuery(): array

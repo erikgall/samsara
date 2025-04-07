@@ -37,7 +37,7 @@ class GetLiveSharingLinks extends Request
     public function __construct(
         protected ?array $ids = null,
         protected ?string $type = null,
-        protected ?int $limit = null,
+        protected ?int $limit = null
     ) {}
 
     public function defaultQuery(): array

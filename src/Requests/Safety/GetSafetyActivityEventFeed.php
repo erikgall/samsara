@@ -44,9 +44,7 @@ class GetSafetyActivityEventFeed extends Request
     /**
      * @param  string|null  $startTime  A start time in RFC 3339 format. Defaults to now if not provided. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
      */
-    public function __construct(
-        protected ?string $startTime = null,
-    ) {}
+    public function __construct(protected ?string $startTime = null) {}
 
     public function defaultQuery(): array
     {

@@ -49,7 +49,7 @@ class V1getAllTrailerAssignments extends Request
         protected ?int $endMs = null,
         protected float|int|null $limit = null,
         protected ?string $startingAfter = null,
-        protected ?string $endingBefore = null,
+        protected ?string $endingBefore = null
     ) {}
 
     public function defaultQuery(): array

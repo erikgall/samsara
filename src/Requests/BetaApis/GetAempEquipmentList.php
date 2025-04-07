@@ -32,9 +32,7 @@ class GetAempEquipmentList extends Request
     /**
      * @param  string  $pageNumber  The number corresponding to a specific page of paginated results, defaulting to the first page if not provided. The default page size is 100 records.
      */
-    public function __construct(
-        protected string $pageNumber,
-    ) {}
+    public function __construct(protected string $pageNumber) {}
 
     public function resolveEndpoint(): string
     {

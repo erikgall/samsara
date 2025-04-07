@@ -31,9 +31,7 @@ class GetWorkOrders extends Request
     /**
      * @param  array|null  $ids  Filter by the IDs. Up to 100 ids. Returns all if no ids are provided.
      */
-    public function __construct(
-        protected ?array $ids = null,
-    ) {}
+    public function __construct(protected ?array $ids = null) {}
 
     public function defaultQuery(): array
     {

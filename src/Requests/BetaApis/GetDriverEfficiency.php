@@ -47,7 +47,7 @@ class GetDriverEfficiency extends Request
         protected ?array $driverTagIds = null,
         protected ?array $driverParentTagIds = null,
         protected ?string $startTime = null,
-        protected ?string $endTime = null,
+        protected ?string $endTime = null
     ) {}
 
     public function defaultQuery(): array

@@ -39,9 +39,15 @@ class Addresses extends Resource
      * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
      * @param  string  $createdAfterTime  A filter on data to have a created at time after or equal to this specified time in RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
      */
-    public function listAddresses(?int $limit = null, ?array $parentTagIds = null, ?array $tagIds = null, ?string $createdAfterTime = null): Response
-    {
-        return $this->connector->send(new ListAddresses($limit, $parentTagIds, $tagIds, $createdAfterTime));
+    public function listAddresses(
+        ?int $limit = null,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?string $createdAfterTime = null
+    ): Response {
+        return $this->connector->send(
+            new ListAddresses($limit, $parentTagIds, $tagIds, $createdAfterTime)
+        );
     }
 
     /**

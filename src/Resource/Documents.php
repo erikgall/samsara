@@ -49,9 +49,15 @@ class Documents extends Resource
      * @param  string  $documentTypeId  ID of the document template type.
      * @param  string  $queryBy  Query by document creation time (`created`) or updated time (`updated`). Defaults to `created`.
      */
-    public function getDocuments(string $startTime, string $endTime, ?string $documentTypeId = null, ?string $queryBy = null): Response
-    {
-        return $this->connector->send(new GetDocuments($startTime, $endTime, $documentTypeId, $queryBy));
+    public function getDocuments(
+        string $startTime,
+        string $endTime,
+        ?string $documentTypeId = null,
+        ?string $queryBy = null
+    ): Response {
+        return $this->connector->send(
+            new GetDocuments($startTime, $endTime, $documentTypeId, $queryBy)
+        );
     }
 
     public function getDocumentTypes(): Response

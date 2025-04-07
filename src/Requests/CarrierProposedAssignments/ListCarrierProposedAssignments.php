@@ -36,12 +36,16 @@ class ListCarrierProposedAssignments extends Request
     public function __construct(
         protected ?int $limit = null,
         protected ?array $driverIds = null,
-        protected ?string $activeTime = null,
+        protected ?string $activeTime = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['limit' => $this->limit, 'driverIds' => $this->driverIds, 'activeTime' => $this->activeTime]);
+        return array_filter([
+            'limit'      => $this->limit,
+            'driverIds'  => $this->driverIds,
+            'activeTime' => $this->activeTime,
+        ]);
     }
 
     public function resolveEndpoint(): string

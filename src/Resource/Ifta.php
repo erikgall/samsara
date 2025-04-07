@@ -36,15 +36,26 @@ class Ifta extends Resource
      */
     public function getIftaJurisdictionReports(
         int $year,
-        ?string $month,
-        ?string $quarter,
-        ?string $jurisdictions,
-        ?string $fuelType,
-        ?string $vehicleIds,
-        ?string $tagIds,
-        ?string $parentTagIds,
+        ?string $month = null,
+        ?string $quarter = null,
+        ?string $jurisdictions = null,
+        ?string $fuelType = null,
+        ?string $vehicleIds = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null
     ): Response {
-        return $this->connector->send(new GetIftaJurisdictionReports($year, $month, $quarter, $jurisdictions, $fuelType, $vehicleIds, $tagIds, $parentTagIds));
+        return $this->connector->send(
+            new GetIftaJurisdictionReports(
+                $year,
+                $month,
+                $quarter,
+                $jurisdictions,
+                $fuelType,
+                $vehicleIds,
+                $tagIds,
+                $parentTagIds
+            )
+        );
     }
 
     /**
@@ -59,14 +70,25 @@ class Ifta extends Resource
      */
     public function getIftaVehicleReports(
         int $year,
-        ?string $month,
-        ?string $quarter,
-        ?string $jurisdictions,
-        ?string $fuelType,
-        ?string $vehicleIds,
-        ?string $tagIds,
-        ?string $parentTagIds,
+        ?string $month = null,
+        ?string $quarter = null,
+        ?string $jurisdictions = null,
+        ?string $fuelType = null,
+        ?string $vehicleIds = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null
     ): Response {
-        return $this->connector->send(new GetIftaVehicleReports($year, $month, $quarter, $jurisdictions, $fuelType, $vehicleIds, $tagIds, $parentTagIds));
+        return $this->connector->send(
+            new GetIftaVehicleReports(
+                $year,
+                $month,
+                $quarter,
+                $jurisdictions,
+                $fuelType,
+                $vehicleIds,
+                $tagIds,
+                $parentTagIds
+            )
+        );
     }
 }

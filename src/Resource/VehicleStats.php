@@ -74,9 +74,11 @@ class VehicleStats extends Resource
         ?array $parentTagIds,
         ?array $tagIds,
         ?array $vehicleIds,
-        array $types,
+        array $types
     ): Response {
-        return $this->connector->send(new GetVehicleStats($time, $parentTagIds, $tagIds, $vehicleIds, $types));
+        return $this->connector->send(
+            new GetVehicleStats($time, $parentTagIds, $tagIds, $vehicleIds, $types)
+        );
     }
 
     /**
@@ -193,9 +195,11 @@ class VehicleStats extends Resource
         ?array $tagIds,
         ?array $vehicleIds,
         array $types,
-        ?array $decorations,
+        ?array $decorations = null
     ): Response {
-        return $this->connector->send(new GetVehicleStatsFeed($parentTagIds, $tagIds, $vehicleIds, $types, $decorations));
+        return $this->connector->send(
+            new GetVehicleStatsFeed($parentTagIds, $tagIds, $vehicleIds, $types, $decorations)
+        );
     }
 
     /**
@@ -316,8 +320,18 @@ class VehicleStats extends Resource
         ?array $tagIds,
         ?array $vehicleIds,
         array $types,
-        ?array $decorations,
+        ?array $decorations = null
     ): Response {
-        return $this->connector->send(new GetVehicleStatsHistory($startTime, $endTime, $parentTagIds, $tagIds, $vehicleIds, $types, $decorations));
+        return $this->connector->send(
+            new GetVehicleStatsHistory(
+                $startTime,
+                $endTime,
+                $parentTagIds,
+                $tagIds,
+                $vehicleIds,
+                $types,
+                $decorations
+            )
+        );
     }
 }

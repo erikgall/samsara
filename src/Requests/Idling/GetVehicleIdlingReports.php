@@ -47,7 +47,7 @@ class GetVehicleIdlingReports extends Request
         protected ?string $tagIds = null,
         protected ?string $parentTagIds = null,
         protected ?bool $isPtoActive = null,
-        protected ?int $minIdlingDurationMinutes = null,
+        protected ?int $minIdlingDurationMinutes = null
     ) {}
 
     public function defaultQuery(): array

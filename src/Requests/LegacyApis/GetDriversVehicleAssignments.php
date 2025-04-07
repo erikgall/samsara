@@ -46,7 +46,7 @@ class GetDriversVehicleAssignments extends Request
         protected ?string $endTime = null,
         protected ?string $tagIds = null,
         protected ?string $parentTagIds = null,
-        protected ?string $driverActivationStatus = null,
+        protected ?string $driverActivationStatus = null
     ) {}
 
     public function defaultQuery(): array

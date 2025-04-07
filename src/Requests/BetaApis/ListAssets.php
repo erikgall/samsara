@@ -47,7 +47,7 @@ class ListAssets extends Request
         protected ?string $tagIds = null,
         protected ?string $parentTagIds = null,
         protected ?array $ids = null,
-        protected ?string $attributeValueIds = null,
+        protected ?string $attributeValueIds = null
     ) {}
 
     public function defaultQuery(): array

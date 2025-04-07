@@ -27,9 +27,7 @@ class DeleteIndustrialAsset extends Request
     /**
      * @param  string  $id  Id of the asset to be deleted.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function resolveEndpoint(): string
     {

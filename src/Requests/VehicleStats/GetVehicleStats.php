@@ -93,7 +93,7 @@ class GetVehicleStats extends Request
         protected ?array $parentTagIds,
         protected ?array $tagIds,
         protected ?array $vehicleIds,
-        protected array $types,
+        protected array $types
     ) {}
 
     public function defaultQuery(): array

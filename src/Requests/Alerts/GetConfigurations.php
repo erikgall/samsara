@@ -91,12 +91,16 @@ class GetConfigurations extends Request
     public function __construct(
         protected ?array $ids = null,
         protected ?string $status = null,
-        protected ?bool $includeExternalIds = null,
+        protected ?bool $includeExternalIds = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['ids' => $this->ids, 'status' => $this->status, 'includeExternalIds' => $this->includeExternalIds]);
+        return array_filter([
+            'ids'                => $this->ids,
+            'status'             => $this->status,
+            'includeExternalIds' => $this->includeExternalIds,
+        ]);
     }
 
     public function resolveEndpoint(): string

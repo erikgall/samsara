@@ -67,7 +67,7 @@ class GetTrailerStatsSnapshot extends Request
         protected ?string $tagIds = null,
         protected ?string $parentTagIds = null,
         protected ?string $trailerIds = null,
-        protected ?string $time = null,
+        protected ?string $time = null
     ) {}
 
     public function defaultQuery(): array

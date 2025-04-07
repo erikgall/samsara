@@ -46,7 +46,7 @@ class GetHosEldEvents extends Request
         protected ?string $tagIds = null,
         protected ?string $parentTagIds = null,
         protected ?string $driverActivationStatus = null,
-        protected ?int $limit = null,
+        protected ?int $limit = null
     ) {}
 
     public function defaultQuery(): array

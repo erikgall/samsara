@@ -51,7 +51,7 @@ class GetDriverVehicleAssignments extends Request
         protected ?array $vehicleIds = null,
         protected ?string $driverTagIds = null,
         protected ?string $vehicleTagIds = null,
-        protected ?string $assignmentType = null,
+        protected ?string $assignmentType = null
     ) {}
 
     public function defaultQuery(): array

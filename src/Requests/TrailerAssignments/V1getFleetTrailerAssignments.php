@@ -45,7 +45,7 @@ class V1getFleetTrailerAssignments extends Request
     public function __construct(
         protected int $trailerId,
         protected ?int $startMs = null,
-        protected ?int $endMs = null,
+        protected ?int $endMs = null
     ) {}
 
     public function defaultQuery(): array

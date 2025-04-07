@@ -35,9 +35,7 @@ class GetMediaRetrieval extends Request
     /**
      * @param  string  $retrievalId  Retrieval ID associated with this media capture request. Examples: 2308cec4-82e0-46f1-8b3c-a3592e5cc21e
      */
-    public function __construct(
-        protected string $retrievalId,
-    ) {}
+    public function __construct(protected string $retrievalId) {}
 
     public function defaultQuery(): array
     {

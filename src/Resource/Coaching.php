@@ -26,9 +26,19 @@ class Coaching extends Resource
         ?bool $includeCoachableEvents,
         string $startTime,
         ?string $endTime = null,
-        ?bool $includeExternalIds = null,
+        ?bool $includeExternalIds = null
     ): Response {
-        return $this->connector->send(new GetCoachingSessions($driverIds, $coachIds, $sessionStatuses, $includeCoachableEvents, $startTime, $endTime, $includeExternalIds));
+        return $this->connector->send(
+            new GetCoachingSessions(
+                $driverIds,
+                $coachIds,
+                $sessionStatuses,
+                $includeCoachableEvents,
+                $startTime,
+                $endTime,
+                $includeExternalIds
+            )
+        );
     }
 
     /**
@@ -36,9 +46,14 @@ class Coaching extends Resource
      * @param  array  $coachIds  Optional string of comma separated IDs of the coaches.
      * @param  bool  $includeExternalIds  Optional boolean indicating whether to return external IDs on supported entities
      */
-    public function getDriverCoachAssignment(?array $driverIds = null, ?array $coachIds = null, ?bool $includeExternalIds = null): Response
-    {
-        return $this->connector->send(new GetDriverCoachAssignment($driverIds, $coachIds, $includeExternalIds));
+    public function getDriverCoachAssignment(
+        ?array $driverIds = null,
+        ?array $coachIds = null,
+        ?bool $includeExternalIds = null
+    ): Response {
+        return $this->connector->send(
+            new GetDriverCoachAssignment($driverIds, $coachIds, $includeExternalIds)
+        );
     }
 
     /**

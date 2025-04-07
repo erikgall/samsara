@@ -42,12 +42,16 @@ class V1getAllAssetCurrentLocations extends Request
     public function __construct(
         protected ?string $startingAfter = null,
         protected ?string $endingBefore = null,
-        protected float|int|null $limit = null,
+        protected float|int|null $limit = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['startingAfter' => $this->startingAfter, 'endingBefore' => $this->endingBefore, 'limit' => $this->limit]);
+        return array_filter([
+            'startingAfter' => $this->startingAfter,
+            'endingBefore'  => $this->endingBefore,
+            'limit'         => $this->limit,
+        ]);
     }
 
     public function resolveEndpoint(): string

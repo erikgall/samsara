@@ -45,7 +45,7 @@ class V1getAssetsReefers extends Request
         protected int $endMs,
         protected ?string $startingAfter = null,
         protected ?string $endingBefore = null,
-        protected float|int|null $limit = null,
+        protected float|int|null $limit = null
     ) {}
 
     public function defaultQuery(): array

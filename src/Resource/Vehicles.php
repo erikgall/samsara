@@ -27,14 +27,23 @@ class Vehicles extends Resource
      * @param  string  $createdAfterTime  A filter on data to have a created at time after or equal to this specified time in RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
      */
     public function listVehicles(
-        ?int $limit,
-        ?string $parentTagIds,
-        ?string $tagIds,
-        ?string $attributeValueIds,
-        ?string $updatedAfterTime,
-        ?string $createdAfterTime,
+        ?int $limit = null,
+        ?string $parentTagIds = null,
+        ?string $tagIds = null,
+        ?string $attributeValueIds = null,
+        ?string $updatedAfterTime = null,
+        ?string $createdAfterTime = null
     ): Response {
-        return $this->connector->send(new ListVehicles($limit, $parentTagIds, $tagIds, $attributeValueIds, $updatedAfterTime, $createdAfterTime));
+        return $this->connector->send(
+            new ListVehicles(
+                $limit,
+                $parentTagIds,
+                $tagIds,
+                $attributeValueIds,
+                $updatedAfterTime,
+                $createdAfterTime
+            )
+        );
     }
 
     /**

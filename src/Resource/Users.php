@@ -37,7 +37,7 @@ class Users extends Resource
     /**
      * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      */
-    public function listUserRoles(?int $limit): Response
+    public function listUserRoles(?int $limit = null): Response
     {
         return $this->connector->send(new ListUserRoles($limit));
     }
@@ -45,7 +45,7 @@ class Users extends Resource
     /**
      * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      */
-    public function listUsers(?int $limit): Response
+    public function listUsers(?int $limit = null): Response
     {
         return $this->connector->send(new ListUsers($limit));
     }

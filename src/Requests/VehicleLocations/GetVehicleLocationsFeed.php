@@ -51,12 +51,16 @@ class GetVehicleLocationsFeed extends Request
     public function __construct(
         protected ?array $parentTagIds = null,
         protected ?array $tagIds = null,
-        protected ?array $vehicleIds = null,
+        protected ?array $vehicleIds = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['parentTagIds' => $this->parentTagIds, 'tagIds' => $this->tagIds, 'vehicleIds' => $this->vehicleIds]);
+        return array_filter([
+            'parentTagIds' => $this->parentTagIds,
+            'tagIds'       => $this->tagIds,
+            'vehicleIds'   => $this->vehicleIds,
+        ]);
     }
 
     public function resolveEndpoint(): string

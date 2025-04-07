@@ -35,7 +35,7 @@ class ListAddresses extends Request
         protected ?int $limit = null,
         protected ?array $parentTagIds = null,
         protected ?array $tagIds = null,
-        protected ?string $createdAfterTime = null,
+        protected ?string $createdAfterTime = null
     ) {}
 
     public function defaultQuery(): array

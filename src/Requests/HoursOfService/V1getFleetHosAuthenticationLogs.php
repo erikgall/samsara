@@ -48,12 +48,16 @@ class V1getFleetHosAuthenticationLogs extends Request
     public function __construct(
         protected int $driverId,
         protected int $startMs,
-        protected int $endMs,
+        protected int $endMs
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['driverId' => $this->driverId, 'startMs' => $this->startMs, 'endMs' => $this->endMs]);
+        return array_filter([
+            'driverId' => $this->driverId,
+            'startMs'  => $this->startMs,
+            'endMs'    => $this->endMs,
+        ]);
     }
 
     public function resolveEndpoint(): string

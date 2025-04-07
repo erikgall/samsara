@@ -48,7 +48,7 @@ class GetCoachingSessions extends Request
         protected ?bool $includeCoachableEvents,
         protected string $startTime,
         protected ?string $endTime = null,
-        protected ?bool $includeExternalIds = null,
+        protected ?bool $includeExternalIds = null
     ) {}
 
     public function defaultQuery(): array

@@ -36,9 +36,7 @@ class UpdateDriverTrailerAssignment extends Request implements HasBody
     /**
      * @param  string  $id  Samsara ID for the assignment.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function defaultQuery(): array
     {

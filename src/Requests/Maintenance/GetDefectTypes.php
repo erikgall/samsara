@@ -32,10 +32,7 @@ class GetDefectTypes extends Request
      * @param  int|null  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      * @param  array|null  $ids  A filter on the data based on this comma-separated list of defect type IDs.
      */
-    public function __construct(
-        protected ?int $limit = null,
-        protected ?array $ids = null,
-    ) {}
+    public function __construct(protected ?int $limit = null, protected ?array $ids = null) {}
 
     public function defaultQuery(): array
     {

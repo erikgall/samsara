@@ -43,7 +43,7 @@ class V1getVisionRunsByCameraAndProgram extends Request
         protected int $cameraId,
         protected int $programId,
         protected int $startedAtMs,
-        protected ?string $include = null,
+        protected ?string $include = null
     ) {}
 
     public function defaultQuery(): array

@@ -38,7 +38,7 @@ class GetSafetyEvents extends Request
         protected string $endTime,
         protected ?array $tagIds = null,
         protected ?array $parentTagIds = null,
-        protected ?array $vehicleIds = null,
+        protected ?array $vehicleIds = null
     ) {}
 
     public function defaultQuery(): array

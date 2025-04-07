@@ -31,9 +31,7 @@ class DeleteConfigurations extends Request
     /**
      * @param  string  $id  The unqiue Samsara id of the alert configuration.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function defaultQuery(): array
     {

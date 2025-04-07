@@ -33,10 +33,7 @@ class ListWebhooks extends Request
      * @param  string|null  $ids  A filter on the data based on this comma-separated list of webhook IDs. Example: `ids=49412323223,49412329928`
      * @param  int|null  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      */
-    public function __construct(
-        protected ?string $ids = null,
-        protected ?int $limit = null,
-    ) {}
+    public function __construct(protected ?string $ids = null, protected ?int $limit = null) {}
 
     public function defaultQuery(): array
     {

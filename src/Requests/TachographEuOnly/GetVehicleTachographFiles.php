@@ -42,7 +42,7 @@ class GetVehicleTachographFiles extends Request
         protected string $endTime,
         protected ?array $vehicleIds = null,
         protected ?array $parentTagIds = null,
-        protected ?array $tagIds = null,
+        protected ?array $tagIds = null
     ) {}
 
     public function defaultQuery(): array

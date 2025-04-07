@@ -19,15 +19,26 @@ class LocationAndSpeed extends Resource
      * @param  bool  $includeExternalIds  Optional boolean indicating whether to return external IDs on supported entities
      */
     public function getLocationAndSpeed(
-        ?int $limit,
-        ?string $startTime,
-        ?string $endTime,
-        ?array $ids,
-        ?bool $includeSpeed,
-        ?bool $includeReverseGeo,
-        ?bool $includeGeofenceLookup,
-        ?bool $includeExternalIds,
+        ?int $limit = null,
+        ?string $startTime = null,
+        ?string $endTime = null,
+        ?array $ids = null,
+        ?bool $includeSpeed = null,
+        ?bool $includeReverseGeo = null,
+        ?bool $includeGeofenceLookup = null,
+        ?bool $includeExternalIds = null
     ): Response {
-        return $this->connector->send(new GetLocationAndSpeed($limit, $startTime, $endTime, $ids, $includeSpeed, $includeReverseGeo, $includeGeofenceLookup, $includeExternalIds));
+        return $this->connector->send(
+            new GetLocationAndSpeed(
+                $limit,
+                $startTime,
+                $endTime,
+                $ids,
+                $includeSpeed,
+                $includeReverseGeo,
+                $includeGeofenceLookup,
+                $includeExternalIds
+            )
+        );
     }
 }

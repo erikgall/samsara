@@ -38,7 +38,7 @@ class GetHosClocks extends Request
         protected ?array $tagIds = null,
         protected ?array $parentTagIds = null,
         protected ?array $driverIds = null,
-        protected ?int $limit = null,
+        protected ?int $limit = null
     ) {}
 
     public function defaultQuery(): array

@@ -28,9 +28,14 @@ class Equipment extends Resource
      * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
      * @param  array  $equipmentIds  A filter on the data based on this comma-separated list of equipment IDs. Example: `equipmentIds=1234,5678`
      */
-    public function getEquipmentLocations(?array $parentTagIds = null, ?array $tagIds = null, ?array $equipmentIds = null): Response
-    {
-        return $this->connector->send(new GetEquipmentLocations($parentTagIds, $tagIds, $equipmentIds));
+    public function getEquipmentLocations(
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $equipmentIds = null
+    ): Response {
+        return $this->connector->send(
+            new GetEquipmentLocations($parentTagIds, $tagIds, $equipmentIds)
+        );
     }
 
     /**
@@ -38,9 +43,14 @@ class Equipment extends Resource
      * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
      * @param  array  $equipmentIds  A filter on the data based on this comma-separated list of equipment IDs. Example: `equipmentIds=1234,5678`
      */
-    public function getEquipmentLocationsFeed(?array $parentTagIds = null, ?array $tagIds = null, ?array $equipmentIds = null): Response
-    {
-        return $this->connector->send(new GetEquipmentLocationsFeed($parentTagIds, $tagIds, $equipmentIds));
+    public function getEquipmentLocationsFeed(
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $equipmentIds = null
+    ): Response {
+        return $this->connector->send(
+            new GetEquipmentLocationsFeed($parentTagIds, $tagIds, $equipmentIds)
+        );
     }
 
     /**
@@ -55,9 +65,17 @@ class Equipment extends Resource
         string $endTime,
         ?array $parentTagIds = null,
         ?array $tagIds = null,
-        ?array $equipmentIds = null,
+        ?array $equipmentIds = null
     ): Response {
-        return $this->connector->send(new GetEquipmentLocationsHistory($startTime, $endTime, $parentTagIds, $tagIds, $equipmentIds));
+        return $this->connector->send(
+            new GetEquipmentLocationsHistory(
+                $startTime,
+                $endTime,
+                $parentTagIds,
+                $tagIds,
+                $equipmentIds
+            )
+        );
     }
 
     /**
@@ -79,9 +97,15 @@ class Equipment extends Resource
      * - `gps`: GPS data including lat/long, heading, speed, address book entry (if exists), and a reverse geocoded address.
      * - `engineTotalIdleTimeMinutes`: Total time in minutes that the engine has been idling.
      */
-    public function getEquipmentStats(?array $parentTagIds, ?array $tagIds, ?array $equipmentIds, array $types): Response
-    {
-        return $this->connector->send(new GetEquipmentStats($parentTagIds, $tagIds, $equipmentIds, $types));
+    public function getEquipmentStats(
+        ?array $parentTagIds,
+        ?array $tagIds,
+        ?array $equipmentIds,
+        array $types
+    ): Response {
+        return $this->connector->send(
+            new GetEquipmentStats($parentTagIds, $tagIds, $equipmentIds, $types)
+        );
     }
 
     /**
@@ -107,9 +131,11 @@ class Equipment extends Resource
         ?array $parentTagIds,
         ?array $tagIds,
         ?array $equipmentIds,
-        array $types,
+        array $types
     ): Response {
-        return $this->connector->send(new GetEquipmentStatsFeed($parentTagIds, $tagIds, $equipmentIds, $types));
+        return $this->connector->send(
+            new GetEquipmentStatsFeed($parentTagIds, $tagIds, $equipmentIds, $types)
+        );
     }
 
     /**
@@ -139,9 +165,18 @@ class Equipment extends Resource
         ?array $parentTagIds,
         ?array $tagIds,
         ?array $equipmentIds,
-        array $types,
+        array $types
     ): Response {
-        return $this->connector->send(new GetEquipmentStatsHistory($startTime, $endTime, $parentTagIds, $tagIds, $equipmentIds, $types));
+        return $this->connector->send(
+            new GetEquipmentStatsHistory(
+                $startTime,
+                $endTime,
+                $parentTagIds,
+                $tagIds,
+                $equipmentIds,
+                $types
+            )
+        );
     }
 
     /**
@@ -149,8 +184,11 @@ class Equipment extends Resource
      * @param  array  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
      * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
      */
-    public function listEquipment(?int $limit = null, ?array $parentTagIds = null, ?array $tagIds = null): Response
-    {
+    public function listEquipment(
+        ?int $limit = null,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null
+    ): Response {
         return $this->connector->send(new ListEquipment($limit, $parentTagIds, $tagIds));
     }
 }

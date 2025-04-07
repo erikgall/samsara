@@ -41,7 +41,7 @@ class GetJobs extends Request
         protected ?array $industrialAssetIds = null,
         protected ?array $fleetDeviceIds = null,
         protected ?string $status = null,
-        protected ?string $customerName = null,
+        protected ?string $customerName = null
     ) {}
 
     public function defaultQuery(): array

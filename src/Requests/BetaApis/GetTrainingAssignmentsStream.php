@@ -49,7 +49,7 @@ class GetTrainingAssignmentsStream extends Request
         protected ?string $endTime = null,
         protected ?array $learnerIds = null,
         protected ?array $courseIds = null,
-        protected ?array $status = null,
+        protected ?array $status = null
     ) {}
 
     public function defaultQuery(): array

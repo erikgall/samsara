@@ -30,10 +30,7 @@ class GetAttributesByEntityType extends Request
      * @param  string  $entityType  Denotes the type of entity, driver or asset.
      * @param  int|null  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      */
-    public function __construct(
-        protected string $entityType,
-        protected ?int $limit = null,
-    ) {}
+    public function __construct(protected string $entityType, protected ?int $limit = null) {}
 
     public function defaultQuery(): array
     {

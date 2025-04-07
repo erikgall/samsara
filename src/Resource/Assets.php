@@ -20,9 +20,11 @@ class Assets extends Resource
     public function v1getAllAssetCurrentLocations(
         ?string $startingAfter = null,
         ?string $endingBefore = null,
-        float|int|null $limit = null,
+        float|int|null $limit = null
     ): Response {
-        return $this->connector->send(new V1getAllAssetCurrentLocations($startingAfter, $endingBefore, $limit));
+        return $this->connector->send(
+            new V1getAllAssetCurrentLocations($startingAfter, $endingBefore, $limit)
+        );
     }
 
     public function v1getAllAssets(): Response
@@ -62,8 +64,10 @@ class Assets extends Resource
         int $endMs,
         ?string $startingAfter = null,
         ?string $endingBefore = null,
-        float|int|null $limit = null,
+        float|int|null $limit = null
     ): Response {
-        return $this->connector->send(new V1getAssetsReefers($startMs, $endMs, $startingAfter, $endingBefore, $limit));
+        return $this->connector->send(
+            new V1getAssetsReefers($startMs, $endMs, $startingAfter, $endingBefore, $limit)
+        );
     }
 }

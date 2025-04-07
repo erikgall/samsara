@@ -40,7 +40,7 @@ class StreamDefects extends Request
         protected string $startTime,
         protected ?string $endTime = null,
         protected ?bool $includeExternalIds = null,
-        protected ?bool $isResolved = null,
+        protected ?bool $isResolved = null
     ) {}
 
     public function defaultQuery(): array

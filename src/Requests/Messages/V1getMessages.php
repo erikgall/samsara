@@ -40,10 +40,7 @@ class V1getMessages extends Request
      * @param  int|null  $endMs  Time in unix milliseconds that represents the end of time range of messages to return. Used in combination with durationMs. Defaults to now.
      * @param  int|null  $durationMs  Time in milliseconds that represents the duration before endMs to query. Defaults to 24 hours.
      */
-    public function __construct(
-        protected ?int $endMs = null,
-        protected ?int $durationMs = null,
-    ) {}
+    public function __construct(protected ?int $endMs = null, protected ?int $durationMs = null) {}
 
     public function defaultQuery(): array
     {

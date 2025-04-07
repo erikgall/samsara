@@ -44,12 +44,14 @@ class Industrial extends Resource
      * @param  array  $assetIds  A comma-separated list of industrial asset UUIDs. Example: `assetIds=076efac2-83b5-47aa-ba36-18428436dcac,6707b3f0-23b9-4fe3-b7be-11be34aea544`
      */
     public function getDataInputDataFeed(
-        ?array $parentTagIds,
-        ?array $tagIds,
-        ?array $dataInputIds,
-        ?array $assetIds,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $dataInputIds = null,
+        ?array $assetIds = null
     ): Response {
-        return $this->connector->send(new GetDataInputDataFeed($parentTagIds, $tagIds, $dataInputIds, $assetIds));
+        return $this->connector->send(
+            new GetDataInputDataFeed($parentTagIds, $tagIds, $dataInputIds, $assetIds)
+        );
     }
 
     /**
@@ -63,12 +65,21 @@ class Industrial extends Resource
     public function getDataInputDataHistory(
         string $startTime,
         string $endTime,
-        ?array $parentTagIds,
-        ?array $tagIds,
-        ?array $dataInputIds,
-        ?array $assetIds,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $dataInputIds = null,
+        ?array $assetIds = null
     ): Response {
-        return $this->connector->send(new GetDataInputDataHistory($startTime, $endTime, $parentTagIds, $tagIds, $dataInputIds, $assetIds));
+        return $this->connector->send(
+            new GetDataInputDataHistory(
+                $startTime,
+                $endTime,
+                $parentTagIds,
+                $tagIds,
+                $dataInputIds,
+                $assetIds
+            )
+        );
     }
 
     /**
@@ -78,12 +89,14 @@ class Industrial extends Resource
      * @param  array  $assetIds  A comma-separated list of industrial asset UUIDs. Example: `assetIds=076efac2-83b5-47aa-ba36-18428436dcac,6707b3f0-23b9-4fe3-b7be-11be34aea544`
      */
     public function getDataInputDataSnapshot(
-        ?array $parentTagIds,
-        ?array $tagIds,
-        ?array $dataInputIds,
-        ?array $assetIds,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $dataInputIds = null,
+        ?array $assetIds = null
     ): Response {
-        return $this->connector->send(new GetDataInputDataSnapshot($parentTagIds, $tagIds, $dataInputIds, $assetIds));
+        return $this->connector->send(
+            new GetDataInputDataSnapshot($parentTagIds, $tagIds, $dataInputIds, $assetIds)
+        );
     }
 
     /**
@@ -92,8 +105,12 @@ class Industrial extends Resource
      * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
      * @param  array  $assetIds  A comma-separated list of industrial asset UUIDs. Example: `assetIds=076efac2-83b5-47aa-ba36-18428436dcac,6707b3f0-23b9-4fe3-b7be-11be34aea544`
      */
-    public function getDataInputs(?int $limit, ?array $parentTagIds, ?array $tagIds, ?array $assetIds): Response
-    {
+    public function getDataInputs(
+        ?int $limit = null,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $assetIds = null
+    ): Response {
         return $this->connector->send(new GetDataInputs($limit, $parentTagIds, $tagIds, $assetIds));
     }
 
@@ -103,9 +120,15 @@ class Industrial extends Resource
      * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
      * @param  array  $assetIds  A comma-separated list of industrial asset UUIDs. Example: `assetIds=076efac2-83b5-47aa-ba36-18428436dcac,6707b3f0-23b9-4fe3-b7be-11be34aea544`
      */
-    public function getIndustrialAssets(?int $limit, ?array $parentTagIds, ?array $tagIds, ?array $assetIds): Response
-    {
-        return $this->connector->send(new GetIndustrialAssets($limit, $parentTagIds, $tagIds, $assetIds));
+    public function getIndustrialAssets(
+        ?int $limit = null,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $assetIds = null
+    ): Response {
+        return $this->connector->send(
+            new GetIndustrialAssets($limit, $parentTagIds, $tagIds, $assetIds)
+        );
     }
 
     /**
@@ -113,8 +136,11 @@ class Industrial extends Resource
      * @param  int  $durationMs  DurationMs is a required param. This works with the EndMs parameter. Indicates the duration in which the visionRuns will be fetched
      * @param  int  $endMs  EndMs is an optional param. It will default to the current time.
      */
-    public function getVisionRunsByCamera(int $cameraId, int $durationMs, ?int $endMs): Response
-    {
+    public function getVisionRunsByCamera(
+        int $cameraId,
+        int $durationMs,
+        ?int $endMs = null
+    ): Response {
         return $this->connector->send(new GetVisionRunsByCamera($cameraId, $durationMs, $endMs));
     }
 
@@ -158,12 +184,14 @@ class Industrial extends Resource
      */
     public function v1getVisionLatestRunCamera(
         int $cameraId,
-        ?int $programId,
-        ?int $startedAtMs,
-        ?string $include,
-        ?int $limit,
+        ?int $programId = null,
+        ?int $startedAtMs = null,
+        ?string $include = null,
+        ?int $limit = null
     ): Response {
-        return $this->connector->send(new V1getVisionLatestRunCamera($cameraId, $programId, $startedAtMs, $include, $limit));
+        return $this->connector->send(
+            new V1getVisionLatestRunCamera($cameraId, $programId, $startedAtMs, $include, $limit)
+        );
     }
 
     /**
@@ -178,7 +206,7 @@ class Industrial extends Resource
      * @param  int  $durationMs  DurationMs is a required param. This works with the EndMs parameter. Indicates the duration in which the visionRuns will be fetched
      * @param  int  $endMs  EndMs is an optional param. It will default to the current time.
      */
-    public function v1getVisionRuns(int $durationMs, ?int $endMs): Response
+    public function v1getVisionRuns(int $durationMs, ?int $endMs = null): Response
     {
         return $this->connector->send(new V1getVisionRuns($durationMs, $endMs));
     }
@@ -193,8 +221,10 @@ class Industrial extends Resource
         int $cameraId,
         int $programId,
         int $startedAtMs,
-        ?string $include,
+        ?string $include = null
     ): Response {
-        return $this->connector->send(new V1getVisionRunsByCameraAndProgram($cameraId, $programId, $startedAtMs, $include));
+        return $this->connector->send(
+            new V1getVisionRunsByCameraAndProgram($cameraId, $programId, $startedAtMs, $include)
+        );
     }
 }

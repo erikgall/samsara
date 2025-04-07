@@ -37,9 +37,7 @@ class PatchAssetDataOutputs extends Request implements HasBody
     /**
      * @param  string  $id  Asset ID
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function resolveEndpoint(): string
     {

@@ -124,9 +124,19 @@ class BetaApis extends Resource
         ?string $endTime = null,
         ?bool $includeExternalIds = null,
         ?bool $includeTags = null,
-        ?bool $includeAttributes = null,
+        ?bool $includeAttributes = null
     ): Response {
-        return $this->connector->send(new GetAssetsInputs($ids, $type, $startTime, $endTime, $includeExternalIds, $includeTags, $includeAttributes));
+        return $this->connector->send(
+            new GetAssetsInputs(
+                $ids,
+                $type,
+                $startTime,
+                $endTime,
+                $includeExternalIds,
+                $includeTags,
+                $includeAttributes
+            )
+        );
     }
 
     /**
@@ -139,9 +149,11 @@ class BetaApis extends Resource
         ?array $models = null,
         ?array $healthStatuses = null,
         ?bool $includeHealth = null,
-        ?int $limit = null, ): Response
-    {
-        return $this->connector->send(new GetDevices($models, $healthStatuses, $includeHealth, $limit));
+        ?int $limit = null
+    ): Response {
+        return $this->connector->send(
+            new GetDevices($models, $healthStatuses, $includeHealth, $limit)
+        );
     }
 
     /**
@@ -162,7 +174,7 @@ class BetaApis extends Resource
         ?array $driverTagIds = null,
         ?array $driverParentTagIds = null,
         ?string $startTime = null,
-        ?string $endTime = null,
+        ?string $endTime = null
     ): Response {
         return $this->connector->send(
             new GetDriverEfficiency(
@@ -180,9 +192,13 @@ class BetaApis extends Resource
      * @param  array  $driverIds  A filter on the data based on this comma-separated list of driver IDs and externalIds. Example: `driverIds=1234,5678,payroll:4841`
      * @param  bool  $includeExternalIds  Optional boolean indicating whether to return external IDs on supported entities
      */
-    public function getDriverTrailerAssignments(array $driverIds, ?bool $includeExternalIds = null): Response
-    {
-        return $this->connector->send(new GetDriverTrailerAssignments($driverIds, $includeExternalIds));
+    public function getDriverTrailerAssignments(
+        array $driverIds,
+        ?bool $includeExternalIds = null
+    ): Response {
+        return $this->connector->send(
+            new GetDriverTrailerAssignments($driverIds, $includeExternalIds)
+        );
     }
 
     /**
@@ -190,9 +206,14 @@ class BetaApis extends Resource
      * @param  string  $startTime  A start time in RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
      * @param  string  $endTime  An end time in RFC 3339 format. Defaults to now if not provided. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
      */
-    public function getEngineImmobilizerStates(string $vehicleIds, string $startTime, ?string $endTime = null): Response
-    {
-        return $this->connector->send(new GetEngineImmobilizerStates($vehicleIds, $startTime, $endTime));
+    public function getEngineImmobilizerStates(
+        string $vehicleIds,
+        string $startTime,
+        ?string $endTime = null
+    ): Response {
+        return $this->connector->send(
+            new GetEngineImmobilizerStates($vehicleIds, $startTime, $endTime)
+        );
     }
 
     /**
@@ -228,7 +249,7 @@ class BetaApis extends Resource
         ?array $userIds = null,
         ?array $driverIds = null,
         ?array $include = null,
-        ?array $assignedToRouteStopIds = null,
+        ?array $assignedToRouteStopIds = null
     ): Response {
         return $this->connector->send(
             new GetFormSubmissionsStream(
@@ -259,7 +280,7 @@ class BetaApis extends Resource
         ?string $tagIds = null,
         ?string $parentTagIds = null,
         ?string $driverActivationStatus = null,
-        ?int $limit = null,
+        ?int $limit = null
     ): Response {
         return $this->connector->send(
             new GetHosEldEvents(
@@ -295,9 +316,11 @@ class BetaApis extends Resource
         ?string $endTime = null,
         ?array $status = null,
         ?array $assetIds = null,
-        ?array $include = null,
+        ?array $include = null
     ): Response {
-        return $this->connector->send(new GetIssuesStream($startTime, $endTime, $status, $assetIds, $include));
+        return $this->connector->send(
+            new GetIssuesStream($startTime, $endTime, $status, $assetIds, $include)
+        );
     }
 
     /**
@@ -316,10 +339,18 @@ class BetaApis extends Resource
         ?array $industrialAssetIds = null,
         ?array $fleetDeviceIds = null,
         ?string $status = null,
-        ?string $customerName = null,
+        ?string $customerName = null
     ): Response {
         return $this->connector->send(
-            new GetJobs($id, $startDate, $endDate, $industrialAssetIds, $fleetDeviceIds, $status, $customerName)
+            new GetJobs(
+                $id,
+                $startDate,
+                $endDate,
+                $industrialAssetIds,
+                $fleetDeviceIds,
+                $status,
+                $customerName
+            )
         );
     }
 
@@ -398,9 +429,11 @@ class BetaApis extends Resource
         ?string $tagIds = null,
         ?string $parentTagIds = null,
         ?string $trailerIds = null,
-        ?string $decorations = null,
+        ?string $decorations = null
     ): Response {
-        return $this->connector->send(new GetTrailerStatsFeed($types, $tagIds, $parentTagIds, $trailerIds, $decorations));
+        return $this->connector->send(
+            new GetTrailerStatsFeed($types, $tagIds, $parentTagIds, $trailerIds, $decorations)
+        );
     }
 
     /**
@@ -473,9 +506,19 @@ class BetaApis extends Resource
         ?string $tagIds = null,
         ?string $parentTagIds = null,
         ?string $trailerIds = null,
-        ?string $decorations = null,
+        ?string $decorations = null
     ): Response {
-        return $this->connector->send(new GetTrailerStatsHistory($startTime, $endTime, $types, $tagIds, $parentTagIds, $trailerIds, $decorations));
+        return $this->connector->send(
+            new GetTrailerStatsHistory(
+                $startTime,
+                $endTime,
+                $types,
+                $tagIds,
+                $parentTagIds,
+                $trailerIds,
+                $decorations
+            )
+        );
     }
 
     /**
@@ -516,9 +559,11 @@ class BetaApis extends Resource
         ?string $tagIds = null,
         ?string $parentTagIds = null,
         ?string $trailerIds = null,
-        ?string $time = null,
+        ?string $time = null
     ): Response {
-        return $this->connector->send(new GetTrailerStatsSnapshot($types, $tagIds, $parentTagIds, $trailerIds, $time));
+        return $this->connector->send(
+            new GetTrailerStatsSnapshot($types, $tagIds, $parentTagIds, $trailerIds, $time)
+        );
     }
 
     /**
@@ -533,9 +578,11 @@ class BetaApis extends Resource
         ?string $endTime = null,
         ?array $learnerIds = null,
         ?array $courseIds = null,
-        ?array $status = null,
+        ?array $status = null
     ): Response {
-        return $this->connector->send(new GetTrainingAssignmentsStream($startTime, $endTime, $learnerIds, $courseIds, $status));
+        return $this->connector->send(
+            new GetTrainingAssignmentsStream($startTime, $endTime, $learnerIds, $courseIds, $status)
+        );
     }
 
     /**
@@ -543,8 +590,11 @@ class BetaApis extends Resource
      * @param  array  $categoryIds  Optional string of comma separated course category IDs. If courseCategoryId is present, training courses for the specified course category(s) will be returned. Max value for this value is 100 objects. Defaults to returning all courses.  Example: `categoryIds=a4db8702-79d5-4396-a717-e301d52ecc11,c6490f6a-d84e-49b5-b0ad-b6baae304075`
      * @param  array  $status  Optional string of comma separated values. If status is present, training courses with the specified status(s) will be returned. Valid values: “published”, “deleted”, “archived”. Defaults to returning all courses.
      */
-    public function getTrainingCourses(?array $courseIds = null, ?array $categoryIds = null, ?array $status = null): Response
-    {
+    public function getTrainingCourses(
+        ?array $courseIds = null,
+        ?array $categoryIds = null,
+        ?array $status = null
+    ): Response {
         return $this->connector->send(new GetTrainingCourses($courseIds, $categoryIds, $status));
     }
 
@@ -562,9 +612,11 @@ class BetaApis extends Resource
         string $startTime,
         ?string $endTime,
         ?string $queryBy,
-        array $ids,
+        array $ids
     ): Response {
-        return $this->connector->send(new GetTrips($includeAsset, $completionStatus, $startTime, $endTime, $queryBy, $ids));
+        return $this->connector->send(
+            new GetTrips($includeAsset, $completionStatus, $startTime, $endTime, $queryBy, $ids)
+        );
     }
 
     /**
@@ -593,7 +645,7 @@ class BetaApis extends Resource
         ?string $tagIds = null,
         ?string $parentTagIds = null,
         ?array $ids = null,
-        ?string $attributeValueIds = null,
+        ?string $attributeValueIds = null
     ): Response {
         return $this->connector->send(
             new ListAssets(
@@ -625,10 +677,18 @@ class BetaApis extends Resource
         ?array $triggerReasons,
         string $startTime,
         string $endTime,
-        ?string $availableAfterTime = null,
+        ?string $availableAfterTime = null
     ): Response {
         return $this->connector->send(
-            new ListUploadedMedia($vehicleIds, $inputs, $mediaTypes, $triggerReasons, $startTime, $endTime, $availableAfterTime)
+            new ListUploadedMedia(
+                $vehicleIds,
+                $inputs,
+                $mediaTypes,
+                $triggerReasons,
+                $startTime,
+                $endTime,
+                $availableAfterTime
+            )
         );
     }
 
@@ -695,9 +755,14 @@ class BetaApis extends Resource
      * @param  string  $dueAtTime  Due date of the training assignment in RFC 3339 format. Millisecond precision and timezones are supported.
      * @param  array  $learnerIds  Optional string of comma separated learner IDs. If learner ID is present, training assignments for the specified learner(s) will be returned. Max value for this value is 100 objects. Example: `learnerIds=driver-281474,driver-46282156`
      */
-    public function postTrainingAssignments(string $courseId, string $dueAtTime, array $learnerIds): Response
-    {
-        return $this->connector->send(new PostTrainingAssignments($courseId, $dueAtTime, $learnerIds));
+    public function postTrainingAssignments(
+        string $courseId,
+        string $dueAtTime,
+        array $learnerIds
+    ): Response {
+        return $this->connector->send(
+            new PostTrainingAssignments($courseId, $dueAtTime, $learnerIds)
+        );
     }
 
     public function postWorkOrders(): Response
@@ -717,9 +782,17 @@ class BetaApis extends Resource
         ?string $endTime = null,
         ?array $workOrderStatuses = null,
         ?array $assetIds = null,
-        ?array $assignedUserIds = null,
+        ?array $assignedUserIds = null
     ): Response {
-        return $this->connector->send(new StreamWorkOrders($startTime, $endTime, $workOrderStatuses, $assetIds, $assignedUserIds));
+        return $this->connector->send(
+            new StreamWorkOrders(
+                $startTime,
+                $endTime,
+                $workOrderStatuses,
+                $assetIds,
+                $assignedUserIds
+            )
+        );
     }
 
     /**

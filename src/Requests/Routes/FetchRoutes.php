@@ -38,12 +38,16 @@ class FetchRoutes extends Request
     public function __construct(
         protected string $startTime,
         protected string $endTime,
-        protected ?int $limit = null,
+        protected ?int $limit = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['startTime' => $this->startTime, 'endTime' => $this->endTime, 'limit' => $this->limit]);
+        return array_filter([
+            'startTime' => $this->startTime,
+            'endTime'   => $this->endTime,
+            'limit'     => $this->limit,
+        ]);
     }
 
     public function resolveEndpoint(): string

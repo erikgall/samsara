@@ -51,7 +51,7 @@ class GetIftaVehicleReports extends Request
         protected ?string $fuelType = null,
         protected ?string $vehicleIds = null,
         protected ?string $tagIds = null,
-        protected ?string $parentTagIds = null,
+        protected ?string $parentTagIds = null
     ) {}
 
     public function defaultQuery(): array

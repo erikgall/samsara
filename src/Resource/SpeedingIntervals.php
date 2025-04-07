@@ -20,12 +20,22 @@ class SpeedingIntervals extends Resource
     public function getSpeedingIntervals(
         array $assetIds,
         string $startTime,
-        ?string $endTime,
-        ?string $queryBy,
-        ?bool $includeAsset,
-        ?bool $includeDriverId,
-        ?array $severityLevels,
+        ?string $endTime = null,
+        ?string $queryBy = null,
+        ?bool $includeAsset = null,
+        ?bool $includeDriverId = null,
+        ?array $severityLevels = null
     ): Response {
-        return $this->connector->send(new GetSpeedingIntervals($assetIds, $startTime, $endTime, $queryBy, $includeAsset, $includeDriverId, $severityLevels));
+        return $this->connector->send(
+            new GetSpeedingIntervals(
+                $assetIds,
+                $startTime,
+                $endTime,
+                $queryBy,
+                $includeAsset,
+                $includeDriverId,
+                $severityLevels
+            )
+        );
     }
 }

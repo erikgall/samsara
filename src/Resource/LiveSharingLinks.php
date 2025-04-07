@@ -29,8 +29,11 @@ class LiveSharingLinks extends Resource
      * @param  string  $type  A filter on the data based on the Live Sharing Link type.  Valid values: `all`, `assetsLocation`, `assetsNearLocation`, `assetsOnRoute`
      * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 100 objects.
      */
-    public function getLiveSharingLinks(?array $ids, ?string $type, ?int $limit): Response
-    {
+    public function getLiveSharingLinks(
+        ?array $ids = null,
+        ?string $type = null,
+        ?int $limit = null
+    ): Response {
         return $this->connector->send(new GetLiveSharingLinks($ids, $type, $limit));
     }
 

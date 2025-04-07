@@ -49,7 +49,7 @@ class ListUploadedMedia extends Request
         protected ?array $triggerReasons,
         protected string $startTime,
         protected string $endTime,
-        protected ?string $availableAfterTime = null,
+        protected ?string $availableAfterTime = null
     ) {}
 
     public function defaultQuery(): array

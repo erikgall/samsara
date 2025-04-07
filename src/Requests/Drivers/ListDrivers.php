@@ -41,7 +41,7 @@ class ListDrivers extends Request
         protected ?array $tagIds = null,
         protected ?array $attributeValueIds = null,
         protected ?string $updatedAfterTime = null,
-        protected ?string $createdAfterTime = null,
+        protected ?string $createdAfterTime = null
     ) {}
 
     public function defaultQuery(): array

@@ -37,7 +37,7 @@ class Tags extends Resource
     /**
      * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      */
-    public function listTags(?int $limit): Response
+    public function listTags(?int $limit = null): Response
     {
         return $this->connector->send(new ListTags($limit));
     }

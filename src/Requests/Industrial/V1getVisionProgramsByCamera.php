@@ -36,9 +36,7 @@ class V1getVisionProgramsByCamera extends Request
     /**
      * @param  int  $cameraId  The camera_id should be valid for the given accessToken.
      */
-    public function __construct(
-        protected int $cameraId,
-    ) {}
+    public function __construct(protected int $cameraId) {}
 
     public function resolveEndpoint(): string
     {

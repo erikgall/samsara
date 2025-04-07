@@ -48,7 +48,7 @@ class GetIssuesStream extends Request
         protected ?string $endTime = null,
         protected ?array $status = null,
         protected ?array $assetIds = null,
-        protected ?array $include = null,
+        protected ?array $include = null
     ) {}
 
     public function defaultQuery(): array

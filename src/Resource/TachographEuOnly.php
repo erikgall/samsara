@@ -20,11 +20,19 @@ class TachographEuOnly extends Resource
     public function getDriverTachographActivity(
         string $startTime,
         string $endTime,
-        ?array $driverIds,
-        ?array $parentTagIds,
-        ?array $tagIds,
+        ?array $driverIds = null,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null
     ): Response {
-        return $this->connector->send(new GetDriverTachographActivity($startTime, $endTime, $driverIds, $parentTagIds, $tagIds));
+        return $this->connector->send(
+            new GetDriverTachographActivity(
+                $startTime,
+                $endTime,
+                $driverIds,
+                $parentTagIds,
+                $tagIds
+            )
+        );
     }
 
     /**
@@ -37,11 +45,13 @@ class TachographEuOnly extends Resource
     public function getDriverTachographFiles(
         string $startTime,
         string $endTime,
-        ?array $driverIds,
-        ?array $parentTagIds,
-        ?array $tagIds,
+        ?array $driverIds = null,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null
     ): Response {
-        return $this->connector->send(new GetDriverTachographFiles($startTime, $endTime, $driverIds, $parentTagIds, $tagIds));
+        return $this->connector->send(
+            new GetDriverTachographFiles($startTime, $endTime, $driverIds, $parentTagIds, $tagIds)
+        );
     }
 
     /**
@@ -54,10 +64,12 @@ class TachographEuOnly extends Resource
     public function getVehicleTachographFiles(
         string $startTime,
         string $endTime,
-        ?array $vehicleIds,
-        ?array $parentTagIds,
-        ?array $tagIds,
+        ?array $vehicleIds = null,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null
     ): Response {
-        return $this->connector->send(new GetVehicleTachographFiles($startTime, $endTime, $vehicleIds, $parentTagIds, $tagIds));
+        return $this->connector->send(
+            new GetVehicleTachographFiles($startTime, $endTime, $vehicleIds, $parentTagIds, $tagIds)
+        );
     }
 }

@@ -52,7 +52,7 @@ class GetFormSubmissionsStream extends Request
         protected ?array $userIds = null,
         protected ?array $driverIds = null,
         protected ?array $include = null,
-        protected ?array $assignedToRouteStopIds = null,
+        protected ?array $assignedToRouteStopIds = null
     ) {}
 
     public function defaultQuery(): array

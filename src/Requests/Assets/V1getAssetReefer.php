@@ -41,7 +41,7 @@ class V1getAssetReefer extends Request
     public function __construct(
         protected int $assetId,
         protected int $startMs,
-        protected int $endMs,
+        protected int $endMs
     ) {}
 
     public function defaultQuery(): array

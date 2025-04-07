@@ -36,12 +36,16 @@ class ListTrailers extends Request
     public function __construct(
         protected ?string $tagIds = null,
         protected ?string $parentTagIds = null,
-        protected ?int $limit = null,
+        protected ?int $limit = null
     ) {}
 
     public function defaultQuery(): array
     {
-        return array_filter(['tagIds' => $this->tagIds, 'parentTagIds' => $this->parentTagIds, 'limit' => $this->limit]);
+        return array_filter([
+            'tagIds'       => $this->tagIds,
+            'parentTagIds' => $this->parentTagIds,
+            'limit'        => $this->limit,
+        ]);
     }
 
     public function resolveEndpoint(): string

@@ -45,9 +45,7 @@ class GetFormTemplates extends Request
     /**
      * @param  array|null  $ids  A comma-separated list containing up to 100 template IDs to filter on.
      */
-    public function __construct(
-        protected ?array $ids = null,
-    ) {}
+    public function __construct(protected ?array $ids = null) {}
 
     public function defaultQuery(): array
     {

@@ -32,9 +32,7 @@ class UpdateDvirDefect extends Request implements HasBody
     /**
      * @param  string  $id  ID of the defect.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function resolveEndpoint(): string
     {

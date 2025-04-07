@@ -35,9 +35,7 @@ class UpdateAsset extends Request implements HasBody
     /**
      * @param  string  $id  A filter selecting a single asset by id.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function defaultQuery(): array
     {

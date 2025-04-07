@@ -32,9 +32,7 @@ class GetWebhook extends Request
     /**
      * @param  string  $id  ID of the webhook. This is the Samsara-specified ID.
      */
-    public function __construct(
-        protected string $id,
-    ) {}
+    public function __construct(protected string $id) {}
 
     public function resolveEndpoint(): string
     {

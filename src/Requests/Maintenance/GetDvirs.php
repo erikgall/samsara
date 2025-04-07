@@ -42,7 +42,7 @@ class GetDvirs extends Request
         protected ?bool $includeExternalIds,
         protected string $startTime,
         protected ?string $endTime = null,
-        protected ?array $safetyStatus = null,
+        protected ?array $safetyStatus = null
     ) {}
 
     public function defaultQuery(): array

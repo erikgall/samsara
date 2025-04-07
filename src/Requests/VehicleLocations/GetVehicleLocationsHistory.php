@@ -45,7 +45,7 @@ class GetVehicleLocationsHistory extends Request
         protected string $endTime,
         protected ?array $parentTagIds = null,
         protected ?array $tagIds = null,
-        protected ?array $vehicleIds = null,
+        protected ?array $vehicleIds = null
     ) {}
 
     public function defaultQuery(): array

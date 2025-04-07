@@ -19,8 +19,12 @@ class HoursOfService extends Resource
      * @param  array  $driverIds  A filter on the data based on this comma-separated list of driver IDs. Example: `driverIds=1234,5678`
      * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      */
-    public function getHosClocks(?array $tagIds, ?array $parentTagIds, ?array $driverIds, ?int $limit): Response
-    {
+    public function getHosClocks(
+        ?array $tagIds = null,
+        ?array $parentTagIds = null,
+        ?array $driverIds = null,
+        ?int $limit = null
+    ): Response {
         return $this->connector->send(new GetHosClocks($tagIds, $parentTagIds, $driverIds, $limit));
     }
 
@@ -36,15 +40,25 @@ class HoursOfService extends Resource
      * Valid value: `vehicle`  Valid values: `vehicle`
      */
     public function getHosDailyLogs(
-        ?array $driverIds,
-        ?string $startDate,
-        ?string $endDate,
-        ?string $tagIds,
-        ?string $parentTagIds,
-        ?string $driverActivationStatus,
-        ?string $expand,
+        ?array $driverIds = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null,
+        ?string $driverActivationStatus = null,
+        ?string $expand = null
     ): Response {
-        return $this->connector->send(new GetHosDailyLogs($driverIds, $startDate, $endDate, $tagIds, $parentTagIds, $driverActivationStatus, $expand));
+        return $this->connector->send(
+            new GetHosDailyLogs(
+                $driverIds,
+                $startDate,
+                $endDate,
+                $tagIds,
+                $parentTagIds,
+                $driverActivationStatus,
+                $expand
+            )
+        );
     }
 
     /**
@@ -55,13 +69,15 @@ class HoursOfService extends Resource
      * @param  string  $endTime  An end time in RFC 3339 format. Defaults to now if not provided. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
      */
     public function getHosLogs(
-        ?array $tagIds,
-        ?array $parentTagIds,
-        ?array $driverIds,
-        ?string $startTime,
-        ?string $endTime,
+        ?array $tagIds = null,
+        ?array $parentTagIds = null,
+        ?array $driverIds = null,
+        ?string $startTime = null,
+        ?string $endTime = null
     ): Response {
-        return $this->connector->send(new GetHosLogs($tagIds, $parentTagIds, $driverIds, $startTime, $endTime));
+        return $this->connector->send(
+            new GetHosLogs($tagIds, $parentTagIds, $driverIds, $startTime, $endTime)
+        );
     }
 
     /**
@@ -73,14 +89,16 @@ class HoursOfService extends Resource
      * @param  array  $types  A filter on violations data based on the violation type enum. Supported types: `NONE, californiaMealbreakMissed, cycleHoursOn, cycleOffHoursAfterOnDutyHours, dailyDrivingHours, dailyOffDutyDeferralAddToDay2Consecutive, dailyOffDutyDeferralNotPartMandatory, dailyOffDutyDeferralTwoDayDrivingLimit, dailyOffDutyDeferralTwoDayOffDuty, dailyOffDutyNonResetHours, dailyOffDutyTotalHours, dailyOnDutyHours, mandatory24HoursOffDuty, restbreakMissed, shiftDrivingHours, shiftHours, shiftOnDutyHours, unsubmittedLogs`
      */
     public function getHosViolations(
-        ?array $driverIds,
-        ?string $startTime,
-        ?string $endTime,
-        ?string $tagIds,
-        ?string $parentTagIds,
-        ?array $types,
+        ?array $driverIds = null,
+        ?string $startTime = null,
+        ?string $endTime = null,
+        ?string $tagIds = null,
+        ?string $parentTagIds = null,
+        ?array $types = null
     ): Response {
-        return $this->connector->send(new GetHosViolations($driverIds, $startTime, $endTime, $tagIds, $parentTagIds, $types));
+        return $this->connector->send(
+            new GetHosViolations($driverIds, $startTime, $endTime, $tagIds, $parentTagIds, $types)
+        );
     }
 
     /**
@@ -96,8 +114,13 @@ class HoursOfService extends Resource
      * @param  int  $startMs  Beginning of the time range, specified in milliseconds UNIX time.
      * @param  int  $endMs  End of the time range, specified in milliseconds UNIX time.
      */
-    public function v1getFleetHosAuthenticationLogs(int $driverId, int $startMs, int $endMs): Response
-    {
-        return $this->connector->send(new V1getFleetHosAuthenticationLogs($driverId, $startMs, $endMs));
+    public function v1getFleetHosAuthenticationLogs(
+        int $driverId,
+        int $startMs,
+        int $endMs
+    ): Response {
+        return $this->connector->send(
+            new V1getFleetHosAuthenticationLogs($driverId, $startMs, $endMs)
+        );
     }
 }
