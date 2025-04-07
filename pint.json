@@ -1,0 +1,81 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "align_multiline_comment": {
+            "comment_type": "phpdocs_only"
+        },
+        "binary_operator_spaces": {
+            "operators": {
+                "=>": "align_single_space_minimal"
+            }
+        },
+        "concat_space": {
+            "spacing": "none"
+        },
+        "explicit_indirect_variable": true,
+        "explicit_string_variable": true,
+        "fully_qualified_strict_types": {
+            "import_symbols": false,
+            "leading_backslash_in_global_namespace": false,
+            "phpdoc_tags": []
+        },
+        "list_syntax": {
+            "syntax": "short"
+        },
+        "multiline_whitespace_before_semicolons": true,
+        "no_multiline_whitespace_around_double_arrow": true,
+        "no_short_bool_cast": true,
+        "no_superfluous_elseif": true,
+        "no_superfluous_phpdoc_tags": false,
+        "simplified_null_return": true,
+        "nullable_type_declaration_for_default_null_value": {
+            "use_nullable_type_declaration": true
+        },
+        "object_operator_without_whitespace": true,
+        "ordered_class_elements": {
+            "order": [
+                "use_trait",
+                "constant_public",
+                "constant_protected",
+                "constant_private",
+                "property_public",
+                "property_protected",
+                "property_private",
+                "construct",
+                "destruct",
+                "phpunit",
+                "method_public",
+                "method_public_static",
+                "magic",
+                "method_protected",
+                "method_protected_static",
+                "method_private",
+                "method_private_static"
+            ],
+            "sort_algorithm": "alpha"
+        },
+        "ordered_imports": {
+            "sort_algorithm": "length"
+        },
+        "php_unit_method_casing": {
+            "case": "snake_case"
+        },
+        "phpdoc_add_missing_param_annotation": true,
+        "phpdoc_param_order": true,
+        "phpdoc_return_self_reference": true,
+        "phpdoc_scalar": true,
+        "phpdoc_summary": true,
+        "phpdoc_types_order": {
+            "null_adjustment": "always_last",
+            "case_sensitive": true
+        },
+        "phpdoc_var_annotation_correct_order": true,
+        "return_assignment": true,
+        "switch_case_semicolon_to_colon": true,
+        "switch_case_space": true,
+        "ternary_operator_spaces": true,
+        "ternary_to_null_coalescing": true,
+        "trim_array_spaces": true,
+        "unary_operator_spaces": true
+    }
+}

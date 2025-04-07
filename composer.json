@@ -1,0 +1,22 @@
+{
+    "name": "erikgall/samsara",
+    "description": "Samsara SDK",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Erikgall\\Samsara\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Erik Galloway",
+            "email": "8866568+erikgall@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "saloonphp/saloon": "^3.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.21"
+    }
+}
