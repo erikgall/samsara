@@ -26,6 +26,7 @@ use ErikGall\Samsara\Resource\Webhooks;
 use ErikGall\Samsara\Resource\Addresses;
 use ErikGall\Samsara\Resource\Documents;
 use ErikGall\Samsara\Resource\Equipment;
+use Saloon\Http\Auth\TokenAuthenticator;
 use ErikGall\Samsara\Resource\Attributes;
 use ErikGall\Samsara\Resource\Industrial;
 use ErikGall\Samsara\Resource\LegacyApis;
@@ -160,6 +161,8 @@ use ErikGall\Samsara\Resource\CarrierProposedAssignments;
  */
 class Samsara extends Connector
 {
+    public function __construct(protected readonly string $token) {}
+
     public function addresses(): Addresses
     {
         return new Addresses($this);
@@ -373,5 +376,28 @@ class Samsara extends Connector
     public function webhooks(): Webhooks
     {
         return new Webhooks($this);
+    }
+
+    /**
+     * Default authenticator used.
+     *
+     * @return \Saloon\Http\Auth\TokenAuthenticator
+     */
+    protected function defaultAuth(): TokenAuthenticator
+    {
+        return new TokenAuthenticator($this->token);
+    }
+
+    /**
+     * Default Request Headers.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultHeaders(): array
+    {
+        return [
+            'Accept'       => 'application/json',
+            'Content-Type' => 'application/json',
+        ];
     }
 }
