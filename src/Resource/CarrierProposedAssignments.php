@@ -10,9 +10,9 @@ use ErikGall\Samsara\Requests\CarrierProposedAssignments\DeleteCarrierProposedAs
 
 class CarrierProposedAssignments extends Resource
 {
-    public function createCarrierProposedAssignment(): Response
+    public function createCarrierProposedAssignment(array $payload = []): Response
     {
-        return $this->connector->send(new CreateCarrierProposedAssignment);
+        return $this->connector->send(new CreateCarrierProposedAssignment($payload));
     }
 
     /**

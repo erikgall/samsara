@@ -41,10 +41,20 @@ class UpdateTrailer extends Request implements HasBody
     /**
      * @param  string  $id  ID of the trailer. Can be either unique Samsara ID or an [external ID](https://developers.samsara.com/docs/external-ids) for the trailer.
      */
-    public function __construct(protected string $id) {}
+    public function __construct(protected string $id, protected array $payload = []) {}
 
     public function resolveEndpoint(): string
     {
         return "/fleet/trailers/{$this->id}";
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

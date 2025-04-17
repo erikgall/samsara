@@ -32,10 +32,20 @@ class UpdateDvirDefect extends Request implements HasBody
     /**
      * @param  string  $id  ID of the defect.
      */
-    public function __construct(protected string $id) {}
+    public function __construct(protected string $id, protected array $payload = []) {}
 
     public function resolveEndpoint(): string
     {
         return "/fleet/defects/{$this->id}";
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

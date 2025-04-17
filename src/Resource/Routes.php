@@ -14,9 +14,9 @@ use ErikGall\Samsara\Requests\Routes\V1deleteDispatchRouteById;
 
 class Routes extends Resource
 {
-    public function createRoute(): Response
+    public function createRoute(array $payload = []): Response
     {
-        return $this->connector->send(new CreateRoute);
+        return $this->connector->send(new CreateRoute($payload));
     }
 
     /**
@@ -58,9 +58,9 @@ class Routes extends Resource
     /**
      * @param  string  $id  ID of the route. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `payrollId:ABFS18600`
      */
-    public function patchRoute(string $id): Response
+    public function patchRoute(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new PatchRoute($id));
+        return $this->connector->send(new PatchRoute($id, $payload));
     }
 
     /**

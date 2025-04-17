@@ -26,8 +26,8 @@ class Gateways extends Resource
         return $this->connector->send(new GetGateways($models));
     }
 
-    public function postGateway(): Response
+    public function postGateway(array $payload = []): Response
     {
-        return $this->connector->send(new PostGateway);
+        return $this->connector->send(new PostGateway($payload));
     }
 }

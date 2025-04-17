@@ -37,10 +37,20 @@ class UpdateEngineImmobilizerState extends Request implements HasBody
     /**
      * @param  int  $id  Vehicle ID
      */
-    public function __construct(protected int $id) {}
+    public function __construct(protected int $id, protected array $payload = []) {}
 
     public function resolveEndpoint(): string
     {
         return "/beta/fleet/vehicles/{$this->id}/immobilizer";
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

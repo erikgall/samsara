@@ -37,10 +37,20 @@ class PatchAssetDataOutputs extends Request implements HasBody
     /**
      * @param  string  $id  Asset ID
      */
-    public function __construct(protected string $id) {}
+    public function __construct(protected string $id, protected array $payload = []) {}
 
     public function resolveEndpoint(): string
     {
         return "/industrial/assets/{$this->id}/data-outputs";
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

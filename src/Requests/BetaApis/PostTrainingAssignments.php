@@ -61,4 +61,14 @@ class PostTrainingAssignments extends Request implements HasBody
     {
         return '/training-assignments';
     }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
+    }
 }

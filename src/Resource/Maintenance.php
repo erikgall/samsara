@@ -14,9 +14,9 @@ use ErikGall\Samsara\Requests\Maintenance\V1getFleetMaintenanceList;
 
 class Maintenance extends Resource
 {
-    public function createDvir(): Response
+    public function createDvir(array $payload = []): Response
     {
-        return $this->connector->send(new CreateDvir);
+        return $this->connector->send(new CreateDvir($payload));
     }
 
     /**
@@ -69,17 +69,17 @@ class Maintenance extends Resource
     /**
      * @param  string  $id  ID of the DVIR.
      */
-    public function updateDvir(string $id): Response
+    public function updateDvir(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateDvir($id));
+        return $this->connector->send(new UpdateDvir($id, $payload));
     }
 
     /**
      * @param  string  $id  ID of the defect.
      */
-    public function updateDvirDefect(string $id): Response
+    public function updateDvirDefect(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateDvirDefect($id));
+        return $this->connector->send(new UpdateDvirDefect($id, $payload));
     }
 
     public function v1getFleetMaintenanceList(): Response

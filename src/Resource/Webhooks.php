@@ -40,13 +40,13 @@ class Webhooks extends Resource
     /**
      * @param  string  $id  Unique identifier for the webhook to update.
      */
-    public function patchWebhook(string $id): Response
+    public function patchWebhook(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new PatchWebhook($id));
+        return $this->connector->send(new PatchWebhook($id, $payload));
     }
 
-    public function postWebhooks(): Response
+    public function postWebhooks(array $payload = []): Response
     {
-        return $this->connector->send(new PostWebhooks);
+        return $this->connector->send(new PostWebhooks($payload));
     }
 }

@@ -29,10 +29,20 @@ class CreateDriver extends Request implements HasBody
 
     protected Method $method = Method::POST;
 
-    public function __construct() {}
+    public function __construct(protected array $payload) {}
 
     public function resolveEndpoint(): string
     {
         return '/fleet/drivers';
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

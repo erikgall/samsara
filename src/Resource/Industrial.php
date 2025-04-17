@@ -24,9 +24,9 @@ use ErikGall\Samsara\Requests\Industrial\V1getVisionRunsByCameraAndProgram;
 
 class Industrial extends Resource
 {
-    public function createIndustrialAsset(): Response
+    public function createIndustrialAsset(array $payload = []): Response
     {
-        return $this->connector->send(new CreateIndustrialAsset);
+        return $this->connector->send(new CreateIndustrialAsset($payload));
     }
 
     /**
@@ -147,17 +147,17 @@ class Industrial extends Resource
     /**
      * @param  string  $id  Asset ID
      */
-    public function patchAssetDataOutputs(string $id): Response
+    public function patchAssetDataOutputs(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new PatchAssetDataOutputs($id));
+        return $this->connector->send(new PatchAssetDataOutputs($id, $payload));
     }
 
     /**
      * @param  string  $id  Id of the asset to be updated
      */
-    public function patchIndustrialAsset(string $id): Response
+    public function patchIndustrialAsset(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new PatchIndustrialAsset($id));
+        return $this->connector->send(new PatchIndustrialAsset($id, $payload));
     }
 
     public function v1getCameras(): Response

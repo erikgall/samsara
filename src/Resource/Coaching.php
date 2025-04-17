@@ -60,8 +60,8 @@ class Coaching extends Resource
      * @param  string  $driverId  Required string ID of the driver. This is a unique Samsara ID of a driver.
      * @param  string  $coachId  Optional string ID of the coach. This is a unique Samsara user ID. If not provided, existing coach assignment will be removed.
      */
-    public function putDriverCoachAssignment(string $driverId, ?string $coachId = null): Response
+    public function putDriverCoachAssignment(string $driverId, ?string $coachId = null, array $payload = []): Response
     {
-        return $this->connector->send(new PutDriverCoachAssignment($driverId, $coachId));
+        return $this->connector->send(new PutDriverCoachAssignment($driverId, $coachId, $payload));
     }
 }

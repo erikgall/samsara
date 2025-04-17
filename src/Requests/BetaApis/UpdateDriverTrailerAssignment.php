@@ -36,7 +36,7 @@ class UpdateDriverTrailerAssignment extends Request implements HasBody
     /**
      * @param  string  $id  Samsara ID for the assignment.
      */
-    public function __construct(protected string $id) {}
+    public function __construct(protected string $id, protected array $payload = []) {}
 
     public function defaultQuery(): array
     {
@@ -46,5 +46,15 @@ class UpdateDriverTrailerAssignment extends Request implements HasBody
     public function resolveEndpoint(): string
     {
         return '/driver-trailer-assignments';
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

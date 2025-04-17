@@ -50,10 +50,20 @@ class SetCurrentDutyStatus extends Request implements HasBody
     /**
      * @param  int  $driverId  ID of the driver for whom the duty status is being set.
      */
-    public function __construct(protected int $driverId) {}
+    public function __construct(protected int $driverId, protected array $payload = []) {}
 
     public function resolveEndpoint(): string
     {
         return "/v1/fleet/drivers/{$this->driverId}/hos/duty_status";
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

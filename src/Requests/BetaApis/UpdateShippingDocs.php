@@ -37,7 +37,7 @@ class UpdateShippingDocs extends Request implements HasBody
      * @param  string  $hosDate  A start date in yyyy-mm-dd format. Required.
      * @param  string  $driverId  ID of the driver for whom the duty status is being set.
      */
-    public function __construct(protected string $hosDate, protected string $driverId) {}
+    public function __construct(protected string $hosDate, protected string $driverId, protected array $payload = []) {}
 
     public function defaultQuery(): array
     {
@@ -47,5 +47,15 @@ class UpdateShippingDocs extends Request implements HasBody
     public function resolveEndpoint(): string
     {
         return '/hos/daily-logs/log-meta-data';
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

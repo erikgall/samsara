@@ -13,9 +13,9 @@ use ErikGall\Samsara\Requests\Tags\ReplaceTag;
 
 class Tags extends Resource
 {
-    public function createTag(): Response
+    public function createTag(array $payload = []): Response
     {
-        return $this->connector->send(new CreateTag);
+        return $this->connector->send(new CreateTag($payload));
     }
 
     /**
@@ -45,16 +45,16 @@ class Tags extends Resource
     /**
      * @param  string  $id  ID of the Tag. This can either be the Samsara-provided ID or an external ID. External IDs are customer-specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `crmId:abc123`. Automatically populated external IDs are prefixed with `samsara.`. For example, `samsara.name:ELD-exempt`.
      */
-    public function patchTag(string $id): Response
+    public function patchTag(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new PatchTag($id));
+        return $this->connector->send(new PatchTag($id, $payload));
     }
 
     /**
      * @param  string  $id  ID of the Tag. This can either be the Samsara-provided ID or an external ID. External IDs are customer-specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `crmId:abc123`. Automatically populated external IDs are prefixed with `samsara.`. For example, `samsara.name:ELD-exempt`.
      */
-    public function replaceTag(string $id): Response
+    public function replaceTag(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new ReplaceTag($id));
+        return $this->connector->send(new ReplaceTag($id, $payload));
     }
 }

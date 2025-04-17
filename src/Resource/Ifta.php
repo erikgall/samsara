@@ -11,9 +11,9 @@ use ErikGall\Samsara\Requests\Ifta\GetIftaJurisdictionReports;
 
 class Ifta extends Resource
 {
-    public function createIftaDetailJob(): Response
+    public function createIftaDetailJob(array $payload = []): Response
     {
-        return $this->connector->send(new CreateIftaDetailJob);
+        return $this->connector->send(new CreateIftaDetailJob, $payload);
     }
 
     /**

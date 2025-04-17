@@ -32,10 +32,20 @@ class UpdateAddress extends Request implements HasBody
     /**
      * @param  string  $id  ID of the Address. This can either be the Samsara-provided ID or an external ID. External IDs are customer-specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `crmId:abc123`
      */
-    public function __construct(protected string $id) {}
+    public function __construct(protected string $id, protected array $payload) {}
 
     public function resolveEndpoint(): string
     {
         return "/addresses/{$this->id}";
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

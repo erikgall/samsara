@@ -12,9 +12,9 @@ use ErikGall\Samsara\Requests\Trailers\UpdateTrailer;
 
 class Trailers extends Resource
 {
-    public function createTrailer(): Response
+    public function createTrailer(array $payload = []): Response
     {
-        return $this->connector->send(new CreateTrailer);
+        return $this->connector->send(new CreateTrailer($payload));
     }
 
     /**
@@ -49,8 +49,8 @@ class Trailers extends Resource
     /**
      * @param  string  $id  ID of the trailer. Can be either unique Samsara ID or an [external ID](https://developers.samsara.com/docs/external-ids) for the trailer.
      */
-    public function updateTrailer(string $id): Response
+    public function updateTrailer(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateTrailer($id));
+        return $this->connector->send(new UpdateTrailer($id, $payload));
     }
 }

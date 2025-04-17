@@ -27,13 +27,13 @@ class Settings extends Resource
         return $this->connector->send(new GetSafetySettings);
     }
 
-    public function patchComplianceSettings(): Response
+    public function patchComplianceSettings(array $payload = []): Response
     {
-        return $this->connector->send(new PatchComplianceSettings);
+        return $this->connector->send(new PatchComplianceSettings($payload));
     }
 
-    public function patchDriverAppSettings(): Response
+    public function patchDriverAppSettings(array $payload = []): Response
     {
-        return $this->connector->send(new PatchDriverAppSettings);
+        return $this->connector->send(new PatchDriverAppSettings($payload));
     }
 }

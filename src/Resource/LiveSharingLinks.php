@@ -11,9 +11,9 @@ use ErikGall\Samsara\Requests\LiveSharingLinks\UpdateLiveSharingLink;
 
 class LiveSharingLinks extends Resource
 {
-    public function createLiveSharingLink(): Response
+    public function createLiveSharingLink(array $payload = []): Response
     {
-        return $this->connector->send(new CreateLiveSharingLink);
+        return $this->connector->send(new CreateLiveSharingLink($payload));
     }
 
     /**
@@ -40,8 +40,8 @@ class LiveSharingLinks extends Resource
     /**
      * @param  string  $id  Unique identifier for the Live Sharing Link.
      */
-    public function updateLiveSharingLink(string $id): Response
+    public function updateLiveSharingLink(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateLiveSharingLink($id));
+        return $this->connector->send(new UpdateLiveSharingLink($id, $payload));
     }
 }

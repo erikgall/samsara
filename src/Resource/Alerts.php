@@ -46,13 +46,13 @@ class Alerts extends Resource
         return $this->connector->send(new GetIncidents($startTime, $configurationIds, $endTime));
     }
 
-    public function patchConfigurations(): Response
+    public function patchConfigurations(array $payload = []): Response
     {
-        return $this->connector->send(new PatchConfigurations);
+        return $this->connector->send(new PatchConfigurations($payload));
     }
 
-    public function postConfigurations(): Response
+    public function postConfigurations(array $payload = []): Response
     {
-        return $this->connector->send(new PostConfigurations);
+        return $this->connector->send(new PostConfigurations($payload));
     }
 }

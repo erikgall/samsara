@@ -32,10 +32,20 @@ class PatchIndustrialAsset extends Request implements HasBody
     /**
      * @param  string  $id  Id of the asset to be updated
      */
-    public function __construct(protected string $id) {}
+    public function __construct(protected string $id, protected array $payload = []) {}
 
     public function resolveEndpoint(): string
     {
         return "/industrial/assets/{$this->id}";
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

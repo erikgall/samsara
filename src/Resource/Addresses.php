@@ -12,9 +12,9 @@ use ErikGall\Samsara\Requests\Addresses\UpdateAddress;
 
 class Addresses extends Resource
 {
-    public function createAddress(): Response
+    public function createAddress(array $payload = []): Response
     {
-        return $this->connector->send(new CreateAddress);
+        return $this->connector->send(new CreateAddress($payload));
     }
 
     /**
@@ -53,8 +53,8 @@ class Addresses extends Resource
     /**
      * @param  string  $id  ID of the Address. This can either be the Samsara-provided ID or an external ID. External IDs are customer-specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `crmId:abc123`
      */
-    public function updateAddress(string $id): Response
+    public function updateAddress(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateAddress($id));
+        return $this->connector->send(new UpdateAddress($id, $payload));
     }
 }

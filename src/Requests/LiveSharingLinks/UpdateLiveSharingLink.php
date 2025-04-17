@@ -36,7 +36,7 @@ class UpdateLiveSharingLink extends Request implements HasBody
     /**
      * @param  string  $id  Unique identifier for the Live Sharing Link.
      */
-    public function __construct(protected string $id) {}
+    public function __construct(protected string $id, protected array $payload = []) {}
 
     public function defaultQuery(): array
     {
@@ -46,5 +46,15 @@ class UpdateLiveSharingLink extends Request implements HasBody
     public function resolveEndpoint(): string
     {
         return '/live-shares';
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

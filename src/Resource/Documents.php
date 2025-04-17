@@ -22,9 +22,9 @@ class Documents extends Resource
         return $this->connector->send(new DeleteDocument($id));
     }
 
-    public function generateDocumentPdf(): Response
+    public function generateDocumentPdf(array $payload = []): Response
     {
-        return $this->connector->send(new GenerateDocumentPdf);
+        return $this->connector->send(new GenerateDocumentPdf($payload));
     }
 
     /**
@@ -65,8 +65,8 @@ class Documents extends Resource
         return $this->connector->send(new GetDocumentTypes);
     }
 
-    public function postDocument(): Response
+    public function postDocument(array $payload = []): Response
     {
-        return $this->connector->send(new PostDocument);
+        return $this->connector->send(new PostDocument($payload));
     }
 }

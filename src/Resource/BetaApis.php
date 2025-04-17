@@ -53,19 +53,19 @@ use ErikGall\Samsara\Requests\BetaApis\UpdateDriverTrailerAssignment;
 
 class BetaApis extends Resource
 {
-    public function createAsset(): Response
+    public function createAsset(array $payload = []): Response
     {
-        return $this->connector->send(new CreateAsset);
+        return $this->connector->send(new CreateAsset($payload));
     }
 
-    public function createDriverTrailerAssignment(): Response
+    public function createDriverTrailerAssignment(array $payload = []): Response
     {
-        return $this->connector->send(new CreateDriverTrailerAssignment);
+        return $this->connector->send(new CreateDriverTrailerAssignment($payload));
     }
 
-    public function createJob(): Response
+    public function createJob(array $payload = []): Response
     {
-        return $this->connector->send(new CreateJob);
+        return $this->connector->send(new CreateJob($payload));
     }
 
     /**
@@ -695,59 +695,59 @@ class BetaApis extends Resource
     /**
      * @param  string  $id  The unique Samsara ID of the Equipment. This is automatically generated when the Equipment object is created. It cannot be changed.
      */
-    public function patchEquipment(string $id): Response
+    public function patchEquipment(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new PatchEquipment($id));
+        return $this->connector->send(new PatchEquipment($id, $payload));
     }
 
-    public function patchFormSubmission(): Response
+    public function patchFormSubmission(array $payload = []): Response
     {
-        return $this->connector->send(new PatchFormSubmission);
+        return $this->connector->send(new PatchFormSubmission($payload));
     }
 
-    public function patchIssue(): Response
+    public function patchIssue(array $payload = []): Response
     {
-        return $this->connector->send(new PatchIssue);
+        return $this->connector->send(new PatchIssue($payload));
     }
 
     /**
      * @param  string  $id  A jobId or uuid in STRING format. JobId must be prefixed with `jobId:`(Examples: `"8d218e6c-7a16-4f9f-90f7-cc1d93b9e596"`, `"jobId:98765"`).
      */
-    public function patchJob(string $id): Response
+    public function patchJob(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new PatchJob($id));
+        return $this->connector->send(new PatchJob($id, $payload));
     }
 
     /**
      * @param  array  $ids  String of comma separated assignments IDs. Max value for this value is 100 objects .Example: `ids=a4db8702-79d5-4396-a717-e301d52ecc11,c6490f6a-d84e-49b5-b0ad-b6baae304075`
      * @param  string  $dueAtTime  Due date of the training assignment in RFC 3339 format. Millisecond precision and timezones are supported.
      */
-    public function patchTrainingAssignments(array $ids, string $dueAtTime): Response
+    public function patchTrainingAssignments(array $ids, string $dueAtTime, array $payload = []): Response
     {
-        return $this->connector->send(new PatchTrainingAssignments($ids, $dueAtTime));
+        return $this->connector->send(new PatchTrainingAssignments($ids, $dueAtTime, $payload));
     }
 
-    public function patchWorkOrders(): Response
+    public function patchWorkOrders(array $payload = []): Response
     {
-        return $this->connector->send(new PatchWorkOrders);
+        return $this->connector->send(new PatchWorkOrders($payload));
     }
 
-    public function postDriverRemoteSignout(): Response
+    public function postDriverRemoteSignout(array $payload = []): Response
     {
-        return $this->connector->send(new PostDriverRemoteSignout);
+        return $this->connector->send(new PostDriverRemoteSignout($payload));
     }
 
-    public function postFormSubmission(): Response
+    public function postFormSubmission(array $payload = []): Response
     {
-        return $this->connector->send(new PostFormSubmission);
+        return $this->connector->send(new PostFormSubmission($payload));
     }
 
     /**
      * @param  string  $id  ID of the form submission to create a PDF export from.
      */
-    public function postFormSubmissionsPdfExports(string $id): Response
+    public function postFormSubmissionsPdfExports(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new PostFormSubmissionsPdfExports($id));
+        return $this->connector->send(new PostFormSubmissionsPdfExports($id, $payload));
     }
 
     /**
@@ -758,16 +758,17 @@ class BetaApis extends Resource
     public function postTrainingAssignments(
         string $courseId,
         string $dueAtTime,
-        array $learnerIds
+        array $learnerIds,
+        array $payload = []
     ): Response {
         return $this->connector->send(
-            new PostTrainingAssignments($courseId, $dueAtTime, $learnerIds)
+            new PostTrainingAssignments($courseId, $dueAtTime, $learnerIds, $payload)
         );
     }
 
-    public function postWorkOrders(): Response
+    public function postWorkOrders(array $payload = []): Response
     {
-        return $this->connector->send(new PostWorkOrders);
+        return $this->connector->send(new PostWorkOrders($payload));
     }
 
     /**
@@ -798,33 +799,33 @@ class BetaApis extends Resource
     /**
      * @param  string  $id  A filter selecting a single asset by id.
      */
-    public function updateAsset(string $id): Response
+    public function updateAsset(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateAsset($id));
+        return $this->connector->send(new UpdateAsset($id, $payload));
     }
 
     /**
      * @param  string  $id  Samsara ID for the assignment.
      */
-    public function updateDriverTrailerAssignment(string $id): Response
+    public function updateDriverTrailerAssignment(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateDriverTrailerAssignment($id));
+        return $this->connector->send(new UpdateDriverTrailerAssignment($id, $payload));
     }
 
     /**
      * @param  int  $id  Vehicle ID
      */
-    public function updateEngineImmobilizerState(int $id): Response
+    public function updateEngineImmobilizerState(int $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateEngineImmobilizerState($id));
+        return $this->connector->send(new UpdateEngineImmobilizerState($id, $payload));
     }
 
     /**
      * @param  string  $hosDate  A start date in yyyy-mm-dd format. Required.
      * @param  string  $driverId  ID of the driver for whom the duty status is being set.
      */
-    public function updateShippingDocs(string $hosDate, string $driverId): Response
+    public function updateShippingDocs(string $hosDate, string $driverId, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateShippingDocs($hosDate, $driverId));
+        return $this->connector->send(new UpdateShippingDocs($hosDate, $driverId, $payload));
     }
 }

@@ -104,9 +104,9 @@ class HoursOfService extends Resource
     /**
      * @param  int  $driverId  ID of the driver for whom the duty status is being set.
      */
-    public function setCurrentDutyStatus(int $driverId): Response
+    public function setCurrentDutyStatus(int $driverId, array $payload = []): Response
     {
-        return $this->connector->send(new SetCurrentDutyStatus($driverId));
+        return $this->connector->send(new SetCurrentDutyStatus($driverId, $payload));
     }
 
     /**

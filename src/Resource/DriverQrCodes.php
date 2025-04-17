@@ -10,9 +10,9 @@ use ErikGall\Samsara\Requests\DriverQrCodes\DeleteDriverQrCode;
 
 class DriverQrCodes extends Resource
 {
-    public function createDriverQrCode(): Response
+    public function createDriverQrCode(array $payload = []): Response
     {
-        return $this->connector->send(new CreateDriverQrCode);
+        return $this->connector->send(new CreateDriverQrCode($payload));
     }
 
     public function deleteDriverQrCode(): Response

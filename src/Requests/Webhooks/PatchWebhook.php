@@ -42,10 +42,20 @@ class PatchWebhook extends Request implements HasBody
     /**
      * @param  string  $id  Unique identifier for the webhook to update.
      */
-    public function __construct(protected string $id) {}
+    public function __construct(protected string $id, protected array $payload = []) {}
 
     public function resolveEndpoint(): string
     {
         return "/webhooks/{$this->id}";
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

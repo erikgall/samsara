@@ -13,9 +13,9 @@ use ErikGall\Samsara\Requests\Users\ListUserRoles;
 
 class Users extends Resource
 {
-    public function createUser(): Response
+    public function createUser(array $payload = []): Response
     {
-        return $this->connector->send(new CreateUser);
+        return $this->connector->send(new CreateUser($payload));
     }
 
     /**
@@ -53,8 +53,8 @@ class Users extends Resource
     /**
      * @param  string  $id  Unique identifier for the user.
      */
-    public function updateUser(string $id): Response
+    public function updateUser(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateUser($id));
+        return $this->connector->send(new UpdateUser($id, $payload));
     }
 }

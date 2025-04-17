@@ -11,9 +11,9 @@ use ErikGall\Samsara\Requests\Drivers\UpdateDriver;
 
 class Drivers extends Resource
 {
-    public function createDriver(): Response
+    public function createDriver(array $payload = []): Response
     {
-        return $this->connector->send(new CreateDriver);
+        return $this->connector->send(new CreateDriver($payload));
     }
 
     /**
@@ -57,9 +57,10 @@ class Drivers extends Resource
 
     /**
      * @param  string  $id  ID of the driver. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `payrollId:ABFS18600`
+     * @param  array  $payload
      */
-    public function updateDriver(string $id): Response
+    public function updateDriver(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateDriver($id));
+        return $this->connector->send(new UpdateDriver($id, $payload));
     }
 }

@@ -32,10 +32,20 @@ class UpdateAttribute extends Request implements HasBody
     /**
      * @param  string  $id  Samsara-provided UUID of the attribute.
      */
-    public function __construct(protected string $id) {}
+    public function __construct(protected string $id, protected array $payload = []) {}
 
     public function resolveEndpoint(): string
     {
         return "/attributes/{$this->id}";
+    }
+
+    /**
+     * Default body.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->payload;
     }
 }

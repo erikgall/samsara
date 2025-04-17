@@ -9,9 +9,9 @@ use ErikGall\Samsara\Requests\Messages\V1createMessages;
 
 class Messages extends Resource
 {
-    public function v1createMessages(): Response
+    public function v1createMessages(array $payload = []): Response
     {
-        return $this->connector->send(new V1createMessages);
+        return $this->connector->send(new V1createMessages, $payload);
     }
 
     /**

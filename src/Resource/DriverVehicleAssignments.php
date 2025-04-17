@@ -11,9 +11,9 @@ use ErikGall\Samsara\Requests\DriverVehicleAssignments\DeleteDriverVehicleAssign
 
 class DriverVehicleAssignments extends Resource
 {
-    public function createDriverVehicleAssignment(): Response
+    public function createDriverVehicleAssignment(array $payload = []): Response
     {
-        return $this->connector->send(new CreateDriverVehicleAssignment);
+        return $this->connector->send(new CreateDriverVehicleAssignment($payload));
     }
 
     public function deleteDriverVehicleAssignments(): Response
@@ -55,8 +55,8 @@ class DriverVehicleAssignments extends Resource
         );
     }
 
-    public function updateDriverVehicleAssignment(): Response
+    public function updateDriverVehicleAssignment(array $payload = []): Response
     {
-        return $this->connector->send(new UpdateDriverVehicleAssignment);
+        return $this->connector->send(new UpdateDriverVehicleAssignment($payload));
     }
 }

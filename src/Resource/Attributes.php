@@ -12,9 +12,9 @@ use ErikGall\Samsara\Requests\Attributes\GetAttributesByEntityType;
 
 class Attributes extends Resource
 {
-    public function createAttribute(): Response
+    public function createAttribute(array $payload = []): Response
     {
-        return $this->connector->send(new CreateAttribute);
+        return $this->connector->send(new CreateAttribute($payload));
     }
 
     /**
@@ -47,8 +47,8 @@ class Attributes extends Resource
     /**
      * @param  string  $id  Samsara-provided UUID of the attribute.
      */
-    public function updateAttribute(string $id): Response
+    public function updateAttribute(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateAttribute($id));
+        return $this->connector->send(new UpdateAttribute($id, $payload));
     }
 }

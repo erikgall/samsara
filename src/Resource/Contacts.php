@@ -12,9 +12,9 @@ use ErikGall\Samsara\Requests\Contacts\UpdateContact;
 
 class Contacts extends Resource
 {
-    public function createContact(): Response
+    public function createContact(array $payload = []): Response
     {
-        return $this->connector->send(new CreateContact);
+        return $this->connector->send(new CreateContact($payload));
     }
 
     /**
@@ -44,8 +44,8 @@ class Contacts extends Resource
     /**
      * @param  string  $id  Unique identifier for the contact.
      */
-    public function updateContact(string $id): Response
+    public function updateContact(string $id, array $payload = []): Response
     {
-        return $this->connector->send(new UpdateContact($id));
+        return $this->connector->send(new UpdateContact($id, $payload));
     }
 }

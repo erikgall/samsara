@@ -57,8 +57,8 @@ class FuelAndEnergy extends Resource
         );
     }
 
-    public function postFuelPurchase(): Response
+    public function postFuelPurchase(array $payload = []): Response
     {
-        return $this->connector->send(new PostFuelPurchase);
+        return $this->connector->send(new PostFuelPurchase($payload));
     }
 }

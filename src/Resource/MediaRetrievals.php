@@ -17,8 +17,8 @@ class MediaRetrievals extends Resource
         return $this->connector->send(new GetMediaRetrieval($retrievalId));
     }
 
-    public function postMediaRetrieval(): Response
+    public function postMediaRetrieval(array $payload = []): Response
     {
-        return $this->connector->send(new PostMediaRetrieval);
+        return $this->connector->send(new PostMediaRetrieval($payload));
     }
 }
