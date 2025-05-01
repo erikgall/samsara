@@ -4,6 +4,8 @@ namespace ErikGall\Samsara\Requests\Drivers;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use Saloon\Http\Response;
+use ErikGall\Samsara\Entities\Driver;
 
 /**
  * listDrivers.
@@ -43,6 +45,16 @@ class ListDrivers extends Request
         protected ?string $updatedAfterTime = null,
         protected ?string $createdAfterTime = null
     ) {}
+
+    /**
+     * Cast the response to a DTO.
+     *
+     * @return \Illuminate\Support\Collection<\ErikGall\Samsara\Entities\Driver>
+     */
+    public function createDtoFromResponse(Response $response): mixed
+    {
+        return $response->collect('data')->mapInto(Driver::class);
+    }
 
     public function defaultQuery(): array
     {

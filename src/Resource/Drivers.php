@@ -11,7 +11,7 @@ use ErikGall\Samsara\Requests\Drivers\UpdateDriver;
 
 class Drivers extends Resource
 {
-    public function createDriver(array $payload = []): Response
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateDriver($payload));
     }
@@ -19,7 +19,7 @@ class Drivers extends Resource
     /**
      * @param  string  $id  ID of the driver. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `payrollId:ABFS18600`
      */
-    public function getDriver(string $id): Response
+    public function find(string $id): Response
     {
         return $this->connector->send(new GetDriver($id));
     }
@@ -33,7 +33,7 @@ class Drivers extends Resource
      * @param  string  $updatedAfterTime  A filter on data to have an updated at time after or equal to this specified time in RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
      * @param  string  $createdAfterTime  A filter on data to have a created at time after or equal to this specified time in RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
      */
-    public function listDrivers(
+    public function get(
         ?string $driverActivationStatus = null,
         ?int $limit = null,
         ?array $parentTagIds = null,
@@ -59,7 +59,7 @@ class Drivers extends Resource
      * @param  string  $id  ID of the driver. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `payrollId:ABFS18600`
      * @param  array  $payload
      */
-    public function updateDriver(string $id, array $payload = []): Response
+    public function update(string $id, array $payload = []): Response
     {
         return $this->connector->send(new UpdateDriver($id, $payload));
     }

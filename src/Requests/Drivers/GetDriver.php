@@ -4,6 +4,8 @@ namespace ErikGall\Samsara\Requests\Drivers;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use Saloon\Http\Response;
+use ErikGall\Samsara\Entities\Driver;
 
 /**
  * getDriver.
@@ -29,6 +31,16 @@ class GetDriver extends Request
      * @param  string  $id  ID of the driver. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `payrollId:ABFS18600`
      */
     public function __construct(protected string $id) {}
+
+    /**
+     * Cast the response to a DTO.
+     *
+     * @return \ErikGall\Samsara\Entities\Driver
+     */
+    public function createDtoFromResponse(Response $response): mixed
+    {
+        return new Driver($response->json('data'));
+    }
 
     public function resolveEndpoint(): string
     {

@@ -4,6 +4,8 @@ namespace ErikGall\Samsara\Requests\Vehicles;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use Saloon\Http\Response;
+use ErikGall\Samsara\Entities\Vehicle;
 
 /**
  * listVehicles.
@@ -44,6 +46,16 @@ class ListVehicles extends Request
         protected ?string $updatedAfterTime = null,
         protected ?string $createdAfterTime = null
     ) {}
+
+    /**
+     * Cast the response to a DTO.
+     *
+     * @return \Illuminate\Support\Collection<\ErikGall\Samsara\Entities\Vehicle>
+     */
+    public function createDtoFromResponse(Response $response): mixed
+    {
+        return $response->collect('data')->mapInto(Vehicle::class);
+    }
 
     public function defaultQuery(): array
     {

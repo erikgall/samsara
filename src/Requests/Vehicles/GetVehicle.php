@@ -4,6 +4,8 @@ namespace ErikGall\Samsara\Requests\Vehicles;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use Saloon\Http\Response;
+use ErikGall\Samsara\Entities\Vehicle;
 
 /**
  * getVehicle.
@@ -29,6 +31,16 @@ class GetVehicle extends Request
      * @param  string  $id  ID of the vehicle. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource, or automatically populated by fields on the vehicle. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `maintenanceId:250020`. Automatically populated external IDs are prefixed with `samsara.`. For example, `samsara.vin:1HGBH41JXMN109186`.
      */
     public function __construct(protected string $id) {}
+
+    /**
+     * Cast the response to a DTO.
+     *
+     * @return \ErikGall\Samsara\Entities\Vehicle
+     */
+    public function createDtoFromResponse(Response $response): mixed
+    {
+        return new Vehicle($response->json('data'));
+    }
 
     public function resolveEndpoint(): string
     {
