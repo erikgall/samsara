@@ -7,8 +7,8 @@ namespace ErikGall\Samsara\Entities;
  *
  * @author Erik Galloway <egalloway@boltsystem.com>
  *
- * @param  string  $externalIds
- * @param  string  $gateway
+ * @param  array  $externalIds
+ * @param  array  $gateway
  * @param  string  $harshAccelerationSettingType
  * @param  string  $id
  * @param  string  $licensePlate
@@ -17,7 +17,7 @@ namespace ErikGall\Samsara\Entities;
  * @param  string  $name
  * @param  string  $notes
  * @param  string  $serial
- * @param  string  $staticAssignedDriver
+ * @param  array  $staticAssignedDriver
  * @param  string  $vin
  * @param  string  $year
  * @param  string  $vehicleRegulationMode
