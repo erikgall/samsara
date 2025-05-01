@@ -8,7 +8,7 @@ use ErikGall\Samsara\Requests\OrganizationInfo\GetOrganizationInfo;
 
 class OrganizationInfo extends Resource
 {
-    public function getOrganizationInfo(): Response
+    public function get(): Response
     {
         return $this->connector->send(new GetOrganizationInfo);
     }

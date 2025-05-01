@@ -4,6 +4,8 @@ namespace ErikGall\Samsara\Requests\OrganizationInfo;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use Saloon\Http\Response;
+use ErikGall\Samsara\Entities\Organization;
 
 /**
  * getOrganizationInfo.
@@ -26,6 +28,16 @@ class GetOrganizationInfo extends Request
     protected Method $method = Method::GET;
 
     public function __construct() {}
+
+    /**
+     * Cast the response to a DTO.
+     *
+     * @return \Illuminate\Support\Collection<\ErikGall\Samsara\Entities\Vehicle>
+     */
+    public function createDtoFromResponse(Response $response): mixed
+    {
+        return new Organization($response->json('data'));
+    }
 
     public function resolveEndpoint(): string
     {
