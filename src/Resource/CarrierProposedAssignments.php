@@ -10,25 +10,37 @@ use ErikGall\Samsara\Requests\CarrierProposedAssignments\DeleteCarrierProposedAs
 
 class CarrierProposedAssignments extends Resource
 {
-    public function createCarrierProposedAssignment(array $payload = []): Response
+    /**
+     * Create a new Carrier Proposed Assignment.
+     *
+     * @param  array  $payload  The data to create the assignment.
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateCarrierProposedAssignment($payload));
     }
 
     /**
+     * Delete a Carrier Proposed Assignment.
+     *
      * @param  string  $id  ID of the assignment.
+     * @return Response
      */
-    public function deleteCarrierProposedAssignment(string $id): Response
+    public function delete(string $id): Response
     {
         return $this->connector->send(new DeleteCarrierProposedAssignment($id));
     }
 
     /**
-     * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
-     * @param  array  $driverIds  A filter on the data based on this comma-separated list of driver IDs and externalIds. Example: `driverIds=1234,5678,payroll:4841`
-     * @param  string  $activeTime  If specified, shows assignments that will be active at this time. Defaults to now, which would show current active assignments. In RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
+     * Get Carrier Proposed Assignments.
+     *
+     * @param  int|null  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
+     * @param  array|null  $driverIds  Filter by driver IDs.
+     * @param  string|null  $activeTime  Show assignments active at this time (RFC 3339).
+     * @return Response
      */
-    public function listCarrierProposedAssignments(
+    public function get(
         ?int $limit = null,
         ?array $driverIds = null,
         ?string $activeTime = null

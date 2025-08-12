@@ -20,9 +20,9 @@ class LegacyApis extends Resource
      * @param  string  $driverActivationStatus  If value is `deactivated`, only drivers that are deactivated will appear in the response. This parameter will default to `active` if not provided (fetching only active drivers).  Valid values: `active`, `deactivated`
      */
     public function getDriversVehicleAssignments(
-        ?array $driverIds = null,
-        ?string $startTime = null,
-        ?string $endTime = null,
+        array $driverIds,
+        string $startTime,
+        string $endTime,
         ?string $tagIds = null,
         ?string $parentTagIds = null,
         ?string $driverActivationStatus = null

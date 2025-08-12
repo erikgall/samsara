@@ -17,9 +17,9 @@ class TrailerAssignments extends Resource
      * @param  string  $endingBefore  Pagination parameter indicating the cursor position to return results before. Used in conjunction with the 'limit' parameter. Mutually exclusive with 'startingAfter' parameter.
      */
     public function v1getAllTrailerAssignments(
-        ?int $startMs,
-        ?int $endMs,
-        float|int|null $limit,
+        ?int $startMs = null,
+        ?int $endMs = null,
+        float|int|null $limit = null,
         ?string $startingAfter = null,
         ?string $endingBefore = null
     ): Response {

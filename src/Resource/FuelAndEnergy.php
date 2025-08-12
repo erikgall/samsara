@@ -11,13 +11,27 @@ use ErikGall\Samsara\Requests\FuelAndEnergy\GetFuelEnergyVehicleReports;
 class FuelAndEnergy extends Resource
 {
     /**
-     * @param  string  $startDate  A start date in RFC 3339 format. This parameter ignores everything (i.e. hour, minutes, seconds, nanoseconds, etc.) besides the date and timezone. If no time zone is passed in, then the UTC time zone will be used. This parameter is inclusive, so data on the date specified will be considered. Note that the most recent 72 hours of data may still be processing and is subject to change and latency, so it is not recommended to request data for the most recent 72 hours. For example, 2022-07-13T14:20:50.52-07:00 is a time in Pacific Daylight Time.
-     * @param  string  $endDate  An end date in RFC 3339 format. This parameter ignores everything (i.e. hour, minutes, seconds, nanoseconds, etc.) besides the date and timezone. If no time zone is passed in, then the UTC time zone will be used. This parameter is inclusive, so data on the date specified will be considered. Note that the most recent 72 hours of data may still be processing and is subject to change and latency, so it is not recommended to request data for the most recent 72 hours. For example, 2022-07-13T14:20:50.52-07:00 is a time in Pacific Daylight Time.
-     * @param  array  $driverIds  A filter on the data based on this comma-separated list of driver IDs and externalIds. Example: `driverIds=1234,5678,payroll:4841`
-     * @param  string  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
-     * @param  string  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
+     * Create a new fuel purchase record.
+     *
+     * @param  array  $payload  The data to create the fuel purchase.
+     * @return Response
      */
-    public function getFuelEnergyDriverReports(
+    public function create(array $payload = []): Response
+    {
+        return $this->connector->send(new PostFuelPurchase($payload));
+    }
+
+    /**
+     * Get fuel and energy driver reports.
+     *
+     * @param  string  $startDate  Start date (RFC 3339).
+     * @param  string  $endDate  End date (RFC 3339).
+     * @param  array|null  $driverIds  Filter by driver IDs.
+     * @param  string|null  $tagIds  Filter by tag IDs.
+     * @param  string|null  $parentTagIds  Filter by parent tag IDs.
+     * @return Response
+     */
+    public function getDriverReports(
         string $startDate,
         string $endDate,
         ?array $driverIds = null,
@@ -30,14 +44,17 @@ class FuelAndEnergy extends Resource
     }
 
     /**
-     * @param  string  $startDate  A start date in RFC 3339 format. This parameter ignores everything (i.e. hour, minutes, seconds, nanoseconds, etc.) besides the date and timezone. If no time zone is passed in, then the UTC time zone will be used. This parameter is inclusive, so data on the date specified will be considered. Note that the most recent 72 hours of data may still be processing and is subject to change and latency, so it is not recommended to request data for the most recent 72 hours. For example, 2022-07-13T14:20:50.52-07:00 is a time in Pacific Daylight Time.
-     * @param  string  $endDate  An end date in RFC 3339 format. This parameter ignores everything (i.e. hour, minutes, seconds, nanoseconds, etc.) besides the date and timezone. If no time zone is passed in, then the UTC time zone will be used. This parameter is inclusive, so data on the date specified will be considered. Note that the most recent 72 hours of data may still be processing and is subject to change and latency, so it is not recommended to request data for the most recent 72 hours. For example, 2022-07-13T14:20:50.52-07:00 is a time in Pacific Daylight Time.
-     * @param  string  $vehicleIds  A filter on the data based on this comma-separated list of vehicle IDs and externalIds. Example: `vehicleIds=1234,5678,samsara.vin:1HGBH41JXMN109186`
-     * @param  string  $energyType  The type of energy used by the vehicle.  Valid values: `fuel`, `hybrid`, `electric`
-     * @param  string  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
-     * @param  string  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
+     * Get fuel and energy vehicle reports.
+     *
+     * @param  string  $startDate  Start date (RFC 3339).
+     * @param  string  $endDate  End date (RFC 3339).
+     * @param  string|null  $vehicleIds  Filter by vehicle IDs.
+     * @param  string|null  $energyType  The type of energy used by the vehicle.
+     * @param  string|null  $tagIds  Filter by tag IDs.
+     * @param  string|null  $parentTagIds  Filter by parent tag IDs.
+     * @return Response
      */
-    public function getFuelEnergyVehicleReports(
+    public function getVehicleReports(
         string $startDate,
         string $endDate,
         ?string $vehicleIds = null,
@@ -55,10 +72,5 @@ class FuelAndEnergy extends Resource
                 $parentTagIds
             )
         );
-    }
-
-    public function postFuelPurchase(array $payload = []): Response
-    {
-        return $this->connector->send(new PostFuelPurchase($payload));
     }
 }

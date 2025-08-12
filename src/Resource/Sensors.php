@@ -13,32 +13,62 @@ use ErikGall\Samsara\Requests\Sensors\V1getSensorsTemperature;
 
 class Sensors extends Resource
 {
-    public function v1getSensors(): Response
+    /**
+     * Get all sensors.
+     *
+     * @return Response
+     */
+    public function getSensors(): Response
     {
         return $this->connector->send(new V1getSensors);
     }
 
-    public function v1getSensorsCargo(): Response
+    /**
+     * Get cargo sensors.
+     *
+     * @return Response
+     */
+    public function getSensorsCargo(): Response
     {
         return $this->connector->send(new V1getSensorsCargo);
     }
 
-    public function v1getSensorsDoor(): Response
+    /**
+     * Get door sensors.
+     *
+     * @return Response
+     */
+    public function getSensorsDoor(): Response
     {
         return $this->connector->send(new V1getSensorsDoor);
     }
 
-    public function v1getSensorsHistory(): Response
+    /**
+     * Get sensors history.
+     *
+     * @return Response
+     */
+    public function getSensorsHistory(): Response
     {
         return $this->connector->send(new V1getSensorsHistory);
     }
 
-    public function v1getSensorsHumidity(): Response
+    /**
+     * Get sensors humidity.
+     *
+     * @return Response
+     */
+    public function getSensorsHumidity(): Response
     {
         return $this->connector->send(new V1getSensorsHumidity);
     }
 
-    public function v1getSensorsTemperature(): Response
+    /**
+     * Get sensors temperature.
+     *
+     * @return Response
+     */
+    public function getSensorsTemperature(): Response
     {
         return $this->connector->send(new V1getSensorsTemperature);
     }

@@ -17,7 +17,7 @@ class SpeedingIntervals extends Resource
      * @param  bool  $includeDriverId  Indicates whether or not to return trip's driver id
      * @param  array  $severityLevels  Optional string of comma-separated severity levels to filter speeding intervals by. Valid values:  “light”, ”moderate”, ”heavy”, “severe”.
      */
-    public function getSpeedingIntervals(
+    public function get(
         array $assetIds,
         string $startTime,
         ?string $endTime = null,

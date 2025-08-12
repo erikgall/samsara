@@ -11,7 +11,7 @@ class Messages extends Resource
 {
     public function v1createMessages(array $payload = []): Response
     {
-        return $this->connector->send(new V1createMessages, $payload);
+        return $this->connector->send(new V1createMessages($payload));
     }
 
     /**

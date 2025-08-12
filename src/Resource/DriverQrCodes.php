@@ -10,20 +10,34 @@ use ErikGall\Samsara\Requests\DriverQrCodes\DeleteDriverQrCode;
 
 class DriverQrCodes extends Resource
 {
-    public function createDriverQrCode(array $payload = []): Response
+    /**
+     * Create a new Driver QR Code resource.
+     *
+     * @param  array  $payload  The data to create the driver QR code.
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateDriverQrCode($payload));
     }
 
-    public function deleteDriverQrCode(): Response
+    /**
+     * Delete a Driver QR Code resource.
+     *
+     * @return Response
+     */
+    public function delete(): Response
     {
         return $this->connector->send(new DeleteDriverQrCode);
     }
 
     /**
-     * @param  array  $driverIds  String of comma separated driver IDs. List of driver - QR codes for specified driver(s) will be returned.
+     * Get Driver QR Codes for specified drivers.
+     *
+     * @param  array  $driverIds  List of driver IDs.
+     * @return Response
      */
-    public function getDriversQrCodes(array $driverIds): Response
+    public function get(array $driverIds): Response
     {
         return $this->connector->send(new GetDriversQrCodes($driverIds));
     }

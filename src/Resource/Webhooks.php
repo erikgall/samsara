@@ -12,10 +12,15 @@ use ErikGall\Samsara\Requests\Webhooks\DeleteWebhook;
 
 class Webhooks extends Resource
 {
+    public function create(array $payload = []): Response
+    {
+        return $this->connector->send(new PostWebhooks($payload));
+    }
+
     /**
      * @param  string  $id  Unique identifier for the webhook to delete.
      */
-    public function deleteWebhook(string $id): Response
+    public function delete(string $id): Response
     {
         return $this->connector->send(new DeleteWebhook($id));
     }
@@ -23,7 +28,7 @@ class Webhooks extends Resource
     /**
      * @param  string  $id  ID of the webhook. This is the Samsara-specified ID.
      */
-    public function getWebhook(string $id): Response
+    public function find(string $id): Response
     {
         return $this->connector->send(new GetWebhook($id));
     }
@@ -32,7 +37,7 @@ class Webhooks extends Resource
      * @param  string  $ids  A filter on the data based on this comma-separated list of webhook IDs. Example: `ids=49412323223,49412329928`
      * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
      */
-    public function listWebhooks(?string $ids = null, ?int $limit = null): Response
+    public function get(?string $ids = null, ?int $limit = null): Response
     {
         return $this->connector->send(new ListWebhooks($ids, $limit));
     }
@@ -40,13 +45,8 @@ class Webhooks extends Resource
     /**
      * @param  string  $id  Unique identifier for the webhook to update.
      */
-    public function patchWebhook(string $id, array $payload = []): Response
+    public function update(string $id, array $payload = []): Response
     {
         return $this->connector->send(new PatchWebhook($id, $payload));
-    }
-
-    public function postWebhooks(array $payload = []): Response
-    {
-        return $this->connector->send(new PostWebhooks($payload));
     }
 }

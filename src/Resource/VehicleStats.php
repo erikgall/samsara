@@ -69,12 +69,12 @@ class VehicleStats extends Resource
      * - `spreaderPlowStatus`: Snow plow status (`Up` or `Down`), as read from the material spreader. Note: this is separate from plow status defined via auxInput.
      * - `seatbeltDriver`: Seatbelt Driver Status as read from the vehicle. `Buckled` or `Unbuckled`. (Beta only)
      */
-    public function getVehicleStats(
-        ?string $time,
-        ?array $parentTagIds,
-        ?array $tagIds,
-        ?array $vehicleIds,
-        array $types
+    public function get(
+        ?string $time = null,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $vehicleIds = null,
+        ?array $types = null
     ): Response {
         return $this->connector->send(
             new GetVehicleStats($time, $parentTagIds, $tagIds, $vehicleIds, $types)
@@ -190,11 +190,11 @@ class VehicleStats extends Resource
      * - `spreaderPlowStatus`: Snow plow status (`Up` or `Down`), as read from the material spreader. Note: this is separate from plow status defined via auxInput.
      * - `seatbeltDriver`: Seatbelt Driver Status as read from the vehicle. `Buckled` or `Unbuckled`. (Beta only)
      */
-    public function getVehicleStatsFeed(
-        ?array $parentTagIds,
-        ?array $tagIds,
-        ?array $vehicleIds,
-        array $types,
+    public function getFeed(
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $vehicleIds = null,
+        ?array $types = null,
         ?array $decorations = null
     ): Response {
         return $this->connector->send(
@@ -313,13 +313,13 @@ class VehicleStats extends Resource
      * - `spreaderPlowStatus`: Snow plow status (`Up` or `Down`), as read from the material spreader. Note: this is separate from plow status defined via auxInput.
      * - `seatbeltDriver`: Seatbelt Driver Status as read from the vehicle. `Buckled` or `Unbuckled`. (Beta only)
      */
-    public function getVehicleStatsHistory(
+    public function getHistory(
         string $startTime,
         string $endTime,
-        ?array $parentTagIds,
-        ?array $tagIds,
-        ?array $vehicleIds,
-        array $types,
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $vehicleIds = null,
+        ?array $types = null,
         ?array $decorations = null
     ): Response {
         return $this->connector->send(

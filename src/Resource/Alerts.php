@@ -13,19 +13,36 @@ use ErikGall\Samsara\Requests\Alerts\DeleteConfigurations;
 class Alerts extends Resource
 {
     /**
-     * @param  string  $id  The unqiue Samsara id of the alert configuration.
+     * Create a new alert configuration.
+     *
+     * @param  array  $payload  The data to create the alert configuration.
+     * @return Response
      */
-    public function deleteConfigurations(string $id): Response
+    public function create(array $payload = []): Response
+    {
+        return $this->connector->send(new PostConfigurations($payload));
+    }
+
+    /**
+     * Delete an alert configuration.
+     *
+     * @param  string  $id  The unique Samsara id of the alert configuration.
+     * @return Response
+     */
+    public function delete(string $id): Response
     {
         return $this->connector->send(new DeleteConfigurations($id));
     }
 
     /**
-     * @param  array  $ids  Filter by the IDs. Returns all if no ids are provided.
-     * @param  string  $status  The status of the alert configuration.  Valid values: `all`, `enabled`, `disabled`
-     * @param  bool  $includeExternalIds  Optional boolean indicating whether to return external IDs on supported entities
+     * Get alert configurations.
+     *
+     * @param  array|null  $ids  Filter by the IDs. Returns all if no ids are provided.
+     * @param  string|null  $status  The status of the alert configuration. Valid values: `all`, `enabled`, `disabled`.
+     * @param  bool|null  $includeExternalIds  Whether to return external IDs on supported entities.
+     * @return Response
      */
-    public function getConfigurations(
+    public function get(
         ?array $ids = null,
         ?string $status = null,
         ?bool $includeExternalIds = null
@@ -34,9 +51,12 @@ class Alerts extends Resource
     }
 
     /**
-     * @param  string  $startTime  Required RFC 3339 timestamp that indicates when to begin receiving data. This will be based on updatedAtTime.
+     * Get alert incidents.
+     *
+     * @param  string  $startTime  Required RFC 3339 timestamp that indicates when to begin receiving data.
      * @param  array  $configurationIds  Required array of alert configuration ids to return incident data for.
-     * @param  string  $endTime  Optional RFC 3339 timestamp to stop receiving data. Defaults to now if not provided. This will be based on updatedAtTime.
+     * @param  string|null  $endTime  Optional RFC 3339 timestamp to stop receiving data. Defaults to now if not provided.
+     * @return Response
      */
     public function getIncidents(
         string $startTime,
@@ -46,13 +66,14 @@ class Alerts extends Resource
         return $this->connector->send(new GetIncidents($startTime, $configurationIds, $endTime));
     }
 
-    public function patchConfigurations(array $payload = []): Response
+    /**
+     * Update alert configurations.
+     *
+     * @param  array  $payload  The data to update the alert configuration.
+     * @return Response
+     */
+    public function update(array $payload = []): Response
     {
         return $this->connector->send(new PatchConfigurations($payload));
-    }
-
-    public function postConfigurations(array $payload = []): Response
-    {
-        return $this->connector->send(new PostConfigurations($payload));
     }
 }

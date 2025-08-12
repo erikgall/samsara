@@ -148,10 +148,10 @@ class GetVehicleStatsFeed extends Request
      * - `seatbeltDriver`: Seatbelt Driver Status as read from the vehicle. `Buckled` or `Unbuckled`. (Beta only)
      */
     public function __construct(
-        protected ?array $parentTagIds,
-        protected ?array $tagIds,
-        protected ?array $vehicleIds,
-        protected array $types,
+        protected ?array $parentTagIds = null,
+        protected ?array $tagIds = null,
+        protected ?array $vehicleIds = null,
+        protected ?array $types = null,
         protected ?array $decorations = null
     ) {}
 

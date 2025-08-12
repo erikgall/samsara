@@ -13,11 +13,24 @@ use ErikGall\Samsara\Requests\Assets\V1getAllAssetCurrentLocations;
 class Assets extends Resource
 {
     /**
-     * @param  string  $startingAfter  Pagination parameter indicating the cursor position to continue returning results after. Used in conjunction with the 'limit' parameter. Mutually exclusive with 'endingBefore' parameter.
-     * @param  string  $endingBefore  Pagination parameter indicating the cursor position to return results before. Used in conjunction with the 'limit' parameter. Mutually exclusive with 'startingAfter' parameter.
-     * @param  float|int  $limit  Pagination parameter indicating the number of results to return in this request. Used in conjunction with either 'startingAfter' or 'endingBefore'.
+     * Get all assets.
+     *
+     * @return Response
      */
-    public function v1getAllAssetCurrentLocations(
+    public function getAll(): Response
+    {
+        return $this->connector->send(new V1getAllAssets);
+    }
+
+    /**
+     * Get all asset current locations.
+     *
+     * @param  string|null  $startingAfter  Pagination cursor for next page.
+     * @param  string|null  $endingBefore  Pagination cursor for previous page.
+     * @param  float|int|null  $limit  Number of results to return.
+     * @return Response
+     */
+    public function getAllCurrentLocations(
         ?string $startingAfter = null,
         ?string $endingBefore = null,
         float|int|null $limit = null
@@ -27,39 +40,17 @@ class Assets extends Resource
         );
     }
 
-    public function v1getAllAssets(): Response
-    {
-        return $this->connector->send(new V1getAllAssets);
-    }
-
     /**
-     * @param  int  $assetId  ID of the asset. Must contain only digits 0-9.
-     * @param  int  $startMs  Timestamp in milliseconds representing the start of the period to fetch, inclusive. Used in combination with endMs.
-     * @param  int  $endMs  Timestamp in milliseconds representing the end of the period to fetch, inclusive. Used in combination with startMs.
+     * Get assets reefers for a time range.
+     *
+     * @param  int  $startMs  Start timestamp (ms).
+     * @param  int  $endMs  End timestamp (ms).
+     * @param  string|null  $startingAfter  Pagination cursor for next page.
+     * @param  string|null  $endingBefore  Pagination cursor for previous page.
+     * @param  float|int|null  $limit  Number of results to return.
+     * @return Response
      */
-    public function v1getAssetLocation(int $assetId, int $startMs, int $endMs): Response
-    {
-        return $this->connector->send(new V1getAssetLocation($assetId, $startMs, $endMs));
-    }
-
-    /**
-     * @param  int  $assetId  ID of the asset. Must contain only digits 0-9.
-     * @param  int  $startMs  Timestamp in milliseconds representing the start of the period to fetch, inclusive. Used in combination with endMs.
-     * @param  int  $endMs  Timestamp in milliseconds representing the end of the period to fetch, inclusive. Used in combination with startMs.
-     */
-    public function v1getAssetReefer(int $assetId, int $startMs, int $endMs): Response
-    {
-        return $this->connector->send(new V1getAssetReefer($assetId, $startMs, $endMs));
-    }
-
-    /**
-     * @param  int  $startMs  Timestamp in milliseconds representing the start of the period to fetch, inclusive. Used in combination with endMs.
-     * @param  int  $endMs  Timestamp in milliseconds representing the end of the period to fetch, inclusive. Used in combination with startMs.
-     * @param  string  $startingAfter  Pagination parameter indicating the cursor position to continue returning results after. Used in conjunction with the 'limit' parameter. Mutually exclusive with 'endingBefore' parameter.
-     * @param  string  $endingBefore  Pagination parameter indicating the cursor position to return results before. Used in conjunction with the 'limit' parameter. Mutually exclusive with 'startingAfter' parameter.
-     * @param  float|int  $limit  Pagination parameter indicating the number of results to return in this request. Used in conjunction with either 'startingAfter' or 'endingBefore'.
-     */
-    public function v1getAssetsReefers(
+    public function getAssetsReefers(
         int $startMs,
         int $endMs,
         ?string $startingAfter = null,
@@ -69,5 +60,31 @@ class Assets extends Resource
         return $this->connector->send(
             new V1getAssetsReefers($startMs, $endMs, $startingAfter, $endingBefore, $limit)
         );
+    }
+
+    /**
+     * Get asset location for a specific asset and time range.
+     *
+     * @param  int  $assetId  Asset ID.
+     * @param  int  $startMs  Start timestamp (ms).
+     * @param  int  $endMs  End timestamp (ms).
+     * @return Response
+     */
+    public function getLocation(int $assetId, int $startMs, int $endMs): Response
+    {
+        return $this->connector->send(new V1getAssetLocation($assetId, $startMs, $endMs));
+    }
+
+    /**
+     * Get asset reefer data for a specific asset and time range.
+     *
+     * @param  int  $assetId  Asset ID.
+     * @param  int  $startMs  Start timestamp (ms).
+     * @param  int  $endMs  End timestamp (ms).
+     * @return Response
+     */
+    public function getReefer(int $assetId, int $startMs, int $endMs): Response
+    {
+        return $this->connector->send(new V1getAssetReefer($assetId, $startMs, $endMs));
     }
 }

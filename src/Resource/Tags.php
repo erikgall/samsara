@@ -13,41 +13,48 @@ use ErikGall\Samsara\Requests\Tags\ReplaceTag;
 
 class Tags extends Resource
 {
-    public function createTag(array $payload = []): Response
+    /**
+     * Create a new Tag resource.
+     *
+     * @param  array  $payload  The data to create the tag.
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateTag($payload));
     }
 
     /**
-     * @param  string  $id  ID of the Tag. This can either be the Samsara-provided ID or an external ID. External IDs are customer-specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `crmId:abc123`. Automatically populated external IDs are prefixed with `samsara.`. For example, `samsara.name:ELD-exempt`.
+     * Delete a Tag resource.
+     *
+     * @param  string  $id  ID of the Tag. This can either be the Samsara-provided ID or an external ID. Use `key:value` for external IDs.
+     * @return Response
      */
-    public function deleteTag(string $id): Response
+    public function delete(string $id): Response
     {
         return $this->connector->send(new DeleteTag($id));
     }
 
     /**
-     * @param  string  $id  ID of the Tag. This can either be the Samsara-provided ID or an external ID. External IDs are customer-specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `crmId:abc123`. Automatically populated external IDs are prefixed with `samsara.`. For example, `samsara.name:ELD-exempt`.
+     * Find a Tag resource by ID.
+     *
+     * @param  string  $id  ID of the Tag. This can either be the Samsara-provided ID or an external ID. Use `key:value` for external IDs.
+     * @return Response
      */
-    public function getTag(string $id): Response
+    public function find(string $id): Response
     {
         return $this->connector->send(new GetTag($id));
     }
 
     /**
-     * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
+     * Get a list of Tag resources.
+     *
+     * @param  int|null  $limit  The limit for how many objects will be in the response.
+     * @return Response
      */
-    public function listTags(?int $limit = null): Response
+    public function get(?int $limit = null): Response
     {
         return $this->connector->send(new ListTags($limit));
-    }
-
-    /**
-     * @param  string  $id  ID of the Tag. This can either be the Samsara-provided ID or an external ID. External IDs are customer-specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `crmId:abc123`. Automatically populated external IDs are prefixed with `samsara.`. For example, `samsara.name:ELD-exempt`.
-     */
-    public function patchTag(string $id, array $payload = []): Response
-    {
-        return $this->connector->send(new PatchTag($id, $payload));
     }
 
     /**
@@ -56,5 +63,17 @@ class Tags extends Resource
     public function replaceTag(string $id, array $payload = []): Response
     {
         return $this->connector->send(new ReplaceTag($id, $payload));
+    }
+
+    /**
+     * Update a Tag resource.
+     *
+     * @param  string  $id  ID of the Tag. This can either be the Samsara-provided ID or an external ID. Use `key:value` for external IDs.
+     * @param  array  $payload  The data to update the tag.
+     * @return Response
+     */
+    public function update(string $id, array $payload = []): Response
+    {
+        return $this->connector->send(new PatchTag($id, $payload));
     }
 }

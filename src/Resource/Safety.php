@@ -13,21 +13,27 @@ use ErikGall\Samsara\Requests\Safety\GetSafetyActivityEventFeed;
 class Safety extends Resource
 {
     /**
-     * @param  string  $startTime  A start time in RFC 3339 format. Defaults to now if not provided. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
+     * Get safety activity event feed.
+     *
+     * @param  string|null  $startTime  Start time (RFC 3339).
+     * @return Response
      */
-    public function getSafetyActivityEventFeed(?string $startTime = null): Response
+    public function getActivityEventFeed(?string $startTime = null): Response
     {
         return $this->connector->send(new GetSafetyActivityEventFeed($startTime));
     }
 
     /**
-     * @param  string  $startTime  A start time in RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
-     * @param  string  $endTime  An end time in RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
-     * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
-     * @param  array  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
-     * @param  array  $vehicleIds  A filter on the data based on this comma-separated list of vehicle IDs. Example: `vehicleIds=1234,5678`
+     * Get safety events.
+     *
+     * @param  string  $startTime  Start time (RFC 3339).
+     * @param  string  $endTime  End time (RFC 3339).
+     * @param  array|null  $tagIds  Filter by tag IDs.
+     * @param  array|null  $parentTagIds  Filter by parent tag IDs.
+     * @param  array|null  $vehicleIds  Filter by vehicle IDs.
+     * @return Response
      */
-    public function getSafetyEvents(
+    public function getEvents(
         string $startTime,
         string $endTime,
         ?array $tagIds = null,

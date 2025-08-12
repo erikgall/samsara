@@ -12,34 +12,49 @@ use ErikGall\Samsara\Requests\Addresses\UpdateAddress;
 
 class Addresses extends Resource
 {
-    public function createAddress(array $payload = []): Response
+    /**
+     * Create a new Address resource.
+     *
+     * @param  array  $payload  The data to create the address.
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateAddress($payload));
     }
 
     /**
-     * @param  string  $id  ID of the Address. This can either be the Samsara-provided ID or an external ID. External IDs are customer-specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `crmId:abc123`
+     * Delete an Address resource.
+     *
+     * @param  string  $id  ID of the Address. This can either be the Samsara-provided ID or an external ID. Use `key:value` for external IDs.
+     * @return Response
      */
-    public function deleteAddress(string $id): Response
+    public function delete(string $id): Response
     {
         return $this->connector->send(new DeleteAddress($id));
     }
 
     /**
-     * @param  string  $id  ID of the Address. This can either be the Samsara-provided ID or an external ID. External IDs are customer-specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `crmId:abc123`
+     * Find an Address resource by ID.
+     *
+     * @param  string  $id  ID of the Address. This can either be the Samsara-provided ID or an external ID. Use `key:value` for external IDs.
+     * @return Response
      */
-    public function getAddress(string $id): Response
+    public function find(string $id): Response
     {
         return $this->connector->send(new GetAddress($id));
     }
 
     /**
-     * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
-     * @param  array  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
-     * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
-     * @param  string  $createdAfterTime  A filter on data to have a created at time after or equal to this specified time in RFC 3339 format. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
+     * Get a list of Address resources.
+     *
+     * @param  int|null  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
+     * @param  array|null  $parentTagIds  Filter by parent tag IDs.
+     * @param  array|null  $tagIds  Filter by tag IDs.
+     * @param  string|null  $createdAfterTime  Filter by created after time (RFC 3339).
+     * @return Response
      */
-    public function listAddresses(
+    public function get(
         ?int $limit = null,
         ?array $parentTagIds = null,
         ?array $tagIds = null,
@@ -51,9 +66,13 @@ class Addresses extends Resource
     }
 
     /**
-     * @param  string  $id  ID of the Address. This can either be the Samsara-provided ID or an external ID. External IDs are customer-specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `crmId:abc123`
+     * Update an Address resource.
+     *
+     * @param  string  $id  ID of the Address. This can either be the Samsara-provided ID or an external ID. Use `key:value` for external IDs.
+     * @param  array  $payload  The data to update the address.
+     * @return Response
      */
-    public function updateAddress(string $id, array $payload = []): Response
+    public function update(string $id, array $payload = []): Response
     {
         return $this->connector->send(new UpdateAddress($id, $payload));
     }

@@ -16,7 +16,7 @@ class VehicleLocations extends Resource
      * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
      * @param  array  $vehicleIds  A filter on the data based on this comma-separated list of vehicle IDs. Example: `vehicleIds=1234,5678`
      */
-    public function getVehicleLocations(
+    public function get(
         ?string $time = null,
         ?array $parentTagIds = null,
         ?array $tagIds = null,
@@ -32,7 +32,7 @@ class VehicleLocations extends Resource
      * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
      * @param  array  $vehicleIds  A filter on the data based on this comma-separated list of vehicle IDs. Example: `vehicleIds=1234,5678`
      */
-    public function getVehicleLocationsFeed(
+    public function getFeed(
         ?array $parentTagIds = null,
         ?array $tagIds = null,
         ?array $vehicleIds = null
@@ -49,7 +49,7 @@ class VehicleLocations extends Resource
      * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
      * @param  array  $vehicleIds  A filter on the data based on this comma-separated list of vehicle IDs. Example: `vehicleIds=1234,5678`
      */
-    public function getVehicleLocationsHistory(
+    public function getHistory(
         string $startTime,
         string $endTime,
         ?array $parentTagIds = null,

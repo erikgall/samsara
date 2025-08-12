@@ -16,41 +16,14 @@ use ErikGall\Samsara\Requests\Equipment\GetEquipmentLocationsHistory;
 class Equipment extends Resource
 {
     /**
+     * Find an Equipment resource by ID.
+     *
      * @param  string  $id  Samsara ID of the Equipment.
+     * @return Response
      */
-    public function getEquipment(string $id): Response
+    public function find(string $id): Response
     {
         return $this->connector->send(new GetEquipment($id));
-    }
-
-    /**
-     * @param  array  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
-     * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
-     * @param  array  $equipmentIds  A filter on the data based on this comma-separated list of equipment IDs. Example: `equipmentIds=1234,5678`
-     */
-    public function getEquipmentLocations(
-        ?array $parentTagIds = null,
-        ?array $tagIds = null,
-        ?array $equipmentIds = null
-    ): Response {
-        return $this->connector->send(
-            new GetEquipmentLocations($parentTagIds, $tagIds, $equipmentIds)
-        );
-    }
-
-    /**
-     * @param  array  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
-     * @param  array  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
-     * @param  array  $equipmentIds  A filter on the data based on this comma-separated list of equipment IDs. Example: `equipmentIds=1234,5678`
-     */
-    public function getEquipmentLocationsFeed(
-        ?array $parentTagIds = null,
-        ?array $tagIds = null,
-        ?array $equipmentIds = null
-    ): Response {
-        return $this->connector->send(
-            new GetEquipmentLocationsFeed($parentTagIds, $tagIds, $equipmentIds)
-        );
     }
 
     /**
@@ -176,6 +149,42 @@ class Equipment extends Resource
                 $equipmentIds,
                 $types
             )
+        );
+    }
+
+    /**
+     * Get equipment locations.
+     *
+     * @param  array|null  $parentTagIds  Filter by parent tag IDs.
+     * @param  array|null  $tagIds  Filter by tag IDs.
+     * @param  array|null  $equipmentIds  Filter by equipment IDs.
+     * @return Response
+     */
+    public function getLocations(
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $equipmentIds = null
+    ): Response {
+        return $this->connector->send(
+            new GetEquipmentLocations($parentTagIds, $tagIds, $equipmentIds)
+        );
+    }
+
+    /**
+     * Get equipment locations feed.
+     *
+     * @param  array|null  $parentTagIds  Filter by parent tag IDs.
+     * @param  array|null  $tagIds  Filter by tag IDs.
+     * @param  array|null  $equipmentIds  Filter by equipment IDs.
+     * @return Response
+     */
+    public function getLocationsFeed(
+        ?array $parentTagIds = null,
+        ?array $tagIds = null,
+        ?array $equipmentIds = null
+    ): Response {
+        return $this->connector->send(
+            new GetEquipmentLocationsFeed($parentTagIds, $tagIds, $equipmentIds)
         );
     }
 

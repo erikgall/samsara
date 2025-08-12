@@ -143,10 +143,10 @@ class GetVehicleStatsHistory extends Request
     public function __construct(
         protected string $startTime,
         protected string $endTime,
-        protected ?array $parentTagIds,
-        protected ?array $tagIds,
-        protected ?array $vehicleIds,
-        protected array $types,
+        protected ?array $parentTagIds = null,
+        protected ?array $tagIds = null,
+        protected ?array $vehicleIds = null,
+        protected ?array $types = null,
         protected ?array $decorations = null
     ) {}
 

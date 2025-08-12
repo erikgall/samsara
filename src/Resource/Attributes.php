@@ -12,42 +12,61 @@ use ErikGall\Samsara\Requests\Attributes\GetAttributesByEntityType;
 
 class Attributes extends Resource
 {
-    public function createAttribute(array $payload = []): Response
+    /**
+     * Create a new Attribute resource.
+     *
+     * @param  array  $payload  The data to create the attribute.
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateAttribute($payload));
     }
 
     /**
+     * Delete an Attribute resource.
+     *
      * @param  string  $id  Samsara-provided UUID of the attribute.
      * @param  string  $entityType  Denotes the type of entity, driver or asset.
+     * @return Response
      */
-    public function deleteAttribute(string $id, string $entityType): Response
+    public function delete(string $id, string $entityType): Response
     {
         return $this->connector->send(new DeleteAttribute($id, $entityType));
     }
 
     /**
+     * Find an Attribute resource by ID and entity type.
+     *
      * @param  string  $id  Samsara-provided UUID of the attribute.
      * @param  string  $entityType  Denotes the type of entity, driver or asset.
+     * @return Response
      */
-    public function getAttribute(string $id, string $entityType): Response
+    public function find(string $id, string $entityType): Response
     {
         return $this->connector->send(new GetAttribute($id, $entityType));
     }
 
     /**
+     * Get attributes by entity type.
+     *
      * @param  string  $entityType  Denotes the type of entity, driver or asset.
-     * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
+     * @param  int|null  $limit  The limit for how many objects will be in the response.
+     * @return Response
      */
-    public function getAttributesByEntityType(string $entityType, ?int $limit = null): Response
+    public function getByEntityType(string $entityType, ?int $limit = null): Response
     {
         return $this->connector->send(new GetAttributesByEntityType($entityType, $limit));
     }
 
     /**
+     * Update an Attribute resource.
+     *
      * @param  string  $id  Samsara-provided UUID of the attribute.
+     * @param  array  $payload  The data to update the attribute.
+     * @return Response
      */
-    public function updateAttribute(string $id, array $payload = []): Response
+    public function update(string $id, array $payload = []): Response
     {
         return $this->connector->send(new UpdateAttribute($id, $payload));
     }

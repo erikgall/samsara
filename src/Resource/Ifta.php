@@ -11,30 +11,42 @@ use ErikGall\Samsara\Requests\Ifta\GetIftaJurisdictionReports;
 
 class Ifta extends Resource
 {
-    public function createIftaDetailJob(array $payload = []): Response
+    /**
+     * Create an IFTA detail job.
+     *
+     * @param  array  $payload
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
-        return $this->connector->send(new CreateIftaDetailJob, $payload);
+        return $this->connector->send(new CreateIftaDetailJob($payload));
     }
 
     /**
+     * Find an IFTA detail job by ID.
+     *
      * @param  string  $id  ID of the requested job.
+     * @return Response
      */
-    public function getIftaDetailJob(string $id): Response
+    public function find(string $id): Response
     {
         return $this->connector->send(new GetIftaDetailJob($id));
     }
 
     /**
-     * @param  int  $year  The year of the requested IFTA report summary. Must be provided with a month or quarter param. Example: `year=2021`
-     * @param  string  $month  The month of the requested IFTA report summary. Can not be provided with the quarter param. Example: `month=January`  Valid values: `January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `October`, `November`, `December`
-     * @param  string  $quarter  The quarter of the requested IFTA report summary. Can not be provided with the month param. Q1: January, February, March. Q2: April, May, June. Q3: July, August, September. Q4: October, November, December. Example: `quarter=Q1`  Valid values: `Q1`, `Q2`, `Q3`, `Q4`
-     * @param  string  $jurisdictions  A filter on the data based on this comma-separated list of jurisdictions. Example: `jurisdictions=GA`
-     * @param  string  $fuelType  A filter on the data based on this comma-separated list of IFTA fuel types. Example: `fuelType=Diesel`  Valid values: `Unspecified`, `A55`, `Biodiesel`, `CompressedNaturalGas`, `Diesel`, `E85`, `Electricity`, `Ethanol`, `Gasohol`, `Gasoline`, `Hydrogen`, `LiquifiedNaturalGas`, `M85`, `Methanol`, `Propane`, `Other`
-     * @param  string  $vehicleIds  A filter on the data based on this comma-separated list of vehicle IDs and externalIds. Example: `vehicleIds=1234,5678,samsara.vin:1HGBH41JXMN109186`
-     * @param  string  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
-     * @param  string  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
+     * Get IFTA jurisdiction reports.
+     *
+     * @param  int  $year  The year of the requested IFTA report summary.
+     * @param  string|null  $month  The month of the requested IFTA report summary.
+     * @param  string|null  $quarter  The quarter of the requested IFTA report summary.
+     * @param  string|null  $jurisdictions  Filter by jurisdictions.
+     * @param  string|null  $fuelType  Filter by IFTA fuel types.
+     * @param  string|null  $vehicleIds  Filter by vehicle IDs and externalIds.
+     * @param  string|null  $tagIds  Filter by tag IDs.
+     * @param  string|null  $parentTagIds  Filter by parent tag IDs.
+     * @return Response
      */
-    public function getIftaJurisdictionReports(
+    public function getJurisdictionReports(
         int $year,
         ?string $month = null,
         ?string $quarter = null,
@@ -59,16 +71,19 @@ class Ifta extends Resource
     }
 
     /**
-     * @param  int  $year  The year of the requested IFTA report summary. Must be provided with a month or quarter param. Example: `year=2021`
-     * @param  string  $month  The month of the requested IFTA report summary. Can not be provided with the quarter param. Example: `month=January`  Valid values: `January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `October`, `November`, `December`
-     * @param  string  $quarter  The quarter of the requested IFTA report summary. Can not be provided with the month param. Q1: January, February, March. Q2: April, May, June. Q3: July, August, September. Q4: October, November, December. Example: `quarter=Q1`  Valid values: `Q1`, `Q2`, `Q3`, `Q4`
-     * @param  string  $jurisdictions  A filter on the data based on this comma-separated list of jurisdictions. Example: `jurisdictions=GA`
-     * @param  string  $fuelType  A filter on the data based on this comma-separated list of IFTA fuel types. Example: `fuelType=Diesel`  Valid values: `Unspecified`, `A55`, `Biodiesel`, `CompressedNaturalGas`, `Diesel`, `E85`, `Electricity`, `Ethanol`, `Gasohol`, `Gasoline`, `Hydrogen`, `LiquifiedNaturalGas`, `M85`, `Methanol`, `Propane`, `Other`
-     * @param  string  $vehicleIds  A filter on the data based on this comma-separated list of vehicle IDs and externalIds. Example: `vehicleIds=1234,5678,samsara.vin:1HGBH41JXMN109186`
-     * @param  string  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
-     * @param  string  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
+     * Get IFTA vehicle reports.
+     *
+     * @param  int  $year  The year of the requested IFTA report summary.
+     * @param  string|null  $month  The month of the requested IFTA report summary.
+     * @param  string|null  $quarter  The quarter of the requested IFTA report summary.
+     * @param  string|null  $jurisdictions  Filter by jurisdictions.
+     * @param  string|null  $fuelType  Filter by IFTA fuel types.
+     * @param  string|null  $vehicleIds  Filter by vehicle IDs and externalIds.
+     * @param  string|null  $tagIds  Filter by tag IDs.
+     * @param  string|null  $parentTagIds  Filter by parent tag IDs.
+     * @return Response
      */
-    public function getIftaVehicleReports(
+    public function getVehicleReports(
         int $year,
         ?string $month = null,
         ?string $quarter = null,

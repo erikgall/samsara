@@ -12,39 +12,58 @@ use ErikGall\Samsara\Requests\Contacts\UpdateContact;
 
 class Contacts extends Resource
 {
-    public function createContact(array $payload = []): Response
+    /**
+     * Create a new Contact resource.
+     *
+     * @param  array  $payload  The data to create the contact.
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateContact($payload));
     }
 
     /**
+     * Delete a Contact resource.
+     *
      * @param  string  $id  Unique identifier for the contact.
+     * @return Response
      */
-    public function deleteContact(string $id): Response
+    public function delete(string $id): Response
     {
         return $this->connector->send(new DeleteContact($id));
     }
 
     /**
+     * Find a Contact resource by ID.
+     *
      * @param  string  $id  Unique identifier for the contact.
+     * @return Response
      */
-    public function getContact(string $id): Response
+    public function find(string $id): Response
     {
         return $this->connector->send(new GetContact($id));
     }
 
     /**
-     * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
+     * Get a list of Contact resources.
+     *
+     * @param  int|null  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
+     * @return Response
      */
-    public function listContacts(?int $limit = null): Response
+    public function get(?int $limit = null): Response
     {
         return $this->connector->send(new ListContacts($limit));
     }
 
     /**
+     * Update a Contact resource.
+     *
      * @param  string  $id  Unique identifier for the contact.
+     * @param  array  $payload  The data to update the contact.
+     * @return Response
      */
-    public function updateContact(string $id, array $payload = []): Response
+    public function update(string $id, array $payload = []): Response
     {
         return $this->connector->send(new UpdateContact($id, $payload));
     }

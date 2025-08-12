@@ -24,15 +24,24 @@ use ErikGall\Samsara\Requests\Industrial\V1getVisionRunsByCameraAndProgram;
 
 class Industrial extends Resource
 {
-    public function createIndustrialAsset(array $payload = []): Response
+    /**
+     * Create an Industrial asset.
+     *
+     * @param  array  $payload
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateIndustrialAsset($payload));
     }
 
     /**
+     * Delete an Industrial asset by ID.
+     *
      * @param  string  $id  Id of the asset to be deleted.
+     * @return Response
      */
-    public function deleteIndustrialAsset(string $id): Response
+    public function delete(string $id): Response
     {
         return $this->connector->send(new DeleteIndustrialAsset($id));
     }

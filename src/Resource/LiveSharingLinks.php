@@ -11,25 +11,37 @@ use ErikGall\Samsara\Requests\LiveSharingLinks\UpdateLiveSharingLink;
 
 class LiveSharingLinks extends Resource
 {
-    public function createLiveSharingLink(array $payload = []): Response
+    /**
+     * Create a new Live Sharing Link resource.
+     *
+     * @param  array  $payload  The data to create the live sharing link.
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateLiveSharingLink($payload));
     }
 
     /**
+     * Delete a Live Sharing Link resource.
+     *
      * @param  string  $id  Unique identifier for the Live Sharing Link.
+     * @return Response
      */
-    public function deleteLiveSharingLink(string $id): Response
+    public function delete(string $id): Response
     {
         return $this->connector->send(new DeleteLiveSharingLink($id));
     }
 
     /**
-     * @param  array  $ids  A filter on the data based on this comma-separated list of Live Share Link IDs
-     * @param  string  $type  A filter on the data based on the Live Sharing Link type.  Valid values: `all`, `assetsLocation`, `assetsNearLocation`, `assetsOnRoute`
-     * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 100 objects.
+     * Get a list of Live Sharing Link resources.
+     *
+     * @param  array|null  $ids  Filter by Live Share Link IDs.
+     * @param  string|null  $type  Filter by Live Sharing Link type.
+     * @param  int|null  $limit  The limit for how many objects will be in the response.
+     * @return Response
      */
-    public function getLiveSharingLinks(
+    public function get(
         ?array $ids = null,
         ?string $type = null,
         ?int $limit = null
@@ -38,9 +50,13 @@ class LiveSharingLinks extends Resource
     }
 
     /**
+     * Update a Live Sharing Link resource.
+     *
      * @param  string  $id  Unique identifier for the Live Sharing Link.
+     * @param  array  $payload  The data to update the live sharing link.
+     * @return Response
      */
-    public function updateLiveSharingLink(string $id, array $payload = []): Response
+    public function update(string $id, array $payload = []): Response
     {
         return $this->connector->send(new UpdateLiveSharingLink($id, $payload));
     }

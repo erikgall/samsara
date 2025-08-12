@@ -12,33 +12,48 @@ use ErikGall\Samsara\Requests\Trailers\UpdateTrailer;
 
 class Trailers extends Resource
 {
-    public function createTrailer(array $payload = []): Response
+    /**
+     * Create a new Trailer resource.
+     *
+     * @param  array  $payload  The data to create the trailer.
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateTrailer($payload));
     }
 
     /**
+     * Delete a Trailer resource.
+     *
      * @param  string  $id  Unique identifier for the trailer to delete.
+     * @return Response
      */
-    public function deleteTrailer(string $id): Response
+    public function delete(string $id): Response
     {
         return $this->connector->send(new DeleteTrailer($id));
     }
 
     /**
-     * @param  string  $id  ID of the trailer. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: "key:value". For example, "maintenanceId:250020".
+     * Find a Trailer resource by ID.
+     *
+     * @param  string  $id  ID of the trailer. This can either be the Samsara-specified ID, or an external ID. Use `key:value` for external IDs.
+     * @return Response
      */
-    public function getTrailer(string $id): Response
+    public function find(string $id): Response
     {
         return $this->connector->send(new GetTrailer($id));
     }
 
     /**
-     * @param  string  $tagIds  A filter on the data based on this comma-separated list of tag IDs. Example: `tagIds=1234,5678`
-     * @param  string  $parentTagIds  A filter on the data based on this comma-separated list of parent tag IDs, for use by orgs with tag hierarchies. Specifying a parent tag will implicitly include all descendent tags of the parent tag. Example: `parentTagIds=345,678`
-     * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
+     * Get a list of Trailer resources.
+     *
+     * @param  string|null  $tagIds  Filter by tag IDs.
+     * @param  string|null  $parentTagIds  Filter by parent tag IDs.
+     * @param  int|null  $limit  The limit for how many objects will be in the response.
+     * @return Response
      */
-    public function listTrailers(
+    public function get(
         ?string $tagIds = null,
         ?string $parentTagIds = null,
         ?int $limit = null
@@ -47,9 +62,13 @@ class Trailers extends Resource
     }
 
     /**
-     * @param  string  $id  ID of the trailer. Can be either unique Samsara ID or an [external ID](https://developers.samsara.com/docs/external-ids) for the trailer.
+     * Update a Trailer resource.
+     *
+     * @param  string  $id  ID of the trailer. Can be either unique Samsara ID or an external ID.
+     * @param  array  $payload  The data to update the trailer.
+     * @return Response
      */
-    public function updateTrailer(string $id, array $payload = []): Response
+    public function update(string $id, array $payload = []): Response
     {
         return $this->connector->send(new UpdateTrailer($id, $payload));
     }

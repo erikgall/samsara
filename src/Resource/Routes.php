@@ -14,13 +14,22 @@ use ErikGall\Samsara\Requests\Routes\V1deleteDispatchRouteById;
 
 class Routes extends Resource
 {
+    /**
+     * Create a new Route resource.
+     *
+     * @param  array  $payload  The data to create the route.
+     * @return Response
+     */
     public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateRoute($payload));
     }
 
     /**
-     * @param  string  $id  ID of the route. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `payrollId:ABFS18600`
+     * Delete a Route resource.
+     *
+     * @param  string  $id  ID of the route. This can either be the Samsara-specified ID, or an external ID. Use `key:value` for external IDs.
+     * @return Response
      */
     public function delete(string $id): Response
     {
@@ -28,9 +37,10 @@ class Routes extends Resource
     }
 
     /**
-     * @param  string  $expand  Expands the specified value(s) in the response object. Expansion populates additional fields in an object, if supported. Unsupported fields are ignored. To expand multiple fields, input a comma-separated list.
+     * Get a feed of Route resources.
      *
-     * Valid value: `route`  Valid values: `route`
+     * @param  string|null  $expand  Expands the specified value(s) in the response object.
+     * @return Response
      */
     public function feed(?string $expand = null): Response
     {
@@ -38,7 +48,10 @@ class Routes extends Resource
     }
 
     /**
-     * @param  string  $id  ID of the route. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `payrollId:ABFS18600`
+     * Find a Route resource by ID.
+     *
+     * @param  string  $id  ID of the route. This can either be the Samsara-specified ID, or an external ID. Use `key:value` for external IDs.
+     * @return Response
      */
     public function find(string $id): Response
     {
@@ -46,9 +59,12 @@ class Routes extends Resource
     }
 
     /**
-     * @param  string  $startTime  A start time in RFC 3339 format. Defaults to now if not provided. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
-     * @param  string  $endTime  An end time in RFC 3339 format. Defaults to now if not provided. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
-     * @param  int  $limit  The limit for how many objects will be in the response. Default and max for this value is 512 objects.
+     * Get a list of Route resources.
+     *
+     * @param  string  $startTime  Start time (RFC 3339).
+     * @param  string  $endTime  End time (RFC 3339).
+     * @param  int|null  $limit  The limit for how many objects will be in the response.
+     * @return Response
      */
     public function get(string $startTime, string $endTime, ?int $limit = null): Response
     {
@@ -56,7 +72,11 @@ class Routes extends Resource
     }
 
     /**
-     * @param  string  $id  ID of the route. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: `key:value`. For example, `payrollId:ABFS18600`
+     * Update a Route resource.
+     *
+     * @param  string  $id  ID of the route. This can either be the Samsara-specified ID, or an external ID. Use `key:value` for external IDs.
+     * @param  array  $payload  The data to update the route.
+     * @return Response
      */
     public function update(string $id, array $payload = []): Response
     {

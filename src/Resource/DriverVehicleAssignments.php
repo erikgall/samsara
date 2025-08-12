@@ -11,27 +11,41 @@ use ErikGall\Samsara\Requests\DriverVehicleAssignments\DeleteDriverVehicleAssign
 
 class DriverVehicleAssignments extends Resource
 {
-    public function createDriverVehicleAssignment(array $payload = []): Response
+    /**
+     * Create a new Driver Vehicle Assignment resource.
+     *
+     * @param  array  $payload  The data to create the assignment.
+     * @return Response
+     */
+    public function create(array $payload = []): Response
     {
         return $this->connector->send(new CreateDriverVehicleAssignment($payload));
     }
 
-    public function deleteDriverVehicleAssignments(): Response
+    /**
+     * Delete all Driver Vehicle Assignments.
+     *
+     * @return Response
+     */
+    public function delete(): Response
     {
         return $this->connector->send(new DeleteDriverVehicleAssignments);
     }
 
     /**
-     * @param  string  $filterBy  Option to filter by drivers or vehicles.  Valid values: `drivers`, `vehicles`
-     * @param  string  $startTime  A start time in RFC 3339 format. Defaults to now if not provided. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
-     * @param  string  $endTime  An end time in RFC 3339 format. Defaults to now if not provided. Millisecond precision and timezones are supported. (Examples: 2019-06-13T19:08:25Z, 2019-06-13T19:08:25.455Z, OR 2015-09-15T14:00:12-04:00).
-     * @param  array  $driverIds  A filter on the data based on this comma-separated list of driver IDs and externalIds. Example: `driverIds=1234,5678,payroll:4841`
-     * @param  array  $vehicleIds  ID of the vehicle. This can either be the Samsara-specified ID, or an external ID. External IDs are customer specified key-value pairs created in the POST or PATCH requests of this resource. To specify an external ID as part of a path parameter, use the following format: "key:value". For example, "maintenanceId:250020".
-     * @param  string  $driverTagIds  A filter on the data based on this comma-separated list of driver tag IDs. Example: `tagIds=1234,5678`
-     * @param  string  $vehicleTagIds  A filter on the data based on this comma-separated list of vehicle tag IDs. Example: `tagIds=1234,5678`
-     * @param  string  $assignmentType  Specifies which assignment type to filter by.  Valid values: `HOS`, `idCard`, `static`, `faceId`, `tachograph`, `safetyManual`, `RFID`, `trailer`, `external`, `qrCode`
+     * Get Driver Vehicle Assignments.
+     *
+     * @param  string  $filterBy  Option to filter by drivers or vehicles.
+     * @param  string|null  $startTime  Start time (RFC 3339).
+     * @param  string|null  $endTime  End time (RFC 3339).
+     * @param  array|null  $driverIds  Filter by driver IDs.
+     * @param  array|null  $vehicleIds  Filter by vehicle IDs.
+     * @param  string|null  $driverTagIds  Filter by driver tag IDs.
+     * @param  string|null  $vehicleTagIds  Filter by vehicle tag IDs.
+     * @param  string|null  $assignmentType  Filter by assignment type.
+     * @return Response
      */
-    public function getDriverVehicleAssignments(
+    public function get(
         string $filterBy,
         ?string $startTime = null,
         ?string $endTime = null,
@@ -55,7 +69,13 @@ class DriverVehicleAssignments extends Resource
         );
     }
 
-    public function updateDriverVehicleAssignment(array $payload = []): Response
+    /**
+     * Update a Driver Vehicle Assignment.
+     *
+     * @param  array  $payload  The data to update the assignment.
+     * @return Response
+     */
+    public function update(array $payload = []): Response
     {
         return $this->connector->send(new UpdateDriverVehicleAssignment($payload));
     }
