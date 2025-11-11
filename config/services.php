@@ -2,6 +2,6 @@
 
 return [
     'samsara' => [
-        'key' => env('SAMSARA_API_KEY'),
+        'api_key' => env('SAMSARA_API_KEY'),
     ],
 ];
