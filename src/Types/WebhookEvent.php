@@ -29,9 +29,13 @@ enum WebhookEvent: string
     case PREDICTIVE_MAINTENANCE_ALERT = 'PredictiveMaintenanceAlert';
     case ROUTE_STOP_ARRIVAL = 'RouteStopArrival';
     case ROUTE_STOP_DEPARTURE = 'RouteStopDeparture';
+    case ROUTE_STOP_EARLY_LATE_ARRIVAL = 'RouteStopEarlyLateArrival';
+    case ROUTE_STOP_ETA_UPDATED = 'RouteStopEtaUpdated';
     case ROUTE_STOP_RESEQUENCE = 'RouteStopResequence';
     case SEVERE_SPEEDING_ENDED = 'SevereSpeedingEnded';
     case SEVERE_SPEEDING_STARTED = 'SevereSpeedingStarted';
+    case SPEEDING_EVENT_ENDED = 'SpeedingEventEnded';
+    case SPEEDING_EVENT_STARTED = 'SpeedingEventStarted';
     case VEHICLE_CREATED = 'VehicleCreated';
     case VEHICLE_UPDATED = 'VehicleUpdated';
 

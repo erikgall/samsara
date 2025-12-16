@@ -161,7 +161,7 @@ use ErikGall\Samsara\Resource\CarrierProposedAssignments;
  */
 class Samsara extends Connector
 {
-    public function __construct(protected readonly string $token) {}
+    public function __construct(protected ?string $token) {}
 
     public function addresses(): Addresses
     {
@@ -236,6 +236,16 @@ class Samsara extends Connector
     public function gateways(): Gateways
     {
         return new Gateways($this);
+    }
+
+    /**
+     * Determine if a token value has been set.
+     *
+     * @return bool
+     */
+    public function hasToken()
+    {
+        return ! is_null($this->token);
     }
 
     public function hoursOfService(): HoursOfService
@@ -376,6 +386,19 @@ class Samsara extends Connector
     public function webhooks(): Webhooks
     {
         return new Webhooks($this);
+    }
+
+    /**
+     * Manually set the API token to be used with requests.
+     *
+     * @param  string  $token
+     * @return $this
+     */
+    public function withToken(string $token)
+    {
+        $this->token = $token;
+
+        return $this;
     }
 
     /**
