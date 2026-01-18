@@ -6,10 +6,11 @@ parameters:
     paths:
         - src
     excludePaths:
-        - src/Requests
-        - src/Resource
-        - src/Resource.php
-        - src/Types
-        - src/Entities
-        - src/Samsara.php.bak
+        analyseAndScan:
+            - src/Requests
+            - src/Resource
+            - src/Resource.php
+            - src/Types (?)
+            - src/Entities
+            - src/Samsara.php.bak (?)
     treatPhpDocTypesAsCertain: false

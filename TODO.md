@@ -176,11 +176,11 @@
 ## Phase 6: Data/Entities (DTOs)
 
 ### 6.1 Address Entities (`src/Data/Address/`)
-- [ ] `Address.php`
-  - [ ] Properties: id, name, formattedAddress, geofence, notes, tagIds, externalIds, contacts
-  - [ ] Nested: `AddressGeofence`
-- [ ] `AddressGeofence.php`
-  - [ ] Properties: circle, polygon, settings
+- [x] `Address.php`
+  - [x] Properties: id, name, formattedAddress, geofence, notes, tagIds, externalIds, contacts
+  - [x] Nested: `AddressGeofence`
+- [x] `AddressGeofence.php`
+  - [x] Properties: circle, polygon, settings
 
 ### 6.2 Driver Entities (`src/Data/Driver/`)
 - [ ] `Driver.php`
