@@ -1,0 +1,113 @@
+{
+    "data": [
+        {
+            "id": "vehicle-001",
+            "name": "Truck 001",
+            "time": "2024-06-15T14:30:00Z",
+            "gps": {
+                "latitude": 37.7749,
+                "longitude": -122.4194,
+                "headingDegrees": 180,
+                "speedMilesPerHour": 55.5,
+                "time": "2024-06-15T14:30:00Z",
+                "reverseGeo": {
+                    "formattedLocation": "San Francisco, CA 94102"
+                }
+            },
+            "engineStates": {
+                "value": "On",
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "fuelPercents": {
+                "value": 75.5,
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "obdOdometerMeters": {
+                "value": 150000000,
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "obdEngineSeconds": {
+                "value": 5400000,
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "engineRpm": {
+                "value": 1800,
+                "time": "2024-06-15T14:30:00Z"
+            }
+        },
+        {
+            "id": "vehicle-002",
+            "name": "Truck 002",
+            "time": "2024-06-15T14:30:00Z",
+            "gps": {
+                "latitude": 32.7767,
+                "longitude": -96.7970,
+                "headingDegrees": 90,
+                "speedMilesPerHour": 0,
+                "time": "2024-06-15T14:30:00Z",
+                "reverseGeo": {
+                    "formattedLocation": "Dallas, TX 75201"
+                }
+            },
+            "engineStates": {
+                "value": "Off",
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "fuelPercents": {
+                "value": 45.0,
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "obdOdometerMeters": {
+                "value": 200000000,
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "obdEngineSeconds": {
+                "value": 7200000,
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "engineRpm": {
+                "value": 0,
+                "time": "2024-06-15T14:30:00Z"
+            }
+        },
+        {
+            "id": "vehicle-003",
+            "name": "Van 001",
+            "time": "2024-06-15T14:30:00Z",
+            "gps": {
+                "latitude": 25.7617,
+                "longitude": -80.1918,
+                "headingDegrees": 270,
+                "speedMilesPerHour": 35.0,
+                "time": "2024-06-15T14:30:00Z",
+                "reverseGeo": {
+                    "formattedLocation": "Miami, FL 33101"
+                }
+            },
+            "engineStates": {
+                "value": "On",
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "fuelPercents": {
+                "value": 90.0,
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "obdOdometerMeters": {
+                "value": 50000000,
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "obdEngineSeconds": {
+                "value": 1800000,
+                "time": "2024-06-15T14:30:00Z"
+            },
+            "engineRpm": {
+                "value": 2100,
+                "time": "2024-06-15T14:30:00Z"
+            }
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}

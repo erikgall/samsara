@@ -1,0 +1,96 @@
+{
+    "data": [
+        {
+            "id": "address-001",
+            "name": "Main Warehouse",
+            "formattedAddress": "123 Industrial Way, San Francisco, CA 94102",
+            "notes": "Main distribution center",
+            "latitude": 37.7749,
+            "longitude": -122.4194,
+            "geofence": {
+                "circle": {
+                    "latitude": 37.7749,
+                    "longitude": -122.4194,
+                    "radiusMeters": 100
+                }
+            },
+            "tagIds": ["tag-001"],
+            "externalIds": {
+                "facility": "FAC001"
+            },
+            "contacts": []
+        },
+        {
+            "id": "address-002",
+            "name": "LA Distribution Center",
+            "formattedAddress": "456 Commerce Blvd, Los Angeles, CA 90001",
+            "notes": "Southern California hub",
+            "latitude": 34.0522,
+            "longitude": -118.2437,
+            "geofence": {
+                "circle": {
+                    "latitude": 34.0522,
+                    "longitude": -118.2437,
+                    "radiusMeters": 150
+                }
+            },
+            "tagIds": ["tag-002"],
+            "externalIds": {
+                "facility": "FAC002"
+            },
+            "contacts": [
+                {
+                    "id": "contact-001",
+                    "name": "Receiving Manager"
+                }
+            ]
+        },
+        {
+            "id": "address-003",
+            "name": "Customer A - Office",
+            "formattedAddress": "789 Business Park, Miami, FL 33101",
+            "notes": "Deliver to front entrance",
+            "latitude": 25.7617,
+            "longitude": -80.1918,
+            "geofence": {
+                "polygon": {
+                    "vertices": [
+                        {"latitude": 25.7620, "longitude": -80.1920},
+                        {"latitude": 25.7620, "longitude": -80.1915},
+                        {"latitude": 25.7615, "longitude": -80.1915},
+                        {"latitude": 25.7615, "longitude": -80.1920}
+                    ]
+                }
+            },
+            "tagIds": [],
+            "externalIds": {
+                "customer": "CUST001"
+            },
+            "contacts": []
+        },
+        {
+            "id": "address-004",
+            "name": "Customer B - Warehouse",
+            "formattedAddress": "321 Storage Lane, Dallas, TX 75201",
+            "notes": "Use loading dock C",
+            "latitude": 32.7767,
+            "longitude": -96.7970,
+            "geofence": {
+                "circle": {
+                    "latitude": 32.7767,
+                    "longitude": -96.7970,
+                    "radiusMeters": 75
+                }
+            },
+            "tagIds": ["tag-003"],
+            "externalIds": {
+                "customer": "CUST002"
+            },
+            "contacts": []
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}

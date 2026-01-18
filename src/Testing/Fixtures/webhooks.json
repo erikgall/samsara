@@ -1,0 +1,60 @@
+{
+    "data": [
+        {
+            "id": "webhook-001",
+            "name": "Vehicle Location Updates",
+            "url": "https://api.example.com/webhooks/location",
+            "eventTypes": [
+                "VehicleLocationUpdated"
+            ],
+            "version": "2024-02-27",
+            "isActive": true,
+            "createdAtTime": "2024-01-01T00:00:00Z",
+            "lastRequestAtTime": "2024-06-15T14:00:00Z",
+            "lastResponseStatusCode": 200,
+            "headers": {
+                "X-API-Key": "secret-key-123"
+            },
+            "customMetadata": {
+                "environment": "production"
+            }
+        },
+        {
+            "id": "webhook-002",
+            "name": "Safety Events",
+            "url": "https://api.example.com/webhooks/safety",
+            "eventTypes": [
+                "SafetyEventCreated",
+                "SafetyEventUpdated"
+            ],
+            "version": "2024-02-27",
+            "isActive": true,
+            "createdAtTime": "2024-02-15T10:00:00Z",
+            "lastRequestAtTime": "2024-06-15T11:20:00Z",
+            "lastResponseStatusCode": 200,
+            "headers": {},
+            "customMetadata": {}
+        },
+        {
+            "id": "webhook-003",
+            "name": "HOS Violations (Disabled)",
+            "url": "https://api.example.com/webhooks/hos",
+            "eventTypes": [
+                "HosViolation"
+            ],
+            "version": "2024-02-27",
+            "isActive": false,
+            "createdAtTime": "2024-03-01T08:00:00Z",
+            "lastRequestAtTime": null,
+            "lastResponseStatusCode": null,
+            "headers": {},
+            "customMetadata": {
+                "reason": "temporarily disabled for maintenance"
+            }
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}

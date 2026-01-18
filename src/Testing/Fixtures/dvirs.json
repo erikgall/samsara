@@ -1,0 +1,94 @@
+{
+    "data": [
+        {
+            "id": "dvir-001",
+            "vehicle": {
+                "id": "vehicle-001",
+                "name": "Truck 001"
+            },
+            "author": {
+                "id": "driver-001",
+                "name": "John Doe"
+            },
+            "inspectionType": "preTrip",
+            "safeToOperate": true,
+            "odometerMeters": 150000000,
+            "location": {
+                "latitude": 37.7749,
+                "longitude": -122.4194,
+                "location": "San Francisco, CA"
+            },
+            "startTime": "2024-06-15T07:30:00Z",
+            "endTime": "2024-06-15T07:45:00Z",
+            "notes": "All systems checked",
+            "defects": [],
+            "trailerDefects": [],
+            "trailer": null
+        },
+        {
+            "id": "dvir-002",
+            "vehicle": {
+                "id": "vehicle-002",
+                "name": "Truck 002"
+            },
+            "author": {
+                "id": "driver-002",
+                "name": "Jane Smith"
+            },
+            "inspectionType": "preTrip",
+            "safeToOperate": false,
+            "odometerMeters": 200000000,
+            "location": {
+                "latitude": 32.7767,
+                "longitude": -96.7970,
+                "location": "Dallas, TX"
+            },
+            "startTime": "2024-06-15T08:00:00Z",
+            "endTime": "2024-06-15T08:20:00Z",
+            "notes": "Found tire issue",
+            "defects": [
+                {
+                    "id": "defect-001",
+                    "defectType": "tire",
+                    "comment": "Left front tire shows excessive wear",
+                    "resolvedBy": null,
+                    "resolvedAtTime": null
+                }
+            ],
+            "trailerDefects": [],
+            "trailer": null
+        },
+        {
+            "id": "dvir-003",
+            "vehicle": {
+                "id": "vehicle-001",
+                "name": "Truck 001"
+            },
+            "author": {
+                "id": "driver-001",
+                "name": "John Doe"
+            },
+            "inspectionType": "postTrip",
+            "safeToOperate": true,
+            "odometerMeters": 150400000,
+            "location": {
+                "latitude": 34.0522,
+                "longitude": -118.2437,
+                "location": "Los Angeles, CA"
+            },
+            "startTime": "2024-06-15T18:00:00Z",
+            "endTime": "2024-06-15T18:15:00Z",
+            "notes": "End of day inspection complete",
+            "defects": [],
+            "trailerDefects": [],
+            "trailer": {
+                "id": "trailer-001",
+                "name": "Trailer 001"
+            }
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}

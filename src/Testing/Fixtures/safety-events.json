@@ -1,0 +1,77 @@
+{
+    "data": [
+        {
+            "id": "safety-001",
+            "vehicle": {
+                "id": "vehicle-001",
+                "name": "Truck 001"
+            },
+            "driver": {
+                "id": "driver-001",
+                "name": "John Doe"
+            },
+            "behaviorLabel": "Harsh Braking",
+            "maxGForce": 0.45,
+            "time": "2024-06-15T10:30:00Z",
+            "location": {
+                "latitude": 36.7783,
+                "longitude": -119.4179,
+                "location": "Fresno, CA"
+            },
+            "coachable": true,
+            "coachingState": "notCoached",
+            "downloadedForwardVideoUrl": null,
+            "downloadedInwardVideoUrl": null
+        },
+        {
+            "id": "safety-002",
+            "vehicle": {
+                "id": "vehicle-003",
+                "name": "Van 001"
+            },
+            "driver": {
+                "id": "driver-002",
+                "name": "Jane Smith"
+            },
+            "behaviorLabel": "Speeding",
+            "maxGForce": null,
+            "time": "2024-06-15T11:15:00Z",
+            "location": {
+                "latitude": 25.8000,
+                "longitude": -80.2000,
+                "location": "Miami, FL"
+            },
+            "coachable": true,
+            "coachingState": "coached",
+            "downloadedForwardVideoUrl": "https://example.com/video1.mp4",
+            "downloadedInwardVideoUrl": null
+        },
+        {
+            "id": "safety-003",
+            "vehicle": {
+                "id": "vehicle-001",
+                "name": "Truck 001"
+            },
+            "driver": {
+                "id": "driver-001",
+                "name": "John Doe"
+            },
+            "behaviorLabel": "Hard Acceleration",
+            "maxGForce": 0.38,
+            "time": "2024-06-15T14:45:00Z",
+            "location": {
+                "latitude": 34.5000,
+                "longitude": -118.5000,
+                "location": "Santa Clarita, CA"
+            },
+            "coachable": false,
+            "coachingState": "dismissed",
+            "downloadedForwardVideoUrl": null,
+            "downloadedInwardVideoUrl": null
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}

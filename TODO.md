@@ -713,35 +713,34 @@
 
 ## Phase 9: Testing
 
-### 9.1 Testing Infrastructure (`src/Testing/`)
-- [ ] Create `SamsaraFake.php`
-  - [ ] `$responses` property - Queued responses
-  - [ ] `$recordedRequests` property
-  - [ ] `fakeResponse(string $endpoint, array $data, int $status = 200): self`
-  - [ ] `fakeDrivers(array $drivers): self`
-  - [ ] `fakeVehicles(array $vehicles): self`
-  - [ ] `fakeVehicleStats(array $stats): self`
-  - [ ] `assertRequested(string $endpoint): self`
-  - [ ] `assertRequestedWithParams(string $endpoint, array $params): self`
-  - [ ] `assertNothingRequested(): self`
-  - [ ] `getRecordedRequests(): array`
-- [ ] Create `MockResponse.php` helper class
+### 9.1 Testing Infrastructure (`src/Testing/`) DONE
+- [x] Create `SamsaraFake.php`
+  - [x] `$responses` property - Queued responses
+  - [x] `$fakeHttp` property - Faked HTTP client
+  - [x] `fakeResponse(string $endpoint, array $data, int $status = 200): static`
+  - [x] `fakeDrivers(array $drivers): static`
+  - [x] `fakeVehicles(array $vehicles): static`
+  - [x] `fakeVehicleStats(array $stats): static`
+  - [x] `assertRequested(string $endpoint): static`
+  - [x] `assertRequestedWithParams(string $endpoint, array $params): static`
+  - [x] `assertNothingRequested(): static`
+  - [x] `getRecordedRequests(): array`
+- [x] Create `Fixtures.php` loader class
 
-### 9.2 Test Fixtures (`src/Testing/Fixtures/`)
-- [ ] `drivers.json`
-- [ ] `vehicles.json`
-- [ ] `vehicle-stats.json`
-- [ ] `trailers.json`
-- [ ] `equipment.json`
-- [ ] `routes.json`
-- [ ] `addresses.json`
-- [ ] `hos-logs.json`
-- [ ] `dvirs.json`
-- [ ] `safety-events.json`
-- [ ] `webhooks.json`
-- [ ] `users.json`
-- [ ] `tags.json`
-- [ ] (Add more as needed)
+### 9.2 Test Fixtures (`src/Testing/Fixtures/`) DONE
+- [x] `drivers.json`
+- [x] `vehicles.json`
+- [x] `vehicle-stats.json`
+- [x] `trailers.json`
+- [x] `equipment.json`
+- [x] `routes.json`
+- [x] `addresses.json`
+- [x] `hos-logs.json`
+- [x] `dvirs.json`
+- [x] `safety-events.json`
+- [x] `webhooks.json`
+- [x] `users.json`
+- [x] `tags.json`
 
 ### 9.3 Unit Tests (`tests/Unit/`)
 - [ ] `Client/SamsaraTest.php`

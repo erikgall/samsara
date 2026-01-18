@@ -1,0 +1,89 @@
+{
+    "data": [
+        {
+            "id": "vehicle-001",
+            "name": "Truck 001",
+            "vin": "1HGBH41JXMN109186",
+            "make": "Freightliner",
+            "model": "Cascadia",
+            "year": 2022,
+            "licensePlate": "ABC1234",
+            "serial": "SER001",
+            "externalIds": {
+                "fleet": "FLT001"
+            },
+            "gateway": {
+                "serial": "GW001",
+                "model": "AG46"
+            },
+            "staticAssignedDriver": {
+                "id": "driver-001",
+                "name": "John Doe"
+            },
+            "notes": "Primary long-haul truck",
+            "tagIds": ["tag-001", "tag-003"],
+            "attributes": [
+                {
+                    "id": "attr-001",
+                    "name": "Department",
+                    "stringValue": "Long Haul"
+                }
+            ]
+        },
+        {
+            "id": "vehicle-002",
+            "name": "Truck 002",
+            "vin": "1HGBH41JXMN109187",
+            "make": "Peterbilt",
+            "model": "579",
+            "year": 2021,
+            "licensePlate": "XYZ5678",
+            "serial": "SER002",
+            "externalIds": {
+                "fleet": "FLT002"
+            },
+            "gateway": {
+                "serial": "GW002",
+                "model": "AG46"
+            },
+            "staticAssignedDriver": null,
+            "notes": "Regional delivery truck",
+            "tagIds": ["tag-002"],
+            "attributes": []
+        },
+        {
+            "id": "vehicle-003",
+            "name": "Van 001",
+            "vin": "1HGBH41JXMN109188",
+            "make": "Ford",
+            "model": "Transit",
+            "year": 2023,
+            "licensePlate": "VAN9999",
+            "serial": "SER003",
+            "externalIds": {
+                "fleet": "FLT003"
+            },
+            "gateway": {
+                "serial": "GW003",
+                "model": "AG24"
+            },
+            "staticAssignedDriver": {
+                "id": "driver-002",
+                "name": "Jane Smith"
+            },
+            "notes": "Last mile delivery van",
+            "tagIds": ["tag-001", "tag-002"],
+            "attributes": [
+                {
+                    "id": "attr-002",
+                    "name": "Department",
+                    "stringValue": "Local Delivery"
+                }
+            ]
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}

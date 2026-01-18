@@ -1,0 +1,104 @@
+{
+    "data": [
+        {
+            "id": "log-001",
+            "driver": {
+                "id": "driver-001",
+                "name": "John Doe"
+            },
+            "vehicle": {
+                "id": "vehicle-001",
+                "name": "Truck 001"
+            },
+            "hosStatusType": "onDuty",
+            "logStartTime": "2024-06-15T08:00:00Z",
+            "logEndTime": "2024-06-15T08:30:00Z",
+            "annotations": [],
+            "codriverIds": [],
+            "location": {
+                "latitude": 37.7749,
+                "longitude": -122.4194,
+                "location": "San Francisco, CA"
+            },
+            "remark": "Pre-trip inspection",
+            "logRecordedAtTime": "2024-06-15T08:00:00Z",
+            "origin": "driver"
+        },
+        {
+            "id": "log-002",
+            "driver": {
+                "id": "driver-001",
+                "name": "John Doe"
+            },
+            "vehicle": {
+                "id": "vehicle-001",
+                "name": "Truck 001"
+            },
+            "hosStatusType": "driving",
+            "logStartTime": "2024-06-15T08:30:00Z",
+            "logEndTime": "2024-06-15T12:00:00Z",
+            "annotations": [],
+            "codriverIds": [],
+            "location": {
+                "latitude": 35.3733,
+                "longitude": -119.0187,
+                "location": "Bakersfield, CA"
+            },
+            "remark": null,
+            "logRecordedAtTime": "2024-06-15T08:30:00Z",
+            "origin": "automatic"
+        },
+        {
+            "id": "log-003",
+            "driver": {
+                "id": "driver-001",
+                "name": "John Doe"
+            },
+            "vehicle": {
+                "id": "vehicle-001",
+                "name": "Truck 001"
+            },
+            "hosStatusType": "offDuty",
+            "logStartTime": "2024-06-15T12:00:00Z",
+            "logEndTime": "2024-06-15T12:30:00Z",
+            "annotations": [],
+            "codriverIds": [],
+            "location": {
+                "latitude": 35.3733,
+                "longitude": -119.0187,
+                "location": "Bakersfield, CA"
+            },
+            "remark": "Lunch break",
+            "logRecordedAtTime": "2024-06-15T12:00:00Z",
+            "origin": "driver"
+        },
+        {
+            "id": "log-004",
+            "driver": {
+                "id": "driver-002",
+                "name": "Jane Smith"
+            },
+            "vehicle": {
+                "id": "vehicle-003",
+                "name": "Van 001"
+            },
+            "hosStatusType": "onDuty",
+            "logStartTime": "2024-06-15T09:00:00Z",
+            "logEndTime": null,
+            "annotations": [],
+            "codriverIds": [],
+            "location": {
+                "latitude": 25.7617,
+                "longitude": -80.1918,
+                "location": "Miami, FL"
+            },
+            "remark": "Starting deliveries",
+            "logRecordedAtTime": "2024-06-15T09:00:00Z",
+            "origin": "driver"
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}

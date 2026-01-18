@@ -1,0 +1,62 @@
+{
+    "data": [
+        {
+            "id": "tag-001",
+            "name": "West Coast",
+            "parentTagId": null,
+            "addresses": [
+                {"id": "address-001", "name": "Main Warehouse"},
+                {"id": "address-002", "name": "LA Distribution Center"}
+            ],
+            "vehicles": [
+                {"id": "vehicle-001", "name": "Truck 001"},
+                {"id": "vehicle-003", "name": "Van 001"}
+            ],
+            "drivers": [
+                {"id": "driver-001", "name": "John Doe"},
+                {"id": "driver-002", "name": "Jane Smith"}
+            ]
+        },
+        {
+            "id": "tag-002",
+            "name": "South Region",
+            "parentTagId": null,
+            "addresses": [
+                {"id": "address-002", "name": "LA Distribution Center"}
+            ],
+            "vehicles": [
+                {"id": "vehicle-002", "name": "Truck 002"},
+                {"id": "vehicle-003", "name": "Van 001"}
+            ],
+            "drivers": [
+                {"id": "driver-002", "name": "Jane Smith"}
+            ]
+        },
+        {
+            "id": "tag-003",
+            "name": "Priority Fleet",
+            "parentTagId": null,
+            "addresses": [
+                {"id": "address-004", "name": "Customer B - Warehouse"}
+            ],
+            "vehicles": [
+                {"id": "vehicle-001", "name": "Truck 001"}
+            ],
+            "drivers": []
+        },
+        {
+            "id": "tag-004",
+            "name": "California",
+            "parentTagId": "tag-001",
+            "addresses": [
+                {"id": "address-001", "name": "Main Warehouse"}
+            ],
+            "vehicles": [],
+            "drivers": []
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}

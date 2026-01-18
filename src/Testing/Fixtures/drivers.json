@@ -1,0 +1,86 @@
+{
+    "data": [
+        {
+            "id": "driver-001",
+            "name": "John Doe",
+            "username": "johndoe",
+            "phone": "+15551234567",
+            "email": "john.doe@example.com",
+            "licenseNumber": "DL12345678",
+            "licenseState": "CA",
+            "timezone": "America/Los_Angeles",
+            "driverActivationStatus": "active",
+            "createdAtTime": "2024-01-15T08:00:00Z",
+            "updatedAtTime": "2024-06-01T12:30:00Z",
+            "externalIds": {
+                "payroll": "EMP001"
+            },
+            "staticAssignedVehicle": {
+                "id": "vehicle-001",
+                "name": "Truck 001"
+            },
+            "eldSettings": {
+                "rulesets": ["USA Property (8/70)"]
+            },
+            "carrierSettings": {
+                "carrierName": "ABC Trucking",
+                "dotNumber": "1234567"
+            },
+            "tagIds": ["tag-001", "tag-002"]
+        },
+        {
+            "id": "driver-002",
+            "name": "Jane Smith",
+            "username": "janesmith",
+            "phone": "+15559876543",
+            "email": "jane.smith@example.com",
+            "licenseNumber": "DL87654321",
+            "licenseState": "TX",
+            "timezone": "America/Chicago",
+            "driverActivationStatus": "active",
+            "createdAtTime": "2024-02-20T10:00:00Z",
+            "updatedAtTime": "2024-05-15T14:45:00Z",
+            "externalIds": {
+                "payroll": "EMP002"
+            },
+            "staticAssignedVehicle": null,
+            "eldSettings": {
+                "rulesets": ["USA Property (8/70)"]
+            },
+            "carrierSettings": {
+                "carrierName": "ABC Trucking",
+                "dotNumber": "1234567"
+            },
+            "tagIds": ["tag-001"]
+        },
+        {
+            "id": "driver-003",
+            "name": "Bob Wilson",
+            "username": "bobwilson",
+            "phone": "+15555551234",
+            "email": "bob.wilson@example.com",
+            "licenseNumber": "DL11223344",
+            "licenseState": "FL",
+            "timezone": "America/New_York",
+            "driverActivationStatus": "deactivated",
+            "createdAtTime": "2023-06-10T09:00:00Z",
+            "updatedAtTime": "2024-03-01T16:00:00Z",
+            "externalIds": {
+                "payroll": "EMP003"
+            },
+            "staticAssignedVehicle": null,
+            "eldSettings": {
+                "rulesets": ["USA Property (8/70)"]
+            },
+            "carrierSettings": {
+                "carrierName": "ABC Trucking",
+                "dotNumber": "1234567"
+            },
+            "tagIds": []
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}

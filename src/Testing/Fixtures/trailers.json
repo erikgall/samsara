@@ -1,0 +1,65 @@
+{
+    "data": [
+        {
+            "id": "trailer-001",
+            "name": "Trailer 001",
+            "vin": "1UYFS2480RU123456",
+            "licensePlate": "TRL1234",
+            "notes": "53ft dry van trailer",
+            "externalIds": {
+                "fleet": "TRL001"
+            },
+            "tagIds": ["tag-001"],
+            "attributes": [
+                {
+                    "id": "attr-003",
+                    "name": "Type",
+                    "stringValue": "Dry Van"
+                }
+            ],
+            "enabledForMobile": true
+        },
+        {
+            "id": "trailer-002",
+            "name": "Trailer 002",
+            "vin": "1UYFS2480RU123457",
+            "licensePlate": "TRL5678",
+            "notes": "48ft refrigerated trailer",
+            "externalIds": {
+                "fleet": "TRL002"
+            },
+            "tagIds": ["tag-002", "tag-003"],
+            "attributes": [
+                {
+                    "id": "attr-004",
+                    "name": "Type",
+                    "stringValue": "Reefer"
+                }
+            ],
+            "enabledForMobile": true
+        },
+        {
+            "id": "trailer-003",
+            "name": "Trailer 003",
+            "vin": "1UYFS2480RU123458",
+            "licensePlate": "TRL9999",
+            "notes": "Flatbed trailer",
+            "externalIds": {
+                "fleet": "TRL003"
+            },
+            "tagIds": [],
+            "attributes": [
+                {
+                    "id": "attr-005",
+                    "name": "Type",
+                    "stringValue": "Flatbed"
+                }
+            ],
+            "enabledForMobile": false
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}

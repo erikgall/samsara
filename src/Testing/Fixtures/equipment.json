@@ -1,0 +1,59 @@
+{
+    "data": [
+        {
+            "id": "equipment-001",
+            "name": "Forklift 001",
+            "serial": "FK001",
+            "notes": "Main warehouse forklift",
+            "externalIds": {
+                "asset": "AST001"
+            },
+            "tagIds": ["tag-001"],
+            "attributes": [
+                {
+                    "id": "attr-006",
+                    "name": "Type",
+                    "stringValue": "Forklift"
+                }
+            ]
+        },
+        {
+            "id": "equipment-002",
+            "name": "Generator 001",
+            "serial": "GEN001",
+            "notes": "Portable generator for job sites",
+            "externalIds": {
+                "asset": "AST002"
+            },
+            "tagIds": ["tag-002"],
+            "attributes": [
+                {
+                    "id": "attr-007",
+                    "name": "Type",
+                    "stringValue": "Generator"
+                }
+            ]
+        },
+        {
+            "id": "equipment-003",
+            "name": "Compressor 001",
+            "serial": "COMP001",
+            "notes": "Industrial air compressor",
+            "externalIds": {
+                "asset": "AST003"
+            },
+            "tagIds": ["tag-001", "tag-003"],
+            "attributes": [
+                {
+                    "id": "attr-008",
+                    "name": "Type",
+                    "stringValue": "Compressor"
+                }
+            ]
+        }
+    ],
+    "pagination": {
+        "endCursor": "cursor_page_1",
+        "hasNextPage": false
+    }
+}
