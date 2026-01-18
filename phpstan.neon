@@ -1,0 +1,15 @@
+includes:
+    - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
+parameters:
+    level: 8
+    paths:
+        - src
+    excludePaths:
+        - src/Requests
+        - src/Resource
+        - src/Resource.php
+        - src/Types
+        - src/Entities
+        - src/Samsara.php.bak
+    treatPhpDocTypesAsCertain: false

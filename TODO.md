@@ -3,41 +3,41 @@
 ## Phase 1: Core Infrastructure
 
 ### 1.1 Base Setup
-- [ ] Remove Saloon dependency from `composer.json`
-- [ ] Add `illuminate/http` as dependency
-- [ ] Add `illuminate/collections` as dependency
-- [ ] Add `illuminate/support` as dependency
-- [ ] Update minimum PHP version to 8.1 (for enums)
-- [ ] Update autoload namespace if needed
+- [x] Remove Saloon dependency from `composer.json`
+- [x] Add `illuminate/http` as dependency
+- [x] Add `illuminate/collections` as dependency
+- [x] Add `illuminate/support` as dependency
+- [x] Update minimum PHP version to 8.1 (for enums)
+- [x] Update autoload namespace if needed
 
 ### 1.2 Configuration
-- [ ] Create `config/samsara.php`
-  - [ ] `api_key` - API token from env
-  - [ ] `region` - US or EU
-  - [ ] `timeout` - Request timeout
-  - [ ] `retry` - Retry count
-  - [ ] `per_page` - Default pagination limit
+- [x] Create `config/samsara.php`
+  - [x] `api_key` - API token from env
+  - [x] `region` - US or EU
+  - [x] `timeout` - Request timeout
+  - [x] `retry` - Retry count
+  - [x] `per_page` - Default pagination limit
 
 ### 1.3 Main Client (`src/Samsara.php`)
-- [ ] Create new `Samsara` class (replace Saloon-based version)
-  - [ ] `__construct(?string $token, array $config = [])`
-  - [ ] `static make(?string $token, array $config = []): static`
-  - [ ] `withToken(string $token): static`
-  - [ ] `useEuEndpoint(): static`
-  - [ ] `client(): PendingRequest` - Laravel HTTP client
-  - [ ] Resource accessor methods (see Phase 3)
+- [x] Create new `Samsara` class (replace Saloon-based version)
+  - [x] `__construct(?string $token, array $config = [])`
+  - [x] `static make(?string $token, array $config = []): static`
+  - [x] `withToken(string $token): static`
+  - [x] `useEuEndpoint(): static`
+  - [x] `client(): PendingRequest` - Laravel HTTP client
+  - [ ] Resource accessor methods (see Phase 7)
 
 ### 1.4 Service Provider (`src/SamsaraServiceProvider.php`)
-- [ ] Rewrite service provider
-  - [ ] `boot()` - Publish config
-  - [ ] `register()` - Bind Samsara singleton
-  - [ ] Handle EU region configuration
+- [x] Rewrite service provider
+  - [x] `boot()` - Publish config
+  - [x] `register()` - Bind Samsara singleton
+  - [x] Handle EU region configuration
 
 ### 1.5 Facade (`src/Facades/Samsara.php`)
-- [ ] Create facade class
-  - [ ] `getFacadeAccessor()` - Return Samsara class
-  - [ ] `static fake(): SamsaraFake` - Testing support
-  - [ ] Add `@method` docblocks for IDE support
+- [x] Create facade class
+  - [x] `getFacadeAccessor()` - Return Samsara class
+  - [ ] `static fake(): SamsaraFake` - Testing support (Phase 9)
+  - [x] Add `@method` docblocks for IDE support
 
 ---
 
