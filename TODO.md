@@ -915,21 +915,22 @@ Following [Laravel's AI Package Guidelines](https://laravel.com/docs/12.x/ai#pac
 
 ## Phase 12: Release
 
-### 12.1 Cleanup
-- [ ] Remove old Saloon-based classes
-- [ ] Remove old Request classes
-- [ ] Remove old Entity classes (if replaced)
-- [ ] Remove any deprecated code
-- [ ] Clean up temporary/debug code
+### 12.1 Cleanup DONE
+- [x] Remove old Saloon-based classes (src/Resource.php, src/Resource/, src/Requests/)
+- [x] Remove old Request classes (src/Requests/)
+- [x] Remove old Entity classes (src/Entities/)
+- [x] Remove old backup files (src/Samsara.php.bak)
+- [x] Remove empty directories (src/Http/)
+- [x] Clean up temporary/debug code
 
-### 12.2 Package Configuration
-- [ ] Update composer.json
-  - [ ] Remove saloon dependency
-  - [ ] Update description
-  - [ ] Update keywords
-  - [ ] Verify autoload configuration
-- [ ] Verify Laravel package discovery
-- [ ] Test fresh installation
+### 12.2 Package Configuration DONE
+- [x] Update composer.json
+  - [x] Remove saloon dependency (already done)
+  - [x] Update description
+  - [x] Update keywords
+  - [x] Verify autoload configuration
+- [x] Verify Laravel package discovery
+- [x] Test fresh installation (all 1185 tests pass)
 
 ### 12.3 Changelog & Versioning
 - [ ] Write comprehensive CHANGELOG.md
