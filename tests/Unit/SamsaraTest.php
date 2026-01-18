@@ -10,6 +10,9 @@ use ErikGall\Samsara\Resources\Fleet\DriversResource;
 use ErikGall\Samsara\Resources\Fleet\TrailersResource;
 use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
+use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
+use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
 
 /**
  * Unit tests for the Samsara main client class.
@@ -160,11 +163,41 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_trips_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $trips = $samsara->trips();
+
+        $this->assertInstanceOf(TripsResource::class, $trips);
+    }
+
+    #[Test]
     public function it_returns_true_when_token_is_set(): void
     {
         $samsara = new Samsara('test-token');
 
         $this->assertTrue($samsara->hasToken());
+    }
+
+    #[Test]
+    public function it_returns_vehicle_locations_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $vehicleLocations = $samsara->vehicleLocations();
+
+        $this->assertInstanceOf(VehicleLocationsResource::class, $vehicleLocations);
+    }
+
+    #[Test]
+    public function it_returns_vehicle_stats_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $vehicleStats = $samsara->vehicleStats();
+
+        $this->assertInstanceOf(VehicleStatsResource::class, $vehicleStats);
     }
 
     #[Test]

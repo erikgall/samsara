@@ -346,44 +346,40 @@
     - [x] `statsFeed(): Builder`
 - [x] Add `equipment()` accessor to `Samsara.php`
 
-### 7.2 Telematics Resources (`src/Resources/Telematics/`)
+### 7.2 Telematics Resources (`src/Resources/Telematics/`) ✅
 
-#### VehicleStatsResource
-- [ ] Create `VehicleStatsResource.php`
-  - [ ] Endpoint: `/fleet/vehicles/stats`
-  - [ ] Entity: `VehicleStats::class`
-  - [ ] Methods:
-    - [ ] `current(): VehicleStatsQueryBuilder`
-    - [ ] `feed(): VehicleStatsQueryBuilder`
-    - [ ] `history(): VehicleStatsQueryBuilder`
-    - [ ] `gps(): VehicleStatsQueryBuilder`
-    - [ ] `engineStates(): VehicleStatsQueryBuilder`
-    - [ ] `fuelPercents(): VehicleStatsQueryBuilder`
-- [ ] Create `VehicleStatsQueryBuilder.php` (specialized builder)
-  - [ ] `types(array $types): self`
-  - [ ] `withGps(): self`
-  - [ ] `withEngineStates(): self`
-  - [ ] `withOdometer(): self`
-  - [ ] `withFuelPercent(): self`
-- [ ] Add `vehicleStats()` accessor to `Samsara.php`
+#### VehicleStatsResource ✅
+- [x] Create `VehicleStatsResource.php`
+  - [x] Endpoint: `/fleet/vehicles/stats`
+  - [x] Entity: `VehicleStats::class`
+  - [x] Methods:
+    - [x] `current(): Builder`
+    - [x] `feed(): Builder`
+    - [x] `history(): Builder`
+    - [x] `gps(): Builder`
+    - [x] `engineStates(): Builder`
+    - [x] `fuelPercents(): Builder`
+    - [x] `odometer(): Builder`
+- [x] Add `vehicleStats()` accessor to `Samsara.php`
 
-#### VehicleLocationsResource
-- [ ] Create `VehicleLocationsResource.php`
-  - [ ] Endpoint: `/fleet/vehicles/locations`
-  - [ ] Methods:
-    - [ ] `current(): Builder`
-    - [ ] `feed(): Builder`
-    - [ ] `history(): Builder`
-- [ ] Add `vehicleLocations()` accessor to `Samsara.php`
+#### VehicleLocationsResource ✅
+- [x] Create `VehicleLocationsResource.php`
+  - [x] Endpoint: `/fleet/vehicles/locations`
+  - [x] Methods:
+    - [x] `current(): Builder`
+    - [x] `feed(): Builder`
+    - [x] `history(): Builder`
+- [x] Add `vehicleLocations()` accessor to `Samsara.php`
 
-#### TripsResource
-- [ ] Create `TripsResource.php`
-  - [ ] Endpoint: `/trips/stream`
-  - [ ] Entity: `Trip::class`
-  - [ ] Methods:
-    - [ ] `stream(): Builder`
-    - [ ] Legacy: `get(array $params): EntityCollection`
-- [ ] Add `trips()` accessor to `Samsara.php`
+#### TripsResource ✅
+- [x] Create `TripsResource.php`
+  - [x] Endpoint: `/trips/stream`
+  - [x] Entity: `Trip::class`
+  - [x] Methods:
+    - [x] `query(): Builder`
+    - [x] `completed(): Builder`
+    - [x] `inProgress(): Builder`
+- [x] Add `trips()` accessor to `Samsara.php`
 
 ### 7.3 Safety Resources (`src/Resources/Safety/`)
 

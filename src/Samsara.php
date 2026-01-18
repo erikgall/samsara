@@ -8,6 +8,9 @@ use ErikGall\Samsara\Resources\Fleet\DriversResource;
 use ErikGall\Samsara\Resources\Fleet\TrailersResource;
 use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
+use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
+use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
 
 /**
  * Samsara API client.
@@ -162,6 +165,15 @@ class Samsara
     }
 
     /**
+     * Get the TripsResource.
+     */
+    public function trips(): TripsResource
+    {
+        /** @var TripsResource */
+        return $this->resource(TripsResource::class);
+    }
+
+    /**
      * Switch to the EU API endpoint.
      */
     public function useEuEndpoint(): static
@@ -182,12 +194,30 @@ class Samsara
     }
 
     /**
+     * Get the VehicleLocationsResource.
+     */
+    public function vehicleLocations(): VehicleLocationsResource
+    {
+        /** @var VehicleLocationsResource */
+        return $this->resource(VehicleLocationsResource::class);
+    }
+
+    /**
      * Get the VehiclesResource.
      */
     public function vehicles(): VehiclesResource
     {
         /** @var VehiclesResource */
         return $this->resource(VehiclesResource::class);
+    }
+
+    /**
+     * Get the VehicleStatsResource.
+     */
+    public function vehicleStats(): VehicleStatsResource
+    {
+        /** @var VehicleStatsResource */
+        return $this->resource(VehicleStatsResource::class);
     }
 
     /**
