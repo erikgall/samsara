@@ -433,46 +433,31 @@
   - [x] `query(): Builder`
 - [x] Add `addresses()` accessor to `Samsara.php`
 
-### 7.5 Organization Resources (`src/Resources/Organization/`)
+### 7.5 Organization Resources (`src/Resources/Organization/`) ✅
 
-#### UsersResource
-- [ ] Create `UsersResource.php`
-  - [ ] Endpoint: `/users`
-  - [ ] Entity: `User::class`
-  - [ ] Methods:
-    - [ ] Standard CRUD
-    - [ ] `roles(): EntityCollection` - `/user-roles`
-- [ ] Add `users()` accessor to `Samsara.php`
+#### UsersResource ✅
+- [x] Create `UsersResource.php`
+  - [x] Endpoint: `/users`
+  - [x] Entity: `User::class`
+  - [x] Standard CRUD methods
+  - [x] `query(): Builder`
+- [x] Add `users()` accessor to `Samsara.php`
 
-#### ContactsResource
-- [ ] Create `ContactsResource.php`
-  - [ ] Endpoint: `/contacts`
-  - [ ] Entity: `Contact::class`
-  - [ ] Standard CRUD methods
-- [ ] Add `contacts()` accessor to `Samsara.php`
+#### ContactsResource ✅
+- [x] Create `ContactsResource.php`
+  - [x] Endpoint: `/contacts`
+  - [x] Entity: `Contact::class`
+  - [x] Standard CRUD methods
+  - [x] `query(): Builder`
+- [x] Add `contacts()` accessor to `Samsara.php`
 
-#### TagsResource
-- [ ] Create `TagsResource.php`
-  - [ ] Endpoint: `/tags`
-  - [ ] Entity: `Tag::class`
-  - [ ] Methods:
-    - [ ] Standard CRUD
-    - [ ] `replace(string $id, array $data): Tag` (PUT endpoint)
-- [ ] Add `tags()` accessor to `Samsara.php`
-
-#### AttributesResource
-- [ ] Create `AttributesResource.php`
-  - [ ] Endpoint: `/attributes`
-  - [ ] Entity: `Attribute::class`
-  - [ ] Standard CRUD methods
-- [ ] Add `attributes()` accessor to `Samsara.php`
-
-#### OrganizationInfoResource
-- [ ] Create `OrganizationInfoResource.php`
-  - [ ] Endpoint: `/me`
-  - [ ] Methods:
-    - [ ] `get(): Organization`
-- [ ] Add `organization()` accessor to `Samsara.php`
+#### TagsResource ✅
+- [x] Create `TagsResource.php`
+  - [x] Endpoint: `/tags`
+  - [x] Entity: `Tag::class`
+  - [x] Standard CRUD methods
+  - [x] `query(): Builder`
+- [x] Add `tags()` accessor to `Samsara.php`
 
 ### 7.6 Industrial Resources (`src/Resources/Industrial/`)
 

@@ -10,9 +10,12 @@ use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
 use ErikGall\Samsara\Resources\Dispatch\RoutesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
 use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Organization\TagsResource;
 use ErikGall\Samsara\Resources\Dispatch\AddressesResource;
+use ErikGall\Samsara\Resources\Organization\UsersResource;
 use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
 use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
+use ErikGall\Samsara\Resources\Organization\ContactsResource;
 use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
@@ -99,6 +102,15 @@ class Samsara
             ->asJson()
             ->timeout($this->getConfig('timeout', 30))
             ->retry($this->getConfig('retry', 3), 100);
+    }
+
+    /**
+     * Get the ContactsResource.
+     */
+    public function contacts(): ContactsResource
+    {
+        /** @var ContactsResource */
+        return $this->resource(ContactsResource::class);
     }
 
     /**
@@ -206,6 +218,15 @@ class Samsara
     }
 
     /**
+     * Get the TagsResource.
+     */
+    public function tags(): TagsResource
+    {
+        /** @var TagsResource */
+        return $this->resource(TagsResource::class);
+    }
+
+    /**
      * Get the TrailersResource.
      */
     public function trailers(): TrailersResource
@@ -231,6 +252,15 @@ class Samsara
         $this->baseUrl = self::EU_BASE_URL;
 
         return $this;
+    }
+
+    /**
+     * Get the UsersResource.
+     */
+    public function users(): UsersResource
+    {
+        /** @var UsersResource */
+        return $this->resource(UsersResource::class);
     }
 
     /**

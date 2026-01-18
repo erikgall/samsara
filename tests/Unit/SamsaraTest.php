@@ -12,9 +12,12 @@ use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
 use ErikGall\Samsara\Resources\Dispatch\RoutesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
 use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Organization\TagsResource;
 use ErikGall\Samsara\Resources\Dispatch\AddressesResource;
+use ErikGall\Samsara\Resources\Organization\UsersResource;
 use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
 use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
+use ErikGall\Samsara\Resources\Organization\ContactsResource;
 use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
@@ -121,6 +124,16 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_contacts_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $contacts = $samsara->contacts();
+
+        $this->assertInstanceOf(ContactsResource::class, $contacts);
+    }
+
+    #[Test]
     public function it_returns_default_value_for_missing_config(): void
     {
         $samsara = new Samsara('test-token');
@@ -208,6 +221,16 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_tags_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $tags = $samsara->tags();
+
+        $this->assertInstanceOf(TagsResource::class, $tags);
+    }
+
+    #[Test]
     public function it_returns_trailers_resource(): void
     {
         $samsara = new Samsara('test-token');
@@ -233,6 +256,16 @@ class SamsaraTest extends TestCase
         $samsara = new Samsara('test-token');
 
         $this->assertTrue($samsara->hasToken());
+    }
+
+    #[Test]
+    public function it_returns_users_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $users = $samsara->users();
+
+        $this->assertInstanceOf(UsersResource::class, $users);
     }
 
     #[Test]
