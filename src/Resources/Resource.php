@@ -127,6 +127,16 @@ abstract class Resource implements ResourceInterface
     }
 
     /**
+     * Get the entity class for this resource.
+     *
+     * @return class-string<Entity>
+     */
+    public function getEntityClass(): string
+    {
+        return $this->entity;
+    }
+
+    /**
      * Update an entity.
      *
      * @param  array<string, mixed>  $data

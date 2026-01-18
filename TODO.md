@@ -110,48 +110,48 @@
 ## Phase 4: Query Builder
 
 ### 4.1 Main Builder (`src/Query/Builder.php`)
-- [ ] Create `Builder` class
-  - [ ] `$resource` property
-  - [ ] `$filters` property
-  - [ ] `$limit` property
-  - [ ] `$cursor` property
-  - [ ] `$expand` property
-  - [ ] `$types` property
-  - [ ] `$decorations` property
-  - [ ] Constructor and fluent methods (all return `static` for proper inheritance):
-    - [ ] `whereTag(array|string $tagIds): static`
-    - [ ] `whereParentTag(array|string $parentTagIds): static`
-    - [ ] `whereAttribute(array|string $attributeValueIds): static`
-    - [ ] `whereVehicle(array|string $vehicleIds): static`
-    - [ ] `whereDriver(array|string $driverIds): static`
-    - [ ] `updatedAfter(DateTimeInterface|string $time): static`
-    - [ ] `createdAfter(DateTimeInterface|string $time): static`
-    - [ ] `startTime(DateTimeInterface|string $time): static`
-    - [ ] `endTime(DateTimeInterface|string $time): static`
-    - [ ] `between(DateTimeInterface|string $start, DateTimeInterface|string $end): static`
-    - [ ] `types(array|string $types): static`
-    - [ ] `withDecorations(array|string $decorations): static`
-    - [ ] `expand(array|string $expand): static`
-    - [ ] `limit(int $limit): static`
-    - [ ] `take(int $count): static`
-    - [ ] `after(string $cursor): static`
-    - [ ] `where(string $key, mixed $value): static`
-  - [ ] Execution methods:
-    - [ ] `get(): EntityCollection`
-    - [ ] `paginate(?int $perPage = null): CursorPaginator`
-    - [ ] `lazy(?int $chunkSize = null): LazyCollection`
-    - [ ] `first(): ?object`
-    - [ ] `buildQuery(): array`
-  - [ ] `formatTime(DateTimeInterface|string $time): string`
+- [x] Create `Builder` class
+  - [x] `$resource` property
+  - [x] `$filters` property
+  - [x] `$limit` property
+  - [x] `$cursor` property
+  - [x] `$expand` property
+  - [x] `$types` property
+  - [x] `$decorations` property
+  - [x] Constructor and fluent methods (all return `static` for proper inheritance):
+    - [x] `whereTag(array|string $tagIds): static`
+    - [x] `whereParentTag(array|string $parentTagIds): static`
+    - [x] `whereAttribute(array|string $attributeValueIds): static`
+    - [x] `whereVehicle(array|string $vehicleIds): static`
+    - [x] `whereDriver(array|string $driverIds): static`
+    - [x] `updatedAfter(DateTimeInterface|string $time): static`
+    - [x] `createdAfter(DateTimeInterface|string $time): static`
+    - [x] `startTime(DateTimeInterface|string $time): static`
+    - [x] `endTime(DateTimeInterface|string $time): static`
+    - [x] `between(DateTimeInterface|string $start, DateTimeInterface|string $end): static`
+    - [x] `types(array|string $types): static`
+    - [x] `withDecorations(array|string $decorations): static`
+    - [x] `expand(array|string $expand): static`
+    - [x] `limit(int $limit): static`
+    - [x] `take(int $count): static`
+    - [x] `after(string $cursor): static`
+    - [x] `where(string $key, mixed $value): static`
+  - [x] Execution methods:
+    - [x] `get(): EntityCollection`
+    - [x] `paginate(?int $perPage = null): CursorPaginator`
+    - [x] `lazy(?int $chunkSize = null): LazyCollection`
+    - [x] `first(): ?object`
+    - [x] `buildQuery(): array`
+  - [x] `formatTime(DateTimeInterface|string $time): string` (via InteractsWithTime trait)
 
 ### 4.2 Pagination (`src/Query/Pagination/`)
-- [ ] `Cursor.php`
-  - [ ] `$endCursor` property
-  - [ ] `$hasNextPage` property
-- [ ] `CursorPaginator.php`
-  - [ ] Iterator implementation
-  - [ ] `nextPage(): ?EntityCollection`
-  - [ ] `hasMorePages(): bool`
+- [x] `Cursor.php`
+  - [x] `$endCursor` property
+  - [x] `$hasNextPage` property
+- [x] `CursorPaginator.php`
+  - [x] Iterator implementation
+  - [x] `nextPage(): ?CursorPaginator`
+  - [x] `hasMorePages(): bool`
 
 ---
 
