@@ -522,153 +522,146 @@
   - [x] Standard CRUD methods
 - [x] Add `liveShares()` accessor to `Samsara.php`
 
-### 7.8 Additional Resources
+### 7.8 Additional Resources DONE
 
-#### AlertsResource
-- [ ] Create `AlertsResource.php`
-  - [ ] Methods:
-    - [ ] `configurations(): Builder`
-    - [ ] `createConfiguration(array $data): AlertConfiguration`
-    - [ ] `updateConfiguration(array $data): AlertConfiguration`
-    - [ ] `deleteConfiguration(array $ids): bool`
-    - [ ] `incidents(): Builder`
-- [ ] Add `alerts()` accessor to `Samsara.php`
+#### AlertsResource DONE
+- [x] Create `AlertsResource.php`
+  - [x] Methods:
+    - [x] `configurations(): Builder`
+    - [x] `createConfiguration(array $data): AlertConfiguration`
+    - [x] `updateConfiguration(string $id, array $data): AlertConfiguration`
+    - [x] `deleteConfigurations(array $ids): bool`
+    - [x] `incidents(): Builder`
+- [x] Add `alerts()` accessor to `Samsara.php`
 
-#### FormsResource
-- [ ] Create `FormsResource.php`
-  - [ ] Methods:
-    - [ ] `submissions(): Builder`
-    - [ ] `submissionsStream(): Builder`
-    - [ ] `createSubmission(array $data): FormSubmission`
-    - [ ] `updateSubmission(string $id, array $data): FormSubmission`
-    - [ ] `templates(): EntityCollection`
-    - [ ] `exportPdf(array $data): object`
-    - [ ] `getPdfExport(string $id): object`
-- [ ] Add `forms()` accessor to `Samsara.php`
+#### FormsResource DONE
+- [x] Create `FormsResource.php`
+  - [x] Methods:
+    - [x] `submissions(): Builder`
+    - [x] `submissionsStream(): Builder`
+    - [x] `createSubmission(array $data): FormSubmission`
+    - [x] `updateSubmission(string $id, array $data): FormSubmission`
+    - [x] `templates(): EntityCollection`
+    - [x] `exportPdf(array $data): array`
+    - [x] `getPdfExport(string $id): array`
+- [x] Add `forms()` accessor to `Samsara.php`
 
-#### IftaResource
-- [ ] Create `IftaResource.php`
-  - [ ] Methods:
-    - [ ] `jurisdictionReport(): object`
-    - [ ] `vehicleReport(): object`
-    - [ ] `detailCsv(): object`
-    - [ ] `getDetailCsv(string $id): object`
-- [ ] Add `ifta()` accessor to `Samsara.php`
+#### IftaResource DONE
+- [x] Create `IftaResource.php`
+  - [x] Methods:
+    - [x] `jurisdictionReport(): Builder`
+    - [x] `vehicleReport(): Builder`
+    - [x] `detailCsv(array $data): array`
+    - [x] `getDetailCsv(string $id): array`
+- [x] Add `ifta()` accessor to `Samsara.php`
 
-#### IdlingResource
-- [ ] Create `IdlingResource.php`
-  - [ ] Endpoint: `/idling/events`
-  - [ ] Methods:
-    - [ ] `events(): Builder`
-- [ ] Add `idling()` accessor to `Samsara.php`
+#### IdlingResource DONE
+- [x] Create `IdlingResource.php`
+  - [x] Endpoint: `/idling/events`
+  - [x] Methods:
+    - [x] `events(): Builder`
+- [x] Add `idling()` accessor to `Samsara.php`
 
-#### IssuesResource
-- [ ] Create `IssuesResource.php`
-  - [ ] Methods:
-    - [ ] `all(): EntityCollection`
-    - [ ] `stream(): Builder`
-    - [ ] `update(string $id, array $data): object`
-- [ ] Add `issues()` accessor to `Samsara.php`
+#### IssuesResource DONE
+- [x] Create `IssuesResource.php`
+  - [x] Methods:
+    - [x] `all(): EntityCollection`
+    - [x] `stream(): Builder`
+    - [x] `update(string $id, array $data): Entity`
+- [x] Add `issues()` accessor to `Samsara.php`
 
-#### FuelAndEnergyResource
-- [ ] Create `FuelAndEnergyResource.php`
-  - [ ] Methods:
-    - [ ] `driverEfficiency(): Builder`
-    - [ ] `vehicleEfficiency(): Builder`
-    - [ ] `driversFuelEnergyReport(): object`
-    - [ ] `vehiclesFuelEnergyReport(): object`
-    - [ ] `createFuelPurchase(array $data): object`
-- [ ] Add `fuelAndEnergy()` accessor to `Samsara.php`
+#### FuelAndEnergyResource DONE
+- [x] Create `FuelAndEnergyResource.php`
+  - [x] Methods:
+    - [x] `driverEfficiency(): Builder`
+    - [x] `vehicleEfficiency(): Builder`
+    - [x] `driversFuelEnergyReport(array $data): array`
+    - [x] `vehiclesFuelEnergyReport(array $data): array`
+    - [x] `createFuelPurchase(array $data): array`
+- [x] Add `fuelAndEnergy()` accessor to `Samsara.php`
 
-#### TachographResource (EU Only)
-- [ ] Create `TachographResource.php`
-  - [ ] Methods:
-    - [ ] `driverActivityHistory(): Builder`
-    - [ ] `driverFilesHistory(): Builder`
-    - [ ] `vehicleFilesHistory(): Builder`
-- [ ] Add `tachograph()` accessor to `Samsara.php`
+#### TachographResource (EU Only) DONE
+- [x] Create `TachographResource.php`
+  - [x] Methods:
+    - [x] `driverActivityHistory(): Builder`
+    - [x] `driverFilesHistory(): Builder`
+    - [x] `vehicleFilesHistory(): Builder`
+- [x] Add `tachograph()` accessor to `Samsara.php`
 
-#### SpeedingResource
-- [ ] Create `SpeedingResource.php`
-  - [ ] Methods:
-    - [ ] `intervalsStream(): Builder`
-- [ ] Add `speeding()` accessor to `Samsara.php`
+#### SpeedingResource DONE
+- [x] Create `SpeedingResource.php`
+  - [x] Methods:
+    - [x] `intervalsStream(): Builder`
+- [x] Add `speeding()` accessor to `Samsara.php`
 
-#### CarrierProposedAssignmentsResource
-- [ ] Create `CarrierProposedAssignmentsResource.php`
-  - [ ] Endpoint: `/fleet/carrier-proposed-assignments`
-  - [ ] Methods:
-    - [ ] `all(): EntityCollection`
-    - [ ] `create(array $data): object`
-    - [ ] `delete(string $id): bool`
-- [ ] Add `carrierProposedAssignments()` accessor to `Samsara.php`
+#### CarrierProposedAssignmentsResource DONE
+- [x] Create `CarrierProposedAssignmentsResource.php`
+  - [x] Endpoint: `/fleet/carrier-proposed-assignments`
+  - [x] Methods:
+    - [x] `all(): EntityCollection`
+    - [x] `create(array $data): Entity`
+    - [x] `delete(string $id): bool`
+- [x] Add `carrierProposedAssignments()` accessor to `Samsara.php`
 
-#### DriverVehicleAssignmentsResource
-- [ ] Create `DriverVehicleAssignmentsResource.php`
-  - [ ] Endpoint: `/fleet/driver-vehicle-assignments`
-  - [ ] Methods: GET, POST, PATCH, DELETE
-- [ ] Add `driverVehicleAssignments()` accessor to `Samsara.php`
+#### DriverVehicleAssignmentsResource DONE
+- [x] Create `DriverVehicleAssignmentsResource.php`
+  - [x] Endpoint: `/fleet/driver-vehicle-assignments`
+  - [x] Methods: all, create, update, delete, query
+- [x] Add `driverVehicleAssignments()` accessor to `Samsara.php`
 
-#### DriverTrailerAssignmentsResource
-- [ ] Create `DriverTrailerAssignmentsResource.php`
-  - [ ] Endpoint: `/driver-trailer-assignments`
-  - [ ] Methods: GET, POST, PATCH
-- [ ] Add `driverTrailerAssignments()` accessor to `Samsara.php`
+#### DriverTrailerAssignmentsResource DONE
+- [x] Create `DriverTrailerAssignmentsResource.php`
+  - [x] Endpoint: `/driver-trailer-assignments`
+  - [x] Methods: all, create, update, query
+- [x] Add `driverTrailerAssignments()` accessor to `Samsara.php`
 
-#### TrailerAssignmentsResource (Legacy)
-- [ ] Create `TrailerAssignmentsResource.php`
-  - [ ] Methods:
-    - [ ] `all(): EntityCollection`
-    - [ ] `forTrailer(string $trailerId): EntityCollection`
-- [ ] Add `trailerAssignments()` accessor to `Samsara.php`
+#### TrailerAssignmentsResource (Legacy) DONE
+- [x] Create `TrailerAssignmentsResource.php`
+  - [x] Methods:
+    - [x] `all(): EntityCollection`
+    - [x] `forTrailer(string $trailerId): EntityCollection`
+- [x] Add `trailerAssignments()` accessor to `Samsara.php`
 
-#### WorkOrdersResource
-- [ ] Create `WorkOrdersResource.php`
-  - [ ] Endpoint: `/maintenance/work-orders`
-  - [ ] Methods:
-    - [ ] Standard CRUD
-    - [ ] `stream(): Builder`
-    - [ ] `serviceTasks(): EntityCollection`
-    - [ ] `uploadInvoiceScan(array $data): object`
-- [ ] Add `workOrders()` accessor to `Samsara.php`
+#### WorkOrdersResource DONE
+- [x] Create `WorkOrdersResource.php`
+  - [x] Endpoint: `/maintenance/work-orders`
+  - [x] Methods:
+    - [x] Standard CRUD
+    - [x] `stream(): Builder`
+    - [x] `serviceTasks(): EntityCollection`
+    - [x] `uploadInvoiceScan(array $data): array`
+- [x] Add `workOrders()` accessor to `Samsara.php`
 
-#### CameraMediaResource
-- [ ] Create `CameraMediaResource.php`
-  - [ ] Methods:
-    - [ ] `get(): EntityCollection`
-    - [ ] `retrieve(array $data): object`
-    - [ ] `getRetrieval(string $id): object`
-- [ ] Add `cameraMedia()` accessor to `Samsara.php`
+#### CameraMediaResource DONE
+- [x] Create `CameraMediaResource.php`
+  - [x] Methods:
+    - [x] `get(): EntityCollection`
+    - [x] `retrieve(array $data): array`
+    - [x] `getRetrieval(string $id): array`
+- [x] Add `cameraMedia()` accessor to `Samsara.php`
 
-#### HubsResource
-- [ ] Create `HubsResource.php`
-  - [ ] Methods:
-    - [ ] `all(): EntityCollection` - `/hubs`
-    - [ ] `locations(): EntityCollection`
-    - [ ] `createLocation(array $data): object`
-    - [ ] `updateLocation(string $id, array $data): object`
-    - [ ] `capacities(): EntityCollection`
-    - [ ] `skills(): EntityCollection`
-    - [ ] `createPlan(array $data): object`
-    - [ ] `plans(): EntityCollection`
-    - [ ] `createPlanOrders(array $data): object`
-- [ ] Add `hubs()` accessor to `Samsara.php`
+#### HubsResource DONE
+- [x] Create `HubsResource.php`
+  - [x] Methods:
+    - [x] Standard CRUD
+    - [x] `query(): Builder`
+- [x] Add `hubs()` accessor to `Samsara.php`
 
-#### SettingsResource
-- [ ] Create `SettingsResource.php`
-  - [ ] Methods:
-    - [ ] `compliance(): object`
-    - [ ] `updateCompliance(array $data): object`
-    - [ ] `driverApp(): object`
-    - [ ] `updateDriverApp(array $data): object`
-    - [ ] `safety(): object`
-- [ ] Add `settings()` accessor to `Samsara.php`
+#### SettingsResource DONE
+- [x] Create `SettingsResource.php`
+  - [x] Methods:
+    - [x] `compliance(): array`
+    - [x] `updateCompliance(array $data): array`
+    - [x] `driverApp(): array`
+    - [x] `updateDriverApp(array $data): array`
+    - [x] `safety(): array`
+- [x] Add `settings()` accessor to `Samsara.php`
 
-#### RouteEventsResource
-- [ ] Create `RouteEventsResource.php`
-  - [ ] Methods:
-    - [ ] `stream(): Builder`
-- [ ] Add `routeEvents()` accessor to `Samsara.php`
+#### RouteEventsResource DONE
+- [x] Create `RouteEventsResource.php`
+  - [x] Methods:
+    - [x] `query(): Builder`
+- [x] Add `routeEvents()` accessor to `Samsara.php`
 
 ---
 

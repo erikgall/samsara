@@ -7,24 +7,41 @@ use Illuminate\Http\Client\Factory as HttpFactory;
 use ErikGall\Samsara\Resources\Fleet\DriversResource;
 use ErikGall\Samsara\Resources\Fleet\TrailersResource;
 use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
+use ErikGall\Samsara\Resources\Additional\HubsResource;
+use ErikGall\Samsara\Resources\Additional\IftaResource;
 use ErikGall\Samsara\Resources\Dispatch\RoutesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
+use ErikGall\Samsara\Resources\Additional\FormsResource;
 use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Additional\AlertsResource;
+use ErikGall\Samsara\Resources\Additional\IdlingResource;
+use ErikGall\Samsara\Resources\Additional\IssuesResource;
 use ErikGall\Samsara\Resources\Industrial\AssetsResource;
 use ErikGall\Samsara\Resources\Organization\TagsResource;
 use ErikGall\Samsara\Resources\Dispatch\AddressesResource;
 use ErikGall\Samsara\Resources\Industrial\SensorsResource;
 use ErikGall\Samsara\Resources\Organization\UsersResource;
 use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
+use ErikGall\Samsara\Resources\Additional\SettingsResource;
+use ErikGall\Samsara\Resources\Additional\SpeedingResource;
 use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
+use ErikGall\Samsara\Resources\Additional\TachographResource;
+use ErikGall\Samsara\Resources\Additional\WorkOrdersResource;
 use ErikGall\Samsara\Resources\Industrial\IndustrialResource;
 use ErikGall\Samsara\Resources\Integrations\GatewaysResource;
 use ErikGall\Samsara\Resources\Integrations\WebhooksResource;
 use ErikGall\Samsara\Resources\Organization\ContactsResource;
 use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
+use ErikGall\Samsara\Resources\Additional\CameraMediaResource;
+use ErikGall\Samsara\Resources\Additional\RouteEventsResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
+use ErikGall\Samsara\Resources\Additional\FuelAndEnergyResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
+use ErikGall\Samsara\Resources\Additional\TrailerAssignmentsResource;
 use ErikGall\Samsara\Resources\Integrations\LiveSharingLinksResource;
+use ErikGall\Samsara\Resources\Additional\DriverTrailerAssignmentsResource;
+use ErikGall\Samsara\Resources\Additional\DriverVehicleAssignmentsResource;
+use ErikGall\Samsara\Resources\Additional\CarrierProposedAssignmentsResource;
 
 /**
  * Samsara API client.
@@ -98,12 +115,39 @@ class Samsara
     }
 
     /**
+     * Get the AlertsResource.
+     */
+    public function alerts(): AlertsResource
+    {
+        /** @var AlertsResource */
+        return $this->resource(AlertsResource::class);
+    }
+
+    /**
      * Get the AssetsResource.
      */
     public function assets(): AssetsResource
     {
         /** @var AssetsResource */
         return $this->resource(AssetsResource::class);
+    }
+
+    /**
+     * Get the CameraMediaResource.
+     */
+    public function cameraMedia(): CameraMediaResource
+    {
+        /** @var CameraMediaResource */
+        return $this->resource(CameraMediaResource::class);
+    }
+
+    /**
+     * Get the CarrierProposedAssignmentsResource.
+     */
+    public function carrierProposedAssignments(): CarrierProposedAssignmentsResource
+    {
+        /** @var CarrierProposedAssignmentsResource */
+        return $this->resource(CarrierProposedAssignmentsResource::class);
     }
 
     /**
@@ -138,12 +182,48 @@ class Samsara
     }
 
     /**
+     * Get the DriverTrailerAssignmentsResource.
+     */
+    public function driverTrailerAssignments(): DriverTrailerAssignmentsResource
+    {
+        /** @var DriverTrailerAssignmentsResource */
+        return $this->resource(DriverTrailerAssignmentsResource::class);
+    }
+
+    /**
+     * Get the DriverVehicleAssignmentsResource.
+     */
+    public function driverVehicleAssignments(): DriverVehicleAssignmentsResource
+    {
+        /** @var DriverVehicleAssignmentsResource */
+        return $this->resource(DriverVehicleAssignmentsResource::class);
+    }
+
+    /**
      * Get the EquipmentResource.
      */
     public function equipment(): EquipmentResource
     {
         /** @var EquipmentResource */
         return $this->resource(EquipmentResource::class);
+    }
+
+    /**
+     * Get the FormsResource.
+     */
+    public function forms(): FormsResource
+    {
+        /** @var FormsResource */
+        return $this->resource(FormsResource::class);
+    }
+
+    /**
+     * Get the FuelAndEnergyResource.
+     */
+    public function fuelAndEnergy(): FuelAndEnergyResource
+    {
+        /** @var FuelAndEnergyResource */
+        return $this->resource(FuelAndEnergyResource::class);
     }
 
     /**
@@ -201,12 +281,48 @@ class Samsara
     }
 
     /**
+     * Get the HubsResource.
+     */
+    public function hubs(): HubsResource
+    {
+        /** @var HubsResource */
+        return $this->resource(HubsResource::class);
+    }
+
+    /**
+     * Get the IdlingResource.
+     */
+    public function idling(): IdlingResource
+    {
+        /** @var IdlingResource */
+        return $this->resource(IdlingResource::class);
+    }
+
+    /**
+     * Get the IftaResource.
+     */
+    public function ifta(): IftaResource
+    {
+        /** @var IftaResource */
+        return $this->resource(IftaResource::class);
+    }
+
+    /**
      * Get the IndustrialResource.
      */
     public function industrial(): IndustrialResource
     {
         /** @var IndustrialResource */
         return $this->resource(IndustrialResource::class);
+    }
+
+    /**
+     * Get the IssuesResource.
+     */
+    public function issues(): IssuesResource
+    {
+        /** @var IssuesResource */
+        return $this->resource(IssuesResource::class);
     }
 
     /**
@@ -225,6 +341,15 @@ class Samsara
     {
         /** @var MaintenanceResource */
         return $this->resource(MaintenanceResource::class);
+    }
+
+    /**
+     * Get the RouteEventsResource.
+     */
+    public function routeEvents(): RouteEventsResource
+    {
+        /** @var RouteEventsResource */
+        return $this->resource(RouteEventsResource::class);
     }
 
     /**
@@ -269,12 +394,48 @@ class Samsara
     }
 
     /**
+     * Get the SettingsResource.
+     */
+    public function settings(): SettingsResource
+    {
+        /** @var SettingsResource */
+        return $this->resource(SettingsResource::class);
+    }
+
+    /**
+     * Get the SpeedingResource.
+     */
+    public function speeding(): SpeedingResource
+    {
+        /** @var SpeedingResource */
+        return $this->resource(SpeedingResource::class);
+    }
+
+    /**
+     * Get the TachographResource.
+     */
+    public function tachograph(): TachographResource
+    {
+        /** @var TachographResource */
+        return $this->resource(TachographResource::class);
+    }
+
+    /**
      * Get the TagsResource.
      */
     public function tags(): TagsResource
     {
         /** @var TagsResource */
         return $this->resource(TagsResource::class);
+    }
+
+    /**
+     * Get the TrailerAssignmentsResource.
+     */
+    public function trailerAssignments(): TrailerAssignmentsResource
+    {
+        /** @var TrailerAssignmentsResource */
+        return $this->resource(TrailerAssignmentsResource::class);
     }
 
     /**
@@ -370,6 +531,15 @@ class Samsara
         $this->token = $token;
 
         return $this;
+    }
+
+    /**
+     * Get the WorkOrdersResource.
+     */
+    public function workOrders(): WorkOrdersResource
+    {
+        /** @var WorkOrdersResource */
+        return $this->resource(WorkOrdersResource::class);
     }
 
     /**
