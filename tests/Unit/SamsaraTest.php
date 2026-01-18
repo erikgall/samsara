@@ -20,10 +20,13 @@ use ErikGall\Samsara\Resources\Organization\UsersResource;
 use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
 use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
 use ErikGall\Samsara\Resources\Industrial\IndustrialResource;
+use ErikGall\Samsara\Resources\Integrations\GatewaysResource;
+use ErikGall\Samsara\Resources\Integrations\WebhooksResource;
 use ErikGall\Samsara\Resources\Organization\ContactsResource;
 use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
+use ErikGall\Samsara\Resources\Integrations\LiveSharingLinksResource;
 
 /**
  * Unit tests for the Samsara main client class.
@@ -184,6 +187,16 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_gateways_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $gateways = $samsara->gateways();
+
+        $this->assertInstanceOf(GatewaysResource::class, $gateways);
+    }
+
+    #[Test]
     public function it_returns_hours_of_service_resource(): void
     {
         $samsara = new Samsara('test-token');
@@ -201,6 +214,16 @@ class SamsaraTest extends TestCase
         $industrial = $samsara->industrial();
 
         $this->assertInstanceOf(IndustrialResource::class, $industrial);
+    }
+
+    #[Test]
+    public function it_returns_live_shares_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $liveShares = $samsara->liveShares();
+
+        $this->assertInstanceOf(LiveSharingLinksResource::class, $liveShares);
     }
 
     #[Test]
@@ -329,6 +352,16 @@ class SamsaraTest extends TestCase
         $vehicles = $samsara->vehicles();
 
         $this->assertInstanceOf(VehiclesResource::class, $vehicles);
+    }
+
+    #[Test]
+    public function it_returns_webhooks_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $webhooks = $samsara->webhooks();
+
+        $this->assertInstanceOf(WebhooksResource::class, $webhooks);
     }
 
     #[Test]

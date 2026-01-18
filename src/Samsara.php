@@ -18,10 +18,13 @@ use ErikGall\Samsara\Resources\Organization\UsersResource;
 use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
 use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
 use ErikGall\Samsara\Resources\Industrial\IndustrialResource;
+use ErikGall\Samsara\Resources\Integrations\GatewaysResource;
+use ErikGall\Samsara\Resources\Integrations\WebhooksResource;
 use ErikGall\Samsara\Resources\Organization\ContactsResource;
 use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
+use ErikGall\Samsara\Resources\Integrations\LiveSharingLinksResource;
 
 /**
  * Samsara API client.
@@ -144,6 +147,15 @@ class Samsara
     }
 
     /**
+     * Get the GatewaysResource.
+     */
+    public function gateways(): GatewaysResource
+    {
+        /** @var GatewaysResource */
+        return $this->resource(GatewaysResource::class);
+    }
+
+    /**
      * Get the current base URL.
      */
     public function getBaseUrl(): string
@@ -195,6 +207,15 @@ class Samsara
     {
         /** @var IndustrialResource */
         return $this->resource(IndustrialResource::class);
+    }
+
+    /**
+     * Get the LiveSharingLinksResource.
+     */
+    public function liveShares(): LiveSharingLinksResource
+    {
+        /** @var LiveSharingLinksResource */
+        return $this->resource(LiveSharingLinksResource::class);
     }
 
     /**
@@ -328,6 +349,15 @@ class Samsara
     {
         /** @var VehicleStatsResource */
         return $this->resource(VehicleStatsResource::class);
+    }
+
+    /**
+     * Get the WebhooksResource.
+     */
+    public function webhooks(): WebhooksResource
+    {
+        /** @var WebhooksResource */
+        return $this->resource(WebhooksResource::class);
     }
 
     /**

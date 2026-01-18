@@ -496,31 +496,31 @@
     - [x] Legacy: locations, reefers
 - [x] Add `assets()` accessor to `Samsara.php`
 
-### 7.7 Integrations Resources (`src/Resources/Integrations/`)
+### 7.7 Integrations Resources (`src/Resources/Integrations/`) ✅
 
-#### WebhooksResource
-- [ ] Create `WebhooksResource.php`
-  - [ ] Endpoint: `/webhooks`
-  - [ ] Entity: `Webhook::class`
-  - [ ] Standard CRUD methods
-- [ ] Add `webhooks()` accessor to `Samsara.php`
+#### WebhooksResource ✅
+- [x] Create `WebhooksResource.php`
+  - [x] Endpoint: `/webhooks`
+  - [x] Entity: `Webhook::class`
+  - [x] Standard CRUD methods
+- [x] Add `webhooks()` accessor to `Samsara.php`
 
-#### GatewaysResource
-- [ ] Create `GatewaysResource.php`
-  - [ ] Endpoint: `/gateways`
-  - [ ] Entity: `Gateway::class`
-  - [ ] Methods:
-    - [ ] `all(): EntityCollection`
-    - [ ] `create(array $data): Gateway`
-    - [ ] `delete(string $id): bool`
-- [ ] Add `gateways()` accessor to `Samsara.php`
+#### GatewaysResource ✅
+- [x] Create `GatewaysResource.php`
+  - [x] Endpoint: `/gateways`
+  - [x] Entity: `Gateway::class`
+  - [x] Methods:
+    - [x] `all(): EntityCollection`
+    - [x] `create(array $data): Gateway`
+    - [x] `delete(string $id): bool`
+- [x] Add `gateways()` accessor to `Samsara.php`
 
-#### LiveSharingLinksResource
-- [ ] Create `LiveSharingLinksResource.php`
-  - [ ] Endpoint: `/live-shares`
-  - [ ] Entity: `LiveShare::class`
-  - [ ] Standard CRUD methods
-- [ ] Add `liveShares()` accessor to `Samsara.php`
+#### LiveSharingLinksResource ✅
+- [x] Create `LiveSharingLinksResource.php`
+  - [x] Endpoint: `/live-shares`
+  - [x] Entity: `LiveShare::class`
+  - [x] Standard CRUD methods
+- [x] Add `liveShares()` accessor to `Samsara.php`
 
 ### 7.8 Additional Resources
 
