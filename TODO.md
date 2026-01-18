@@ -225,9 +225,9 @@
 - [x] `HosDailyLog.php`
 
 ### 6.8 Safety Entities (`src/Data/Safety/`)
-- [ ] `SafetyEvent.php`
-- [ ] `SafetyScore.php`
-- [ ] `CoachingSession.php`
+- [x] `SafetyEvent.php`
+- [x] `SafetyScore.php`
+- [x] `CoachingSession.php`
 
 ### 6.9 Maintenance Entities (`src/Data/Maintenance/`)
 - [ ] `Dvir.php` (Driver Vehicle Inspection Report)
