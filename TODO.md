@@ -232,17 +232,17 @@
 ### 6.9 Maintenance Entities (`src/Data/Maintenance/`)
 - [x] `Dvir.php` (Driver Vehicle Inspection Report)
 - [x] `Defect.php`
-- [ ] `DefectType.php`
+- [x] `DefectType.php`
 - [x] `WorkOrder.php`
-- [ ] `ServiceTask.php`
+- [x] `ServiceTask.php`
 
 ### 6.10 Document Entities (`src/Data/Document/`)
-- [ ] `Document.php`
-- [ ] `DocumentType.php`
+- [x] `Document.php`
+- [x] `DocumentType.php`
 
 ### 6.11 User Entities (`src/Data/User/`)
-- [ ] `User.php`
-- [ ] `UserRole.php`
+- [x] `User.php`
+- [x] `UserRole.php`
 
 ### 6.12 Contact Entities (`src/Data/Contact/`)
 - [x] `Contact.php`
@@ -251,43 +251,43 @@
 - [x] `Tag.php`
 
 ### 6.14 Attribute Entities (`src/Data/Attribute/`)
-- [ ] `Attribute.php`
-- [ ] `AttributeValue.php`
+- [x] `Attribute.php`
+- [x] `AttributeValue.php`
 
 ### 6.15 Asset Entities (`src/Data/Asset/`)
-- [ ] `Asset.php`
-- [ ] `AssetLocation.php`
+- [x] `Asset.php`
+- [x] `AssetLocation.php`
 
 ### 6.16 Industrial Entities (`src/Data/Industrial/`)
-- [ ] `IndustrialAsset.php`
-- [ ] `DataInput.php`
-- [ ] `DataPoint.php`
-- [ ] `Machine.php`
-- [ ] `VisionCamera.php`
-- [ ] `VisionRun.php`
+- [x] `IndustrialAsset.php`
+- [x] `DataInput.php`
+- [x] `DataPoint.php`
+- [x] `Machine.php`
+- [x] `VisionCamera.php`
+- [x] `VisionRun.php`
 
 ### 6.17 Webhook Entities (`src/Data/Webhook/`)
-- [ ] `Webhook.php`
+- [x] `Webhook.php`
 
 ### 6.18 Alert Entities (`src/Data/Alert/`)
-- [ ] `AlertConfiguration.php`
-- [ ] `AlertIncident.php`
+- [x] `AlertConfiguration.php`
+- [x] `AlertIncident.php`
 
 ### 6.19 Trip Entities (`src/Data/Trip/`)
-- [ ] `Trip.php`
+- [x] `Trip.php`
 
 ### 6.20 Form Entities (`src/Data/Form/`)
-- [ ] `FormSubmission.php`
-- [ ] `FormTemplate.php`
+- [x] `FormSubmission.php`
+- [x] `FormTemplate.php`
 
 ### 6.21 Organization Entities (`src/Data/Organization/`)
-- [ ] `Organization.php`
+- [x] `Organization.php`
 
 ### 6.22 Gateway Entities (`src/Data/Gateway/`)
-- [ ] `Gateway.php`
+- [x] `Gateway.php` (already exists in src/Data/Vehicle/)
 
 ### 6.23 LiveShare Entities (`src/Data/LiveShare/`)
-- [ ] `LiveShare.php`
+- [x] `LiveShare.php`
 
 ---
 
