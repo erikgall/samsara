@@ -847,8 +847,8 @@ Resource tests (DriversResourceTest, VehiclesResourceTest, etc.) test:
 - [x] Complete PHPDoc on all public classes
 - [x] Complete PHPDoc on all public methods
 - [x] Add `@method` annotations to Samsara.php for IDE support
-- [ ] Add `@property` annotations to Entity classes
-- [ ] Add `@throws` annotations for exceptions
+- [x] Add `@property` annotations to Entity classes
+- [x] Add `@throws` annotations for exceptions
 - [ ] Configure phpDocumentor for generated docs
 - [ ] Generate and publish API reference docs
 

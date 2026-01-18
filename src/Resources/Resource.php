@@ -52,6 +52,12 @@ abstract class Resource implements ResourceInterface
      * Get all entities from this resource.
      *
      * @return EntityCollection<int, Entity>
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
      */
     public function all(): EntityCollection
     {
@@ -76,6 +82,13 @@ abstract class Resource implements ResourceInterface
      * Create a new entity.
      *
      * @param  array<string, mixed>  $data
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws ValidationException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
      */
     public function create(array $data): object
     {
@@ -90,6 +103,13 @@ abstract class Resource implements ResourceInterface
 
     /**
      * Delete an entity.
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws NotFoundException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
      */
     public function delete(string $id): bool
     {
@@ -102,6 +122,12 @@ abstract class Resource implements ResourceInterface
 
     /**
      * Find an entity by ID.
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
      */
     public function find(string $id): ?object
     {
@@ -148,6 +174,14 @@ abstract class Resource implements ResourceInterface
      * Update an entity.
      *
      * @param  array<string, mixed>  $data
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
      */
     public function update(string $id, array $data): object
     {
@@ -163,7 +197,13 @@ abstract class Resource implements ResourceInterface
     /**
      * Handle API error responses.
      *
-     * @throws SamsaraException
+     * @throws AuthenticationException When API returns 401
+     * @throws AuthorizationException When API returns 403
+     * @throws NotFoundException When API returns 404
+     * @throws ValidationException When API returns 422
+     * @throws RateLimitException When API returns 429
+     * @throws ServerException When API returns 5xx
+     * @throws SamsaraException For other error responses
      */
     protected function handleError(Response $response): void
     {
