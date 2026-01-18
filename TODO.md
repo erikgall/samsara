@@ -214,9 +214,9 @@
 - [ ] `TrailerStats.php`
 
 ### 6.6 Route Entities (`src/Data/Route/`)
-- [ ] `Route.php`
-- [ ] `RouteStop.php`
-- [ ] `RouteSettings.php`
+- [x] `Route.php`
+- [x] `RouteStop.php`
+- [x] `RouteSettings.php`
 
 ### 6.7 HOS Entities (`src/Data/HoursOfService/`)
 - [ ] `HosLog.php`
