@@ -3,14 +3,17 @@
 namespace ErikGall\Samsara;
 
 use Illuminate\Http\Client\PendingRequest;
+use ErikGall\Samsara\Resources\Beta\BetaResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use ErikGall\Samsara\Resources\Fleet\DriversResource;
+use ErikGall\Samsara\Resources\Legacy\LegacyResource;
 use ErikGall\Samsara\Resources\Fleet\TrailersResource;
 use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
 use ErikGall\Samsara\Resources\Additional\HubsResource;
 use ErikGall\Samsara\Resources\Additional\IftaResource;
 use ErikGall\Samsara\Resources\Dispatch\RoutesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
+use ErikGall\Samsara\Resources\Preview\PreviewResource;
 use ErikGall\Samsara\Resources\Additional\FormsResource;
 use ErikGall\Samsara\Resources\Telematics\TripsResource;
 use ErikGall\Samsara\Resources\Additional\AlertsResource;
@@ -130,6 +133,17 @@ class Samsara
     {
         /** @var AssetsResource */
         return $this->resource(AssetsResource::class);
+    }
+
+    /**
+     * Get the BetaResource.
+     *
+     * Provides access to beta/preview endpoints that are not yet stable.
+     */
+    public function beta(): BetaResource
+    {
+        /** @var BetaResource */
+        return $this->resource(BetaResource::class);
     }
 
     /**
@@ -326,6 +340,17 @@ class Samsara
     }
 
     /**
+     * Get the LegacyResource.
+     *
+     * Provides access to deprecated v1 endpoints.
+     */
+    public function legacy(): LegacyResource
+    {
+        /** @var LegacyResource */
+        return $this->resource(LegacyResource::class);
+    }
+
+    /**
      * Get the LiveSharingLinksResource.
      */
     public function liveShares(): LiveSharingLinksResource
@@ -341,6 +366,17 @@ class Samsara
     {
         /** @var MaintenanceResource */
         return $this->resource(MaintenanceResource::class);
+    }
+
+    /**
+     * Get the PreviewResource.
+     *
+     * Provides access to preview endpoints that are in early testing.
+     */
+    public function preview(): PreviewResource
+    {
+        /** @var PreviewResource */
+        return $this->resource(PreviewResource::class);
     }
 
     /**

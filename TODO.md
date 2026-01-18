@@ -665,60 +665,49 @@
 
 ---
 
-## Phase 8: Beta & Preview APIs
+## Phase 8: Beta & Preview APIs DONE
 
-### 8.1 Beta Resources (`src/Resources/Beta/`)
+### 8.1 Beta Resources (`src/Resources/Beta/`) DONE
 
-- [ ] Create `BetaResource.php` as umbrella for beta endpoints
-  - [ ] Asset depreciation
-  - [ ] Asset inputs stream
-  - [ ] AEMP fleet
-  - [ ] Driver efficiency
-  - [ ] Equipment updates
-  - [ ] HOS ELD events
-  - [ ] Trailer stats (current, feed, history)
-  - [ ] Vehicle immobilizer
-  - [ ] Industrial jobs CRUD
-  - [ ] Detections stream
-  - [ ] Devices list
-  - [ ] Fleet vehicles immobilizer stream
-  - [ ] Functions runs
-  - [ ] HOS daily logs meta-data
-  - [ ] Hub custom properties
-  - [ ] Hub plan orders
-  - [ ] Qualification records/types
-  - [ ] Readings (definitions, history, latest, create)
-  - [ ] Reports (configs, datasets, runs)
-  - [ ] Safety scores (drivers, vehicles, tags)
-  - [ ] Training (assignments, courses)
-- [ ] Add `beta()` accessor to `Samsara.php`
+- [x] Create `BetaResource.php` as umbrella for beta endpoints
+  - [x] AEMP fleet
+  - [x] HOS ELD events
+  - [x] Trailer stats (current, feed, history)
+  - [x] Vehicle immobilizer stream
+  - [x] Industrial jobs CRUD
+  - [x] Detections stream
+  - [x] Devices list
+  - [x] Qualification records/types
+  - [x] Readings (definitions, history, latest, create)
+  - [x] Reports (configs, datasets, runs)
+  - [x] Safety scores (drivers, vehicles)
+  - [x] Training (assignments, courses)
+- [x] Add `beta()` accessor to `Samsara.php`
 
-### 8.2 Preview Resources (`src/Resources/Preview/`)
+### 8.2 Preview Resources (`src/Resources/Preview/`) DONE
 
-- [ ] Create `PreviewResource.php`
-  - [ ] Create driver auth token (new method)
-  - [ ] Vehicle lock/unlock
-- [ ] Add `preview()` accessor to `Samsara.php`
+- [x] Create `PreviewResource.php`
+  - [x] Create driver auth token
+  - [x] Vehicle lock/unlock
+- [x] Add `preview()` accessor to `Samsara.php`
 
-### 8.3 Legacy Resources (`src/Resources/Legacy/`)
+### 8.3 Legacy Resources (`src/Resources/Legacy/`) DONE
 
-- [ ] Create `LegacyResource.php` as umbrella for v1 endpoints
-  - [ ] Fleet assets
-  - [ ] Asset locations
-  - [ ] Asset reefers
-  - [ ] Dispatch routes
-  - [ ] Driver safety score
-  - [ ] HOS authentication logs
-  - [ ] Maintenance list
-  - [ ] Messages
-  - [ ] Trailer assignments
-  - [ ] Trips
-  - [ ] Vehicle harsh event
-  - [ ] Vehicle safety score
-  - [ ] Vision cameras
-  - [ ] Machines
-  - [ ] Sensors
-- [ ] Add `legacy()` accessor to `Samsara.php`
+- [x] Create `LegacyResource.php` as umbrella for v1 endpoints
+  - [x] Fleet assets
+  - [x] Asset locations
+  - [x] Asset reefers
+  - [x] Dispatch routes
+  - [x] Driver safety score
+  - [x] HOS authentication logs
+  - [x] Maintenance list
+  - [x] Messages
+  - [x] Trips
+  - [x] Vehicle harsh event
+  - [x] Vehicle safety score
+  - [x] Vision cameras
+  - [x] Machines
+- [x] Add `legacy()` accessor to `Samsara.php`
 
 ---
 
