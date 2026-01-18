@@ -205,12 +205,12 @@
 - [x] `StaticAssignedDriver.php`
 
 ### 6.4 Equipment Entities (`src/Data/Equipment/`)
-- [ ] `Equipment.php`
+- [x] `Equipment.php`
 - [ ] `EquipmentStats.php`
 - [ ] `EquipmentLocation.php`
 
 ### 6.5 Trailer Entities (`src/Data/Trailer/`)
-- [ ] `Trailer.php`
+- [x] `Trailer.php`
 - [ ] `TrailerStats.php`
 
 ### 6.6 Route Entities (`src/Data/Route/`)
@@ -245,10 +245,10 @@
 - [ ] `UserRole.php`
 
 ### 6.12 Contact Entities (`src/Data/Contact/`)
-- [ ] `Contact.php`
+- [x] `Contact.php`
 
 ### 6.13 Tag Entities (`src/Data/Tag/`)
-- [ ] `Tag.php`
+- [x] `Tag.php`
 
 ### 6.14 Attribute Entities (`src/Data/Attribute/`)
 - [ ] `Attribute.php`
