@@ -158,18 +158,18 @@
 ## Phase 5: Enums
 
 ### 5.1 Core Enums (`src/Enums/`)
-- [ ] `DriverActivationStatus.php` (active, deactivated)
-- [ ] `DutyStatus.php` (off_duty, sleeper_berth, driving, on_duty, yard_move, personal_conveyance)
-- [ ] `EngineState.php` (on, off, idle)
-- [ ] `VehicleStatType.php` (gps, engineStates, fuelPercents, obdOdometerMeters, etc.)
-- [ ] `WebhookEvent.php` (all 30+ webhook event types)
-- [ ] `DocumentType.php`
-- [ ] `SafetyEventType.php`
-- [ ] `HosLogType.php`
-- [ ] `MaintenanceStatus.php`
-- [ ] `RouteState.php`
-- [ ] `AlertType.php`
-- [ ] `AssetType.php`
+- [x] `DriverActivationStatus.php` (active, deactivated)
+- [x] `DutyStatus.php` (offDuty, sleeperBerth, driving, onDuty, yardMove, personalConveyance)
+- [x] `EngineState.php` (On, Off, Idle)
+- [x] `VehicleStatType.php` (gps, engineStates, fuelPercents, obdOdometerMeters, etc. - 50+ types)
+- [x] `WebhookEvent.php` (70+ webhook event types)
+- [x] `DocumentType.php`
+- [x] `SafetyEventType.php`
+- [x] `HosLogType.php`
+- [x] `MaintenanceStatus.php`
+- [x] `RouteState.php`
+- [x] `AlertType.php`
+- [x] `AssetType.php`
 
 ---
 
