@@ -230,10 +230,10 @@
 - [x] `CoachingSession.php`
 
 ### 6.9 Maintenance Entities (`src/Data/Maintenance/`)
-- [ ] `Dvir.php` (Driver Vehicle Inspection Report)
-- [ ] `Defect.php`
+- [x] `Dvir.php` (Driver Vehicle Inspection Report)
+- [x] `Defect.php`
 - [ ] `DefectType.php`
-- [ ] `WorkOrder.php`
+- [x] `WorkOrder.php`
 - [ ] `ServiceTask.php`
 
 ### 6.10 Document Entities (`src/Data/Document/`)
