@@ -1,20 +1,20 @@
 <?php
 
-namespace ErikGall\Samsara\Resources;
+namespace Samsara\Resources;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Samsara;
+use Samsara\Data\Entity;
+use Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Response;
+use Samsara\Exceptions\ServerException;
+use Samsara\Contracts\ResourceInterface;
+use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\NotFoundException;
 use Illuminate\Http\Client\PendingRequest;
-use ErikGall\Samsara\Data\EntityCollection;
-use ErikGall\Samsara\Exceptions\ServerException;
-use ErikGall\Samsara\Contracts\ResourceInterface;
-use ErikGall\Samsara\Exceptions\SamsaraException;
-use ErikGall\Samsara\Exceptions\NotFoundException;
-use ErikGall\Samsara\Exceptions\RateLimitException;
-use ErikGall\Samsara\Exceptions\ValidationException;
-use ErikGall\Samsara\Exceptions\AuthorizationException;
-use ErikGall\Samsara\Exceptions\AuthenticationException;
+use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\ValidationException;
+use Samsara\Exceptions\AuthorizationException;
+use Samsara\Exceptions\AuthenticationException;
 
 /**
  * Base resource class for API endpoints.

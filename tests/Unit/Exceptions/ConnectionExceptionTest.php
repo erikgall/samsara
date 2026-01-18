@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Exceptions;
+namespace Samsara\Tests\Unit\Exceptions;
 
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Exceptions\SamsaraException;
-use ErikGall\Samsara\Exceptions\ConnectionException;
+use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\ConnectionException;
 
 /**
  * Unit tests for the ConnectionException class.

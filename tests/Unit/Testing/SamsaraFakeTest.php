@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Testing;
+namespace Samsara\Tests\Unit\Testing;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Tests\TestCase;
+use Samsara\Testing\SamsaraFake;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Testing\SamsaraFake;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**

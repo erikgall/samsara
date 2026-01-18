@@ -1,12 +1,12 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data;
+namespace Samsara\Tests\Unit\Data;
 
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
 use Illuminate\Support\Fluent;
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Contracts\EntityInterface;
+use Samsara\Contracts\EntityInterface;
 
 /**
  * Unit tests for the Entity base class.

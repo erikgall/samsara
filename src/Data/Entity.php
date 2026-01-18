@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Data;
+namespace Samsara\Data;
 
 use Illuminate\Support\Fluent;
-use ErikGall\Samsara\Contracts\EntityInterface;
+use Samsara\Contracts\EntityInterface;
 
 /**
  * Base entity class for API DTOs.

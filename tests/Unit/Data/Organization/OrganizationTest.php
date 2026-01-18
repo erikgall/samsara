@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Organization;
+namespace Samsara\Tests\Unit\Data\Organization;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Organization\Organization;
+use Samsara\Data\Organization\Organization;
 
 /**
  * Unit tests for the Organization entity.

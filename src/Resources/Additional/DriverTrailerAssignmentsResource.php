@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Additional;
+namespace Samsara\Resources\Additional;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
 
 /**
  * DriverTrailerAssignments resource for the Samsara API.

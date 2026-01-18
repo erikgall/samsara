@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Route;
+namespace Samsara\Data\Route;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * RouteStop entity.

@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Driver;
+namespace Samsara\Data\Driver;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Driver carrier settings entity.

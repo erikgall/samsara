@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Address;
+namespace Samsara\Tests\Unit\Data\Address;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Address\AddressGeofence;
+use Samsara\Data\Address\AddressGeofence;
 
 /**
  * Unit tests for the AddressGeofence entity.

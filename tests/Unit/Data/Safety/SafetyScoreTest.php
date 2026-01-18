@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Safety;
+namespace Samsara\Tests\Unit\Data\Safety;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Safety\SafetyScore;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Safety\SafetyScore;
 
 /**
  * Unit tests for the SafetyScore entity.

@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Query\Pagination;
+namespace Samsara\Tests\Unit\Query\Pagination;
 
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Tests\TestCase;
+use Samsara\Query\Pagination\Cursor;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Query\Pagination\Cursor;
 
 /**
  * Unit tests for the Cursor class.

@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Form;
+namespace Samsara\Data\Form;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * FormTemplate entity.

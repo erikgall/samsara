@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Telematics;
+namespace Samsara\Resources\Telematics;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\Vehicle\VehicleStats;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
+use Samsara\Data\Vehicle\VehicleStats;
 
 /**
  * Vehicle stats resource for the Samsara API.

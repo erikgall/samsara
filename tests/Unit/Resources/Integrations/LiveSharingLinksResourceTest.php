@@ -1,15 +1,15 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Integrations;
+namespace Samsara\Tests\Unit\Resources\Integrations;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
+use Samsara\Data\EntityCollection;
+use Samsara\Data\LiveShare\LiveShare;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\EntityCollection;
-use ErikGall\Samsara\Data\LiveShare\LiveShare;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Integrations\LiveSharingLinksResource;
+use Samsara\Resources\Integrations\LiveSharingLinksResource;
 
 /**
  * Unit tests for the LiveSharingLinksResource class.

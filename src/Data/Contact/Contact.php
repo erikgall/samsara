@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Contact;
+namespace Samsara\Data\Contact;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Contact entity.

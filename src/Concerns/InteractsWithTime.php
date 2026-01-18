@@ -1,6 +1,6 @@
 <?php
 
-namespace ErikGall\Samsara\Concerns;
+namespace Samsara\Concerns;
 
 use Carbon\Carbon;
 use DateTimeInterface;

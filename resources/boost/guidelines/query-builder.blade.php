@@ -8,7 +8,7 @@ The SDK provides a fluent query builder for filtering, paginating, and streaming
 
 @verbatim
 <code-snippet name="Create a query builder instance" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Start a new query
 $query = Samsara::drivers()->query();
@@ -23,7 +23,7 @@ $query = Samsara::vehicleStats()->query();
 
 @verbatim
 <code-snippet name="Filter results by tag IDs" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Filter by single tag
 $drivers = Samsara::drivers()
@@ -43,7 +43,7 @@ $vehicles = Samsara::vehicles()
 
 @verbatim
 <code-snippet name="Filter results by parent tag IDs" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $vehicles = Samsara::vehicles()
     ->query()
@@ -56,7 +56,7 @@ $vehicles = Samsara::vehicles()
 
 @verbatim
 <code-snippet name="Filter results by driver IDs" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Filter trips by driver
 $trips = Samsara::trips()
@@ -76,7 +76,7 @@ $logs = Samsara::hoursOfService()
 
 @verbatim
 <code-snippet name="Filter results by vehicle IDs" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Filter vehicle stats by vehicle
 $stats = Samsara::vehicleStats()
@@ -96,7 +96,7 @@ $trips = Samsara::trips()
 
 @verbatim
 <code-snippet name="Filter results by attribute value IDs" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $drivers = Samsara::drivers()
     ->query()
@@ -109,7 +109,7 @@ $drivers = Samsara::drivers()
 
 @verbatim
 <code-snippet name="Add custom filter parameters" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Filter drivers by activation status
 $activeDrivers = Samsara::drivers()
@@ -131,7 +131,7 @@ $driver = Samsara::drivers()
 
 @verbatim
 <code-snippet name="Filter results within a time range" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Using between() with Carbon instances
@@ -155,7 +155,7 @@ $logs = Samsara::hoursOfService()
 
 @verbatim
 <code-snippet name="Set start and end times independently" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 $stats = Samsara::vehicleStats()
@@ -171,7 +171,7 @@ $stats = Samsara::vehicleStats()
 
 @verbatim
 <code-snippet name="Filter by modification timestamps" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Get drivers updated in the last hour
@@ -194,7 +194,7 @@ $newAddresses = Samsara::addresses()
 
 @verbatim
 <code-snippet name="Limit the number of results returned" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get first 10 drivers
 $drivers = Samsara::drivers()
@@ -214,7 +214,7 @@ $vehicles = Samsara::vehicles()
 
 @verbatim
 <code-snippet name="Get only the first matching result" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Returns entity or null
 $driver = Samsara::drivers()
@@ -230,7 +230,7 @@ $driver = Samsara::drivers()
 
 @verbatim
 <code-snippet name="Execute query and get all results" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // get() returns an EntityCollection
 $drivers = Samsara::drivers()
@@ -257,7 +257,7 @@ The SDK uses cursor-based pagination for efficient traversal of large datasets.
 
 @verbatim
 <code-snippet name="Paginate query results" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Paginate with default page size
 $page = Samsara::drivers()->query()->paginate();
@@ -281,7 +281,7 @@ if ($page->hasMorePages()) {
 
 @verbatim
 <code-snippet name="Navigate through paginated results" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get first page
 $page = Samsara::drivers()->query()->paginate(100);
@@ -306,7 +306,7 @@ foreach ($page->items() as $driver) {
 
 @verbatim
 <code-snippet name="Set pagination cursor manually" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Continue from a saved cursor position
 $drivers = Samsara::drivers()
@@ -325,7 +325,7 @@ For large datasets, use lazy loading to stream results without loading everythin
 
 @verbatim
 <code-snippet name="Stream results with lazy loading" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Returns a LazyCollection
 $drivers = Samsara::drivers()
@@ -343,7 +343,7 @@ foreach ($drivers as $driver) {
 
 @verbatim
 <code-snippet name="Control lazy loading chunk size" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Fetch 500 records per API call
@@ -363,7 +363,7 @@ foreach ($logs as $log) {
 
 @verbatim
 <code-snippet name="Use collection methods with lazy loading" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // LazyCollection supports most collection methods
 $activeDriverNames = Samsara::drivers()
@@ -382,7 +382,7 @@ $activeDriverNames = Samsara::drivers()
 
 @verbatim
 <code-snippet name="Request specific telemetry types" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get specific vehicle stat types
 $stats = Samsara::vehicleStats()
@@ -397,7 +397,7 @@ $stats = Samsara::vehicleStats()
 
 @verbatim
 <code-snippet name="Include related data in response" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $vehicles = Samsara::vehicles()
     ->query()
@@ -410,7 +410,7 @@ $vehicles = Samsara::vehicles()
 
 @verbatim
 <code-snippet name="Include additional decorations in response" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $vehicles = Samsara::vehicles()
     ->query()
@@ -425,7 +425,7 @@ $vehicles = Samsara::vehicles()
 
 @verbatim
 <code-snippet name="Build complex queries with multiple filters" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Get vehicle stats for specific vehicles and time range
@@ -443,7 +443,7 @@ $stats = Samsara::vehicleStats()
 
 @verbatim
 <code-snippet name="Query fleet by organizational tags" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all active drivers in West Coast fleet
 $westCoastDrivers = Samsara::drivers()
@@ -467,7 +467,7 @@ foreach ($westCoastDrivers as $driver) {
 
 @verbatim
 <code-snippet name="Process large datasets efficiently" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Stream through all trips from the past year

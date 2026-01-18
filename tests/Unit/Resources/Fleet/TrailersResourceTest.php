@@ -1,15 +1,15 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Fleet;
+namespace Samsara\Tests\Unit\Resources\Fleet;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Trailer\Trailer;
+use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Trailer\Trailer;
-use ErikGall\Samsara\Data\EntityCollection;
+use Samsara\Resources\Fleet\TrailersResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Fleet\TrailersResource;
 
 /**
  * Unit tests for the TrailersResource.

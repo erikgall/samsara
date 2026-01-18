@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Asset;
+namespace Samsara\Tests\Unit\Data\Asset;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Asset\AssetLocation;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Asset\AssetLocation;
 
 /**
  * Unit tests for the AssetLocation entity.

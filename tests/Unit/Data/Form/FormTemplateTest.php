@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Form;
+namespace Samsara\Tests\Unit\Data\Form;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Form\FormTemplate;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Form\FormTemplate;
 
 /**
  * Unit tests for the FormTemplate entity.

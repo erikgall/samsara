@@ -1,13 +1,13 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Additional;
+namespace Samsara\Tests\Unit\Resources\Additional;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Tests\TestCase;
+use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Additional\TrailerAssignmentsResource;
+use Samsara\Resources\Additional\TrailerAssignmentsResource;
 
 /**
  * Unit tests for the TrailerAssignmentsResource class (Legacy).

@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Trip;
+namespace Samsara\Data\Trip;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Trip entity.

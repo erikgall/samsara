@@ -1,6 +1,6 @@
 <?php
 
-namespace ErikGall\Samsara;
+namespace Samsara;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;

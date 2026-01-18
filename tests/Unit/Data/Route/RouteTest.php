@@ -1,13 +1,13 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Route;
+namespace Samsara\Tests\Unit\Data\Route;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
-use ErikGall\Samsara\Data\Route\Route;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Route\Route;
+use Samsara\Data\Route\RouteStop;
+use Samsara\Data\Route\RouteSettings;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Route\RouteStop;
-use ErikGall\Samsara\Data\Route\RouteSettings;
 
 /**
  * Unit tests for the Route entity.

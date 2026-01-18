@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Integrations;
+namespace Samsara\Resources\Integrations;
 
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\Vehicle\Gateway;
+use Samsara\Resources\Resource;
+use Samsara\Data\Vehicle\Gateway;
 
 /**
  * Gateways resource for the Samsara API.

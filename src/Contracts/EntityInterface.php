@@ -1,6 +1,6 @@
 <?php
 
-namespace ErikGall\Samsara\Contracts;
+namespace Samsara\Contracts;
 
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;

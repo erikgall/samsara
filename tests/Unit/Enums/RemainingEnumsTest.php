@@ -1,16 +1,16 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Enums;
+namespace Samsara\Tests\Unit\Enums;
 
-use ErikGall\Samsara\Tests\TestCase;
-use ErikGall\Samsara\Enums\AlertType;
-use ErikGall\Samsara\Enums\AssetType;
-use ErikGall\Samsara\Enums\HosLogType;
-use ErikGall\Samsara\Enums\RouteState;
+use Samsara\Tests\TestCase;
+use Samsara\Enums\AlertType;
+use Samsara\Enums\AssetType;
+use Samsara\Enums\HosLogType;
+use Samsara\Enums\RouteState;
+use Samsara\Enums\DocumentType;
+use Samsara\Enums\SafetyEventType;
+use Samsara\Enums\MaintenanceStatus;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Enums\DocumentType;
-use ErikGall\Samsara\Enums\SafetyEventType;
-use ErikGall\Samsara\Enums\MaintenanceStatus;
 
 /**
  * Unit tests for remaining enums.

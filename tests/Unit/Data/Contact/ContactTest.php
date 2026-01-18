@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Contact;
+namespace Samsara\Tests\Unit\Data\Contact;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Contact\Contact;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Contact\Contact;
 
 /**
  * Unit tests for the Contact entity.

@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Additional;
+namespace Samsara\Resources\Additional;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\EntityCollection;
-use ErikGall\Samsara\Data\Maintenance\WorkOrder;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
+use Samsara\Data\EntityCollection;
+use Samsara\Data\Maintenance\WorkOrder;
 
 /**
  * WorkOrders resource for the Samsara API.
@@ -39,7 +39,7 @@ class WorkOrdersResource extends Resource
     /**
      * Get all service tasks.
      *
-     * @return EntityCollection<int, \ErikGall\Samsara\Data\Entity>
+     * @return EntityCollection<int, \Samsara\Data\Entity>
      */
     public function serviceTasks(): EntityCollection
     {

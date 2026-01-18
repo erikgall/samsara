@@ -1,6 +1,6 @@
 <?php
 
-namespace ErikGall\Samsara\Exceptions;
+namespace Samsara\Exceptions;
 
 use Exception;
 use Throwable;

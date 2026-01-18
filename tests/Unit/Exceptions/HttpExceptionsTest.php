@@ -1,16 +1,16 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Exceptions;
+namespace Samsara\Tests\Unit\Exceptions;
 
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Exceptions\ServerException;
-use ErikGall\Samsara\Exceptions\SamsaraException;
-use ErikGall\Samsara\Exceptions\NotFoundException;
-use ErikGall\Samsara\Exceptions\RateLimitException;
-use ErikGall\Samsara\Exceptions\ValidationException;
-use ErikGall\Samsara\Exceptions\AuthorizationException;
-use ErikGall\Samsara\Exceptions\AuthenticationException;
+use Samsara\Exceptions\ServerException;
+use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\NotFoundException;
+use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\ValidationException;
+use Samsara\Exceptions\AuthorizationException;
+use Samsara\Exceptions\AuthenticationException;
 
 /**
  * Unit tests for HTTP-specific exception classes.

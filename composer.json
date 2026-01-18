@@ -5,12 +5,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "ErikGall\\Samsara\\": "src/"
+            "Samsara\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ErikGall\\Samsara\\Tests\\": "tests/"
+            "Samsara\\Tests\\": "tests/"
         }
     },
     "authors": [
@@ -36,10 +36,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "ErikGall\\Samsara\\SamsaraServiceProvider"
+                "Samsara\\SamsaraServiceProvider"
             ],
             "aliases": {
-                "Samsara": "ErikGall\\Samsara\\Facades\\Samsara"
+                "Samsara": "Samsara\\Facades\\Samsara"
             }
         }
     },

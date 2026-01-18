@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Additional;
+namespace Samsara\Resources\Additional;
 
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\EntityCollection;
+use Samsara\Resources\Resource;
+use Samsara\Data\EntityCollection;
 
 /**
  * TrailerAssignments resource for the Samsara API (Legacy v1).
@@ -22,7 +22,7 @@ class TrailerAssignmentsResource extends Resource
     /**
      * Get assignments for a specific trailer.
      *
-     * @return EntityCollection<int, \ErikGall\Samsara\Data\Entity>
+     * @return EntityCollection<int, \Samsara\Data\Entity>
      */
     public function forTrailer(string $trailerId): EntityCollection
     {

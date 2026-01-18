@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Attribute;
+namespace Samsara\Data\Attribute;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Attribute entity.

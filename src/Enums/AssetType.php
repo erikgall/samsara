@@ -1,6 +1,6 @@
 <?php
 
-namespace ErikGall\Samsara\Enums;
+namespace Samsara\Enums;
 
 /**
  * Asset type enum.

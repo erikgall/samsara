@@ -1,6 +1,6 @@
 <?php
 
-namespace ErikGall\Samsara\Data;
+namespace Samsara\Data;
 
 use Illuminate\Support\Collection;
 

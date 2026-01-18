@@ -1,6 +1,6 @@
 <?php
 
-namespace ErikGall\Samsara\Testing;
+namespace Samsara\Testing;
 
 use RuntimeException;
 

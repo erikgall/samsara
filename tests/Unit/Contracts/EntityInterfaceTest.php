@@ -1,12 +1,12 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Contracts;
+namespace Samsara\Tests\Unit\Contracts;
 
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Samsara\Contracts\EntityInterface;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
-use ErikGall\Samsara\Contracts\EntityInterface;
 
 /**
  * Unit tests for the EntityInterface contract.

@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Maintenance;
+namespace Samsara\Data\Maintenance;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * WorkOrder entity.

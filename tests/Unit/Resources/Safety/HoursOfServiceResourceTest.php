@@ -1,15 +1,15 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Safety;
+namespace Samsara\Tests\Unit\Resources\Safety;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
+use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\EntityCollection;
-use ErikGall\Samsara\Data\HoursOfService\HosLog;
+use Samsara\Data\HoursOfService\HosLog;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
+use Samsara\Resources\Safety\HoursOfServiceResource;
 
 /**
  * Unit tests for the HoursOfServiceResource.

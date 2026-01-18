@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Equipment;
+namespace Samsara\Data\Equipment;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Equipment location entity.

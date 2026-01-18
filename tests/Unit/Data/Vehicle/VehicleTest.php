@@ -1,13 +1,13 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Vehicle;
+namespace Samsara\Tests\Unit\Data\Vehicle;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Vehicle\Gateway;
+use Samsara\Data\Vehicle\Vehicle;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Vehicle\Gateway;
-use ErikGall\Samsara\Data\Vehicle\Vehicle;
-use ErikGall\Samsara\Data\Vehicle\StaticAssignedDriver;
+use Samsara\Data\Vehicle\StaticAssignedDriver;
 
 /**
  * Unit tests for the Vehicle entity.

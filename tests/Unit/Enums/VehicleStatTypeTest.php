@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Enums;
+namespace Samsara\Tests\Unit\Enums;
 
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Tests\TestCase;
+use Samsara\Enums\VehicleStatType;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Enums\VehicleStatType;
 
 /**
  * Unit tests for the VehicleStatType enum.

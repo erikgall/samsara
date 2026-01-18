@@ -6,7 +6,7 @@ Resources are accessed through the Samsara facade or client instance. Each resou
 
 @verbatim
 <code-snippet name="Resource access pattern" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Access any resource via facade
 $drivers = Samsara::drivers();
@@ -28,7 +28,7 @@ The drivers resource provides driver management with activation controls and aut
 
 @verbatim
 <code-snippet name="Activate and deactivate drivers" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Activate a driver
 $driver = Samsara::drivers()->activate('driver-123');
@@ -42,7 +42,7 @@ $driver = Samsara::drivers()->deactivate('driver-123');
 
 @verbatim
 <code-snippet name="Query drivers by activation status" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all active drivers
 $activeDrivers = Samsara::drivers()->active()->get();
@@ -62,7 +62,7 @@ $activeInFleet = Samsara::drivers()
 
 @verbatim
 <code-snippet name="Find driver by external system ID" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Find driver by external ID from your system
 $driver = Samsara::drivers()->findByExternalId('mySystem', 'EMP-12345');
@@ -77,7 +77,7 @@ if ($driver === null) {
 
 @verbatim
 <code-snippet name="Create driver authentication tokens" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Create auth token for driver app login
 $token = Samsara::drivers()->createAuthToken('driver-123');
@@ -91,7 +91,7 @@ Samsara::drivers()->remoteSignOut('driver-123');
 
 @verbatim
 <code-snippet name="Manage driver QR codes" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all QR codes
 $qrCodes = Samsara::drivers()->getQrCodes();
@@ -111,7 +111,7 @@ Samsara::drivers()->deleteQrCode('qr-code-id');
 
 @verbatim
 <code-snippet name="Vehicle management operations" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all vehicles
 $vehicles = Samsara::vehicles()->all();
@@ -138,7 +138,7 @@ $vehicle = Samsara::vehicles()->create([
 
 @verbatim
 <code-snippet name="Trailer management operations" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all trailers
 $trailers = Samsara::trailers()->all();
@@ -158,7 +158,7 @@ $trailer = Samsara::trailers()->create([
 
 @verbatim
 <code-snippet name="Equipment tracking operations" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all equipment
 $equipment = Samsara::equipment()->all();
@@ -180,7 +180,7 @@ The vehicle stats resource provides access to vehicle telemetry data including G
 
 @verbatim
 <code-snippet name="Get current vehicle stats" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get current stats for all vehicles
 $stats = Samsara::vehicleStats()->current()->get();
@@ -197,7 +197,7 @@ $stats = Samsara::vehicleStats()
 
 @verbatim
 <code-snippet name="Get historical vehicle stats" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Get stats history for a time period
@@ -214,7 +214,7 @@ $history = Samsara::vehicleStats()
 
 @verbatim
 <code-snippet name="Get vehicle stats feed" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get stats feed (for polling new data)
 $feed = Samsara::vehicleStats()
@@ -228,7 +228,7 @@ $feed = Samsara::vehicleStats()
 
 @verbatim
 <code-snippet name="Query specific telemetry types" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // GPS data only
 $gps = Samsara::vehicleStats()->gps()->get();
@@ -248,7 +248,7 @@ $odometer = Samsara::vehicleStats()->odometer()->get();
 
 @verbatim
 <code-snippet name="Get real-time vehicle locations" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get current locations for all vehicles
 $locations = Samsara::vehicleLocations()->all();
@@ -265,7 +265,7 @@ $locations = Samsara::vehicleLocations()
 
 @verbatim
 <code-snippet name="Query trip data" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Get trips for a driver
@@ -296,7 +296,7 @@ The HOS resource provides access to driver duty status logs, clocks, violations,
 
 @verbatim
 <code-snippet name="Query HOS duty status logs" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Get HOS logs for drivers
@@ -321,7 +321,7 @@ $logs = Samsara::hoursOfService()
 
 @verbatim
 <code-snippet name="Get driver HOS clocks" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get current HOS clocks for drivers
 $clocks = Samsara::hoursOfService()
@@ -341,7 +341,7 @@ $clocks = Samsara::hoursOfService()
 
 @verbatim
 <code-snippet name="Query HOS violations" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Get violations for a driver
@@ -364,7 +364,7 @@ $allViolations = Samsara::hoursOfService()
 
 @verbatim
 <code-snippet name="Query HOS daily logs" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Get daily logs for compliance reporting
@@ -380,7 +380,7 @@ $dailyLogs = Samsara::hoursOfService()
 
 @verbatim
 <code-snippet name="Query safety events" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 // Get safety events (harsh braking, speeding, etc.)
@@ -396,7 +396,7 @@ $events = Samsara::safetyEvents()
 
 @verbatim
 <code-snippet name="Access maintenance and DVIR data" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get maintenance records
 $maintenance = Samsara::maintenance()->all();
@@ -417,7 +417,7 @@ $dvirs = Samsara::maintenance()
 
 @verbatim
 <code-snippet name="Route management operations" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all routes
 $routes = Samsara::routes()->all();
@@ -447,7 +447,7 @@ Samsara::routes()->delete('route-123');
 
 @verbatim
 <code-snippet name="Address/geofence management" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all addresses
 $addresses = Samsara::addresses()->all();
@@ -480,7 +480,7 @@ $address = Samsara::addresses()->update('address-123', [
 
 @verbatim
 <code-snippet name="Tag management for organizing fleet" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all tags
 $tags = Samsara::tags()->all();
@@ -505,7 +505,7 @@ Samsara::tags()->delete('tag-123');
 
 @verbatim
 <code-snippet name="User management operations" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all users
 $users = Samsara::users()->all();
@@ -526,7 +526,7 @@ $user = Samsara::users()->create([
 
 @verbatim
 <code-snippet name="Contact management" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all contacts
 $contacts = Samsara::contacts()->all();
@@ -549,7 +549,7 @@ $contact = Samsara::contacts()->create([
 
 @verbatim
 <code-snippet name="Webhook management" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all webhooks
 $webhooks = Samsara::webhooks()->all();
@@ -581,7 +581,7 @@ Samsara::webhooks()->delete('webhook-123');
 
 @verbatim
 <code-snippet name="Gateway management" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all gateways
 $gateways = Samsara::gateways()->all();
@@ -595,7 +595,7 @@ $gateway = Samsara::gateways()->find('gateway-123');
 
 @verbatim
 <code-snippet name="Live sharing link management" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all live shares
 $liveShares = Samsara::liveShares()->all();
@@ -617,7 +617,7 @@ $liveShare = Samsara::liveShares()->create([
 
 @verbatim
 <code-snippet name="Alert configuration" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $alerts = Samsara::alerts()->all();
 </code-snippet>
@@ -627,7 +627,7 @@ $alerts = Samsara::alerts()->all();
 
 @verbatim
 <code-snippet name="IFTA reporting data" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $ifta = Samsara::ifta()->all();
 </code-snippet>
@@ -637,7 +637,7 @@ $ifta = Samsara::ifta()->all();
 
 @verbatim
 <code-snippet name="Idling reports" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
 $idling = Samsara::idling()
@@ -652,7 +652,7 @@ $idling = Samsara::idling()
 
 @verbatim
 <code-snippet name="Fuel and energy data" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $fuelData = Samsara::fuelAndEnergy()->all();
 </code-snippet>
@@ -662,7 +662,7 @@ $fuelData = Samsara::fuelAndEnergy()->all();
 
 @verbatim
 <code-snippet name="Work order management" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get work orders
 $workOrders = Samsara::workOrders()->all();
@@ -680,7 +680,7 @@ $workOrder = Samsara::workOrders()->create([
 
 @verbatim
 <code-snippet name="Manage driver and equipment assignments" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Driver-vehicle assignments
 $assignments = Samsara::driverVehicleAssignments()->all();
@@ -704,7 +704,7 @@ $proposed = Samsara::carrierProposedAssignments()->all();
 
 @verbatim
 <code-snippet name="Access beta API features" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Access beta endpoints (may change without notice)
 $beta = Samsara::beta();
@@ -715,7 +715,7 @@ $beta = Samsara::beta();
 
 @verbatim
 <code-snippet name="Access preview API features" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Access preview endpoints (early testing)
 $preview = Samsara::preview();
@@ -726,7 +726,7 @@ $preview = Samsara::preview();
 
 @verbatim
 <code-snippet name="Access legacy v1 endpoints" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Access deprecated v1 endpoints
 $legacy = Samsara::legacy();

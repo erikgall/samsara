@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Telematics;
+namespace Samsara\Resources\Telematics;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Data\Trip\Trip;
-use ErikGall\Samsara\Resources\Resource;
+use Samsara\Query\Builder;
+use Samsara\Data\Trip\Trip;
+use Samsara\Resources\Resource;
 
 /**
  * Trips resource for the Samsara API.

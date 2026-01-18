@@ -1,12 +1,12 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Concerns;
+namespace Samsara\Tests\Unit\Concerns;
 
 use Carbon\Carbon;
 use DateTimeImmutable;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Concerns\InteractsWithTime;
+use Samsara\Concerns\InteractsWithTime;
 
 /**
  * Unit tests for the InteractsWithTime trait.

@@ -1,14 +1,14 @@
 <?php
 
-namespace ErikGall\Samsara\Query\Pagination;
+namespace Samsara\Query\Pagination;
 
 use Countable;
 use Traversable;
 use ArrayIterator;
 use IteratorAggregate;
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Data\EntityCollection;
+use Samsara\Data\Entity;
+use Samsara\Query\Builder;
+use Samsara\Data\EntityCollection;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**

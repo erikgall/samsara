@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Enums;
+namespace Samsara\Tests\Unit\Enums;
 
-use ErikGall\Samsara\Tests\TestCase;
-use ErikGall\Samsara\Enums\DutyStatus;
+use Samsara\Tests\TestCase;
+use Samsara\Enums\DutyStatus;
 use PHPUnit\Framework\Attributes\Test;
 
 /**

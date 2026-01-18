@@ -43,7 +43,7 @@ SAMSARA_RETRY=3
 
 @verbatim
 <code-snippet name="Basic facade usage pattern" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all drivers
 $drivers = Samsara::drivers()->all();
@@ -72,7 +72,7 @@ Samsara::tags()->delete('tag-789');
 
 @verbatim
 <code-snippet name="Dependency injection pattern" lang="php">
-use ErikGall\Samsara\Samsara;
+use Samsara\Samsara;
 
 class FleetService
 {
@@ -95,7 +95,7 @@ class FleetService
 
 @verbatim
 <code-snippet name="Switch between US and EU API endpoints" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Use EU endpoint
 $euDrivers = Samsara::useEuEndpoint()->drivers()->all();
@@ -113,7 +113,7 @@ All resources support standard CRUD operations through a consistent interface.
 
 @verbatim
 <code-snippet name="Retrieve all entities from a resource" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Returns an EntityCollection
 $drivers = Samsara::drivers()->all();
@@ -126,7 +126,7 @@ $tags = Samsara::tags()->all();
 
 @verbatim
 <code-snippet name="Find a single entity by its ID" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Returns the entity or null if not found
 $driver = Samsara::drivers()->find('driver-123');
@@ -141,7 +141,7 @@ if ($driver === null) {
 
 @verbatim
 <code-snippet name="Create a new entity" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $driver = Samsara::drivers()->create([
     'name' => 'Jane Doe',
@@ -163,7 +163,7 @@ $webhook = Samsara::webhooks()->create([
 
 @verbatim
 <code-snippet name="Update an existing entity" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $driver = Samsara::drivers()->update('driver-123', [
     'phone' => '555-0200',
@@ -176,7 +176,7 @@ $driver = Samsara::drivers()->update('driver-123', [
 
 @verbatim
 <code-snippet name="Delete an entity by ID" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Returns true on success
 $deleted = Samsara::addresses()->delete('address-456');
@@ -191,7 +191,7 @@ Entities extend Laravel's Fluent class, providing convenient property access and
 
 @verbatim
 <code-snippet name="Access entity properties" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $driver = Samsara::drivers()->find('driver-123');
 
@@ -215,7 +215,7 @@ $hasEmail = isset($driver->email);
 
 @verbatim
 <code-snippet name="Convert entities to array or JSON" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $vehicle = Samsara::vehicles()->find('vehicle-123');
 
@@ -238,7 +238,7 @@ Query results are returned as `EntityCollection` objects, which extend Laravel's
 
 @verbatim
 <code-snippet name="Work with EntityCollection results" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $drivers = Samsara::drivers()->all();
 
@@ -280,12 +280,12 @@ The SDK provides a hierarchy of exceptions for different API error scenarios.
 
 @verbatim
 <code-snippet name="Handle API exceptions" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Exceptions\SamsaraException;
-use ErikGall\Samsara\Exceptions\NotFoundException;
-use ErikGall\Samsara\Exceptions\ValidationException;
-use ErikGall\Samsara\Exceptions\RateLimitException;
-use ErikGall\Samsara\Exceptions\AuthenticationException;
+use Samsara\Facades\Samsara;
+use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\NotFoundException;
+use Samsara\Exceptions\ValidationException;
+use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\AuthenticationException;
 
 try {
     $driver = Samsara::drivers()->create([
@@ -317,7 +317,7 @@ try {
 
 @verbatim
 <code-snippet name="Access exception context for debugging" lang="php">
-use ErikGall\Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\SamsaraException;
 
 try {
     $driver = Samsara::drivers()->find('invalid-id');

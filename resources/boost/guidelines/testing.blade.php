@@ -10,7 +10,7 @@ The SDK provides testing utilities to mock API responses and assert requests in 
 
 @verbatim
 <code-snippet name="Create fake instance via facade" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Create a new SamsaraFake instance
 $fake = Samsara::fake();
@@ -21,7 +21,7 @@ $fake = Samsara::fake();
 
 @verbatim
 <code-snippet name="Create fake instance directly" lang="php">
-use ErikGall\Samsara\Testing\SamsaraFake;
+use Samsara\Testing\SamsaraFake;
 
 // Create directly
 $fake = new SamsaraFake();
@@ -37,7 +37,7 @@ $fake = SamsaraFake::create();
 
 @verbatim
 <code-snippet name="Fake a generic API response" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $fake = Samsara::fake();
 
@@ -57,7 +57,7 @@ $drivers = $fake->drivers()->all();
 
 @verbatim
 <code-snippet name="Use convenience methods for common resources" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $fake = Samsara::fake();
 
@@ -84,7 +84,7 @@ $fake->fakeVehicleStats([
 
 @verbatim
 <code-snippet name="Fake error responses for testing error handling" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $fake = Samsara::fake();
 
@@ -117,8 +117,8 @@ The SDK includes fixture files with realistic sample data for testing.
 
 @verbatim
 <code-snippet name="Load fixture data for tests" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Testing\Fixtures;
+use Samsara\Facades\Samsara;
+use Samsara\Testing\Fixtures;
 
 $fake = Samsara::fake();
 
@@ -136,7 +136,7 @@ $fake->fakeVehicles($vehiclesData['data']);
 
 @verbatim
 <code-snippet name="Available fixture methods" lang="php">
-use ErikGall\Samsara\Testing\Fixtures;
+use Samsara\Testing\Fixtures;
 
 // Fleet fixtures
 $drivers = Fixtures::drivers();
@@ -172,7 +172,7 @@ $custom = Fixtures::load('custom-fixture.json');
 
 @verbatim
 <code-snippet name="Use custom fixtures directory" lang="php">
-use ErikGall\Samsara\Testing\Fixtures;
+use Samsara\Testing\Fixtures;
 
 // Set custom fixtures path for your app
 Fixtures::setFixturesPath(base_path('tests/fixtures/samsara'));
@@ -188,7 +188,7 @@ $drivers = Fixtures::drivers();
 
 @verbatim
 <code-snippet name="Assert an API endpoint was requested" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $fake = Samsara::fake();
 $fake->fakeDrivers([]);
@@ -205,7 +205,7 @@ $fake->assertRequested('/fleet/drivers');
 
 @verbatim
 <code-snippet name="Assert request included specific parameters" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $fake = Samsara::fake();
 $fake->fakeDrivers([]);
@@ -228,7 +228,7 @@ $fake->assertRequestedWithParams('/fleet/drivers', [
 
 @verbatim
 <code-snippet name="Assert no API requests were made" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $fake = Samsara::fake();
 
@@ -252,8 +252,8 @@ $fake->assertNothingRequested();
 namespace Tests\Unit\Services;
 
 use Tests\TestCase;
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Testing\Fixtures;
+use Samsara\Facades\Samsara;
+use Samsara\Testing\Fixtures;
 use App\Services\FleetReportService;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -312,8 +312,8 @@ class FleetReportServiceTest extends TestCase
 namespace Tests\Unit\Services;
 
 use Tests\TestCase;
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Testing\Fixtures;
+use Samsara\Facades\Samsara;
+use Samsara\Testing\Fixtures;
 use App\Services\VehicleTelemetryService;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -352,8 +352,8 @@ class VehicleTelemetryServiceTest extends TestCase
 namespace Tests\Unit\Services;
 
 use Tests\TestCase;
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Exceptions\RateLimitException;
+use Samsara\Facades\Samsara;
+use Samsara\Exceptions\RateLimitException;
 use App\Services\DriverSyncService;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -405,7 +405,7 @@ class DriverSyncServiceTest extends TestCase
 
 @verbatim
 <code-snippet name="Access recorded requests for custom assertions" lang="php">
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $fake = Samsara::fake();
 $fake->fakeDrivers([]);

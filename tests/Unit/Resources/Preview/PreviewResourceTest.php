@@ -1,12 +1,12 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Preview;
+namespace Samsara\Tests\Unit\Resources\Preview;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Samsara\Resources\Preview\PreviewResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Preview\PreviewResource;
 
 /**
  * Unit tests for the PreviewResource class.

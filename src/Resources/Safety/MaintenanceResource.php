@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Safety;
+namespace Samsara\Resources\Safety;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\Maintenance\Dvir;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
+use Samsara\Data\Maintenance\Dvir;
 
 /**
  * Maintenance resource for the Samsara API.

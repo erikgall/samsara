@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\HoursOfService;
+namespace Samsara\Tests\Unit\Data\HoursOfService;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\HoursOfService\HosViolation;
+use Samsara\Data\HoursOfService\HosViolation;
 
 /**
  * Unit tests for the HosViolation entity.

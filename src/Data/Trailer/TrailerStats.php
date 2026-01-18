@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Trailer;
+namespace Samsara\Data\Trailer;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Trailer stats entity.

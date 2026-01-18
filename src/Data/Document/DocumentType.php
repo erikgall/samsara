@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Document;
+namespace Samsara\Data\Document;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * DocumentType entity.

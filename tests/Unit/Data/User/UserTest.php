@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\User;
+namespace Samsara\Tests\Unit\Data\User;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Data\User\User;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Data\User\User;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace ErikGall\Samsara\Query\Pagination;
+namespace Samsara\Query\Pagination;
 
 use Illuminate\Contracts\Support\Arrayable;
 

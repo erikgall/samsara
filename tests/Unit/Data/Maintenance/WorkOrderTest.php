@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Maintenance;
+namespace Samsara\Tests\Unit\Data\Maintenance;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Maintenance\WorkOrder;
+use Samsara\Data\Maintenance\WorkOrder;
 
 /**
  * Unit tests for the WorkOrder entity.

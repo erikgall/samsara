@@ -1,13 +1,13 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Additional;
+namespace Samsara\Tests\Unit\Resources\Additional;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Additional\RouteEventsResource;
+use Samsara\Resources\Additional\RouteEventsResource;
 
 /**
  * Unit tests for the RouteEventsResource class.

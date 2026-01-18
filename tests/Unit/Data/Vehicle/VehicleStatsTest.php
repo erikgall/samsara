@@ -1,13 +1,13 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Vehicle;
+namespace Samsara\Tests\Unit\Data\Vehicle;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Enums\EngineState;
+use Samsara\Data\Vehicle\GpsLocation;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Enums\EngineState;
-use ErikGall\Samsara\Data\Vehicle\GpsLocation;
-use ErikGall\Samsara\Data\Vehicle\VehicleStats;
+use Samsara\Data\Vehicle\VehicleStats;
 
 /**
  * Unit tests for the VehicleStats entity.

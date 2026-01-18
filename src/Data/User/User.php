@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\User;
+namespace Samsara\Data\User;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * User entity.

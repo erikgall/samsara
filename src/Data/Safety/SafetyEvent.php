@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Safety;
+namespace Samsara\Data\Safety;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * SafetyEvent entity.

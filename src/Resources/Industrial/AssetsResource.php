@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Industrial;
+namespace Samsara\Resources\Industrial;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Data\Asset\Asset;
-use ErikGall\Samsara\Resources\Resource;
+use Samsara\Query\Builder;
+use Samsara\Data\Asset\Asset;
+use Samsara\Resources\Resource;
 
 /**
  * Assets resource for the Samsara API.

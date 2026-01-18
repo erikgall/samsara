@@ -1,6 +1,6 @@
 <?php
 
-namespace ErikGall\Samsara\Enums;
+namespace Samsara\Enums;
 
 /**
  * Driver activation status enum.

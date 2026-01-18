@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Webhook;
+namespace Samsara\Tests\Unit\Data\Webhook;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Webhook\Webhook;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Webhook\Webhook;
 
 /**
  * Unit tests for the Webhook entity.

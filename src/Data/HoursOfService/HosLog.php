@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Data\HoursOfService;
+namespace Samsara\Data\HoursOfService;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Enums\DutyStatus;
+use Samsara\Data\Entity;
+use Samsara\Enums\DutyStatus;
 
 /**
  * HosLog entity.

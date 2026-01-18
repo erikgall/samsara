@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Legacy;
+namespace Samsara\Resources\Legacy;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Resources\Resource;
+use Samsara\Data\Entity;
+use Samsara\Resources\Resource;
 
 /**
  * Legacy resource for the Samsara API.

@@ -1,15 +1,15 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Dispatch;
+namespace Samsara\Tests\Unit\Resources\Dispatch;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Address\Address;
+use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Address\Address;
-use ErikGall\Samsara\Data\EntityCollection;
+use Samsara\Resources\Dispatch\AddressesResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Dispatch\AddressesResource;
 
 /**
  * Unit tests for the AddressesResource.

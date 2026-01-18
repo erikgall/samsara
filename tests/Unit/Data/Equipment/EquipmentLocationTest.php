@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Equipment;
+namespace Samsara\Tests\Unit\Data\Equipment;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Equipment\EquipmentLocation;
+use Samsara\Data\Equipment\EquipmentLocation;
 
 /**
  * Unit tests for the EquipmentLocation entity.

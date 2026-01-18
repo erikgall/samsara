@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Industrial;
+namespace Samsara\Tests\Unit\Data\Industrial;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Industrial\VisionCamera;
+use Samsara\Data\Industrial\VisionCamera;
 
 /**
  * Unit tests for the VisionCamera entity.

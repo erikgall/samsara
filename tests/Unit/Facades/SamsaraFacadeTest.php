@@ -1,13 +1,13 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Facades;
+namespace Samsara\Tests\Unit\Facades;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Tests\TestCase;
+use Samsara\Testing\SamsaraFake;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Testing\SamsaraFake;
 use Illuminate\Http\Client\PendingRequest;
-use ErikGall\Samsara\Facades\Samsara as SamsaraFacade;
+use Samsara\Facades\Samsara as SamsaraFacade;
 
 /**
  * Unit tests for the Samsara facade.

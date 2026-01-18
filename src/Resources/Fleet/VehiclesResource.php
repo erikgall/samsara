@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Fleet;
+namespace Samsara\Resources\Fleet;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\Vehicle\Vehicle;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
+use Samsara\Data\Vehicle\Vehicle;
 
 /**
  * Vehicles resource for the Samsara API.

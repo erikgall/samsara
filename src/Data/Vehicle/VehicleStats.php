@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Vehicle;
+namespace Samsara\Data\Vehicle;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Enums\EngineState;
+use Samsara\Data\Entity;
+use Samsara\Enums\EngineState;
 
 /**
  * Vehicle stats entity.

@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Additional;
+namespace Samsara\Resources\Additional;
 
-use ErikGall\Samsara\Resources\Resource;
+use Samsara\Resources\Resource;
 
 /**
  * CarrierProposedAssignments resource for the Samsara API.

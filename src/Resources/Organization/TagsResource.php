@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Organization;
+namespace Samsara\Resources\Organization;
 
-use ErikGall\Samsara\Data\Tag\Tag;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
+use Samsara\Data\Tag\Tag;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
 
 /**
  * Tags resource for the Samsara API.

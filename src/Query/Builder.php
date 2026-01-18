@@ -1,13 +1,13 @@
 <?php
 
-namespace ErikGall\Samsara\Query;
+namespace Samsara\Query;
 
 use DateTimeInterface;
+use Samsara\Resources\Resource;
+use Samsara\Data\EntityCollection;
 use Illuminate\Support\LazyCollection;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\EntityCollection;
-use ErikGall\Samsara\Concerns\InteractsWithTime;
-use ErikGall\Samsara\Contracts\QueryBuilderInterface;
+use Samsara\Concerns\InteractsWithTime;
+use Samsara\Contracts\QueryBuilderInterface;
 
 /**
  * Query builder for API requests.
@@ -170,7 +170,7 @@ class Builder implements QueryBuilderInterface
     /**
      * Execute the query and get results.
      *
-     * @return EntityCollection<int, \ErikGall\Samsara\Data\Entity>
+     * @return EntityCollection<int, \Samsara\Data\Entity>
      */
     public function get(): EntityCollection
     {
@@ -206,7 +206,7 @@ class Builder implements QueryBuilderInterface
     /**
      * Get results as a lazy collection.
      *
-     * @return LazyCollection<int, \ErikGall\Samsara\Data\Entity>
+     * @return LazyCollection<int, \Samsara\Data\Entity>
      */
     public function lazy(?int $chunkSize = null): LazyCollection
     {
@@ -396,11 +396,11 @@ class Builder implements QueryBuilderInterface
      * Map data to entity collection.
      *
      * @param  array<int, array<string, mixed>>  $data
-     * @return EntityCollection<int, \ErikGall\Samsara\Data\Entity>
+     * @return EntityCollection<int, \Samsara\Data\Entity>
      */
     protected function mapToEntities(array $data): EntityCollection
     {
-        /** @var array<int, \ErikGall\Samsara\Data\Entity> $entities */
+        /** @var array<int, \Samsara\Data\Entity> $entities */
         $entities = array_map(
             fn (array $item) => $this->mapToEntity($item),
             $data

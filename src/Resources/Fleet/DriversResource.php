@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Fleet;
+namespace Samsara\Resources\Fleet;
 
+use Samsara\Query\Builder;
+use Samsara\Data\Driver\Driver;
+use Samsara\Resources\Resource;
 use Illuminate\Support\Collection;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Data\Driver\Driver;
-use ErikGall\Samsara\Resources\Resource;
 
 /**
  * Drivers resource for the Samsara API.

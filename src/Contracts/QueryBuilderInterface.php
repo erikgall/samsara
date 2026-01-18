@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Contracts;
+namespace Samsara\Contracts;
 
 use DateTimeInterface;
+use Samsara\Data\EntityCollection;
 use Illuminate\Support\LazyCollection;
-use ErikGall\Samsara\Data\EntityCollection;
 
 /**
  * Interface for query builder implementations.
@@ -33,14 +33,14 @@ interface QueryBuilderInterface
     /**
      * Execute the query and get results.
      *
-     * @return EntityCollection<int, \ErikGall\Samsara\Data\Entity>
+     * @return EntityCollection<int, \Samsara\Data\Entity>
      */
     public function get(): EntityCollection;
 
     /**
      * Get results as a lazy collection.
      *
-     * @return LazyCollection<int, \ErikGall\Samsara\Data\Entity>
+     * @return LazyCollection<int, \Samsara\Data\Entity>
      */
     public function lazy(?int $chunkSize = null): LazyCollection;
 

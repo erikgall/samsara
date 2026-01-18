@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Contracts;
+namespace Samsara\Contracts;
 
-use ErikGall\Samsara\Data\EntityCollection;
+use Samsara\Data\EntityCollection;
 
 /**
  * Interface for API resource classes.
@@ -14,7 +14,7 @@ interface ResourceInterface
     /**
      * Get all entities from this resource.
      *
-     * @return EntityCollection<int, \ErikGall\Samsara\Data\Entity>
+     * @return EntityCollection<int, \Samsara\Data\Entity>
      */
     public function all(): EntityCollection;
 

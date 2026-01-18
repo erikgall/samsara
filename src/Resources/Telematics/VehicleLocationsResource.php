@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Telematics;
+namespace Samsara\Resources\Telematics;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
 
 /**
  * Vehicle locations resource for the Samsara API.

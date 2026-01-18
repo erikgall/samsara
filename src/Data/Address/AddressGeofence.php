@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Address;
+namespace Samsara\Data\Address;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Address geofence entity.

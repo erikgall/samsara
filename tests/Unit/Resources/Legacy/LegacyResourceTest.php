@@ -1,12 +1,12 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Legacy;
+namespace Samsara\Tests\Unit\Resources\Legacy;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Samsara\Resources\Legacy\LegacyResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Legacy\LegacyResource;
 
 /**
  * Unit tests for the LegacyResource class.

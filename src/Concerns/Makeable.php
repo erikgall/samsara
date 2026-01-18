@@ -1,6 +1,6 @@
 <?php
 
-namespace ErikGall\Samsara\Concerns;
+namespace Samsara\Concerns;
 
 /**
  * Trait for static factory method.

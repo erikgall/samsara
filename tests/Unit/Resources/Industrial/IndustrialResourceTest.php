@@ -1,14 +1,14 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Industrial;
+namespace Samsara\Tests\Unit\Resources\Industrial;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Samsara\Data\Industrial\IndustrialAsset;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Data\Industrial\IndustrialAsset;
-use ErikGall\Samsara\Resources\Industrial\IndustrialResource;
+use Samsara\Resources\Industrial\IndustrialResource;
 
 /**
  * Unit tests for the IndustrialResource class.

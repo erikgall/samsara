@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\LiveShare;
+namespace Samsara\Tests\Unit\Data\LiveShare;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\LiveShare\LiveShare;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\LiveShare\LiveShare;
 
 /**
  * Unit tests for the LiveShare entity.

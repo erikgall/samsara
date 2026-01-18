@@ -1,15 +1,15 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Integrations;
+namespace Samsara\Tests\Unit\Resources\Integrations;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Webhook\Webhook;
+use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Webhook\Webhook;
-use ErikGall\Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Integrations\WebhooksResource;
+use Samsara\Resources\Integrations\WebhooksResource;
 
 /**
  * Unit tests for the WebhooksResource class.

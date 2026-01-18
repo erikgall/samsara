@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Preview;
+namespace Samsara\Resources\Preview;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Resources\Resource;
+use Samsara\Data\Entity;
+use Samsara\Resources\Resource;
 
 /**
  * Preview resource for the Samsara API.

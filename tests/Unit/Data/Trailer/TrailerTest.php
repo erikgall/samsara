@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Trailer;
+namespace Samsara\Tests\Unit\Data\Trailer;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Trailer\Trailer;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Trailer\Trailer;
 
 /**
  * Unit tests for the Trailer entity.

@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit;
+namespace Samsara\Tests\Unit;
 
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
 /**

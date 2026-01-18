@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Driver;
+namespace Samsara\Data\Driver;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Enums\DriverActivationStatus;
+use Samsara\Data\Entity;
+use Samsara\Enums\DriverActivationStatus;
 
 /**
  * Driver entity.

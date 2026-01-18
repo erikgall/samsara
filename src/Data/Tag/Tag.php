@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Tag;
+namespace Samsara\Data\Tag;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Tag entity.

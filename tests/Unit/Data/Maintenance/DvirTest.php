@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Maintenance;
+namespace Samsara\Tests\Unit\Data\Maintenance;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Maintenance\Dvir;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Maintenance\Dvir;
 
 /**
  * Unit tests for the Dvir entity.

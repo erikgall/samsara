@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Additional;
+namespace Samsara\Resources\Additional;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\Alert\AlertConfiguration;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
+use Samsara\Data\Alert\AlertConfiguration;
 
 /**
  * Alerts resource for the Samsara API.

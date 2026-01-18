@@ -1,18 +1,18 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Query\Pagination;
+namespace Samsara\Tests\Unit\Query\Pagination;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Data\Entity;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
+use Samsara\Resources\Resource;
+use Samsara\Data\EntityCollection;
+use Samsara\Query\Pagination\Cursor;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Resources\Resource;
 use Illuminate\Http\Client\PendingRequest;
-use ErikGall\Samsara\Data\EntityCollection;
-use ErikGall\Samsara\Query\Pagination\Cursor;
+use Samsara\Query\Pagination\CursorPaginator;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Query\Pagination\CursorPaginator;
 
 /**
  * Unit tests for the CursorPaginator class.

@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Industrial;
+namespace Samsara\Data\Industrial;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * DataPoint entity.

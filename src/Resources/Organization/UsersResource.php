@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Organization;
+namespace Samsara\Resources\Organization;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Data\User\User;
-use ErikGall\Samsara\Resources\Resource;
+use Samsara\Query\Builder;
+use Samsara\Data\User\User;
+use Samsara\Resources\Resource;
 
 /**
  * Users resource for the Samsara API.

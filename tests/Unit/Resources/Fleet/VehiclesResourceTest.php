@@ -1,15 +1,15 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Fleet;
+namespace Samsara\Tests\Unit\Resources\Fleet;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Vehicle\Vehicle;
+use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Vehicle\Vehicle;
-use ErikGall\Samsara\Data\EntityCollection;
+use Samsara\Resources\Fleet\VehiclesResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
 
 /**
  * Unit tests for the VehiclesResource.

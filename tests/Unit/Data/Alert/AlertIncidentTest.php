@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Alert;
+namespace Samsara\Tests\Unit\Data\Alert;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Alert\AlertIncident;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Alert\AlertIncident;
 
 /**
  * Unit tests for the AlertIncident entity.

@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Enums;
+namespace Samsara\Tests\Unit\Enums;
 
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Enums\DriverActivationStatus;
+use Samsara\Enums\DriverActivationStatus;
 
 /**
  * Unit tests for the DriverActivationStatus enum.

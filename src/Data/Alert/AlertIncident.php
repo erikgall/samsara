@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Alert;
+namespace Samsara\Data\Alert;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * AlertIncident entity.

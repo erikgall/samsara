@@ -1,15 +1,15 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Safety;
+namespace Samsara\Tests\Unit\Resources\Safety;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
+use Samsara\Data\EntityCollection;
+use Samsara\Data\Safety\SafetyEvent;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\EntityCollection;
-use ErikGall\Samsara\Data\Safety\SafetyEvent;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
+use Samsara\Resources\Safety\SafetyEventsResource;
 
 /**
  * Unit tests for the SafetyEventsResource.

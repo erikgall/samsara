@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Additional;
+namespace Samsara\Resources\Additional;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\EntityCollection;
-use ErikGall\Samsara\Data\Form\FormSubmission;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
+use Samsara\Data\EntityCollection;
+use Samsara\Data\Form\FormSubmission;
 
 /**
  * Forms resource for the Samsara API.
@@ -99,7 +99,7 @@ class FormsResource extends Resource
     /**
      * Get all form templates.
      *
-     * @return EntityCollection<int, \ErikGall\Samsara\Data\Entity>
+     * @return EntityCollection<int, \Samsara\Data\Entity>
      */
     public function templates(): EntityCollection
     {

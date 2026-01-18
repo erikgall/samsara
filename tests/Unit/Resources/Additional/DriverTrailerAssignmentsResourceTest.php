@@ -1,15 +1,15 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Additional;
+namespace Samsara\Tests\Unit\Resources\Additional;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Data\Entity;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
+use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Additional\DriverTrailerAssignmentsResource;
+use Samsara\Resources\Additional\DriverTrailerAssignmentsResource;
 
 /**
  * Unit tests for the DriverTrailerAssignmentsResource class.

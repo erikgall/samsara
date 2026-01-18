@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Beta;
+namespace Samsara\Resources\Beta;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\EntityCollection;
+use Samsara\Data\Entity;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
+use Samsara\Data\EntityCollection;
 
 /**
  * Beta resource for the Samsara API.

@@ -1,12 +1,12 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data;
+namespace Samsara\Tests\Unit\Data;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
 use Illuminate\Support\Collection;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\EntityCollection;
 
 /**
  * Unit tests for the EntityCollection class.

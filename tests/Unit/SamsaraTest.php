@@ -1,32 +1,32 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit;
+namespace Samsara\Tests\Unit;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\PendingRequest;
-use ErikGall\Samsara\Resources\Fleet\DriversResource;
-use ErikGall\Samsara\Resources\Fleet\TrailersResource;
-use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
-use ErikGall\Samsara\Resources\Dispatch\RoutesResource;
-use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
-use ErikGall\Samsara\Resources\Telematics\TripsResource;
-use ErikGall\Samsara\Resources\Industrial\AssetsResource;
-use ErikGall\Samsara\Resources\Organization\TagsResource;
-use ErikGall\Samsara\Resources\Dispatch\AddressesResource;
-use ErikGall\Samsara\Resources\Industrial\SensorsResource;
-use ErikGall\Samsara\Resources\Organization\UsersResource;
-use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
-use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
-use ErikGall\Samsara\Resources\Industrial\IndustrialResource;
-use ErikGall\Samsara\Resources\Integrations\GatewaysResource;
-use ErikGall\Samsara\Resources\Integrations\WebhooksResource;
-use ErikGall\Samsara\Resources\Organization\ContactsResource;
-use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
-use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
-use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
-use ErikGall\Samsara\Resources\Integrations\LiveSharingLinksResource;
+use Samsara\Resources\Fleet\DriversResource;
+use Samsara\Resources\Fleet\TrailersResource;
+use Samsara\Resources\Fleet\VehiclesResource;
+use Samsara\Resources\Dispatch\RoutesResource;
+use Samsara\Resources\Fleet\EquipmentResource;
+use Samsara\Resources\Telematics\TripsResource;
+use Samsara\Resources\Industrial\AssetsResource;
+use Samsara\Resources\Organization\TagsResource;
+use Samsara\Resources\Dispatch\AddressesResource;
+use Samsara\Resources\Industrial\SensorsResource;
+use Samsara\Resources\Organization\UsersResource;
+use Samsara\Resources\Safety\MaintenanceResource;
+use Samsara\Resources\Safety\SafetyEventsResource;
+use Samsara\Resources\Industrial\IndustrialResource;
+use Samsara\Resources\Integrations\GatewaysResource;
+use Samsara\Resources\Integrations\WebhooksResource;
+use Samsara\Resources\Organization\ContactsResource;
+use Samsara\Resources\Safety\HoursOfServiceResource;
+use Samsara\Resources\Telematics\VehicleStatsResource;
+use Samsara\Resources\Telematics\VehicleLocationsResource;
+use Samsara\Resources\Integrations\LiveSharingLinksResource;
 
 /**
  * Unit tests for the Samsara main client class.

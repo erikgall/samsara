@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Exceptions;
+namespace Samsara\Tests\Unit\Exceptions;
 
 use Exception;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\SamsaraException;
 
 /**
  * Unit tests for the SamsaraException base class.

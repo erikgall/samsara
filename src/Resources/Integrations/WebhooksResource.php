@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Integrations;
+namespace Samsara\Resources\Integrations;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\Webhook\Webhook;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
+use Samsara\Data\Webhook\Webhook;
 
 /**
  * Webhooks resource for the Samsara API.

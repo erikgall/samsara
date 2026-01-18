@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Vehicle;
+namespace Samsara\Data\Vehicle;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * GPS location entity.

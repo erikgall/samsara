@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Concerns;
+namespace Samsara\Tests\Unit\Concerns;
 
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Tests\TestCase;
+use Samsara\Concerns\Makeable;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Concerns\Makeable;
 
 /**
  * Unit tests for the Makeable trait.

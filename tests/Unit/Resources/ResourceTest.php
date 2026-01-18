@@ -1,15 +1,15 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources;
+namespace Samsara\Tests\Unit\Resources;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Resources\Resource;
+use Samsara\Data\EntityCollection;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Resources\Resource;
 use Illuminate\Http\Client\PendingRequest;
-use ErikGall\Samsara\Data\EntityCollection;
 
 /**
  * Unit tests for the Resource base class.

@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Attribute;
+namespace Samsara\Tests\Unit\Data\Attribute;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Attribute\AttributeValue;
+use Samsara\Data\Attribute\AttributeValue;
 
 /**
  * Unit tests for the AttributeValue entity.

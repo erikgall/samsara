@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit;
+namespace Samsara\Tests\Unit;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Tests\TestCase;
+use Samsara\SamsaraServiceProvider;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\SamsaraServiceProvider;
 
 /**
  * Unit tests for the Samsara service provider.

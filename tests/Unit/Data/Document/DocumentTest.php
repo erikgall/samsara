@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Document;
+namespace Samsara\Tests\Unit\Data\Document;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Document\Document;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Document\Document;
 
 /**
  * Unit tests for the Document entity.

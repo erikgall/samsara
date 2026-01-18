@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Industrial;
+namespace Samsara\Tests\Unit\Data\Industrial;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Industrial\IndustrialAsset;
+use Samsara\Data\Industrial\IndustrialAsset;
 
 /**
  * Unit tests for the IndustrialAsset entity.

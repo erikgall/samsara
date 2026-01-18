@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Industrial;
+namespace Samsara\Resources\Industrial;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\EntityCollection;
+use Samsara\Data\Entity;
+use Samsara\Resources\Resource;
+use Samsara\Data\EntityCollection;
 
 /**
  * Sensors resource for the Samsara API (Legacy v1).

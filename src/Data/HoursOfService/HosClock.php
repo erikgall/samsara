@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\HoursOfService;
+namespace Samsara\Data\HoursOfService;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * HosClock entity.

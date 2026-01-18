@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Tests;
+namespace Samsara\Tests;
 
-use ErikGall\Samsara\SamsaraServiceProvider;
+use Samsara\SamsaraServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 /**
@@ -35,7 +35,7 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageAliases($app): array
     {
         return [
-            'Samsara' => \ErikGall\Samsara\Facades\Samsara::class,
+            'Samsara' => \Samsara\Facades\Samsara::class,
         ];
     }
 

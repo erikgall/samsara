@@ -1,9 +1,9 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Additional;
+namespace Samsara\Resources\Additional;
 
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\EntityCollection;
+use Samsara\Resources\Resource;
+use Samsara\Data\EntityCollection;
 
 /**
  * CameraMedia resource for the Samsara API.
@@ -22,7 +22,7 @@ class CameraMediaResource extends Resource
     /**
      * Get camera media.
      *
-     * @return EntityCollection<int, \ErikGall\Samsara\Data\Entity>
+     * @return EntityCollection<int, \Samsara\Data\Entity>
      */
     public function get(): EntityCollection
     {

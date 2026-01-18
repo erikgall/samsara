@@ -1,13 +1,13 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Telematics;
+namespace Samsara\Tests\Unit\Resources\Telematics;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Query\Builder;
+use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
+use Samsara\Resources\Telematics\VehicleLocationsResource;
 
 /**
  * Unit tests for the VehicleLocationsResource.

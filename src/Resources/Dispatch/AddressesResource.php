@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Resources\Dispatch;
+namespace Samsara\Resources\Dispatch;
 
-use ErikGall\Samsara\Query\Builder;
-use ErikGall\Samsara\Resources\Resource;
-use ErikGall\Samsara\Data\Address\Address;
+use Samsara\Query\Builder;
+use Samsara\Resources\Resource;
+use Samsara\Data\Address\Address;
 
 /**
  * Addresses resource for the Samsara API.

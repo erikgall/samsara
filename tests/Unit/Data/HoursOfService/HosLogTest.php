@@ -1,12 +1,12 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\HoursOfService;
+namespace Samsara\Tests\Unit\Data\HoursOfService;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
-use ErikGall\Samsara\Enums\DutyStatus;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Enums\DutyStatus;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\HoursOfService\HosLog;
+use Samsara\Data\HoursOfService\HosLog;
 
 /**
  * Unit tests for the HosLog entity.

@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\Vehicle;
+namespace Samsara\Tests\Unit\Data\Vehicle;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Vehicle\GpsLocation;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Vehicle\GpsLocation;
 
 /**
  * Unit tests for the GpsLocation entity.

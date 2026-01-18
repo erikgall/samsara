@@ -1,14 +1,14 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Resources\Integrations;
+namespace Samsara\Tests\Unit\Resources\Integrations;
 
-use ErikGall\Samsara\Samsara;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Samsara;
+use Samsara\Tests\TestCase;
+use Samsara\Data\Vehicle\Gateway;
+use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\Vehicle\Gateway;
-use ErikGall\Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use ErikGall\Samsara\Resources\Integrations\GatewaysResource;
+use Samsara\Resources\Integrations\GatewaysResource;
 
 /**
  * Unit tests for the GatewaysResource class.

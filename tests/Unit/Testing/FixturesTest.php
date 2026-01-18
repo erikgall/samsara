@@ -1,10 +1,10 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Testing;
+namespace Samsara\Tests\Unit\Testing;
 
 use RuntimeException;
-use ErikGall\Samsara\Tests\TestCase;
-use ErikGall\Samsara\Testing\Fixtures;
+use Samsara\Tests\TestCase;
+use Samsara\Testing\Fixtures;
 use PHPUnit\Framework\Attributes\Test;
 
 /**

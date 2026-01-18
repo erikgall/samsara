@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Testing;
+namespace Samsara\Testing;
 
-use ErikGall\Samsara\Samsara;
+use Samsara\Samsara;
 use PHPUnit\Framework\Assert;
 use Illuminate\Http\Client\Factory as HttpFactory;
 

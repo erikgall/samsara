@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Asset;
+namespace Samsara\Data\Asset;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Asset entity.

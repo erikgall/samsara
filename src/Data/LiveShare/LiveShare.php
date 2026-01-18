@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\LiveShare;
+namespace Samsara\Data\LiveShare;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * LiveShare entity.

@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Webhook;
+namespace Samsara\Data\Webhook;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Webhook entity.

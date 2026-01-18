@@ -1,11 +1,11 @@
 <?php
 
-namespace ErikGall\Samsara\Tests\Unit\Data\User;
+namespace Samsara\Tests\Unit\Data\User;
 
-use ErikGall\Samsara\Data\Entity;
-use ErikGall\Samsara\Tests\TestCase;
+use Samsara\Data\Entity;
+use Samsara\Tests\TestCase;
+use Samsara\Data\User\UserRole;
 use PHPUnit\Framework\Attributes\Test;
-use ErikGall\Samsara\Data\User\UserRole;
 
 /**
  * Unit tests for the UserRole entity.

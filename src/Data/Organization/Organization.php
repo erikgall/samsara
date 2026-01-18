@@ -1,8 +1,8 @@
 <?php
 
-namespace ErikGall\Samsara\Data\Organization;
+namespace Samsara\Data\Organization;
 
-use ErikGall\Samsara\Data\Entity;
+use Samsara\Data\Entity;
 
 /**
  * Organization entity.
