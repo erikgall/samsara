@@ -193,14 +193,16 @@
 - [x] `StaticAssignedVehicle.php`
 
 ### 6.3 Vehicle Entities (`src/Data/Vehicle/`)
-- [ ] `Vehicle.php`
-  - [ ] Properties: id, name, vin, make, model, year, licensePlate, etc.
-  - [ ] Nested: gateway, tags, attributes
-- [ ] `VehicleStats.php`
-  - [ ] Properties: id, name, time, gps, engineState, fuelPercent, etc.
-  - [ ] Nested: GpsLocation
-- [ ] `GpsLocation.php`
-  - [ ] Properties: latitude, longitude, headingDegrees, speedMilesPerHour, time
+- [x] `Vehicle.php`
+  - [x] Properties: id, name, vin, make, model, year, licensePlate, etc.
+  - [x] Nested: gateway, tags, attributes
+- [x] `VehicleStats.php`
+  - [x] Properties: id, name, time, gps, engineState, fuelPercent, etc.
+  - [x] Nested: GpsLocation
+- [x] `GpsLocation.php`
+  - [x] Properties: latitude, longitude, headingDegrees, speedMilesPerHour, time
+- [x] `Gateway.php`
+- [x] `StaticAssignedDriver.php`
 
 ### 6.4 Equipment Entities (`src/Data/Equipment/`)
 - [ ] `Equipment.php`
