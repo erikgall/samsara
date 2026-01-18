@@ -932,12 +932,12 @@ Following [Laravel's AI Package Guidelines](https://laravel.com/docs/12.x/ai#pac
 - [x] Verify Laravel package discovery
 - [x] Test fresh installation (all 1185 tests pass)
 
-### 12.3 Changelog & Versioning
-- [ ] Write comprehensive CHANGELOG.md
-- [ ] Document all breaking changes
-- [ ] Document new features
-- [ ] Document deprecations
-- [ ] Choose version number (2.0.0 for breaking change)
+### 12.3 Changelog & Versioning DONE
+- [x] Write comprehensive CHANGELOG.md
+- [x] Document all breaking changes
+- [x] Document new features
+- [x] Document deprecations/removals
+- [x] Choose version number (2.0.0 for breaking change)
 
 ### 12.4 Release Preparation
 - [ ] Create release branch
