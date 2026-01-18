@@ -44,20 +44,20 @@
 ## Phase 2: Exception Hierarchy
 
 ### 2.1 Exceptions (`src/Exceptions/`)
-- [ ] `SamsaraException.php` - Base exception
-  - [ ] `$context` property
-  - [ ] `getContext(): array`
-- [ ] `AuthenticationException.php` - 401 errors
-- [ ] `AuthorizationException.php` - 403 errors
-- [ ] `NotFoundException.php` - 404 errors
-- [ ] `ValidationException.php` - 422 errors
-  - [ ] `$errors` property
-  - [ ] `getErrors(): array`
-- [ ] `RateLimitException.php` - 429 errors
-  - [ ] `$retryAfter` property
-  - [ ] `getRetryAfter(): ?int`
-- [ ] `ServerException.php` - 5xx errors
-- [ ] `ConnectionException.php` - Network errors
+- [x] `SamsaraException.php` - Base exception
+  - [x] `$context` property
+  - [x] `getContext(): array`
+- [x] `AuthenticationException.php` - 401 errors
+- [x] `AuthorizationException.php` - 403 errors
+- [x] `NotFoundException.php` - 404 errors
+- [x] `ValidationException.php` - 422 errors
+  - [x] `$errors` property
+  - [x] `getErrors(): array`
+- [x] `RateLimitException.php` - 429 errors
+  - [x] `$retryAfter` property
+  - [x] `getRetryAfter(): ?int`
+- [x] `ServerException.php` - 5xx errors
+- [x] `ConnectionException.php` - Network errors
 
 ---
 
