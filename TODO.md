@@ -841,7 +841,7 @@ Resource tests (DriversResourceTest, VehiclesResourceTest, etc.) test:
 - [x] `docs/pagination.md` - (Included in query-builder.md)
 - [x] `docs/testing.md` - Testing with SamsaraFake
 - [x] `docs/error-handling.md` - Exception handling guide
-- [ ] `docs/upgrading.md` - Migration from previous versions
+- [x] `docs/upgrading.md` - Migration from previous versions
 
 ### 11.4 API Reference (PHPDoc)
 - [x] Complete PHPDoc on all public classes
