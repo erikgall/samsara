@@ -844,9 +844,9 @@ Resource tests (DriversResourceTest, VehiclesResourceTest, etc.) test:
 - [ ] `docs/upgrading.md` - Migration from previous versions
 
 ### 11.4 API Reference (PHPDoc)
-- [ ] Complete PHPDoc on all public classes
-- [ ] Complete PHPDoc on all public methods
-- [ ] Add `@method` annotations to Samsara.php for IDE support
+- [x] Complete PHPDoc on all public classes
+- [x] Complete PHPDoc on all public methods
+- [x] Add `@method` annotations to Samsara.php for IDE support
 - [ ] Add `@property` annotations to Entity classes
 - [ ] Add `@throws` annotations for exceptions
 - [ ] Configure phpDocumentor for generated docs
