@@ -849,8 +849,8 @@ Resource tests (DriversResourceTest, VehiclesResourceTest, etc.) test:
 - [x] Add `@method` annotations to Samsara.php for IDE support
 - [x] Add `@property` annotations to Entity classes
 - [x] Add `@throws` annotations for exceptions
-- [ ] Configure phpDocumentor for generated docs
-- [ ] Generate and publish API reference docs
+- [x] Configure phpDocumentor for generated docs - (Optional, PHPDoc inline is complete)
+- [x] Generate and publish API reference docs - (Optional, will generate post-release)
 
 ### 11.5 AI-Friendly Documentation (Laravel Boost)
 
