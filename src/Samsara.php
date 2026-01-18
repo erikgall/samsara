@@ -9,6 +9,9 @@ use ErikGall\Samsara\Resources\Fleet\TrailersResource;
 use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
 use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
+use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
+use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
 
@@ -139,6 +142,33 @@ class Samsara
     public function hasToken(): bool
     {
         return $this->token !== null;
+    }
+
+    /**
+     * Get the HoursOfServiceResource.
+     */
+    public function hoursOfService(): HoursOfServiceResource
+    {
+        /** @var HoursOfServiceResource */
+        return $this->resource(HoursOfServiceResource::class);
+    }
+
+    /**
+     * Get the MaintenanceResource.
+     */
+    public function maintenance(): MaintenanceResource
+    {
+        /** @var MaintenanceResource */
+        return $this->resource(MaintenanceResource::class);
+    }
+
+    /**
+     * Get the SafetyEventsResource.
+     */
+    public function safetyEvents(): SafetyEventsResource
+    {
+        /** @var SafetyEventsResource */
+        return $this->resource(SafetyEventsResource::class);
     }
 
     /**

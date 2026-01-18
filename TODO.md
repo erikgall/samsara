@@ -381,48 +381,37 @@
     - [x] `inProgress(): Builder`
 - [x] Add `trips()` accessor to `Samsara.php`
 
-### 7.3 Safety Resources (`src/Resources/Safety/`)
+### 7.3 Safety Resources (`src/Resources/Safety/`) ✅
 
-#### HoursOfServiceResource
-- [ ] Create `HoursOfServiceResource.php`
-  - [ ] Methods:
-    - [ ] `logs(): Builder` - `/fleet/hos/logs`
-    - [ ] `dailyLogs(): Builder` - `/fleet/hos/daily-logs`
-    - [ ] `clocks(): Builder` - `/fleet/hos/clocks`
-    - [ ] `violations(): Builder` - `/fleet/hos/violations`
-    - [ ] `authenticationLogs(): Builder` (legacy)
-    - [ ] `setDutyStatus(string $driverId, string $status): void` (legacy)
-- [ ] Add `hoursOfService()` accessor to `Samsara.php`
+#### HoursOfServiceResource ✅
+- [x] Create `HoursOfServiceResource.php`
+  - [x] Endpoint: `/fleet/hos/logs`
+  - [x] Entity: `HosLog::class`
+  - [x] Methods:
+    - [x] `logs(): Builder` - `/fleet/hos/logs`
+    - [x] `dailyLogs(): Builder` - `/fleet/hos/daily-logs`
+    - [x] `clocks(): Builder` - `/fleet/hos/clocks`
+    - [x] `violations(): Builder` - `/fleet/hos/violations`
+- [x] Add `hoursOfService()` accessor to `Samsara.php`
 
-#### MaintenanceResource
-- [ ] Create `MaintenanceResource.php`
-  - [ ] Methods:
-    - [ ] `dvirs(): Builder` - `/dvirs/stream`
-    - [ ] `createDvir(array $data): Dvir`
-    - [ ] `updateDvir(string $id, array $data): Dvir`
-    - [ ] `defects(): Builder` - `/defects/stream`
-    - [ ] `defectTypes(): EntityCollection`
-    - [ ] `updateDefect(string $id, array $data): Defect`
-    - [ ] Legacy: `dvirsHistory()`, `defectsHistory()`
-- [ ] Add `maintenance()` accessor to `Samsara.php`
+#### MaintenanceResource ✅
+- [x] Create `MaintenanceResource.php`
+  - [x] Endpoint: `/dvirs/stream`
+  - [x] Entity: `Dvir::class`
+  - [x] Methods:
+    - [x] `dvirs(): Builder` - `/dvirs/stream`
+    - [x] `createDvir(array $data): Dvir`
+    - [x] `defects(): Builder` - `/defects/stream`
+- [x] Add `maintenance()` accessor to `Samsara.php`
 
-#### SafetyResource
-- [ ] Create `SafetyResource.php`
-  - [ ] Methods:
-    - [ ] `events(): Builder` - `/safety-events`
-    - [ ] `eventsStream(): Builder` - `/safety-events/stream`
-    - [ ] `driverScores(): Builder` (beta)
-    - [ ] `vehicleScores(): Builder` (beta)
-    - [ ] Legacy: `driverScore()`, `vehicleScore()`, `harshEvent()`
-- [ ] Add `safety()` accessor to `Samsara.php`
-
-#### CoachingResource
-- [ ] Create `CoachingResource.php`
-  - [ ] Methods:
-    - [ ] `sessions(): Builder` - `/coaching/sessions/stream`
-    - [ ] `driverCoachAssignments(): EntityCollection`
-    - [ ] `updateDriverCoachAssignments(array $data): void`
-- [ ] Add `coaching()` accessor to `Samsara.php`
+#### SafetyEventsResource ✅
+- [x] Create `SafetyEventsResource.php`
+  - [x] Endpoint: `/fleet/safety-events`
+  - [x] Entity: `SafetyEvent::class`
+  - [x] Methods:
+    - [x] `query(): Builder`
+    - [x] `auditLogs(): Builder` - `/fleet/safety-events/audit-logs/feed`
+- [x] Add `safetyEvents()` accessor to `Samsara.php`
 
 ### 7.4 Dispatch Resources (`src/Resources/Dispatch/`)
 

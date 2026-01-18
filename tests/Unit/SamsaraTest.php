@@ -11,6 +11,9 @@ use ErikGall\Samsara\Resources\Fleet\TrailersResource;
 use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
 use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
+use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
+use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleLocationsResource;
 
@@ -143,6 +146,26 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_hours_of_service_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $hos = $samsara->hoursOfService();
+
+        $this->assertInstanceOf(HoursOfServiceResource::class, $hos);
+    }
+
+    #[Test]
+    public function it_returns_maintenance_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $maintenance = $samsara->maintenance();
+
+        $this->assertInstanceOf(MaintenanceResource::class, $maintenance);
+    }
+
+    #[Test]
     public function it_returns_pending_request_from_client_method(): void
     {
         $samsara = new Samsara('test-token');
@@ -150,6 +173,16 @@ class SamsaraTest extends TestCase
         $client = $samsara->client();
 
         $this->assertInstanceOf(PendingRequest::class, $client);
+    }
+
+    #[Test]
+    public function it_returns_safety_events_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $safetyEvents = $samsara->safetyEvents();
+
+        $this->assertInstanceOf(SafetyEventsResource::class, $safetyEvents);
     }
 
     #[Test]
