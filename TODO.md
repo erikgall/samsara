@@ -413,41 +413,25 @@
     - [x] `auditLogs(): Builder` - `/fleet/safety-events/audit-logs/feed`
 - [x] Add `safetyEvents()` accessor to `Samsara.php`
 
-### 7.4 Dispatch Resources (`src/Resources/Dispatch/`)
+### 7.4 Dispatch Resources (`src/Resources/Dispatch/`) ✅
 
-#### RoutesResource
-- [ ] Create `RoutesResource.php`
-  - [ ] Endpoint: `/fleet/routes`
-  - [ ] Entity: `Route::class`
-  - [ ] Methods:
-    - [ ] Standard CRUD
-    - [ ] `auditLogs(): Builder` - `/fleet/routes/audit-logs/feed`
-    - [ ] `hubRoutes(): Builder` - `/hub/plan/routes`
-    - [ ] Legacy: `deleteByExternalId()`
-- [ ] Add `routes()` accessor to `Samsara.php`
+#### RoutesResource ✅
+- [x] Create `RoutesResource.php`
+  - [x] Endpoint: `/fleet/routes`
+  - [x] Entity: `Route::class`
+  - [x] Methods:
+    - [x] Standard CRUD (create, find, update, delete, all)
+    - [x] `query(): Builder`
+    - [x] `auditLogs(): Builder` - `/fleet/routes/audit-logs/feed`
+- [x] Add `routes()` accessor to `Samsara.php`
 
-#### AddressesResource
-- [ ] Create `AddressesResource.php`
-  - [ ] Endpoint: `/addresses`
-  - [ ] Entity: `Address::class`
-  - [ ] Standard CRUD methods
-- [ ] Add `addresses()` accessor to `Samsara.php`
-
-#### DocumentsResource
-- [ ] Create `DocumentsResource.php`
-  - [ ] Endpoint: `/fleet/documents`
-  - [ ] Methods:
-    - [ ] Standard CRUD
-    - [ ] `types(): EntityCollection` - Document types
-    - [ ] `createPdf(array $data): object`
-    - [ ] `getPdf(string $id): object`
-- [ ] Add `documents()` accessor to `Samsara.php`
-
-#### MessagesResource
-- [ ] Create `MessagesResource.php` (Legacy)
-  - [ ] Endpoint: `/v1/fleet/messages`
-  - [ ] Methods: `get()`, `send()`
-- [ ] Add `messages()` accessor to `Samsara.php`
+#### AddressesResource ✅
+- [x] Create `AddressesResource.php`
+  - [x] Endpoint: `/addresses`
+  - [x] Entity: `Address::class`
+  - [x] Standard CRUD methods
+  - [x] `query(): Builder`
+- [x] Add `addresses()` accessor to `Samsara.php`
 
 ### 7.5 Organization Resources (`src/Resources/Organization/`)
 

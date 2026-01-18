@@ -9,8 +9,10 @@ use Illuminate\Http\Client\PendingRequest;
 use ErikGall\Samsara\Resources\Fleet\DriversResource;
 use ErikGall\Samsara\Resources\Fleet\TrailersResource;
 use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
+use ErikGall\Samsara\Resources\Dispatch\RoutesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
 use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Dispatch\AddressesResource;
 use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
 use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
 use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
@@ -109,6 +111,16 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_addresses_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $addresses = $samsara->addresses();
+
+        $this->assertInstanceOf(AddressesResource::class, $addresses);
+    }
+
+    #[Test]
     public function it_returns_default_value_for_missing_config(): void
     {
         $samsara = new Samsara('test-token');
@@ -173,6 +185,16 @@ class SamsaraTest extends TestCase
         $client = $samsara->client();
 
         $this->assertInstanceOf(PendingRequest::class, $client);
+    }
+
+    #[Test]
+    public function it_returns_routes_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $routes = $samsara->routes();
+
+        $this->assertInstanceOf(RoutesResource::class, $routes);
     }
 
     #[Test]

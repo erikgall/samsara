@@ -7,8 +7,10 @@ use Illuminate\Http\Client\Factory as HttpFactory;
 use ErikGall\Samsara\Resources\Fleet\DriversResource;
 use ErikGall\Samsara\Resources\Fleet\TrailersResource;
 use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
+use ErikGall\Samsara\Resources\Dispatch\RoutesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
 use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Dispatch\AddressesResource;
 use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
 use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
 use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
@@ -75,6 +77,15 @@ class Samsara
         $this->token = $token;
         $this->config = $config;
         $this->http = new HttpFactory;
+    }
+
+    /**
+     * Get the AddressesResource.
+     */
+    public function addresses(): AddressesResource
+    {
+        /** @var AddressesResource */
+        return $this->resource(AddressesResource::class);
     }
 
     /**
@@ -160,6 +171,15 @@ class Samsara
     {
         /** @var MaintenanceResource */
         return $this->resource(MaintenanceResource::class);
+    }
+
+    /**
+     * Get the RoutesResource.
+     */
+    public function routes(): RoutesResource
+    {
+        /** @var RoutesResource */
+        return $this->resource(RoutesResource::class);
     }
 
     /**
