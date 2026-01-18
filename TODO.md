@@ -36,7 +36,7 @@
 ### 1.5 Facade (`src/Facades/Samsara.php`)
 - [x] Create facade class
   - [x] `getFacadeAccessor()` - Return Samsara class
-  - [ ] `static fake(): SamsaraFake` - Testing support (Phase 9)
+  - [x] `static fake(): SamsaraFake` - Testing support (Phase 9)
   - [x] Add `@method` docblocks for IDE support
 
 ---
@@ -70,8 +70,8 @@
 
 ### 3.2 Concerns/Traits (`src/Concerns/`)
 - [x] `Makeable.php` - Static `make()` factory
-- [ ] `HasPagination.php` - Pagination helpers (Phase 4)
-- [ ] `HasFiltering.php` - Filter helpers (Phase 4)
+- [x] `HasPagination.php` - (Absorbed into Query/Builder.php)
+- [x] `HasFiltering.php` - (Absorbed into Query/Builder.php)
 - [x] `InteractsWithTime.php` - Date/time formatting
 
 ### 3.3 Base Entity (`src/Data/Entity.php`)
@@ -206,12 +206,12 @@
 
 ### 6.4 Equipment Entities (`src/Data/Equipment/`)
 - [x] `Equipment.php`
-- [ ] `EquipmentStats.php`
-- [ ] `EquipmentLocation.php`
+- [x] `EquipmentStats.php`
+- [x] `EquipmentLocation.php`
 
 ### 6.5 Trailer Entities (`src/Data/Trailer/`)
 - [x] `Trailer.php`
-- [ ] `TrailerStats.php`
+- [x] `TrailerStats.php`
 
 ### 6.6 Route Entities (`src/Data/Route/`)
 - [x] `Route.php`
