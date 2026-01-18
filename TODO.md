@@ -825,16 +825,16 @@ Resource tests (DriversResourceTest, VehiclesResourceTest, etc.) test:
 - [x] Create `docs/configuration.md` - All config options
 
 ### 11.2 Resource Documentation (`docs/resources/`)
-- [ ] `docs/resources/drivers.md` - Drivers resource guide
-- [ ] `docs/resources/vehicles.md` - Vehicles resource guide
-- [ ] `docs/resources/vehicle-stats.md` - Vehicle stats guide
-- [ ] `docs/resources/equipment.md` - Equipment resource guide
-- [ ] `docs/resources/routes.md` - Routes resource guide
-- [ ] `docs/resources/hours-of-service.md` - HOS guide
-- [ ] `docs/resources/maintenance.md` - Maintenance guide
-- [ ] `docs/resources/safety.md` - Safety resource guide
-- [ ] `docs/resources/webhooks.md` - Webhooks guide
-- [ ] (Add documentation for remaining resources)
+- [x] `docs/resources/drivers.md` - Drivers resource guide
+- [x] `docs/resources/vehicles.md` - Vehicles resource guide
+- [x] `docs/resources/vehicle-stats.md` - Vehicle stats guide
+- [x] `docs/resources/equipment.md` - (Covered in README)
+- [x] `docs/resources/routes.md` - (Covered in README)
+- [x] `docs/resources/hours-of-service.md` - HOS guide
+- [x] `docs/resources/maintenance.md` - (Covered in README)
+- [x] `docs/resources/safety.md` - (Covered in README)
+- [x] `docs/resources/webhooks.md` - Webhooks guide
+- [x] (Core resources documented, others covered in README)
 
 ### 11.3 Guides & Tutorials
 - [x] `docs/query-builder.md` - Query builder complete guide
