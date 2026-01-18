@@ -3,6 +3,7 @@
 namespace ErikGall\Samsara\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use ErikGall\Samsara\Testing\SamsaraFake;
 use Illuminate\Http\Client\PendingRequest;
 use ErikGall\Samsara\Samsara as SamsaraClient;
 
@@ -23,6 +24,14 @@ use ErikGall\Samsara\Samsara as SamsaraClient;
  */
 class Samsara extends Facade
 {
+    /**
+     * Create a new SamsaraFake instance for testing.
+     */
+    public static function fake(): SamsaraFake
+    {
+        return SamsaraFake::create();
+    }
+
     /**
      * Get the registered name of the component.
      */

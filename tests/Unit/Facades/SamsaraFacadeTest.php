@@ -5,6 +5,7 @@ namespace ErikGall\Samsara\Tests\Unit\Facades;
 use ErikGall\Samsara\Samsara;
 use ErikGall\Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use ErikGall\Samsara\Testing\SamsaraFake;
 use Illuminate\Http\Client\PendingRequest;
 use ErikGall\Samsara\Facades\Samsara as SamsaraFacade;
 
@@ -15,6 +16,21 @@ use ErikGall\Samsara\Facades\Samsara as SamsaraFacade;
  */
 class SamsaraFacadeTest extends TestCase
 {
+    #[Test]
+    public function fake_instance_can_mock_responses(): void
+    {
+        $fake = SamsaraFacade::fake();
+
+        $fake->fakeDrivers([
+            ['id' => 'driver-1', 'name' => 'John Doe'],
+        ]);
+
+        $drivers = $fake->drivers()->all();
+
+        $this->assertCount(1, $drivers);
+        $this->assertSame('driver-1', $drivers[0]->id);
+    }
+
     #[Test]
     public function it_can_call_client_method(): void
     {
@@ -60,6 +76,14 @@ class SamsaraFacadeTest extends TestCase
         SamsaraFacade::withToken('new-token');
 
         $this->assertTrue(SamsaraFacade::hasToken());
+    }
+
+    #[Test]
+    public function it_can_create_fake_instance(): void
+    {
+        $fake = SamsaraFacade::fake();
+
+        $this->assertInstanceOf(SamsaraFake::class, $fake);
     }
 
     #[Test]
