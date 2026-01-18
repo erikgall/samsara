@@ -18,7 +18,7 @@ Version 2.0 is a complete rewrite of the SDK, replacing the Saloon-based impleme
 ### PHP Version
 
 - Minimum PHP version is now **8.1** (for enum support)
-- Minimum Laravel version is now **10.x**
+- Minimum Laravel version is now **10.x** (also supports 11.x and 12.x)
 
 ### Namespace Changes
 

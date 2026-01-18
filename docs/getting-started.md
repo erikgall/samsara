@@ -5,7 +5,7 @@ This guide will help you get started with the Samsara SDK for Laravel.
 ## Requirements
 
 - PHP 8.1 or higher
-- Laravel 10.x or 11.x
+- Laravel 10.x, 11.x, or 12.x
 - Samsara API token
 
 ## Installation
@@ -123,6 +123,20 @@ The SDK provides access to 40+ Samsara API endpoints:
 - `webhooks()` - Webhook management
 - `gateways()` - Gateway devices
 - `liveShares()` - Live sharing links
+
+### Industrial
+- `industrial()` - Industrial assets and data inputs
+- `assets()` - Asset management
+- `sensors()` - Legacy sensor data (v1 API)
+
+### Additional
+- `alerts()` - Alert configurations and incidents
+- `forms()` - Form submissions and templates
+- `fuelAndEnergy()` - Fuel and energy efficiency
+- `ifta()` - IFTA reporting
+- `workOrders()` - Maintenance work orders
+- `settings()` - Organization settings
+- And more...
 
 See the [README](../README.md) for a complete list of resources.
 
