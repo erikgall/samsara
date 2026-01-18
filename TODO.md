@@ -219,10 +219,10 @@
 - [x] `RouteSettings.php`
 
 ### 6.7 HOS Entities (`src/Data/HoursOfService/`)
-- [ ] `HosLog.php`
-- [ ] `HosClock.php`
-- [ ] `HosViolation.php`
-- [ ] `HosDailyLog.php`
+- [x] `HosLog.php`
+- [x] `HosClock.php`
+- [x] `HosViolation.php`
+- [x] `HosDailyLog.php`
 
 ### 6.8 Safety Entities (`src/Data/Safety/`)
 - [ ] `SafetyEvent.php`
