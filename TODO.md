@@ -64,46 +64,46 @@
 ## Phase 3: Base Components
 
 ### 3.1 Contracts (`src/Contracts/`)
-- [ ] `EntityInterface.php`
-- [ ] `ResourceInterface.php`
-- [ ] `QueryBuilderInterface.php`
+- [x] `EntityInterface.php`
+- [x] `ResourceInterface.php`
+- [x] `QueryBuilderInterface.php`
 
 ### 3.2 Concerns/Traits (`src/Concerns/`)
-- [ ] `Makeable.php` - Static `make()` factory
-- [ ] `HasPagination.php` - Pagination helpers
-- [ ] `HasFiltering.php` - Filter helpers
-- [ ] `InteractsWithTime.php` - Date/time formatting
+- [x] `Makeable.php` - Static `make()` factory
+- [ ] `HasPagination.php` - Pagination helpers (Phase 4)
+- [ ] `HasFiltering.php` - Filter helpers (Phase 4)
+- [x] `InteractsWithTime.php` - Date/time formatting
 
 ### 3.3 Base Entity (`src/Data/Entity.php`)
-- [ ] Create `Entity` class extending `Illuminate\Support\Fluent`
-  - [ ] Extends `Fluent` (provides ArrayAccess, Arrayable, Jsonable, JsonSerializable, magic methods)
-  - [ ] `static make(array $attributes = []): static`
-  - [ ] `fill(array $attributes): static`
-  - [ ] `getId(): ?string`
-  - [ ] Note: Fluent handles `toArray()`, `toJson()`, `__get`, `__set`, `offsetGet`, etc.
+- [x] Create `Entity` class extending `Illuminate\Support\Fluent`
+  - [x] Extends `Fluent` (provides ArrayAccess, Arrayable, Jsonable, JsonSerializable, magic methods)
+  - [x] `static make(array $attributes = []): static` (inherited from Fluent)
+  - [x] `fill(array $attributes): static` (inherited from Fluent)
+  - [x] `getId(): ?string`
+  - [x] Note: Fluent handles `toArray()`, `toJson()`, `__get`, `__set`, `offsetGet`, etc.
 
 ### 3.4 Entity Collection (`src/Data/EntityCollection.php`)
-- [ ] Create `EntityCollection` class extending Illuminate Collection
-  - [ ] `findById(string $id): ?Entity`
-  - [ ] `ids(): array`
+- [x] Create `EntityCollection` class extending Illuminate Collection
+  - [x] `findById(string $id): ?Entity`
+  - [x] `ids(): array`
 
 ### 3.5 Base Resource (`src/Resources/Resource.php`)
-- [ ] Create `Resource` class
-  - [ ] `$samsara` property
-  - [ ] `$endpoint` property
-  - [ ] `$entity` property
-  - [ ] `__construct(Samsara $samsara)`
-  - [ ] `client(): PendingRequest`
-  - [ ] `query(): Builder`
-  - [ ] `all(): EntityCollection`
-  - [ ] `find(string $id): ?object`
-  - [ ] `create(array $data): object`
-  - [ ] `update(string $id, array $data): object`
-  - [ ] `delete(string $id): bool`
-  - [ ] `mapToEntity(array $data): object`
-  - [ ] `mapToEntities(array $data): EntityCollection`
-  - [ ] `getEndpoint(): string`
-  - [ ] `handleError(Response $response): void`
+- [x] Create `Resource` class
+  - [x] `$samsara` property
+  - [x] `$endpoint` property
+  - [x] `$entity` property
+  - [x] `__construct(Samsara $samsara)`
+  - [x] `client(): PendingRequest`
+  - [ ] `query(): Builder` (Phase 4)
+  - [x] `all(): EntityCollection`
+  - [x] `find(string $id): ?object`
+  - [x] `create(array $data): object`
+  - [x] `update(string $id, array $data): object`
+  - [x] `delete(string $id): bool`
+  - [x] `mapToEntity(array $data): object`
+  - [x] `mapToEntities(array $data): EntityCollection`
+  - [x] `getEndpoint(): string`
+  - [x] `handleError(Response $response): void`
 
 ---
 
