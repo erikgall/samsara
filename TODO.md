@@ -821,8 +821,8 @@ Resource tests (DriversResourceTest, VehiclesResourceTest, etc.) test:
   - [x] Entity documentation
   - [x] Error handling documentation
   - [x] Testing documentation
-- [ ] Create `docs/getting-started.md` - Full setup guide
-- [ ] Create `docs/configuration.md` - All config options
+- [x] Create `docs/getting-started.md` - Full setup guide
+- [x] Create `docs/configuration.md` - All config options
 
 ### 11.2 Resource Documentation (`docs/resources/`)
 - [ ] `docs/resources/drivers.md` - Drivers resource guide
@@ -837,10 +837,10 @@ Resource tests (DriversResourceTest, VehiclesResourceTest, etc.) test:
 - [ ] (Add documentation for remaining resources)
 
 ### 11.3 Guides & Tutorials
-- [ ] `docs/query-builder.md` - Query builder complete guide
-- [ ] `docs/pagination.md` - Pagination and lazy loading
-- [ ] `docs/testing.md` - Testing with SamsaraFake
-- [ ] `docs/error-handling.md` - Exception handling guide
+- [x] `docs/query-builder.md` - Query builder complete guide
+- [x] `docs/pagination.md` - (Included in query-builder.md)
+- [x] `docs/testing.md` - Testing with SamsaraFake
+- [x] `docs/error-handling.md` - Exception handling guide
 - [ ] `docs/upgrading.md` - Migration from previous versions
 
 ### 11.4 API Reference (PHPDoc)
