@@ -459,44 +459,42 @@
   - [x] `query(): Builder`
 - [x] Add `tags()` accessor to `Samsara.php`
 
-### 7.6 Industrial Resources (`src/Resources/Industrial/`)
+### 7.6 Industrial Resources (`src/Resources/Industrial/`) ✅
 
-#### IndustrialResource
-- [ ] Create `IndustrialResource.php`
-  - [ ] Methods:
-    - [ ] `assets(): Builder` - `/industrial/assets`
-    - [ ] `createAsset(array $data): IndustrialAsset`
-    - [ ] `updateAsset(string $id, array $data): IndustrialAsset`
-    - [ ] `deleteAsset(string $id): bool`
-    - [ ] `dataInputs(): Builder` - `/industrial/data-inputs`
-    - [ ] `dataPoints(): Builder`
-    - [ ] `dataPointsFeed(): Builder`
-    - [ ] `dataPointsHistory(): Builder`
-    - [ ] Vision methods (legacy v1 endpoints)
-    - [ ] Machine methods (legacy v1 endpoints)
-- [ ] Add `industrial()` accessor to `Samsara.php`
+#### IndustrialResource ✅
+- [x] Create `IndustrialResource.php`
+  - [x] Methods:
+    - [x] `assets(): Builder` - `/industrial/assets`
+    - [x] `createAsset(array $data): IndustrialAsset`
+    - [x] `updateAsset(string $id, array $data): IndustrialAsset`
+    - [x] `deleteAsset(string $id): bool`
+    - [x] `dataInputs(): Builder` - `/industrial/data-inputs`
+    - [x] `dataPoints(): Builder`
+    - [x] `dataPointsFeed(): Builder`
+    - [x] `dataPointsHistory(): Builder`
+- [x] Add `industrial()` accessor to `Samsara.php`
 
-#### SensorsResource
-- [ ] Create `SensorsResource.php` (Legacy v1)
-  - [ ] Methods:
-    - [ ] `list(array $data): EntityCollection`
-    - [ ] `cargo(array $data): object`
-    - [ ] `door(array $data): object`
-    - [ ] `humidity(array $data): object`
-    - [ ] `temperature(array $data): object`
-    - [ ] `history(array $data): object`
-- [ ] Add `sensors()` accessor to `Samsara.php`
+#### SensorsResource ✅
+- [x] Create `SensorsResource.php` (Legacy v1)
+  - [x] Methods:
+    - [x] `list(array $data): EntityCollection`
+    - [x] `cargo(array $data): array`
+    - [x] `door(array $data): array`
+    - [x] `humidity(array $data): array`
+    - [x] `temperature(array $data): array`
+    - [x] `history(array $data): array`
+- [x] Add `sensors()` accessor to `Samsara.php`
 
-#### AssetsResource
-- [ ] Create `AssetsResource.php`
-  - [ ] Endpoint: `/assets`
-  - [ ] Methods:
-    - [ ] Standard CRUD
-    - [ ] `depreciation(): Builder`
-    - [ ] `inputsStream(): Builder`
-    - [ ] `locationAndSpeedStream(): Builder`
-    - [ ] Legacy: locations, reefers
-- [ ] Add `assets()` accessor to `Samsara.php`
+#### AssetsResource ✅
+- [x] Create `AssetsResource.php`
+  - [x] Endpoint: `/assets`
+  - [x] Methods:
+    - [x] Standard CRUD
+    - [x] `depreciation(): Builder`
+    - [x] `inputsStream(): Builder`
+    - [x] `locationAndSpeedStream(): Builder`
+    - [x] Legacy: locations, reefers
+- [x] Add `assets()` accessor to `Samsara.php`
 
 ### 7.7 Integrations Resources (`src/Resources/Integrations/`)
 

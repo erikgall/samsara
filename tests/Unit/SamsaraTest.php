@@ -12,11 +12,14 @@ use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
 use ErikGall\Samsara\Resources\Dispatch\RoutesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
 use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Industrial\AssetsResource;
 use ErikGall\Samsara\Resources\Organization\TagsResource;
 use ErikGall\Samsara\Resources\Dispatch\AddressesResource;
+use ErikGall\Samsara\Resources\Industrial\SensorsResource;
 use ErikGall\Samsara\Resources\Organization\UsersResource;
 use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
 use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
+use ErikGall\Samsara\Resources\Industrial\IndustrialResource;
 use ErikGall\Samsara\Resources\Organization\ContactsResource;
 use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
@@ -124,6 +127,16 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_assets_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $assets = $samsara->assets();
+
+        $this->assertInstanceOf(AssetsResource::class, $assets);
+    }
+
+    #[Test]
     public function it_returns_contacts_resource(): void
     {
         $samsara = new Samsara('test-token');
@@ -181,6 +194,16 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_industrial_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $industrial = $samsara->industrial();
+
+        $this->assertInstanceOf(IndustrialResource::class, $industrial);
+    }
+
+    #[Test]
     public function it_returns_maintenance_resource(): void
     {
         $samsara = new Samsara('test-token');
@@ -218,6 +241,16 @@ class SamsaraTest extends TestCase
         $safetyEvents = $samsara->safetyEvents();
 
         $this->assertInstanceOf(SafetyEventsResource::class, $safetyEvents);
+    }
+
+    #[Test]
+    public function it_returns_sensors_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $sensors = $samsara->sensors();
+
+        $this->assertInstanceOf(SensorsResource::class, $sensors);
     }
 
     #[Test]

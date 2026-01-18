@@ -10,11 +10,14 @@ use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
 use ErikGall\Samsara\Resources\Dispatch\RoutesResource;
 use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
 use ErikGall\Samsara\Resources\Telematics\TripsResource;
+use ErikGall\Samsara\Resources\Industrial\AssetsResource;
 use ErikGall\Samsara\Resources\Organization\TagsResource;
 use ErikGall\Samsara\Resources\Dispatch\AddressesResource;
+use ErikGall\Samsara\Resources\Industrial\SensorsResource;
 use ErikGall\Samsara\Resources\Organization\UsersResource;
 use ErikGall\Samsara\Resources\Safety\MaintenanceResource;
 use ErikGall\Samsara\Resources\Safety\SafetyEventsResource;
+use ErikGall\Samsara\Resources\Industrial\IndustrialResource;
 use ErikGall\Samsara\Resources\Organization\ContactsResource;
 use ErikGall\Samsara\Resources\Safety\HoursOfServiceResource;
 use ErikGall\Samsara\Resources\Telematics\VehicleStatsResource;
@@ -89,6 +92,15 @@ class Samsara
     {
         /** @var AddressesResource */
         return $this->resource(AddressesResource::class);
+    }
+
+    /**
+     * Get the AssetsResource.
+     */
+    public function assets(): AssetsResource
+    {
+        /** @var AssetsResource */
+        return $this->resource(AssetsResource::class);
     }
 
     /**
@@ -177,6 +189,15 @@ class Samsara
     }
 
     /**
+     * Get the IndustrialResource.
+     */
+    public function industrial(): IndustrialResource
+    {
+        /** @var IndustrialResource */
+        return $this->resource(IndustrialResource::class);
+    }
+
+    /**
      * Get the MaintenanceResource.
      */
     public function maintenance(): MaintenanceResource
@@ -201,6 +222,15 @@ class Samsara
     {
         /** @var SafetyEventsResource */
         return $this->resource(SafetyEventsResource::class);
+    }
+
+    /**
+     * Get the SensorsResource (Legacy v1).
+     */
+    public function sensors(): SensorsResource
+    {
+        /** @var SensorsResource */
+        return $this->resource(SensorsResource::class);
     }
 
     /**
