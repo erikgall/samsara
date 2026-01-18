@@ -5,7 +5,7 @@ Manage drivers in your Samsara fleet.
 ## Basic Usage
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all drivers
 $drivers = Samsara::drivers()->all();

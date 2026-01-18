@@ -19,8 +19,8 @@ SamsaraException (base)
 ### Basic Error Handling
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Exceptions\SamsaraException;
+use Samsara\Facades\Samsara;
+use Samsara\Exceptions\SamsaraException;
 
 try {
     $driver = Samsara::drivers()->find('driver-id');
@@ -33,14 +33,14 @@ try {
 ### Specific Exception Handling
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Exceptions\AuthenticationException;
-use ErikGall\Samsara\Exceptions\AuthorizationException;
-use ErikGall\Samsara\Exceptions\NotFoundException;
-use ErikGall\Samsara\Exceptions\ValidationException;
-use ErikGall\Samsara\Exceptions\RateLimitException;
-use ErikGall\Samsara\Exceptions\ServerException;
-use ErikGall\Samsara\Exceptions\SamsaraException;
+use Samsara\Facades\Samsara;
+use Samsara\Exceptions\AuthenticationException;
+use Samsara\Exceptions\AuthorizationException;
+use Samsara\Exceptions\NotFoundException;
+use Samsara\Exceptions\ValidationException;
+use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\ServerException;
+use Samsara\Exceptions\SamsaraException;
 
 try {
     $driver = Samsara::drivers()->create($data);
@@ -209,9 +209,9 @@ The SDK includes automatic retry for transient failures. Configure in `config/sa
 For manual retry with exponential backoff:
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Exceptions\RateLimitException;
-use ErikGall\Samsara\Exceptions\ServerException;
+use Samsara\Facades\Samsara;
+use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\ServerException;
 
 function fetchWithRetry(callable $callback, int $maxAttempts = 3): mixed
 {
@@ -242,9 +242,9 @@ $drivers = fetchWithRetry(fn() => Samsara::drivers()->all());
 Handle Samsara exceptions globally in `app/Exceptions/Handler.php`:
 
 ```php
-use ErikGall\Samsara\Exceptions\SamsaraException;
-use ErikGall\Samsara\Exceptions\AuthenticationException;
-use ErikGall\Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\AuthenticationException;
+use Samsara\Exceptions\RateLimitException;
 
 public function register(): void
 {
@@ -280,7 +280,7 @@ Network issues throw Laravel's `ConnectionException`:
 
 ```php
 use Illuminate\Http\Client\ConnectionException;
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 try {
     $drivers = Samsara::drivers()->all();

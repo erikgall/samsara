@@ -5,7 +5,7 @@ Manage webhooks for real-time event notifications.
 ## Basic Usage
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all webhooks
 $webhooks = Samsara::webhooks()->all();
@@ -34,7 +34,7 @@ Samsara::webhooks()->delete('webhook-id');
 Use the `WebhookEvent` enum for available event types:
 
 ```php
-use ErikGall\Samsara\Enums\WebhookEvent;
+use Samsara\Enums\WebhookEvent;
 
 $webhook = Samsara::webhooks()->create([
     'name' => 'Fleet Events',

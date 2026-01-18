@@ -5,7 +5,7 @@ Retrieve telemetry data for vehicles.
 ## Basic Usage
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get current stats
 $stats = Samsara::vehicleStats()
@@ -18,7 +18,7 @@ $stats = Samsara::vehicleStats()
 Use the `VehicleStatType` enum or strings:
 
 ```php
-use ErikGall\Samsara\Enums\VehicleStatType;
+use Samsara\Enums\VehicleStatType;
 
 // Using enum
 $stats = Samsara::vehicleStats()

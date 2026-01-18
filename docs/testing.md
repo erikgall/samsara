@@ -7,8 +7,8 @@ The Samsara SDK provides `SamsaraFake` for mocking API responses in your tests.
 Use the `Samsara::fake()` method to create a fake client:
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Testing\SamsaraFake;
+use Samsara\Facades\Samsara;
+use Samsara\Testing\SamsaraFake;
 
 public function test_it_lists_drivers(): void
 {
@@ -142,7 +142,7 @@ $requests = $fake->getRecordedRequests();
 The SDK includes JSON fixtures for common responses:
 
 ```php
-use ErikGall\Samsara\Testing\Fixtures;
+use Samsara\Testing\Fixtures;
 
 // Load driver fixtures
 $drivers = Fixtures::drivers();
@@ -173,8 +173,8 @@ $stats = Fixtures::vehicleStats();
 ### Using Fixtures with SamsaraFake
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Testing\Fixtures;
+use Samsara\Facades\Samsara;
+use Samsara\Testing\Fixtures;
 
 public function test_with_fixtures(): void
 {
@@ -192,7 +192,7 @@ public function test_with_fixtures(): void
 ### Authentication Errors
 
 ```php
-use ErikGall\Samsara\Exceptions\AuthenticationException;
+use Samsara\Exceptions\AuthenticationException;
 
 public function test_handles_auth_error(): void
 {
@@ -210,7 +210,7 @@ public function test_handles_auth_error(): void
 ### Validation Errors
 
 ```php
-use ErikGall\Samsara\Exceptions\ValidationException;
+use Samsara\Exceptions\ValidationException;
 
 public function test_handles_validation_error(): void
 {
@@ -231,7 +231,7 @@ public function test_handles_validation_error(): void
 ### Rate Limiting
 
 ```php
-use ErikGall\Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\RateLimitException;
 
 public function test_handles_rate_limit(): void
 {
@@ -254,9 +254,9 @@ public function test_handles_rate_limit(): void
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Testing\Fixtures;
-use ErikGall\Samsara\Data\Driver\Driver;
+use Samsara\Facades\Samsara;
+use Samsara\Testing\Fixtures;
+use Samsara\Data\Driver\Driver;
 
 class FleetServiceTest extends TestCase
 {
@@ -309,8 +309,8 @@ Create a trait to simplify test setup:
 
 namespace Tests\Concerns;
 
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Testing\SamsaraFake;
+use Samsara\Facades\Samsara;
+use Samsara\Testing\SamsaraFake;
 
 trait UsesSamsaraFake
 {

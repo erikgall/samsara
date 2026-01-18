@@ -5,7 +5,7 @@ Manage HOS logs, clocks, and violations.
 ## Basic Usage
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get HOS logs
 $logs = Samsara::hoursOfService()->logs()->get();
@@ -87,7 +87,7 @@ $dailyLogs = Samsara::hoursOfService()
 Use the `DutyStatus` enum:
 
 ```php
-use ErikGall\Samsara\Enums\DutyStatus;
+use Samsara\Enums\DutyStatus;
 
 DutyStatus::OFF_DUTY;           // 'offDuty'
 DutyStatus::SLEEPER_BERTH;      // 'sleeperBerth'

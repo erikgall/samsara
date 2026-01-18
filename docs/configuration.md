@@ -7,7 +7,7 @@ This guide covers all configuration options for the Samsara SDK.
 Publish the configuration file:
 
 ```bash
-php artisan vendor:publish --provider="ErikGall\Samsara\SamsaraServiceProvider"
+php artisan vendor:publish --provider="Samsara\SamsaraServiceProvider"
 ```
 
 This creates `config/samsara.php`.
@@ -160,7 +160,7 @@ return [
 You can switch regions at runtime:
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Switch to EU endpoint
 Samsara::useEuEndpoint();
@@ -174,7 +174,7 @@ Samsara::useUsEndpoint();
 You can use a different API token for specific requests:
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Use a different token
 Samsara::withToken('different-api-token');
@@ -185,7 +185,7 @@ Samsara::withToken('different-api-token');
 Create a new instance with custom configuration:
 
 ```php
-use ErikGall\Samsara\Samsara;
+use Samsara\Samsara;
 
 $samsara = Samsara::make('api-token', [
     'timeout' => 60,
@@ -222,7 +222,7 @@ SAMSARA_RETRY=3
 For testing, use `SamsaraFake` instead of real API calls:
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $fake = Samsara::fake();
 ```

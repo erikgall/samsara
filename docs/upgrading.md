@@ -26,15 +26,15 @@ All classes have been reorganized:
 
 | v1.x | v2.0 |
 |------|------|
-| `ErikGall\Samsara\Resource\*` | `ErikGall\Samsara\Resources\*` |
-| `ErikGall\Samsara\Requests\*` | Removed (methods on Resources) |
-| `ErikGall\Samsara\Entities\*` | `ErikGall\Samsara\Data\*` |
+| `Samsara\Resource\*` | `Samsara\Resources\*` |
+| `Samsara\Requests\*` | Removed (methods on Resources) |
+| `Samsara\Entities\*` | `Samsara\Data\*` |
 
 ### Client Initialization
 
 **v1.x (Saloon):**
 ```php
-use ErikGall\Samsara\Samsara;
+use Samsara\Samsara;
 
 $samsara = new Samsara($token);
 $connector = $samsara->connector();
@@ -42,7 +42,7 @@ $connector = $samsara->connector();
 
 **v2.0 (Laravel HTTP):**
 ```php
-use ErikGall\Samsara\Samsara;
+use Samsara\Samsara;
 
 $samsara = Samsara::make($token);
 // or
@@ -53,7 +53,7 @@ $samsara = new Samsara($token);
 
 **v1.x (Saloon Requests):**
 ```php
-use ErikGall\Samsara\Requests\Fleet\ListDrivers;
+use Samsara\Requests\Fleet\ListDrivers;
 
 $request = new ListDrivers();
 $response = $connector->send($request);
@@ -62,7 +62,7 @@ $drivers = $response->json()['data'];
 
 **v2.0 (Resource Methods):**
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $drivers = Samsara::drivers()->all();
 // Returns EntityCollection of Driver entities
@@ -145,10 +145,10 @@ Saloon exceptions.
 Custom exception hierarchy:
 
 ```php
-use ErikGall\Samsara\Exceptions\AuthenticationException;
-use ErikGall\Samsara\Exceptions\NotFoundException;
-use ErikGall\Samsara\Exceptions\ValidationException;
-use ErikGall\Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\AuthenticationException;
+use Samsara\Exceptions\NotFoundException;
+use Samsara\Exceptions\ValidationException;
+use Samsara\Exceptions\RateLimitException;
 
 try {
     $driver = Samsara::drivers()->find('id');
@@ -202,7 +202,7 @@ Saloon's `MockClient`.
 `SamsaraFake` class:
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $fake = Samsara::fake();
 
@@ -222,7 +222,7 @@ $drivers = $fake->drivers()->all();
 
 2. **Update configuration:**
    ```bash
-   php artisan vendor:publish --provider="ErikGall\Samsara\SamsaraServiceProvider" --force
+   php artisan vendor:publish --provider="Samsara\SamsaraServiceProvider" --force
    ```
 
 3. **Update environment variables:**

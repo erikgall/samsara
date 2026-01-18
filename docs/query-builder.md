@@ -7,7 +7,7 @@ The Samsara SDK provides a fluent query builder for filtering, pagination, and d
 Access the query builder via the `query()` method on any resource:
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 $drivers = Samsara::drivers()
     ->query()
@@ -121,7 +121,7 @@ Filter records created after a timestamp:
 For telemetry resources, specify which stat types to retrieve:
 
 ```php
-use ErikGall\Samsara\Enums\VehicleStatType;
+use Samsara\Enums\VehicleStatType;
 
 // Using strings
 ->types(['gps', 'engineStates', 'fuelPercents'])

@@ -23,7 +23,7 @@ The package will auto-register its service provider and facade.
 ### 1. Publish the Configuration
 
 ```bash
-php artisan vendor:publish --provider="ErikGall\Samsara\SamsaraServiceProvider"
+php artisan vendor:publish --provider="Samsara\SamsaraServiceProvider"
 ```
 
 This creates `config/samsara.php`.
@@ -49,7 +49,7 @@ SAMSARA_REGION=eu
 ### Using the Facade
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all drivers
 $drivers = Samsara::drivers()->all();
@@ -66,7 +66,7 @@ $stats = Samsara::vehicleStats()
 ### Using Dependency Injection
 
 ```php
-use ErikGall\Samsara\Samsara;
+use Samsara\Samsara;
 
 class FleetController extends Controller
 {
@@ -84,7 +84,7 @@ class FleetController extends Controller
 ### Creating a Fresh Instance
 
 ```php
-use ErikGall\Samsara\Samsara;
+use Samsara\Samsara;
 
 $samsara = Samsara::make('your-api-token');
 $drivers = $samsara->drivers()->all();
@@ -131,7 +131,7 @@ See the [README](../README.md) for a complete list of resources.
 Most resources support a fluent query builder:
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Filter by tags
 $drivers = Samsara::drivers()
@@ -165,11 +165,11 @@ Samsara::vehicleStats()
 The SDK throws specific exceptions for different error types:
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
-use ErikGall\Samsara\Exceptions\AuthenticationException;
-use ErikGall\Samsara\Exceptions\NotFoundException;
-use ErikGall\Samsara\Exceptions\RateLimitException;
-use ErikGall\Samsara\Exceptions\ValidationException;
+use Samsara\Facades\Samsara;
+use Samsara\Exceptions\AuthenticationException;
+use Samsara\Exceptions\NotFoundException;
+use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\ValidationException;
 
 try {
     $driver = Samsara::drivers()->find('driver-id');
@@ -191,7 +191,7 @@ try {
 Use `SamsaraFake` to mock API responses in tests:
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 public function test_it_lists_drivers(): void
 {

@@ -5,7 +5,7 @@ Manage vehicles in your Samsara fleet.
 ## Basic Usage
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all vehicles
 $vehicles = Samsara::vehicles()->all();

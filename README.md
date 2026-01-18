@@ -27,7 +27,7 @@ The package will auto-register its service provider and facade.
 ### Publish Configuration
 
 ```bash
-php artisan vendor:publish --provider="ErikGall\Samsara\SamsaraServiceProvider"
+php artisan vendor:publish --provider="Samsara\SamsaraServiceProvider"
 ```
 
 This will create a `config/samsara.php` file where you can configure your API settings.
@@ -58,7 +58,7 @@ return [
 ### Using the Facade
 
 ```php
-use ErikGall\Samsara\Facades\Samsara;
+use Samsara\Facades\Samsara;
 
 // Get all drivers
 $drivers = Samsara::drivers()->all();
@@ -77,7 +77,7 @@ $stats = Samsara::vehicleStats()
 ### Using Dependency Injection
 
 ```php
-use ErikGall\Samsara\Samsara;
+use Samsara\Samsara;
 
 class FleetController extends Controller
 {
@@ -93,7 +93,7 @@ class FleetController extends Controller
 ### Using the Client Directly
 
 ```php
-use ErikGall\Samsara\Samsara;
+use Samsara\Samsara;
 
 $samsara = new Samsara('your-api-token');
 
@@ -385,12 +385,12 @@ $activeDrivers = $drivers->filter(fn ($d) => $d->isActive());
 The SDK throws specific exceptions for different error types:
 
 ```php
-use ErikGall\Samsara\Exceptions\AuthenticationException;
-use ErikGall\Samsara\Exceptions\AuthorizationException;
-use ErikGall\Samsara\Exceptions\NotFoundException;
-use ErikGall\Samsara\Exceptions\ValidationException;
-use ErikGall\Samsara\Exceptions\RateLimitException;
-use ErikGall\Samsara\Exceptions\ServerException;
+use Samsara\Exceptions\AuthenticationException;
+use Samsara\Exceptions\AuthorizationException;
+use Samsara\Exceptions\NotFoundException;
+use Samsara\Exceptions\ValidationException;
+use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\ServerException;
 
 try {
     $driver = Samsara::drivers()->find('invalid-id');
@@ -410,7 +410,7 @@ try {
 The SDK includes a `SamsaraFake` class for testing:
 
 ```php
-use ErikGall\Samsara\Testing\SamsaraFake;
+use Samsara\Testing\SamsaraFake;
 
 public function test_it_fetches_drivers(): void
 {
@@ -431,7 +431,7 @@ public function test_it_fetches_drivers(): void
 ### Using Test Fixtures
 
 ```php
-use ErikGall\Samsara\Testing\Fixtures;
+use Samsara\Testing\Fixtures;
 
 $driversData = Fixtures::drivers();
 $vehiclesData = Fixtures::vehicles();
