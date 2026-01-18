@@ -6,6 +6,10 @@ use ErikGall\Samsara\Samsara;
 use ErikGall\Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\PendingRequest;
+use ErikGall\Samsara\Resources\Fleet\DriversResource;
+use ErikGall\Samsara\Resources\Fleet\TrailersResource;
+use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
+use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
 
 /**
  * Unit tests for the Samsara main client class.
@@ -25,6 +29,17 @@ class SamsaraTest extends TestCase
         $samsara = new Samsara('test-token', $config);
 
         $this->assertInstanceOf(Samsara::class, $samsara);
+    }
+
+    #[Test]
+    public function it_caches_resource_instances(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $drivers1 = $samsara->drivers();
+        $drivers2 = $samsara->drivers();
+
+        $this->assertSame($drivers1, $drivers2);
     }
 
     #[Test]
@@ -97,6 +112,26 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_drivers_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $drivers = $samsara->drivers();
+
+        $this->assertInstanceOf(DriversResource::class, $drivers);
+    }
+
+    #[Test]
+    public function it_returns_equipment_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $equipment = $samsara->equipment();
+
+        $this->assertInstanceOf(EquipmentResource::class, $equipment);
+    }
+
+    #[Test]
     public function it_returns_false_when_token_is_not_set(): void
     {
         $samsara = new Samsara;
@@ -115,11 +150,31 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_trailers_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $trailers = $samsara->trailers();
+
+        $this->assertInstanceOf(TrailersResource::class, $trailers);
+    }
+
+    #[Test]
     public function it_returns_true_when_token_is_set(): void
     {
         $samsara = new Samsara('test-token');
 
         $this->assertTrue($samsara->hasToken());
+    }
+
+    #[Test]
+    public function it_returns_vehicles_resource(): void
+    {
+        $samsara = new Samsara('test-token');
+
+        $vehicles = $samsara->vehicles();
+
+        $this->assertInstanceOf(VehiclesResource::class, $vehicles);
     }
 
     #[Test]

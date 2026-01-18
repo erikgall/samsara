@@ -4,6 +4,10 @@ namespace ErikGall\Samsara;
 
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use ErikGall\Samsara\Resources\Fleet\DriversResource;
+use ErikGall\Samsara\Resources\Fleet\TrailersResource;
+use ErikGall\Samsara\Resources\Fleet\VehiclesResource;
+use ErikGall\Samsara\Resources\Fleet\EquipmentResource;
 
 /**
  * Samsara API client.
@@ -81,6 +85,24 @@ class Samsara
     }
 
     /**
+     * Get the DriversResource.
+     */
+    public function drivers(): DriversResource
+    {
+        /** @var DriversResource */
+        return $this->resource(DriversResource::class);
+    }
+
+    /**
+     * Get the EquipmentResource.
+     */
+    public function equipment(): EquipmentResource
+    {
+        /** @var EquipmentResource */
+        return $this->resource(EquipmentResource::class);
+    }
+
+    /**
      * Get the current base URL.
      */
     public function getBaseUrl(): string
@@ -131,6 +153,15 @@ class Samsara
     }
 
     /**
+     * Get the TrailersResource.
+     */
+    public function trailers(): TrailersResource
+    {
+        /** @var TrailersResource */
+        return $this->resource(TrailersResource::class);
+    }
+
+    /**
      * Switch to the EU API endpoint.
      */
     public function useEuEndpoint(): static
@@ -148,6 +179,15 @@ class Samsara
         $this->baseUrl = self::US_BASE_URL;
 
         return $this;
+    }
+
+    /**
+     * Get the VehiclesResource.
+     */
+    public function vehicles(): VehiclesResource
+    {
+        /** @var VehiclesResource */
+        return $this->resource(VehiclesResource::class);
     }
 
     /**

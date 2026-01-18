@@ -105,7 +105,15 @@ abstract class Resource implements ResourceInterface
      */
     public function find(string $id): ?object
     {
-        $response = $this->client()->get("{$this->endpoint}/{$id}");
+        try {
+            $response = $this->client()->get("{$this->endpoint}/{$id}");
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            if ($e->response->status() === 404) {
+                return null;
+            }
+
+            throw $e;
+        }
 
         if ($response->status() === 404) {
             return null;

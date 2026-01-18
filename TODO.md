@@ -296,49 +296,55 @@
 ### 7.1 Fleet Resources (`src/Resources/Fleet/`)
 
 #### DriversResource
-- [ ] Create `DriversResource.php`
-  - [ ] Endpoint: `/fleet/drivers`
-  - [ ] Entity: `Driver::class`
-  - [ ] Methods:
-    - [ ] `active(): Builder` - Filter active drivers
-    - [ ] `deactivated(): Builder` - Filter deactivated drivers
-    - [ ] `findByExternalId(string $key, string $value): ?Driver`
-    - [ ] `deactivate(string $id): Driver`
-    - [ ] `activate(string $id): Driver`
-    - [ ] `remoteSignOut(string $id): void`
-    - [ ] `createAuthToken(string $id): string`
-    - [ ] `getQrCodes(): EntityCollection`
-    - [ ] `createQrCode(array $data): object`
-    - [ ] `deleteQrCode(string $id): bool`
-- [ ] Add `drivers()` accessor to `Samsara.php`
+- [x] Create `DriversResource.php`
+  - [x] Endpoint: `/fleet/drivers`
+  - [x] Entity: `Driver::class`
+  - [x] Methods:
+    - [x] `active(): Builder` - Filter active drivers
+    - [x] `deactivated(): Builder` - Filter deactivated drivers
+    - [x] `findByExternalId(string $key, string $value): ?Driver`
+    - [x] `deactivate(string $id): Driver`
+    - [x] `activate(string $id): Driver`
+    - [x] `remoteSignOut(string $id): void`
+    - [x] `createAuthToken(string $id): string`
+    - [x] `getQrCodes(): Collection`
+    - [x] `createQrCode(array $data): object`
+    - [x] `deleteQrCode(string $id): bool`
+- [x] Add `drivers()` accessor to `Samsara.php`
 
 #### VehiclesResource
-- [ ] Create `VehiclesResource.php`
-  - [ ] Endpoint: `/fleet/vehicles`
-  - [ ] Entity: `Vehicle::class`
-  - [ ] Standard CRUD methods
-- [ ] Add `vehicles()` accessor to `Samsara.php`
+- [x] Create `VehiclesResource.php`
+  - [x] Endpoint: `/fleet/vehicles`
+  - [x] Entity: `Vehicle::class`
+  - [x] Standard CRUD methods
+  - [x] `findByExternalId(string $key, string $value): ?Vehicle`
+  - [x] `query(): Builder`
+- [x] Add `vehicles()` accessor to `Samsara.php`
 
 #### TrailersResource
-- [ ] Create `TrailersResource.php`
-  - [ ] Endpoint: `/fleet/trailers`
-  - [ ] Entity: `Trailer::class`
-  - [ ] Methods: CRUD + trailer-specific
-- [ ] Add `trailers()` accessor to `Samsara.php`
+- [x] Create `TrailersResource.php`
+  - [x] Endpoint: `/fleet/trailers`
+  - [x] Entity: `Trailer::class`
+  - [x] Standard CRUD methods
+  - [x] `findByExternalId(string $key, string $value): ?Trailer`
+  - [x] `query(): Builder`
+- [x] Add `trailers()` accessor to `Samsara.php`
 
 #### EquipmentResource
-- [ ] Create `EquipmentResource.php`
-  - [ ] Endpoint: `/fleet/equipment`
-  - [ ] Entity: `Equipment::class`
-  - [ ] Methods:
-    - [ ] Standard CRUD
-    - [ ] `locations(): Builder` - Equipment locations
-    - [ ] `locationsHistory(): Builder`
-    - [ ] `locationsFeed(): Builder`
-    - [ ] `stats(): Builder` - Equipment stats
-    - [ ] `statsHistory(): Builder`
-    - [ ] `statsFeed(): Builder`
-- [ ] Add `equipment()` accessor to `Samsara.php`
+- [x] Create `EquipmentResource.php`
+  - [x] Endpoint: `/fleet/equipment`
+  - [x] Entity: `Equipment::class`
+  - [x] Methods:
+    - [x] Standard CRUD
+    - [x] `findByExternalId(string $key, string $value): ?Equipment`
+    - [x] `query(): Builder`
+    - [x] `locations(): Builder` - Equipment locations
+    - [x] `locationsHistory(): Builder`
+    - [x] `locationsFeed(): Builder`
+    - [x] `stats(): Builder` - Equipment stats
+    - [x] `statsHistory(): Builder`
+    - [x] `statsFeed(): Builder`
+- [x] Add `equipment()` accessor to `Samsara.php`
 
 ### 7.2 Telematics Resources (`src/Resources/Telematics/`)
 
