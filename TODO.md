@@ -183,14 +183,14 @@
   - [x] Properties: circle, polygon, settings
 
 ### 6.2 Driver Entities (`src/Data/Driver/`)
-- [ ] `Driver.php`
-  - [ ] Properties: id, name, username, phone, licenseNumber, licenseState, timezone, etc.
-  - [ ] Casts: createdAtTime, updatedAtTime, driverActivationStatus
-  - [ ] Nested: eldSettings, carrierSettings, staticAssignedVehicle
-  - [ ] Methods: `isActive()`, `isDeactivated()`, `getDisplayName()`
-- [ ] `EldSettings.php`
-- [ ] `CarrierSettings.php`
-- [ ] `AssignedVehicle.php`
+- [x] `Driver.php`
+  - [x] Properties: id, name, username, phone, licenseNumber, licenseState, timezone, etc.
+  - [x] Casts: createdAtTime, updatedAtTime, driverActivationStatus
+  - [x] Nested: eldSettings, carrierSettings, staticAssignedVehicle
+  - [x] Methods: `isActive()`, `isDeactivated()`, `getDisplayName()`
+- [x] `EldSettings.php`
+- [x] `CarrierSettings.php`
+- [x] `StaticAssignedVehicle.php`
 
 ### 6.3 Vehicle Entities (`src/Data/Vehicle/`)
 - [ ] `Vehicle.php`
