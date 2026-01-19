@@ -5,31 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2025-01-17
-
-### Breaking Changes
-
-This is a complete rewrite of the SDK, replacing the Saloon-based implementation with Laravel's HTTP client.
-
-**Removed Dependencies:**
-- `saloonphp/saloon` and all related packages have been removed
-- `saloonphp/laravel-plugin` has been removed
-
-**New Dependencies:**
-- `illuminate/http` - Laravel HTTP Client
-- `illuminate/collections` - Laravel Collections
-- `illuminate/support` - Laravel Support
-
-**API Changes:**
-- All Request classes have been removed (e.g., `src/Requests/*`)
-- All old Resource classes have been replaced (e.g., `src/Resource/*`)
-- All old Entity classes have been replaced (e.g., `src/Entities/*`)
-- The main `Samsara` class has been completely rewritten
+## [1.0.0] - 2025-01-17
 
 ### Added
 
 **Core Infrastructure:**
-- New `Samsara` client class with fluent API
+- `Samsara` client class with fluent API
 - `SamsaraServiceProvider` with Laravel integration
 - `Samsara` Facade for easy access
 - EU region support with `useEuEndpoint()`
@@ -80,21 +61,7 @@ This is a complete rewrite of the SDK, replacing the Saloon-based implementation
 - `Fixtures` class with 13 JSON fixture files
 - Comprehensive test coverage (1185 tests)
 
-### Changed
+### Requirements
 
-- PHP minimum version is now 8.1 (for enum support)
-- Laravel minimum version is now 10.x
-- All entities now extend `Illuminate\Support\Fluent`
-- All methods return `static` instead of `self` for proper inheritance
-
-### Removed
-
-- All Saloon-based Request classes
-- All Saloon-based Resource classes
-- All old Entity classes
-- `Samsara.php.bak` backup file
-- Empty `src/Http/` directory
-
-## [1.x] - Previous Versions
-
-See the [previous releases](https://github.com/erikgall/samsara/releases) for the Saloon-based implementation.
+- PHP 8.1 or higher (for enum support)
+- Laravel 10.x, 11.x, or 12.x
