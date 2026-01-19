@@ -1,3 +1,12 @@
+---
+title: Fuel and Energy
+layout: default
+parent: Resources
+nav_order: 30
+description: "Access fuel and energy efficiency data"
+permalink: /resources/fuel-and-energy
+---
+
 # Fuel and Energy Resource
 
 Access fuel and energy efficiency data and reports.

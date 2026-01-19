@@ -1,3 +1,12 @@
+---
+title: Contacts
+layout: default
+parent: Resources
+nav_order: 15
+description: "Manage contacts for addresses and dispatch operations"
+permalink: /resources/contacts
+---
+
 # Contacts Resource
 
 Manage contacts for addresses and dispatch operations.

@@ -1,3 +1,12 @@
+---
+title: Addresses
+layout: default
+parent: Resources
+nav_order: 12
+description: "Manage addresses and geofences for location-based operations"
+permalink: /resources/addresses
+---
+
 # Addresses Resource
 
 Manage addresses and geofences for location-based operations.

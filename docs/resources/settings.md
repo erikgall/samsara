@@ -1,3 +1,12 @@
+---
+title: Settings
+layout: default
+parent: Resources
+nav_order: 33
+description: "Access and manage organization settings"
+permalink: /resources/settings
+---
+
 # Settings Resource
 
 Access and manage organization settings.

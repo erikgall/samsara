@@ -1,3 +1,12 @@
+---
+title: Live Shares
+layout: default
+parent: Resources
+nav_order: 18
+description: "Manage live sharing links for external visibility into fleet data"
+permalink: /resources/live-shares
+---
+
 # Live Sharing Links Resource
 
 Manage live sharing links for external visibility into fleet data.

@@ -1,3 +1,12 @@
+---
+title: Industrial
+layout: default
+parent: Resources
+nav_order: 20
+description: "Manage industrial assets and data inputs"
+permalink: /resources/industrial
+---
+
 # Industrial Resource
 
 Manage industrial assets and data inputs for monitoring equipment and machinery.

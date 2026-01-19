@@ -1,3 +1,12 @@
+---
+title: Route Events
+layout: default
+parent: Resources
+nav_order: 35
+description: "Access route events for tracking dispatch operations"
+permalink: /resources/route-events
+---
+
 # Route Events Resource
 
 Access route events for tracking dispatch and delivery operations.

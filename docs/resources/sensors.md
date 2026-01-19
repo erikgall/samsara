@@ -1,3 +1,12 @@
+---
+title: Sensors
+layout: default
+parent: Resources
+nav_order: 21
+description: "Access legacy v1 sensor endpoints"
+permalink: /resources/sensors
+---
+
 # Sensors Resource (Legacy)
 
 Access legacy v1 sensor endpoints for temperature, humidity, door status, and cargo monitoring.

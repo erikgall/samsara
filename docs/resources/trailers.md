@@ -1,3 +1,12 @@
+---
+title: Trailers
+layout: default
+parent: Resources
+nav_order: 3
+description: "Manage trailers in your Samsara fleet"
+permalink: /resources/trailers
+---
+
 # Trailers Resource
 
 Manage trailers in your Samsara fleet.

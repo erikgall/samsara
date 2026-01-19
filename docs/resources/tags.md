@@ -1,3 +1,12 @@
+---
+title: Tags
+layout: default
+parent: Resources
+nav_order: 14
+description: "Manage tags for organizing and grouping resources"
+permalink: /resources/tags
+---
+
 # Tags Resource
 
 Manage tags for organizing and grouping resources like vehicles, drivers, and equipment.

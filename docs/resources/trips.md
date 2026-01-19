@@ -1,3 +1,12 @@
+---
+title: Trips
+layout: default
+parent: Resources
+nav_order: 7
+description: "Access trip data for vehicles and drivers"
+permalink: /resources/trips
+---
+
 # Trips Resource
 
 Access trip data for vehicles and drivers.

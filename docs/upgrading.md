@@ -1,3 +1,11 @@
+---
+title: Upgrading
+layout: default
+nav_order: 7
+description: "Migration guide from v1.x to v2.0"
+permalink: /upgrading
+---
+
 # Upgrading from v1.x to v2.0
 
 Version 2.0 is a complete rewrite of the SDK, replacing the Saloon-based implementation with Laravel's HTTP client.

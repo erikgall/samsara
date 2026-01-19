@@ -1,3 +1,12 @@
+---
+title: Routes
+layout: default
+parent: Resources
+nav_order: 11
+description: "Manage dispatch routes for drivers and vehicles"
+permalink: /resources/routes
+---
+
 # Routes Resource
 
 Manage dispatch routes for drivers and vehicles.

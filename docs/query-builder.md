@@ -1,3 +1,11 @@
+---
+title: Query Builder
+layout: default
+nav_order: 4
+description: "Fluent query builder for filtering, pagination, and data retrieval"
+permalink: /query-builder
+---
+
 # Query Builder
 
 The Samsara SDK provides a fluent query builder for filtering, pagination, and data retrieval.

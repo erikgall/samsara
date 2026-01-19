@@ -1,3 +1,11 @@
+---
+title: Testing
+layout: default
+nav_order: 6
+description: "Testing with SamsaraFake and fixtures"
+permalink: /testing
+---
+
 # Testing
 
 The Samsara SDK provides `SamsaraFake` for mocking API responses in your tests.

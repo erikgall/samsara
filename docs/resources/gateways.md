@@ -1,3 +1,12 @@
+---
+title: Gateways
+layout: default
+parent: Resources
+nav_order: 17
+description: "Manage gateway devices attached to vehicles"
+permalink: /resources/gateways
+---
+
 # Gateways Resource
 
 Manage gateway devices attached to vehicles.

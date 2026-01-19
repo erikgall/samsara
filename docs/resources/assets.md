@@ -1,3 +1,12 @@
+---
+title: Assets
+layout: default
+parent: Resources
+nav_order: 19
+description: "Manage fleet assets with tracking capabilities"
+permalink: /resources/assets
+---
+
 # Assets Resource
 
 Manage fleet assets including vehicles, trailers, and equipment with tracking capabilities.

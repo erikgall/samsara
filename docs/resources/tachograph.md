@@ -1,3 +1,12 @@
+---
+title: Tachograph
+layout: default
+parent: Resources
+nav_order: 29
+description: "Access tachograph data for EU compliance"
+permalink: /resources/tachograph
+---
+
 # Tachograph Resource (EU Only)
 
 Access tachograph data for EU compliance requirements.

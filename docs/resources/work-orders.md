@@ -1,3 +1,12 @@
+---
+title: Work Orders
+layout: default
+parent: Resources
+nav_order: 26
+description: "Manage maintenance work orders and service tasks"
+permalink: /resources/work-orders
+---
+
 # Work Orders Resource
 
 Manage maintenance work orders and service tasks.

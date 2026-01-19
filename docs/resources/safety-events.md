@@ -1,3 +1,12 @@
+---
+title: Safety Events
+layout: default
+parent: Resources
+nav_order: 10
+description: "Access safety events and safety-related incidents"
+permalink: /resources/safety-events
+---
+
 # Safety Events Resource
 
 Access safety events such as harsh braking, speeding, and other safety-related incidents.

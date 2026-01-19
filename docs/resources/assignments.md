@@ -1,3 +1,12 @@
+---
+title: Assignments
+layout: default
+parent: Resources
+nav_order: 34
+description: "Manage driver, vehicle, and trailer assignments"
+permalink: /resources/assignments
+---
+
 # Assignments Resources
 
 Manage various assignment types for drivers, vehicles, and trailers.

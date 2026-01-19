@@ -1,3 +1,12 @@
+---
+title: Resources
+layout: default
+nav_order: 8
+has_children: true
+description: "Detailed documentation for each Samsara API resource"
+permalink: /resources/
+---
+
 # Resources
 
 This section provides detailed documentation for each Samsara API resource.

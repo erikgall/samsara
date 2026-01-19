@@ -1,3 +1,11 @@
+---
+title: Configuration
+layout: default
+nav_order: 3
+description: "Configuration options for the Samsara SDK"
+permalink: /configuration
+---
+
 # Configuration
 
 This guide covers all configuration options for the Samsara SDK.

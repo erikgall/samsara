@@ -1,3 +1,12 @@
+---
+title: Webhooks
+layout: default
+parent: Resources
+nav_order: 16
+description: "Manage webhooks for real-time event notifications"
+permalink: /resources/webhooks
+---
+
 # Webhooks Resource
 
 Manage webhooks for real-time event notifications.

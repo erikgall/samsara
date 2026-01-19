@@ -1,3 +1,12 @@
+---
+title: Users
+layout: default
+parent: Resources
+nav_order: 13
+description: "Manage users and their access to your Samsara organization"
+permalink: /resources/users
+---
+
 # Users Resource
 
 Manage users and their access to your Samsara organization.

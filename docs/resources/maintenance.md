@@ -1,3 +1,12 @@
+---
+title: Maintenance
+layout: default
+parent: Resources
+nav_order: 9
+description: "Access DVIRs and defects for fleet maintenance tracking"
+permalink: /resources/maintenance
+---
+
 # Maintenance Resource
 
 Access DVIRs (Driver Vehicle Inspection Reports) and defects for fleet maintenance tracking.

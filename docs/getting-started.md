@@ -1,3 +1,11 @@
+---
+title: Getting Started
+layout: default
+nav_order: 2
+description: "Installation and quick start guide for the Samsara SDK"
+permalink: /getting-started
+---
+
 # Getting Started
 
 This guide will help you get started with the Samsara SDK for Laravel.

@@ -1,3 +1,12 @@
+---
+title: Vehicle Stats
+layout: default
+parent: Resources
+nav_order: 5
+description: "Retrieve telemetry data for vehicles"
+permalink: /resources/vehicle-stats
+---
+
 # Vehicle Stats Resource
 
 Retrieve telemetry data for vehicles.

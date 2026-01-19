@@ -1,3 +1,12 @@
+---
+title: Hubs
+layout: default
+parent: Resources
+nav_order: 32
+description: "Manage hubs for organizing fleet operations"
+permalink: /resources/hubs
+---
+
 # Hubs Resource
 
 Manage hubs for organizing fleet operations.

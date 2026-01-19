@@ -1,3 +1,11 @@
+---
+title: Error Handling
+layout: default
+nav_order: 5
+description: "Exception handling and retry logic for the Samsara SDK"
+permalink: /error-handling
+---
+
 # Error Handling
 
 The Samsara SDK provides a comprehensive exception hierarchy for handling API errors.

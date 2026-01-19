@@ -1,3 +1,12 @@
+---
+title: Forms
+layout: default
+parent: Resources
+nav_order: 23
+description: "Manage form submissions and access form templates"
+permalink: /resources/forms
+---
+
 # Forms Resource
 
 Manage form submissions and access form templates.

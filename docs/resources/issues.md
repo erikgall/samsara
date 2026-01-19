@@ -1,3 +1,12 @@
+---
+title: Issues
+layout: default
+parent: Resources
+nav_order: 31
+description: "Access vehicle and equipment issue tracking data"
+permalink: /resources/issues
+---
+
 # Issues Resource
 
 Access vehicle and equipment issue tracking data.

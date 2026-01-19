@@ -1,3 +1,12 @@
+---
+title: Idling
+layout: default
+parent: Resources
+nav_order: 25
+description: "Access vehicle idling events"
+permalink: /resources/idling
+---
+
 # Idling Resource
 
 Access vehicle idling events for monitoring fuel efficiency and compliance.

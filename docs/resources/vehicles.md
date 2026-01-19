@@ -1,3 +1,12 @@
+---
+title: Vehicles
+layout: default
+parent: Resources
+nav_order: 2
+description: "Manage vehicles in your Samsara fleet"
+permalink: /resources/vehicles
+---
+
 # Vehicles Resource
 
 Manage vehicles in your Samsara fleet.

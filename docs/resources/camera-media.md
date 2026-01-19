@@ -1,3 +1,12 @@
+---
+title: Camera Media
+layout: default
+parent: Resources
+nav_order: 27
+description: "Retrieve camera media from dash cameras"
+permalink: /resources/camera-media
+---
+
 # Camera Media Resource
 
 Retrieve camera media from dash cameras and other vehicle-mounted cameras.

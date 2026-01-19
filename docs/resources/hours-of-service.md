@@ -1,3 +1,12 @@
+---
+title: Hours of Service
+layout: default
+parent: Resources
+nav_order: 8
+description: "Manage HOS logs, clocks, and violations"
+permalink: /resources/hours-of-service
+---
+
 # Hours of Service Resource
 
 Manage HOS logs, clocks, and violations.

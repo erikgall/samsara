@@ -1,3 +1,12 @@
+---
+title: Drivers
+layout: default
+parent: Resources
+nav_order: 1
+description: "Manage drivers in your Samsara fleet"
+permalink: /resources/drivers
+---
+
 # Drivers Resource
 
 Manage drivers in your Samsara fleet.

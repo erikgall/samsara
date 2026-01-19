@@ -1,3 +1,12 @@
+---
+title: Alerts
+layout: default
+parent: Resources
+nav_order: 22
+description: "Manage alert configurations and access alert incidents"
+permalink: /resources/alerts
+---
+
 # Alerts Resource
 
 Manage alert configurations and access alert incidents.

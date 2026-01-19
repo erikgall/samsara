@@ -1,3 +1,12 @@
+---
+title: Equipment
+layout: default
+parent: Resources
+nav_order: 4
+description: "Manage and track equipment assets in your Samsara fleet"
+permalink: /resources/equipment
+---
+
 # Equipment Resource
 
 Manage and track equipment assets in your Samsara fleet.

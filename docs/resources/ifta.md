@@ -1,3 +1,12 @@
+---
+title: IFTA
+layout: default
+parent: Resources
+nav_order: 24
+description: "Access IFTA reports for tax compliance"
+permalink: /resources/ifta
+---
+
 # IFTA Resource
 
 Access IFTA (International Fuel Tax Agreement) reports for tax compliance.

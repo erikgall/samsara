@@ -1,3 +1,12 @@
+---
+title: Speeding
+layout: default
+parent: Resources
+nav_order: 28
+description: "Access speeding interval data"
+permalink: /resources/speeding
+---
+
 # Speeding Resource
 
 Access speeding interval data for compliance and safety monitoring.

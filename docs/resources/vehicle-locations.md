@@ -1,3 +1,12 @@
+---
+title: Vehicle Locations
+layout: default
+parent: Resources
+nav_order: 6
+description: "Access real-time and historical vehicle location data"
+permalink: /resources/vehicle-locations
+---
+
 # Vehicle Locations Resource
 
 Access real-time and historical vehicle location data.
