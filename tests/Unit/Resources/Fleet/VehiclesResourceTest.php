@@ -10,6 +10,7 @@ use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Fleet\VehiclesResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the VehiclesResource.
@@ -37,43 +38,6 @@ class VehiclesResourceTest extends TestCase
         $resource = new VehiclesResource($this->samsara);
 
         $this->assertInstanceOf(VehiclesResource::class, $resource);
-    }
-
-    #[Test]
-    public function it_can_create_vehicle(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    'id'   => '123',
-                    'name' => 'New Vehicle',
-                    'vin'  => 'VIN789',
-                ],
-            ]),
-        ]);
-
-        $resource = new VehiclesResource($this->samsara);
-        $vehicle = $resource->create([
-            'name' => 'New Vehicle',
-            'vin'  => 'VIN789',
-        ]);
-
-        $this->assertInstanceOf(Vehicle::class, $vehicle);
-        $this->assertSame('123', $vehicle->id);
-        $this->assertSame('New Vehicle', $vehicle->name);
-    }
-
-    #[Test]
-    public function it_can_delete_vehicle(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([]),
-        ]);
-
-        $resource = new VehiclesResource($this->samsara);
-        $result = $resource->delete('123');
-
-        $this->assertTrue($result);
     }
 
     #[Test]
@@ -206,5 +170,28 @@ class VehiclesResourceTest extends TestCase
         $vehicle = $resource->find('999');
 
         $this->assertNull($vehicle);
+    }
+
+    #[Test]
+    public function it_throws_exception_when_creating_vehicle(): void
+    {
+        $this->expectException(UnsupportedOperationException::class);
+        $this->expectExceptionMessage('Vehicles cannot be created via /fleet/vehicles');
+
+        $resource = new VehiclesResource($this->samsara);
+        $resource->create([
+            'name' => 'New Vehicle',
+            'vin'  => 'VIN789',
+        ]);
+    }
+
+    #[Test]
+    public function it_throws_exception_when_deleting_vehicle(): void
+    {
+        $this->expectException(UnsupportedOperationException::class);
+        $this->expectExceptionMessage('Vehicles cannot be deleted via the Samsara API');
+
+        $resource = new VehiclesResource($this->samsara);
+        $resource->delete('123');
     }
 }

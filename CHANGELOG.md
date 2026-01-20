@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `UnsupportedOperationException` for operations not supported by the Samsara API
+- **InteractsWithTime**: Added `toUnixMilliseconds()` method for legacy v1 API requests that require Unix timestamps in milliseconds
+- **InteractsWithTime**: Added `fromUnixMilliseconds()` method for parsing timestamps from legacy v1 API responses
+- **InteractsWithTime**: Added `toUtcString()` method for explicit UTC conversion with Z suffix
+
+### Changed
+
+- **VehiclesResource**: `create()` now throws `UnsupportedOperationException` with guidance to use Assets API (`POST /assets` with `type: "vehicle"`) since vehicles cannot be created via `/fleet/vehicles`
+- **VehiclesResource**: `delete()` now throws `UnsupportedOperationException` explaining vehicles cannot be deleted (use `update()` to mark as retired instead)
+- **WebhookEvent**: Replaced `AlertIncidentCreated` and `AlertIncidentResolved` with single `AlertIncident` case to match Samsara API documentation
+- **WebhookEvent**: Reorganized enum with GA (Generally Available) and Beta event categorization with documentation link
+- **InteractsWithTime**: `formatTime()` now converts timestamps to UTC with Z suffix (e.g., `2024-01-15T14:30:00Z`) to match Samsara API documentation format
+
+### Fixed
+
+- **DriversResourceTest**: Added required `password` field to driver creation test payload per API requirements
+- **RoutesResourceTest**: Added required `stops` array with minimum 2 stops including `scheduledDepartureTime` and `scheduledArrivalTime` per API requirements
+- **AddressesResourceTest**: Added `geofence` field with circle configuration per API requirements
+- **Timestamp handling**: Timestamps from non-UTC timezones are now properly converted to UTC before formatting for API requests
+
 ## [1.0.0] - 2025-01-17
 
 ### Added

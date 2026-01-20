@@ -47,15 +47,23 @@ class RoutesResourceTest extends TestCase
                 'data' => [
                     'id'   => 'route-1',
                     'name' => 'Morning Route',
-                    'type' => 'dynamic',
                 ],
             ]),
         ]);
 
         $resource = new RoutesResource($this->samsara);
         $route = $resource->create([
-            'name' => 'Morning Route',
-            'type' => 'dynamic',
+            'name'  => 'Morning Route',
+            'stops' => [
+                [
+                    'addressId'              => 'addr-1',
+                    'scheduledDepartureTime' => '2025-01-20T08:00:00Z',
+                ],
+                [
+                    'addressId'            => 'addr-2',
+                    'scheduledArrivalTime' => '2025-01-20T10:00:00Z',
+                ],
+            ],
         ]);
 
         $this->assertInstanceOf(Route::class, $route);

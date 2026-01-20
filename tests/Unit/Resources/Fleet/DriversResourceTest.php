@@ -91,6 +91,7 @@ class DriversResourceTest extends TestCase
         $driver = $resource->create([
             'name'     => 'New Driver',
             'username' => 'newdriver',
+            'password' => 'SecureP@ssw0rd!',
         ]);
 
         $this->assertInstanceOf(Driver::class, $driver);

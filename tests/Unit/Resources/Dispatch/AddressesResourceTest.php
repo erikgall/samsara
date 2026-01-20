@@ -47,7 +47,9 @@ class AddressesResourceTest extends TestCase
                 'data' => [
                     'id'               => 'addr-1',
                     'name'             => 'Warehouse',
-                    'formattedAddress' => '123 Main St',
+                    'formattedAddress' => '123 Main St, San Francisco, CA 94103',
+                    'latitude'         => 37.7749,
+                    'longitude'        => -122.4194,
                 ],
             ]),
         ]);
@@ -55,7 +57,12 @@ class AddressesResourceTest extends TestCase
         $resource = new AddressesResource($this->samsara);
         $address = $resource->create([
             'name'             => 'Warehouse',
-            'formattedAddress' => '123 Main St',
+            'formattedAddress' => '123 Main St, San Francisco, CA 94103',
+            'geofence'         => [
+                'circle' => [
+                    'radiusMeters' => 100,
+                ],
+            ],
         ]);
 
         $this->assertInstanceOf(Address::class, $address);

@@ -42,6 +42,12 @@ class WebhookEventTest extends TestCase
     }
 
     #[Test]
+    public function it_has_alert_incident_case(): void
+    {
+        $this->assertSame('AlertIncident', WebhookEvent::ALERT_INCIDENT->value);
+    }
+
+    #[Test]
     public function it_has_all_expected_cases(): void
     {
         $cases = WebhookEvent::cases();
@@ -56,9 +62,21 @@ class WebhookEventTest extends TestCase
     }
 
     #[Test]
+    public function it_has_dvir_submitted_case(): void
+    {
+        $this->assertSame('DvirSubmitted', WebhookEvent::DVIR_SUBMITTED->value);
+    }
+
+    #[Test]
     public function it_has_geofence_entry_case(): void
     {
         $this->assertSame('GeofenceEntry', WebhookEvent::GEOFENCE_ENTRY->value);
+    }
+
+    #[Test]
+    public function it_has_severe_speeding_ended_case(): void
+    {
+        $this->assertSame('SevereSpeedingEnded', WebhookEvent::SEVERE_SPEEDING_ENDED->value);
     }
 
     #[Test]

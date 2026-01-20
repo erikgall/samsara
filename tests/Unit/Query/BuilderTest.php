@@ -381,7 +381,8 @@ class BuilderTest extends TestCase
         $builder->startTime($date);
 
         $query = $builder->buildQuery();
-        $this->assertSame('2024-06-15T10:30:00+00:00', $query['startTime']);
+        // Timestamps are formatted in UTC with Z suffix per Samsara API requirements
+        $this->assertSame('2024-06-15T10:30:00Z', $query['startTime']);
     }
 
     #[Test]
