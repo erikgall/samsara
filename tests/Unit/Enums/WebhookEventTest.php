@@ -42,9 +42,9 @@ class WebhookEventTest extends TestCase
     }
 
     #[Test]
-    public function it_has_alert_incident_case(): void
+    public function it_has_address_created_case(): void
     {
-        $this->assertSame('AlertIncident', WebhookEvent::ALERT_INCIDENT->value);
+        $this->assertSame('AddressCreated', WebhookEvent::ADDRESS_CREATED->value);
     }
 
     #[Test]
@@ -52,7 +52,8 @@ class WebhookEventTest extends TestCase
     {
         $cases = WebhookEvent::cases();
 
-        $this->assertGreaterThan(50, count($cases));
+        // 27 valid event types
+        $this->assertCount(27, $cases);
     }
 
     #[Test]

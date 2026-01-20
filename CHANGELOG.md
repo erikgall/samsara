@@ -18,8 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **VehiclesResource**: `create()` now throws `UnsupportedOperationException` with guidance to use Assets API (`POST /assets` with `type: "vehicle"`) since vehicles cannot be created via `/fleet/vehicles`
 - **VehiclesResource**: `delete()` now throws `UnsupportedOperationException` explaining vehicles cannot be deleted (use `update()` to mark as retired instead)
-- **WebhookEvent**: Replaced `AlertIncidentCreated` and `AlertIncidentResolved` with single `AlertIncident` case to match Samsara API documentation
-- **WebhookEvent**: Reorganized enum with GA (Generally Available) and Beta event categorization with documentation link
+- **WebhookEvent**: Reduced to 27 valid event types per Samsara API documentation (removed unsupported events like `AlertIncident`, `HosLogsUpdated`, `RouteCreated`, etc.)
 - **InteractsWithTime**: `formatTime()` now converts timestamps to UTC with Z suffix (e.g., `2024-01-15T14:30:00Z`) to match Samsara API documentation format
 
 ### Fixed
