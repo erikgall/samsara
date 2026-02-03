@@ -47,7 +47,7 @@ class VehicleStatsResourceTest extends TestCase
 
         $this->assertInstanceOf(Builder::class, $query);
         $queryParams = $query->buildQuery();
-        $this->assertContains('engineStates', $queryParams['types'] ?? []);
+        $this->assertStringContainsString('engineStates', $queryParams['types'] ?? '');
     }
 
     #[Test]
@@ -58,7 +58,7 @@ class VehicleStatsResourceTest extends TestCase
 
         $this->assertInstanceOf(Builder::class, $query);
         $queryParams = $query->buildQuery();
-        $this->assertContains('fuelPercents', $queryParams['types'] ?? []);
+        $this->assertStringContainsString('fuelPercents', $queryParams['types'] ?? '');
     }
 
     #[Test]
@@ -69,7 +69,7 @@ class VehicleStatsResourceTest extends TestCase
 
         $this->assertInstanceOf(Builder::class, $query);
         $queryParams = $query->buildQuery();
-        $this->assertContains('gps', $queryParams['types'] ?? []);
+        $this->assertStringContainsString('gps', $queryParams['types'] ?? '');
     }
 
     #[Test]
@@ -80,7 +80,7 @@ class VehicleStatsResourceTest extends TestCase
 
         $this->assertInstanceOf(Builder::class, $query);
         $queryParams = $query->buildQuery();
-        $this->assertTrue(in_array('obdOdometerMeters', $queryParams['types'] ?? []));
+        $this->assertStringContainsString('obdOdometerMeters', $queryParams['types'] ?? '');
     }
 
     #[Test]

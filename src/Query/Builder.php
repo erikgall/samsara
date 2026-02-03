@@ -111,7 +111,7 @@ class Builder implements QueryBuilderInterface
         }
 
         if (! empty($this->types)) {
-            $query['types'] = $this->types;
+            $query['types'] = implode(',', $this->types);
         }
 
         if (! empty($this->expand)) {

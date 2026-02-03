@@ -64,4 +64,17 @@ return [
 
     'per_page' => env('SAMSARA_PER_PAGE', 100),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Webhook Secret
+    |--------------------------------------------------------------------------
+    |
+    | The Base64-encoded secret key for verifying webhook signatures. You can
+    | find this in the Samsara Dashboard when creating or viewing a webhook.
+    | This is used by the VerifyWebhookSignature middleware.
+    |
+    */
+
+    'webhook_secret' => env('SAMSARA_WEBHOOK_SECRET'),
+
 ];
