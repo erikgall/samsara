@@ -99,6 +99,22 @@ Default number of items per page for paginated requests.
 SAMSARA_PER_PAGE=50
 ```
 
+### Webhook Secret
+
+The Base64-encoded secret key for verifying webhook signatures.
+
+```php
+// config/samsara.php
+'webhook_secret' => env('SAMSARA_WEBHOOK_SECRET'),
+```
+
+```env
+# .env
+SAMSARA_WEBHOOK_SECRET=your-base64-encoded-secret
+```
+
+You can obtain this secret from the Samsara dashboard when creating or viewing a webhook. See the [Webhooks Guide](resources/webhooks.md) for usage details.
+
 ## Complete Configuration File
 
 ```php
@@ -158,6 +174,17 @@ return [
     |
     */
     'per_page' => env('SAMSARA_PER_PAGE', 100),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webhook Secret
+    |--------------------------------------------------------------------------
+    |
+    | The Base64-encoded secret key for verifying webhook signatures. You can
+    | find this in the Samsara Dashboard when creating or viewing a webhook.
+    |
+    */
+    'webhook_secret' => env('SAMSARA_WEBHOOK_SECRET'),
 ];
 ```
 
@@ -184,8 +211,22 @@ You can use a different API token for specific requests:
 ```php
 use Samsara\Facades\Samsara;
 
-// Use a different token
+// Set a different token for subsequent requests
 Samsara::withToken('different-api-token');
+
+// All subsequent calls now use the new token
+$drivers = Samsara::drivers()->all();
+```
+
+Or chain it for a single operation:
+
+```php
+use Samsara\Facades\Samsara;
+
+// Use a different token for this specific request
+$drivers = Samsara::withToken('different-api-token')
+    ->drivers()
+    ->all();
 ```
 
 ### Creating a Fresh Instance
