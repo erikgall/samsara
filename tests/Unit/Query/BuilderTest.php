@@ -284,32 +284,6 @@ class BuilderTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_types(): void
-    {
-        $samsara = new Samsara('test-token');
-        $resource = new TestQueryResource($samsara);
-        $builder = new Builder($resource);
-
-        $result = $builder->types(['gps', 'engineStates']);
-
-        $this->assertSame($builder, $result);
-        $this->assertSame(['types' => ['gps', 'engineStates']], $builder->buildQuery());
-    }
-
-    #[Test]
-    public function it_can_set_types_with_string(): void
-    {
-        $samsara = new Samsara('test-token');
-        $resource = new TestQueryResource($samsara);
-        $builder = new Builder($resource);
-
-        $result = $builder->types('gps');
-
-        $this->assertSame($builder, $result);
-        $this->assertSame(['types' => ['gps']], $builder->buildQuery());
-    }
-
-    #[Test]
     public function it_can_use_take_alias_for_limit(): void
     {
         $samsara = new Samsara('test-token');
@@ -383,6 +357,32 @@ class BuilderTest extends TestCase
         $query = $builder->buildQuery();
         // Timestamps are formatted in UTC with Z suffix per Samsara API requirements
         $this->assertSame('2024-06-15T10:30:00Z', $query['startTime']);
+    }
+
+    #[Test]
+    public function it_formats_single_type_as_string(): void
+    {
+        $samsara = new Samsara('test-token');
+        $resource = new TestQueryResource($samsara);
+        $builder = new Builder($resource);
+
+        $result = $builder->types('gps');
+
+        $this->assertSame($builder, $result);
+        $this->assertSame('gps', $builder->buildQuery()['types']);
+    }
+
+    #[Test]
+    public function it_formats_types_as_comma_separated_string(): void
+    {
+        $samsara = new Samsara('test-token');
+        $resource = new TestQueryResource($samsara);
+        $builder = new Builder($resource);
+
+        $result = $builder->types(['gps', 'obdOdometerMeters']);
+
+        $this->assertSame($builder, $result);
+        $this->assertSame('gps,obdOdometerMeters', $builder->buildQuery()['types']);
     }
 
     #[Test]
