@@ -1,5 +1,6 @@
 title: Samsara SDK for Laravel
 description: A comprehensive Laravel SDK for the Samsara Fleet Management API
+version: "1.0.4"
 baseurl: "/samsara"
 url: "https://erikgall.github.io"
 

@@ -9,6 +9,7 @@ A comprehensive Laravel SDK for the [Samsara Fleet Management API](https://devel
 - **Type-Safe Entities** - All API responses are mapped to strongly-typed entity classes
 - **Cursor Pagination** - Built-in support for Samsara's cursor-based pagination
 - **Lazy Collections** - Memory-efficient streaming for large datasets
+- **Webhook Signature Verification** - Middleware for validating incoming Samsara webhook requests
 - **Testing Support** - `SamsaraFake` class for easy mocking in tests
 
 ## Requirements
@@ -39,6 +40,7 @@ Add your Samsara API token to your `.env` file:
 ```env
 SAMSARA_API_KEY=your-api-token-here
 SAMSARA_REGION=us  # or 'eu' for European API
+SAMSARA_WEBHOOK_SECRET=your-base64-encoded-secret
 ```
 
 Configuration options in `config/samsara.php`:
@@ -50,6 +52,7 @@ return [
     'timeout' => env('SAMSARA_TIMEOUT', 30),
     'retry' => env('SAMSARA_RETRY', 3),
     'per_page' => env('SAMSARA_PER_PAGE', 100),
+    'webhook_secret' => env('SAMSARA_WEBHOOK_SECRET'),
 ];
 ```
 
@@ -404,6 +407,26 @@ try {
     // Handle validation errors
 }
 ```
+
+## Webhook Signature Verification
+
+The SDK includes middleware to verify that incoming webhook requests are authentic. It validates the HMAC-SHA256 signature sent in the `X-Samsara-Signature` header.
+
+```php
+use Samsara\Webhooks\VerifyWebhookSignature;
+
+Route::post('/samsara/webhook', WebhookController::class)
+    ->middleware(VerifyWebhookSignature::class);
+```
+
+The middleware uses the `webhook_secret` from your `config/samsara.php` by default. You can also pass a custom secret and tolerance (in seconds) as middleware parameters:
+
+```php
+Route::post('/samsara/webhook', WebhookController::class)
+    ->middleware('samsara.webhook:my-secret-key,600');
+```
+
+For detailed usage, custom secrets, and controller examples, see the [Webhooks documentation](docs/resources/webhooks.md).
 
 ## Testing
 

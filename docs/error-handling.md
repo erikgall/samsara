@@ -17,6 +17,7 @@ SamsaraException (base)
 ├── AuthenticationException (401)
 ├── AuthorizationException (403)
 ├── NotFoundException (404)
+├── UnsupportedOperationException
 ├── ValidationException (422)
 ├── RateLimitException (429)
 └── ServerException (5xx)
@@ -45,6 +46,7 @@ use Samsara\Facades\Samsara;
 use Samsara\Exceptions\AuthenticationException;
 use Samsara\Exceptions\AuthorizationException;
 use Samsara\Exceptions\NotFoundException;
+use Samsara\Exceptions\UnsupportedOperationException;
 use Samsara\Exceptions\ValidationException;
 use Samsara\Exceptions\RateLimitException;
 use Samsara\Exceptions\ServerException;
@@ -63,6 +65,10 @@ try {
 } catch (NotFoundException $e) {
     // Resource not found (404)
     Log::warning('Resource not found');
+
+} catch (UnsupportedOperationException $e) {
+    // Operation not supported (e.g., vehicle creation/deletion)
+    Log::warning('Unsupported operation: ' . $e->getMessage());
 
 } catch (ValidationException $e) {
     // Invalid request data (422)
@@ -129,6 +135,27 @@ try {
     echo $e->getMessage(); // "Driver not found"
 }
 ```
+
+### UnsupportedOperationException
+
+Thrown when a resource does not support the requested operation. Some Samsara API resources have restrictions that prevent certain CRUD operations. For example, vehicles cannot be created or deleted via the `/fleet/vehicles` endpoint.
+
+```php
+use Samsara\Facades\Samsara;
+use Samsara\Exceptions\UnsupportedOperationException;
+
+try {
+    Samsara::vehicles()->create(['name' => 'Truck 001']);
+} catch (UnsupportedOperationException $e) {
+    // The exception message includes guidance on the correct approach
+    echo $e->getMessage();
+    // "Vehicles cannot be created via /fleet/vehicles. Vehicles are automatically
+    // created when a Samsara Vehicle Gateway is installed. To manually create
+    // vehicles, use the Assets API: $samsara->assets()->create(['type' => 'vehicle', ...])."
+}
+```
+
+Unlike other exceptions in the hierarchy, this is not tied to an HTTP status code. It is thrown before any API request is made, indicating that the operation is fundamentally unsupported for the resource.
 
 ### ValidationException (422)
 

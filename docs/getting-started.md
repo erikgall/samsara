@@ -52,6 +52,16 @@ For EU customers, set the region:
 SAMSARA_REGION=eu
 ```
 
+### 4. Optional: Configure Webhook Secret
+
+If you plan to receive webhooks from Samsara, add your webhook secret to your `.env` file:
+
+```env
+SAMSARA_WEBHOOK_SECRET=your-base64-encoded-secret
+```
+
+See the [Webhooks Guide](resources/webhooks.md) for more details on setting up and verifying webhooks.
+
 ## Basic Usage
 
 ### Using the Facade

@@ -26,7 +26,7 @@ $webhook = Samsara::webhooks()->find('webhook-id');
 $webhook = Samsara::webhooks()->create([
     'name' => 'My Webhook',
     'url' => 'https://example.com/webhook',
-    'eventTypes' => ['VehicleLocation', 'DriverHosLog'],
+    'eventTypes' => ['VehicleCreated', 'DriverCreated'],
 ]);
 
 // Update a webhook
@@ -49,49 +49,65 @@ $webhook = Samsara::webhooks()->create([
     'name' => 'Fleet Events',
     'url' => 'https://example.com/webhook',
     'eventTypes' => [
-        WebhookEvent::VEHICLE_LOCATION->value,
-        WebhookEvent::DRIVER_HOS_LOG->value,
+        WebhookEvent::VEHICLE_CREATED->value,
         WebhookEvent::DRIVER_CREATED->value,
+        WebhookEvent::GEOFENCE_ENTRY->value,
     ],
 ]);
 ```
 
 ### Available Event Types
 
+There are 27 available event types defined in the `WebhookEvent` enum.
+
+#### Address Events
+- `AddressCreated`
+- `AddressDeleted`
+- `AddressUpdated`
+
 #### Driver Events
 - `DriverCreated`
 - `DriverUpdated`
-- `DriverHosLog`
 
 #### Vehicle Events
 - `VehicleCreated`
 - `VehicleUpdated`
-- `VehicleLocation`
 
-#### Route Events
-- `RouteCreated`
-- `RouteUpdated`
-- `RouteDeleted`
+#### Dispatch / Route Events
 - `RouteStopArrival`
 - `RouteStopDeparture`
+- `RouteStopEarlyLateArrival`
+- `RouteStopEtaUpdated`
+- `RouteStopResequence`
 
 #### Safety Events
-- `SafetyEvent`
-- `CameraSafetyEvent`
+- `SevereSpeedingEnded`
+- `SevereSpeedingStarted`
+- `SpeedingEventEnded`
+- `SpeedingEventStarted`
+
+#### Geofence Events
+- `GeofenceEntry`
+- `GeofenceExit`
+
+#### Industrial / Equipment Events
+- `EngineFaultOff`
+- `EngineFaultOn`
+- `GatewayUnplugged`
 
 #### Maintenance Events
-- `DvirCreated`
-- `DvirUpdated`
-- `DefectCreated`
-- `DefectUpdated`
+- `DvirSubmitted`
+- `PredictiveMaintenanceAlert`
 
-#### Document Events
+#### Document / Form Events
 - `DocumentSubmitted`
+- `FormSubmitted`
+- `FormUpdated`
 
-#### Alert Events
-- `AlertIncident`
+#### Issue Events
+- `IssueCreated`
 
-See the `WebhookEvent` enum for 70+ available event types.
+See the `WebhookEvent` enum for the full list of available event types.
 
 ## Webhook Entity
 
@@ -197,28 +213,28 @@ class SamsaraWebhookController extends Controller
         $data = $request->input('data');
 
         match ($eventType) {
-            'VehicleLocation' => $this->handleVehicleLocation($data),
-            'DriverHosLog' => $this->handleDriverHosLog($data),
-            'SafetyEvent' => $this->handleSafetyEvent($data),
+            'VehicleCreated' => $this->handleVehicleCreated($data),
+            'DriverCreated' => $this->handleDriverCreated($data),
+            'GeofenceEntry' => $this->handleGeofenceEntry($data),
             default => null,
         };
 
         return response()->json(['status' => 'ok']);
     }
 
-    protected function handleVehicleLocation(array $data): void
+    protected function handleVehicleCreated(array $data): void
     {
-        // Process vehicle location update
+        // Process vehicle created event
     }
 
-    protected function handleDriverHosLog(array $data): void
+    protected function handleDriverCreated(array $data): void
     {
-        // Process HOS log update
+        // Process driver created event
     }
 
-    protected function handleSafetyEvent(array $data): void
+    protected function handleGeofenceEntry(array $data): void
     {
-        // Process safety event
+        // Process geofence entry event
     }
 }
 ```

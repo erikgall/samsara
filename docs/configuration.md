@@ -36,7 +36,7 @@ The Samsara API token for authentication.
 SAMSARA_API_KEY=samsara_api_xxxxxxxxxxxxxxxx
 ```
 
-You can obtain an API token from the Samsara dashboard under **Settings > API Tokens**.
+You can obtain an API token from the Samsara dashboard under **Settings -> Organization -> API Tokens**.
 
 ### Region
 
@@ -73,7 +73,7 @@ SAMSARA_TIMEOUT=60
 
 ### Retry
 
-Number of times to retry failed requests.
+Number of times to retry failed requests. Set to `0` to disable retries.
 
 ```php
 // config/samsara.php
@@ -120,18 +120,18 @@ You can obtain this secret from the Samsara dashboard when creating or viewing a
 ```php
 <?php
 
-// config/samsara.php
-
 return [
+
     /*
     |--------------------------------------------------------------------------
     | Samsara API Key
     |--------------------------------------------------------------------------
     |
-    | Your Samsara API token. Obtain this from the Samsara dashboard under
-    | Settings > API Tokens.
+    | Your Samsara API token. You can obtain this from the Samsara Dashboard
+    | under Settings -> Organization -> API Tokens.
     |
     */
+
     'api_key' => env('SAMSARA_API_KEY'),
 
     /*
@@ -139,10 +139,13 @@ return [
     | API Region
     |--------------------------------------------------------------------------
     |
-    | The region for your Samsara account. Use 'us' for United States or
-    | 'eu' for European Union customers.
+    | The region for your Samsara API. Use 'us' for the US region
+    | (api.samsara.com) or 'eu' for the EU region (api.eu.samsara.com).
+    |
+    | Supported: "us", "eu"
     |
     */
+
     'region' => env('SAMSARA_REGION', 'us'),
 
     /*
@@ -150,29 +153,35 @@ return [
     | Request Timeout
     |--------------------------------------------------------------------------
     |
-    | The number of seconds to wait before timing out a request.
+    | The number of seconds to wait for a response from the Samsara API
+    | before timing out.
     |
     */
+
     'timeout' => env('SAMSARA_TIMEOUT', 30),
 
     /*
     |--------------------------------------------------------------------------
-    | Retry Count
+    | Retry Attempts
     |--------------------------------------------------------------------------
     |
     | The number of times to retry a failed request before giving up.
+    | Set to 0 to disable retries.
     |
     */
+
     'retry' => env('SAMSARA_RETRY', 3),
 
     /*
     |--------------------------------------------------------------------------
-    | Items Per Page
+    | Default Items Per Page
     |--------------------------------------------------------------------------
     |
-    | The default number of items to fetch per page for paginated requests.
+    | The default number of items to retrieve per page when using
+    | paginated API endpoints.
     |
     */
+
     'per_page' => env('SAMSARA_PER_PAGE', 100),
 
     /*
@@ -182,9 +191,12 @@ return [
     |
     | The Base64-encoded secret key for verifying webhook signatures. You can
     | find this in the Samsara Dashboard when creating or viewing a webhook.
+    | This is used by the VerifyWebhookSignature middleware.
     |
     */
+
     'webhook_secret' => env('SAMSARA_WEBHOOK_SECRET'),
+
 ];
 ```
 

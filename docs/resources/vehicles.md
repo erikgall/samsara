@@ -22,19 +22,62 @@ $vehicles = Samsara::vehicles()->all();
 // Find a vehicle
 $vehicle = Samsara::vehicles()->find('vehicle-id');
 
-// Create a vehicle
-$vehicle = Samsara::vehicles()->create([
-    'name' => 'Truck 001',
-    'vin' => '1HGBH41JXMN109186',
-]);
-
 // Update a vehicle
 $vehicle = Samsara::vehicles()->update('vehicle-id', [
     'name' => 'Truck 001 - Updated',
 ]);
+```
 
-// Delete a vehicle
-Samsara::vehicles()->delete('vehicle-id');
+## Unsupported Operations
+
+The Samsara API does not support creating or deleting vehicles via the `/fleet/vehicles` endpoint. Calling these methods will throw an `UnsupportedOperationException`.
+
+### Create
+
+Vehicles are automatically created when a Samsara Vehicle Gateway is installed. To manually create vehicles, use the Assets API.
+
+```php
+use Samsara\Facades\Samsara;
+use Samsara\Exceptions\UnsupportedOperationException;
+
+try {
+    $vehicle = Samsara::vehicles()->create([
+        'name' => 'Truck 001',
+        'vin' => '1HGBH41JXMN109186',
+    ]);
+} catch (UnsupportedOperationException $e) {
+    // "Vehicles cannot be created via /fleet/vehicles. Vehicles are automatically
+    // created when a Samsara Vehicle Gateway is installed. To manually create
+    // vehicles, use the Assets API: $samsara->assets()->create(['type' => 'vehicle', ...])."
+}
+
+// Use the Assets API instead:
+$vehicle = Samsara::assets()->create([
+    'type' => 'vehicle',
+    'name' => 'Truck 001',
+]);
+```
+
+### Delete
+
+Vehicles cannot be deleted via the Samsara API. To retire a vehicle, update its name or notes field instead.
+
+```php
+use Samsara\Facades\Samsara;
+use Samsara\Exceptions\UnsupportedOperationException;
+
+try {
+    Samsara::vehicles()->delete('vehicle-id');
+} catch (UnsupportedOperationException $e) {
+    // "Vehicles cannot be deleted via the Samsara API. To retire a vehicle,
+    // update its name or notes field instead:
+    // $samsara->vehicles()->update($id, ['name' => '[RETIRED] Vehicle Name'])."
+}
+
+// Retire a vehicle instead:
+Samsara::vehicles()->update('vehicle-id', [
+    'name' => '[RETIRED] Truck 001',
+]);
 ```
 
 ## Query Builder
@@ -108,4 +151,4 @@ $vehicle->getStaticAssignedDriver(); // ?StaticAssignedDriver
 ## Related Resources
 
 - [Vehicle Stats](vehicle-stats.md) - Telemetry data
-- [Vehicle Locations](../query-builder.md) - GPS locations
+- [Vehicle Locations](vehicle-locations.md) - GPS locations
