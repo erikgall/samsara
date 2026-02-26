@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-02-26
+
+### Fixed
+
+- **Builder**: Fixed endpoint reset bug in `createBuilderWithEndpoint()` where the endpoint was temporarily set on the resource then immediately reset, causing the Builder to use the wrong (base) URL for requests. The fix stores an optional endpoint override on the Builder itself and centralizes `createBuilderWithEndpoint()` in the base Resource class, removing 16 duplicated copies from subclasses.
+
+## [1.0.3] - 2026-02-03
+
+### Added
+
+- **Webhooks**: Added webhook signature verification support with `WebhookSignature` class for validating incoming Samsara webhook payloads
+
+### Fixed
+
+- **VehicleStatsResource**: Fixed query `types` parameter to be formatted as a comma-separated string instead of an array, matching the Samsara API's expected format
+
+## [1.0.2] - 2026-01-20
+
+### Changed
+
+- **WebhookEvent**: Reduced to 27 valid event types per Samsara API documentation (removed unsupported events like `AlertIncident`, `HosLogsUpdated`, `RouteCreated`, etc.)
+
+## [1.0.1] - 2026-01-20
+
 ### Added
 
 - `UnsupportedOperationException` for operations not supported by the Samsara API
@@ -18,7 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **VehiclesResource**: `create()` now throws `UnsupportedOperationException` with guidance to use Assets API (`POST /assets` with `type: "vehicle"`) since vehicles cannot be created via `/fleet/vehicles`
 - **VehiclesResource**: `delete()` now throws `UnsupportedOperationException` explaining vehicles cannot be deleted (use `update()` to mark as retired instead)
-- **WebhookEvent**: Reduced to 27 valid event types per Samsara API documentation (removed unsupported events like `AlertIncident`, `HosLogsUpdated`, `RouteCreated`, etc.)
 - **InteractsWithTime**: `formatTime()` now converts timestamps to UTC with Z suffix (e.g., `2024-01-15T14:30:00Z`) to match Samsara API documentation format
 
 ### Fixed
