@@ -141,6 +141,26 @@ class VehicleStatsResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_feed_hits_correct_endpoint(): void
+    {
+        $this->http->fake([
+            'samsara.com/fleet/vehicles/stats/feed*' => $this->http->response([
+                'data' => [
+                    ['id' => '2', 'name' => 'Truck 002', 'fuelPercent' => ['value' => 75]],
+                ],
+            ]),
+            '*' => $this->http->response(['data' => []], 200),
+        ]);
+
+        $resource = new VehicleStatsResource($this->samsara);
+        $stats = $resource->feed()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $stats);
+        $this->assertCount(1, $stats);
+        $this->assertSame('2', $stats->first()->getId());
+    }
+
+    #[Test]
     public function it_has_correct_endpoint(): void
     {
         $resource = new VehicleStatsResource($this->samsara);
@@ -154,5 +174,25 @@ class VehicleStatsResourceTest extends TestCase
         $resource = new VehicleStatsResource($this->samsara);
 
         $this->assertSame(VehicleStats::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_history_hits_correct_endpoint(): void
+    {
+        $this->http->fake([
+            'samsara.com/fleet/vehicles/stats/history*' => $this->http->response([
+                'data' => [
+                    ['id' => '1', 'name' => 'Truck 001', 'gps' => ['latitude' => 37.7749]],
+                ],
+            ]),
+            '*' => $this->http->response(['data' => []], 200),
+        ]);
+
+        $resource = new VehicleStatsResource($this->samsara);
+        $stats = $resource->history()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $stats);
+        $this->assertCount(1, $stats);
+        $this->assertSame('1', $stats->first()->getId());
     }
 }

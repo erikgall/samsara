@@ -10,8 +10,10 @@ use Samsara\Tests\TestCase;
 use Samsara\Resources\Resource;
 use Samsara\Data\EntityCollection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\PendingRequest;
+use Samsara\Query\Pagination\CursorPaginator;
 
 /**
  * Unit tests for the Query Builder class.
@@ -345,6 +347,91 @@ class BuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_executes_get_with_custom_endpoint(): void
+    {
+        $fakeHttp = new \Illuminate\Http\Client\Factory;
+        $fakeHttp->fake([
+            'samsara.com/custom/endpoint*' => $fakeHttp->response([
+                'data' => [
+                    ['id' => '1', 'name' => 'Custom'],
+                ],
+            ], 200),
+            '*' => $fakeHttp->response([
+                'data' => [],
+            ], 200),
+        ]);
+
+        $samsara = new Samsara('test-token');
+        $samsara->setHttpFactory($fakeHttp);
+        $resource = new TestQueryResource($samsara);
+        $builder = new Builder($resource, '/custom/endpoint');
+
+        $result = $builder->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $result);
+        $this->assertCount(1, $result);
+        $this->assertSame('1', $result->first()->getId());
+    }
+
+    #[Test]
+    public function it_executes_get_with_pagination_with_custom_endpoint(): void
+    {
+        $fakeHttp = new \Illuminate\Http\Client\Factory;
+        $fakeHttp->fake([
+            'samsara.com/custom/paginated*' => $fakeHttp->response([
+                'data' => [
+                    ['id' => '1', 'name' => 'Paginated'],
+                ],
+                'pagination' => [
+                    'endCursor'   => 'cursor-abc',
+                    'hasNextPage' => false,
+                ],
+            ], 200),
+            '*' => $fakeHttp->response(['data' => []], 200),
+        ]);
+
+        $samsara = new Samsara('test-token');
+        $samsara->setHttpFactory($fakeHttp);
+        $resource = new TestQueryResource($samsara);
+        $builder = new Builder($resource, '/custom/paginated');
+
+        $result = $builder->getWithPagination();
+
+        $this->assertInstanceOf(CursorPaginator::class, $result);
+        $this->assertCount(1, $result);
+    }
+
+    #[Test]
+    public function it_executes_lazy_with_custom_endpoint(): void
+    {
+        $fakeHttp = new \Illuminate\Http\Client\Factory;
+        $fakeHttp->fake([
+            'samsara.com/custom/lazy*' => $fakeHttp->response([
+                'data' => [
+                    ['id' => '1', 'name' => 'Lazy'],
+                ],
+                'pagination' => [
+                    'endCursor'   => null,
+                    'hasNextPage' => false,
+                ],
+            ], 200),
+            '*' => $fakeHttp->response(['data' => []], 200),
+        ]);
+
+        $samsara = new Samsara('test-token');
+        $samsara->setHttpFactory($fakeHttp);
+        $resource = new TestQueryResource($samsara);
+        $builder = new Builder($resource, '/custom/lazy');
+
+        $result = $builder->lazy();
+
+        $this->assertInstanceOf(LazyCollection::class, $result);
+        $items = $result->all();
+        $this->assertCount(1, $items);
+        $this->assertSame('1', $items[0]->getId());
+    }
+
+    #[Test]
     public function it_formats_datetime_correctly(): void
     {
         $samsara = new Samsara('test-token');
@@ -403,6 +490,26 @@ class BuilderTest extends TestCase
         $result = $builder->first();
 
         $this->assertNull($result);
+    }
+
+    #[Test]
+    public function it_uses_custom_endpoint_when_provided(): void
+    {
+        $samsara = new Samsara('test-token');
+        $resource = new TestQueryResource($samsara);
+        $builder = new Builder($resource, '/custom/endpoint');
+
+        $this->assertSame('/custom/endpoint', $builder->getEndpoint());
+    }
+
+    #[Test]
+    public function it_uses_resource_endpoint_by_default(): void
+    {
+        $samsara = new Samsara('test-token');
+        $resource = new TestQueryResource($samsara);
+        $builder = new Builder($resource);
+
+        $this->assertSame('/test-query-endpoint', $builder->getEndpoint());
     }
 }
 

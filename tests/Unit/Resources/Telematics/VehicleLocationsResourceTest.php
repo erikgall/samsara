@@ -5,6 +5,7 @@ namespace Samsara\Tests\Unit\Resources\Telematics;
 use Samsara\Samsara;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
+use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Telematics\VehicleLocationsResource;
@@ -74,10 +75,50 @@ class VehicleLocationsResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_feed_hits_correct_endpoint(): void
+    {
+        $this->http->fake([
+            'samsara.com/fleet/vehicles/locations/feed*' => $this->http->response([
+                'data' => [
+                    ['id' => '2', 'latitude' => 40.7128, 'longitude' => -74.0060],
+                ],
+            ]),
+            '*' => $this->http->response(['data' => []], 200),
+        ]);
+
+        $resource = new VehicleLocationsResource($this->samsara);
+        $locations = $resource->feed()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $locations);
+        $this->assertCount(1, $locations);
+        $this->assertSame('2', $locations->first()->getId());
+    }
+
+    #[Test]
     public function it_has_correct_endpoint(): void
     {
         $resource = new VehicleLocationsResource($this->samsara);
 
         $this->assertSame('/fleet/vehicles/locations', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_history_hits_correct_endpoint(): void
+    {
+        $this->http->fake([
+            'samsara.com/fleet/vehicles/locations/history*' => $this->http->response([
+                'data' => [
+                    ['id' => '1', 'latitude' => 37.7749, 'longitude' => -122.4194],
+                ],
+            ]),
+            '*' => $this->http->response(['data' => []], 200),
+        ]);
+
+        $resource = new VehicleLocationsResource($this->samsara);
+        $locations = $resource->history()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $locations);
+        $this->assertCount(1, $locations);
+        $this->assertSame('1', $locations->first()->getId());
     }
 }

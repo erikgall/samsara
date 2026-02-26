@@ -4,6 +4,7 @@ namespace Samsara\Resources;
 
 use Samsara\Samsara;
 use Samsara\Data\Entity;
+use Samsara\Query\Builder;
 use Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Response;
 use Samsara\Exceptions\ServerException;
@@ -192,6 +193,14 @@ abstract class Resource implements ResourceInterface
         $responseData = $response->json('data', $response->json());
 
         return $this->mapToEntity($responseData);
+    }
+
+    /**
+     * Create a builder with a custom endpoint.
+     */
+    protected function createBuilderWithEndpoint(string $endpoint): Builder
+    {
+        return new Builder($this, $endpoint);
     }
 
     /**

@@ -34,6 +34,11 @@ class Builder implements QueryBuilderInterface
     protected array $decorations = [];
 
     /**
+     * The optional endpoint override.
+     */
+    protected ?string $endpoint = null;
+
+    /**
      * The relations to expand.
      *
      * @var array<string>
@@ -67,9 +72,10 @@ class Builder implements QueryBuilderInterface
     /**
      * Create a new query builder instance.
      */
-    public function __construct(Resource $resource)
+    public function __construct(Resource $resource, ?string $endpoint = null)
     {
         $this->resource = $resource;
+        $this->endpoint = $endpoint;
     }
 
     /**
@@ -175,7 +181,7 @@ class Builder implements QueryBuilderInterface
     public function get(): EntityCollection
     {
         $response = $this->resource->client()->get(
-            $this->resource->getEndpoint(),
+            $this->getEndpoint(),
             $this->buildQuery()
         );
 
@@ -185,12 +191,20 @@ class Builder implements QueryBuilderInterface
     }
 
     /**
+     * Get the endpoint for this query.
+     */
+    public function getEndpoint(): string
+    {
+        return $this->endpoint ?? $this->resource->getEndpoint();
+    }
+
+    /**
      * Execute the query and get results with pagination information.
      */
     public function getWithPagination(): Pagination\CursorPaginator
     {
         $response = $this->resource->client()->get(
-            $this->resource->getEndpoint(),
+            $this->getEndpoint(),
             $this->buildQuery()
         );
 
@@ -225,7 +239,7 @@ class Builder implements QueryBuilderInterface
                 }
 
                 $response = $this->resource->client()->get(
-                    $this->resource->getEndpoint(),
+                    $this->getEndpoint(),
                     $builder->buildQuery()
                 );
 

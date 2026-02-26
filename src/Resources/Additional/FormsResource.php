@@ -124,17 +124,4 @@ class FormsResource extends Resource
         /** @var FormSubmission */
         return $this->mapToEntity($response->json('data', $response->json()));
     }
-
-    /**
-     * Create a builder with a custom endpoint.
-     */
-    protected function createBuilderWithEndpoint(string $endpoint): Builder
-    {
-        $originalEndpoint = $this->endpoint;
-        $this->endpoint = $endpoint;
-        $builder = new Builder($this);
-        $this->endpoint = $originalEndpoint;
-
-        return $builder;
-    }
 }

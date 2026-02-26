@@ -88,17 +88,4 @@ class AssetsResource extends Resource
 
         return $response->json();
     }
-
-    /**
-     * Create a builder with a custom endpoint.
-     */
-    protected function createBuilderWithEndpoint(string $endpoint): Builder
-    {
-        $originalEndpoint = $this->endpoint;
-        $this->endpoint = $endpoint;
-        $builder = new Builder($this);
-        $this->endpoint = $originalEndpoint;
-
-        return $builder;
-    }
 }
