@@ -12,6 +12,8 @@ use Samsara\Exceptions\InvalidSignatureException;
  * The message format is: v1:<timestamp>:<body>
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @phpstan-consistent-constructor
  */
 class WebhookSignatureVerifier
 {

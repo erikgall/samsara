@@ -1,0 +1,62 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }} · Laravel ${{ matrix.laravel }} · ${{ matrix.dependency-version }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { php: '8.2', laravel: 12, testbench: 10, dependency-version: prefer-stable }
+          - { php: '8.3', laravel: 12, testbench: 10, dependency-version: prefer-stable }
+          - { php: '8.3', laravel: 13, testbench: 11, dependency-version: prefer-stable }
+          - { php: '8.4', laravel: 12, testbench: 10, dependency-version: prefer-stable }
+          - { php: '8.4', laravel: 13, testbench: 11, dependency-version: prefer-stable }
+          - { php: '8.2', laravel: 12, testbench: 10, dependency-version: prefer-lowest }
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate composer.json
+        run: composer validate --strict --no-check-publish
+
+      - name: Pin Laravel ${{ matrix.laravel }} / Testbench ${{ matrix.testbench }}
+        run: |
+          composer require --no-update --no-interaction \
+            "illuminate/http:^${{ matrix.laravel }}.0" \
+            "illuminate/collections:^${{ matrix.laravel }}.0" \
+            "illuminate/support:^${{ matrix.laravel }}.0" \
+            "orchestra/testbench:^${{ matrix.testbench }}.0"
+
+      - name: Install dependencies (${{ matrix.dependency-version }})
+        run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-progress
+
+      - name: Show resolved versions
+        run: |
+          jq -r '.packages[]|select(.name=="laravel/framework")|.name + " " + .version' composer.lock
+          jq -r '.["packages-dev"][]|select(.name=="orchestra/testbench" or .name=="phpunit/phpunit" or .name=="phpstan/phpstan")|.name + " " + .version' composer.lock
+
+      - name: Run phpunit
+        run: vendor/bin/phpunit
+
+      - name: Run phpstan
+        run: vendor/bin/phpstan analyse --no-progress
+
+      - name: Run pint --test
+        run: vendor/bin/pint --test

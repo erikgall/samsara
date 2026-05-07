@@ -29,6 +29,8 @@ use Samsara\Exceptions\InvalidSignatureException;
  *         ->middleware(new VerifyWebhookSignature('my-secret-key', 600));
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @phpstan-consistent-constructor
  */
 class VerifyWebhookSignature
 {
@@ -79,8 +81,8 @@ class VerifyWebhookSignature
 
         $verifier->verifyFromRequest(
             $request->getContent(),
-            $request->header('X-Samsara-Signature'),
-            $request->header('X-Samsara-Timestamp'),
+            $request->headers->get('X-Samsara-Signature'),
+            $request->headers->get('X-Samsara-Timestamp'),
             $timestampTolerance
         );
 

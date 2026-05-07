@@ -58,7 +58,7 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
      */
     public function count(): int
     {
-        return $this->items->count();
+        return max(0, $this->items->count());
     }
 
     /**
