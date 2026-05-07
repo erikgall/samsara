@@ -2,44 +2,72 @@
 title: Home
 layout: home
 nav_order: 1
-description: "A comprehensive Laravel SDK for the Samsara Fleet Management API"
+description: Laravel SDK for the Samsara Fleet Management API.
 permalink: /
 ---
 
 # Samsara SDK for Laravel
 {: .fs-9 }
 
-A comprehensive Laravel SDK for the Samsara Fleet Management API with fluent query builder, type-safe entities, and full API coverage.
+A Laravel SDK for the Samsara Fleet Management API.
 {: .fs-6 .fw-300 }
 
 [Get Started](/samsara/getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
 [View on GitHub](https://github.com/erikgall/samsara){: .btn .fs-5 .mb-4 .mb-md-0 }
 
----
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Your First Query](#your-first-query)
+- [Where to Next](#where-to-next)
+- [Requirements](#requirements)
+- [License](#license)
 
-## Features
+## Introduction
 
-- **40+ Resource Endpoints** - Full coverage of Samsara's API including Fleet, Telematics, Safety, Dispatch, Industrial, and more
-- **Fluent Query Builder** - Filter, paginate, and stream data with an intuitive query interface
-- **Type-Safe Entities** - All API responses are mapped to strongly-typed entity classes
-- **Cursor Pagination** - Built-in support for Samsara's cursor-based pagination
-- **Lazy Collections** - Memory-efficient streaming for large datasets
-- **Testing Support** - `SamsaraFake` class for easy mocking in tests
+Samsara is a Laravel SDK for the Samsara Fleet Management API. You reach for it when you need to read or mutate fleet data — drivers, vehicles, telematics, hours of service, safety events — from a Laravel application without hand-rolling HTTP calls. The SDK exposes resources through a `Samsara` facade, returns typed entities, and provides a fluent query builder for filtering, paginating, and streaming results.
 
----
+## Installation
 
-## Quick Example
+Install the SDK with Composer:
+
+```bash
+composer require erikgall/samsara
+```
+
+Laravel auto-discovers the package's service provider and the `Samsara` facade alias, so no manual registration is required.
+
+## Configuration
+
+Publish the config file:
+
+```bash
+php artisan vendor:publish --provider="Samsara\SamsaraServiceProvider"
+```
+
+Then add your API token to `.env`:
+
+```env
+SAMSARA_API_KEY=your-api-token-here
+```
+
+For EU customers, set `SAMSARA_REGION=eu`. See [configuration.md](configuration.md) for every option, including timeout, retry, default page size, and the webhook secret.
+
+## Your First Query
 
 ```php
 use Samsara\Facades\Samsara;
 
-// Get all drivers
 $drivers = Samsara::drivers()->all();
 
-// Find a specific vehicle
-$vehicle = Samsara::vehicles()->find('vehicle-id');
+foreach ($drivers as $driver) {
+    logger()->info("{$driver->name} ({$driver->id})");
+}
+```
 
-// Query with filters
+Every resource accessor on the facade returns a resource object. Resources expose verbs like `all()`, `find()`, and `query()`, plus resource-specific helpers. The fluent query builder layers on filters, time windows, pagination, and lazy iteration:
+
+```php
 $stats = Samsara::vehicleStats()
     ->current()
     ->whereVehicle(['vehicle-1', 'vehicle-2'])
@@ -47,43 +75,21 @@ $stats = Samsara::vehicleStats()
     ->get();
 ```
 
----
+## Where to Next
 
-## Documentation
-
-### Getting Started
-
-- [Getting Started](/samsara/getting-started) - Installation and quick start guide
-- [Configuration](/samsara/configuration) - All configuration options
-
-### Guides
-
-- [Query Builder](/samsara/query-builder) - Fluent filtering, pagination, and data retrieval
-- [Error Handling](/samsara/error-handling) - Exception handling and retry logic
-- [Testing](/samsara/testing) - Testing with SamsaraFake and fixtures
-
-### Resources
-
-See the [Resources](/samsara/resources/) section for detailed documentation on each API resource:
-
-| Category | Resources |
-|:---------|:----------|
-| **Fleet** | [Drivers](/samsara/resources/drivers), [Vehicles](/samsara/resources/vehicles), [Trailers](/samsara/resources/trailers), [Equipment](/samsara/resources/equipment) |
-| **Telematics** | [Vehicle Stats](/samsara/resources/vehicle-stats), [Vehicle Locations](/samsara/resources/vehicle-locations), [Trips](/samsara/resources/trips) |
-| **Safety** | [Hours of Service](/samsara/resources/hours-of-service), [Maintenance](/samsara/resources/maintenance), [Safety Events](/samsara/resources/safety-events) |
-| **Dispatch** | [Routes](/samsara/resources/routes), [Addresses](/samsara/resources/addresses) |
-| **Organization** | [Users](/samsara/resources/users), [Tags](/samsara/resources/tags), [Contacts](/samsara/resources/contacts) |
-
----
+- [Getting Started](getting-started.md) — install, configure, and walk through dependency injection.
+- [Configuration](configuration.md) — every config key, env var, and runtime override.
+- [Query Builder](query-builder.md) — filtering, pagination, lazy collections, and the underlying HTTP client.
+- [Error Handling](error-handling.md) — exception hierarchy and Laravel 12 exception handler integration.
+- [Testing](testing.md) — `SamsaraFake` and HTTP-level fakes.
+- [Resources](resources/index.md) — every resource the SDK exposes.
 
 ## Requirements
 
-- PHP 8.1 or higher
-- Laravel 10.x, 11.x, or 12.x
-- Samsara API token
-
----
+- PHP 8.2 or higher
+- Laravel 12.x or 13.x
+- A Samsara API token
 
 ## License
 
-This package is open-sourced software licensed under the [MIT license](https://github.com/erikgall/samsara/blob/main/LICENSE).
+The SDK is open-sourced software licensed under the [MIT license](https://github.com/erikgall/samsara/blob/main/LICENSE).
