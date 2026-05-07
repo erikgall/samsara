@@ -135,7 +135,7 @@ The most commonly requested stat types:
 | `defLevelMilliPercent` | DEF level as milli-percent. |
 | `obdEngineSeconds` | Cumulative engine seconds. |
 
-> **Note:** `VehicleStatType` defines 50 cases covering EV battery telemetry, spreader inputs, and tire pressures. See [Enums](../enums.md#vehiclestattype) for the complete list.
+> **Note:** `VehicleStatType` defines 52 cases covering EV battery telemetry, spreader inputs, and tire pressures. See [Enums](../enums.md#vehiclestattype) for the complete list.
 
 ## Filtering
 

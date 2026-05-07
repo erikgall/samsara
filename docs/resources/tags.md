@@ -21,7 +21,7 @@ permalink: /resources/tags
 
 ## Introduction
 
-Tags are lightweight labels that group every other resource in Samsara — vehicles, drivers, equipment, addresses, alerts. You create a tag once and reference it from anywhere a `whereTag()` filter is supported. Tags also nest: a parent tag (`Regions`) can hold child tags (`West`, `East`), which lets you filter at any level of the hierarchy.
+Tags are labels that group every other resource in Samsara — vehicles, drivers, equipment, addresses, alerts. You create a tag once and reference it from anywhere a `whereTag()` filter is supported. Tags also nest: a parent tag (`Regions`) can hold child tags (`West`, `East`), which lets you filter at any level of the hierarchy.
 
 ## Retrieving Records
 

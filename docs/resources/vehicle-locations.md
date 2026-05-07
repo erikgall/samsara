@@ -12,14 +12,14 @@ permalink: /resources/vehicle-locations
 - [Location Feed](#location-feed)
 - [Location History](#location-history)
 - [Filtering](#filtering)
-- [Properties](#available-properties)
+- [Properties](#properties)
 - [Related Resources](#related-resources)
 
 ## Introduction
 
 Vehicle locations expose the GPS coordinates each vehicle gateway emits — the latest known position, a polling feed for low-latency updates, and a historical track for arbitrary time windows. Pick `current()` for an at-a-glance map, `feed()` for incremental polling, and `history()` for back-fill or audit work.
 
-> **Note:** `VehicleLocationsResource` does not declare a typed `$entity`. Each result is a generic `Entity` (a `Fluent` instance) keyed by the response shape documented in [Properties](#available-properties). There are no `getLatitude()` / `getLongitude()` helpers on the result; access keys directly with `$location->latitude`.
+> **Note:** `VehicleLocationsResource` does not declare a typed `$entity`. Each result is a generic `Entity` (a `Fluent` instance) keyed by the response shape documented in [Properties](#properties). There are no `getLatitude()` / `getLongitude()` helpers on the result; access keys directly with `$location->latitude`.
 
 ## Current Locations
 

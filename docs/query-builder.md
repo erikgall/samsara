@@ -24,7 +24,7 @@ permalink: /query-builder
 
 ## Introduction
 
-The query builder is the fluent interface you reach for whenever you need to filter, paginate, or stream records from a Samsara resource. You start a builder by calling `query()` on a resource, or by calling a builder-returning helper such as `current()` or `history()` on resources that expose multiple endpoints. Some resources, including [Vehicle Stats](resources/vehicle-stats.md), do not expose a single `query()` method — begin the chain with one of their builder helpers instead.
+The query builder is the fluent interface you reach for whenever you need to filter, paginate, or stream records from a Samsara resource. You start a builder by calling `query()` on a resource, or by calling a builder-returning helper such as `current()` or `history()` on resources that expose multiple endpoints. Resources like [Vehicle Stats](resources/vehicle-stats.md) also expose typed shortcuts (`current()`, `history()`, `feed()`, `gps()`, `engineStates()`, etc.) that return a pre-configured builder — prefer those when you know which endpoint or stat type you want.
 
 ## Building Queries
 
@@ -46,7 +46,7 @@ if ($updatedAfter = request('updated_after')) {
 $vehicles = $query->limit(100)->get();
 ```
 
-A handful of resources skip `query()` and return a builder from a domain-specific helper. The Vehicle Stats resource is the most common example — every example must begin by selecting an endpoint:
+Some resources expose domain-specific helpers in addition to `query()`. The Vehicle Stats resource is the clearest example — `current()`, `history()`, and `feed()` each select a different endpoint, so most chains begin there rather than with the bare `query()`:
 
 ```php
 $stats = Samsara::vehicleStats()
