@@ -1,155 +1,210 @@
 ---
 title: Drivers
-layout: default
-parent: Resources
 nav_order: 1
-description: "Manage drivers in your Samsara fleet"
+description: Manage drivers in your Samsara fleet.
 permalink: /resources/drivers
 ---
 
-# Drivers Resource
+# Drivers
 
-Manage drivers in your Samsara fleet.
+- [Introduction](#introduction)
+- [Retrieving Records](#retrieving-records)
+- [Creating Records](#creating-records)
+- [Updating Records](#updating-records)
+- [Deleting Records](#deleting-records)
+- [Filtering](#filtering)
+  - [Active and Deactivated](#active-and-deactivated)
+  - [By External ID](#by-external-id)
+- [Additional Operations](#additional-operations)
+  - [Activation and Deactivation](#activation-and-deactivation)
+  - [Remote Sign Out](#remote-sign-out)
+  - [QR Codes](#qr-codes)
+  - [Auth Tokens](#auth-tokens)
+- [Driver Activation Status](#driver-activation-status)
+- [Helper Methods](#helper-methods)
+- [Properties](#properties)
+- [Related Resources](#related-resources)
 
-## Basic Usage
+## Introduction
+
+Drivers are the people who operate vehicles in your Samsara fleet. Reach for this resource when you need to maintain the driver roster, manage activation, look drivers up by an external payroll ID, or generate the credentials a driver uses to log into the Samsara app.
+
+## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-// Get all drivers
 $drivers = Samsara::drivers()->all();
 
-// Find a driver
 $driver = Samsara::drivers()->find('driver-id');
+```
 
-// Create a driver
+## Creating Records
+
+```php
 $driver = Samsara::drivers()->create([
-    'name' => 'John Doe',
+    'name'  => 'John Doe',
     'phone' => '+1234567890',
 ]);
+```
 
-// Update a driver
+## Updating Records
+
+```php
 $driver = Samsara::drivers()->update('driver-id', [
     'phone' => '+0987654321',
 ]);
+```
 
-// Delete a driver
+## Deleting Records
+
+```php
 Samsara::drivers()->delete('driver-id');
 ```
 
-## Query Builder
+## Filtering
+
+Drivers accept the standard query builder. See [the query builder reference](../query-builder.md) for the full method list.
 
 ```php
-// Filter active drivers
-$activeDrivers = Samsara::drivers()->active()->get();
-
-// Filter deactivated drivers
-$deactivatedDrivers = Samsara::drivers()->deactivated()->get();
-
-// Filter by tag
 $drivers = Samsara::drivers()
     ->query()
     ->whereTag('tag-id')
-    ->get();
-
-// Filter by parent tag
-$drivers = Samsara::drivers()
-    ->query()
     ->whereParentTag('parent-tag-id')
     ->get();
 ```
 
-## Driver Activation
+### Active and Deactivated
+
+The resource ships two convenience sub-builders that pre-filter on `driverActivationStatus`.
 
 ```php
-// Deactivate a driver
-$driver = Samsara::drivers()->deactivate('driver-id');
+$activeDrivers = Samsara::drivers()->active()->get();
 
-// Activate a driver
-$driver = Samsara::drivers()->activate('driver-id');
+$deactivatedDrivers = Samsara::drivers()->deactivated()->get();
 ```
 
-## External IDs
+### By External ID
+
+`findByExternalId()` looks up a single driver by an `externalIds[key]` mapping you control.
 
 ```php
-// Find by external ID
 $driver = Samsara::drivers()->findByExternalId('payroll_id', '12345');
 ```
 
-## Remote Sign Out
+## Additional Operations
+
+### Activation and Deactivation
+
+Both helpers wrap an `update()` call that flips `driverActivationStatus`.
 
 ```php
-// Remotely sign out a driver from their device
+$driver = Samsara::drivers()->deactivate('driver-id');
+
+$driver = Samsara::drivers()->activate('driver-id');
+```
+
+### Remote Sign Out
+
+```php
 Samsara::drivers()->remoteSignOut('driver-id');
 ```
 
-## QR Codes
+### QR Codes
+
+QR codes provide a passwordless app login path for drivers.
 
 ```php
-// Get all QR codes
-$qrCodes = Samsara::drivers()->getQrCodes();
+$qrCodes = Samsara::drivers()->getQrCodes(); // Collection<int, object>
 
-// Create a QR code
 $qrCode = Samsara::drivers()->createQrCode([
     'driverId' => 'driver-id',
 ]);
 
-// Delete a QR code
 Samsara::drivers()->deleteQrCode('qr-code-id');
 ```
 
-## Auth Tokens
+### Auth Tokens
+
+`createAuthToken()` returns a session token string that the driver app can use to authenticate.
 
 ```php
-// Create an authentication token for a driver
 $token = Samsara::drivers()->createAuthToken('driver-id');
 ```
 
-## Driver Entity
+## Driver Activation Status
 
-The `Driver` entity provides helper methods:
+The `Samsara\Enums\DriverActivationStatus` enum lists the values for the `driverActivationStatus` field. See the [enum reference](../enums.md) for the canonical mapping.
+
+| Case | Value | Description |
+|------|-------|-------------|
+| `ACTIVE` | `active` | Driver can log into the app and be assigned to a vehicle. |
+| `DEACTIVATED` | `deactivated` | Driver is archived but their history is retained. |
+
+The `Driver` entity exposes a typed accessor:
+
+```php
+$driver->getActivationStatus(); // ?DriverActivationStatus
+```
+
+## Helper Methods
 
 ```php
 $driver = Samsara::drivers()->find('driver-id');
 
-// Check status
-$driver->isActive();      // bool
-$driver->isDeactivated(); // bool
+$driver->isActive();                    // bool
+$driver->isDeactivated();               // bool
 
-// Get display name (name or username)
-$driver->getDisplayName(); // string
+$driver->getDisplayName();              // string — name, falls back to username
 
-// Check ELD settings
-$driver->isEldExempt();              // bool
+$driver->isEldExempt();                 // bool
 $driver->isPersonalConveyanceEnabled(); // bool
-$driver->isYardMoveEnabled();        // bool
+$driver->isYardMoveEnabled();           // bool
 
-// Get related entities
-$driver->getEldSettings();         // ?EldSettings
-$driver->getCarrierSettings();     // ?CarrierSettings
-$driver->getStaticAssignedVehicle(); // ?StaticAssignedVehicle
+$driver->getEldSettings();              // ?EldSettings
+$driver->getCarrierSettings();          // ?CarrierSettings
+$driver->getStaticAssignedVehicle();    // ?StaticAssignedVehicle
+$driver->hasStaticAssignedVehicle();    // bool
 
-// Get external ID
-$driver->getExternalId('payroll_id'); // ?string
-
-// Get tag IDs
-$driver->getTagIds(); // array<string>
+$driver->getExternalId('payroll_id');   // ?string
+$driver->getTagIds();                   // array<int, string>
 ```
 
-## Available Properties
+## Properties
+
+The `Driver` entity (`Samsara\Data\Driver\Driver`) exposes the following typed properties.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `id` | string | Driver ID |
-| `name` | string | Driver name |
-| `username` | string | Login username |
-| `phone` | string | Phone number |
-| `licenseNumber` | string | License number |
-| `licenseState` | string | License state |
-| `timezone` | string | Timezone |
-| `driverActivationStatus` | string | 'active' or 'deactivated' |
-| `eldExempt` | bool | ELD exempt flag |
-| `eldPcEnabled` | bool | Personal conveyance enabled |
-| `eldYmEnabled` | bool | Yard move enabled |
-| `externalIds` | array | External ID mappings |
-| `tags` | array | Associated tags |
+| `id` | `?string` | Driver ID. |
+| `name` | `?string` | Driver name. |
+| `username` | `?string` | Login username. |
+| `phone` | `?string` | Phone number. |
+| `licenseNumber` | `?string` | Driver's license number. |
+| `licenseState` | `?string` | License state abbreviation. |
+| `timezone` | `?string` | Home terminal timezone. |
+| `notes` | `?string` | Notes about the driver. |
+| `createdAtTime` | `?string` | Creation timestamp (RFC 3339). |
+| `updatedAtTime` | `?string` | Last update timestamp (RFC 3339). |
+| `driverActivationStatus` | `?string` | `active` or `deactivated`. See [`DriverActivationStatus`](#driver-activation-status). |
+| `profileImageUrl` | `?string` | Profile image URL. |
+| `locale` | `?string` | Driver's locale. |
+| `currentIdCardCode` | `?string` | Current ID card code. |
+| `tachographCardNumber` | `?string` | Tachograph card number. |
+| `eldExempt` | `?bool` | Whether the driver is ELD exempt. |
+| `eldExemptReason` | `?string` | Reason text when `eldExempt` is true. |
+| `eldPcEnabled` | `?bool` | Personal conveyance enabled. |
+| `eldYmEnabled` | `?bool` | Yard move enabled. |
+| `externalIds` | `?array<string, string>` | External ID mappings. |
+| `tags` | `?array` | Associated tags. Each entry is `{id, name?, parentTagId?}`. |
+| `eldSettings` | `?array` | ELD settings — `{rulesets?: [...]}`. Use `getEldSettings()` for a typed wrapper. |
+| `carrierSettings` | `?array` | Carrier settings. Use `getCarrierSettings()` for a typed wrapper. |
+| `staticAssignedVehicle` | `?array` | Static assigned vehicle — `{id, name?}`. Use `getStaticAssignedVehicle()` for a typed wrapper. |
+
+## Related Resources
+
+- [Hours of Service](hours-of-service.md) — HOS logs, clocks, and violations per driver.
+- [Assignments](assignments.md) — driver-vehicle and driver-trailer assignment history.
+- [Tags](tags.md) — group drivers for filtering.
+- [Query Builder](../query-builder.md) — filters and pagination.
+- [Testing](../testing.md) — fake `Samsara::drivers()` calls in your tests.

@@ -1,75 +1,91 @@
 ---
 title: Equipment
-layout: default
-parent: Resources
 nav_order: 4
-description: "Manage and track equipment assets in your Samsara fleet"
+description: Manage and track non-vehicle equipment in your Samsara fleet.
 permalink: /resources/equipment
 ---
 
-# Equipment Resource
+# Equipment
 
-Manage and track equipment assets in your Samsara fleet.
+- [Introduction](#introduction)
+- [Retrieving Records](#retrieving-records)
+- [Creating Records](#creating-records)
+- [Updating Records](#updating-records)
+- [Deleting Records](#deleting-records)
+- [Filtering](#filtering)
+  - [By External ID](#by-external-id)
+- [Equipment Locations](#equipment-locations)
+- [Equipment Stats](#equipment-stats)
+- [Helper Methods](#helper-methods)
+- [Properties](#properties)
+- [Related Resources](#related-resources)
 
-## Basic Usage
+## Introduction
+
+Equipment covers the non-vehicle, non-trailer assets in your fleet — generators, light towers, attachments, and similar units that carry a Samsara gateway. Reach for this resource when you need a typed, equipment-specific entity (rather than the generic [Assets](assets.md) view) and when you want the per-equipment locations and stats sub-builders.
+
+## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-// Get all equipment
 $equipment = Samsara::equipment()->all();
 
-// Find equipment
 $item = Samsara::equipment()->find('equipment-id');
+```
 
-// Create equipment
+## Creating Records
+
+```php
 $item = Samsara::equipment()->create([
-    'name' => 'Generator G-100',
-    'serialNumber' => 'GEN12345',
+    'name'        => 'Generator G-100',
+    'assetSerial' => 'GEN12345',
 ]);
+```
 
-// Update equipment
+## Updating Records
+
+```php
 $item = Samsara::equipment()->update('equipment-id', [
     'name' => 'Generator G-100 Updated',
 ]);
+```
 
-// Delete equipment
+## Deleting Records
+
+```php
 Samsara::equipment()->delete('equipment-id');
 ```
 
-## Query Builder
+## Filtering
+
+Equipment accepts the standard query builder. See [the query builder reference](../query-builder.md) for the full method list.
 
 ```php
-// Filter by tag
 $equipment = Samsara::equipment()
     ->query()
     ->whereTag('tag-id')
-    ->get();
-
-// Filter by parent tag
-$equipment = Samsara::equipment()
-    ->query()
     ->whereParentTag('parent-tag-id')
     ->get();
 ```
 
-## External IDs
+### By External ID
+
+`findByExternalId()` looks up a single record by an `externalIds[key]` mapping you control.
 
 ```php
-// Find by external ID
 $item = Samsara::equipment()->findByExternalId('asset_id', 'EQ-12345');
 ```
 
 ## Equipment Locations
 
+Three sub-builders expose location data: a current snapshot, a polling feed, and a historical query.
+
 ```php
-// Get current equipment locations
 $locations = Samsara::equipment()->locations()->get();
 
-// Get equipment locations feed (for polling)
 $feed = Samsara::equipment()->locationsFeed()->get();
 
-// Get equipment locations history
 $history = Samsara::equipment()
     ->locationsHistory()
     ->between(now()->subDays(7), now())
@@ -78,40 +94,49 @@ $history = Samsara::equipment()
 
 ## Equipment Stats
 
+Stats follow the same three-builder shape as locations.
+
 ```php
-// Get current equipment stats
 $stats = Samsara::equipment()->stats()->get();
 
-// Get equipment stats feed (for polling)
 $feed = Samsara::equipment()->statsFeed()->get();
 
-// Get equipment stats history
 $history = Samsara::equipment()
     ->statsHistory()
     ->between(now()->subDays(7), now())
     ->get();
 ```
 
-## Equipment Entity
+## Helper Methods
+
+The `Equipment` entity exposes a small set of helpers:
 
 ```php
 $item = Samsara::equipment()->find('equipment-id');
 
-$item->id;           // string
-$item->name;         // string
-$item->serialNumber; // ?string
-$item->notes;        // ?string
-$item->tags;         // array
-$item->externalIds;  // array
+$item->getDisplayName();              // string — falls back to "Unknown"
+$item->getExternalId('asset_id');     // ?string
+$item->getTagIds();                   // array<int, string>
 ```
 
-## Available Properties
+## Properties
+
+The `Equipment` entity (`Samsara\Data\Equipment\Equipment`) exposes the following typed properties.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `id` | string | Equipment ID |
-| `name` | string | Equipment name |
-| `serialNumber` | string | Serial number |
-| `notes` | string | Notes |
-| `tags` | array | Associated tags |
-| `externalIds` | array | External ID mappings |
+| `id` | `?string` | Equipment ID. |
+| `name` | `?string` | Equipment name. |
+| `assetSerial` | `?string` | Equipment identification number. |
+| `notes` | `?string` | Notes about the equipment. |
+| `externalIds` | `?array<string, string>` | External ID mappings. |
+| `tags` | `?array` | Associated tags. Each entry is `{id, name?, parentTagId?}`. |
+| `installedGateway` | `?array` | Installed gateway info — `{serial?, model?}`. |
+
+## Related Resources
+
+- [Vehicles](vehicles.md) — vehicle equivalents with their own locations and stats sub-builders.
+- [Trailers](trailers.md) — trailer equivalents.
+- [Assets](assets.md) — combined view across all asset classes.
+- [Gateways](gateways.md) — typed reference to the installed gateway.
+- [Query Builder](../query-builder.md) — for filtering, pagination, and lazy iteration.

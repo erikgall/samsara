@@ -1,62 +1,73 @@
 ---
 title: Addresses
-layout: default
-parent: Resources
 nav_order: 12
-description: "Manage addresses and geofences for location-based operations"
+description: Manage addresses and geofences for location-based fleet operations.
 permalink: /resources/addresses
 ---
 
-# Addresses Resource
+# Addresses
 
-Manage addresses and geofences for location-based operations.
+- [Introduction](#introduction)
+- [Retrieving Records](#retrieving-records)
+- [Creating Records](#creating-records)
+  - [Circular Geofences](#circular-geofences)
+  - [Polygon Geofences](#polygon-geofences)
+- [Updating Records](#updating-records)
+- [Deleting Records](#deleting-records)
+- [Filtering](#filtering)
+- [Helper Methods](#helper-methods)
+- [Properties](#properties)
+- [Related Resources](#related-resources)
 
-## Basic Usage
+## Introduction
+
+An address in Samsara is a named location with an optional **geofence** — a polygon or circle that encloses an area you care about, such as a yard, customer site, or distribution center. The Samsara platform uses geofences to detect arrivals, departures, and dwell time. Reach for this resource when you need to maintain that directory of geofenced locations and the contacts attached to them.
+
+## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-// Get all addresses
 $addresses = Samsara::addresses()->all();
 
-// Find an address
 $address = Samsara::addresses()->find('address-id');
-
-// Create an address
-$address = Samsara::addresses()->create([
-    'name' => 'Distribution Center',
-    'formattedAddress' => '123 Warehouse Blvd, City, ST 12345',
-    'notes' => 'Main loading dock on west side',
-]);
-
-// Update an address
-$address = Samsara::addresses()->update('address-id', [
-    'name' => 'Main Distribution Center',
-]);
-
-// Delete an address
-Samsara::addresses()->delete('address-id');
 ```
 
-## Creating Geofences
+## Creating Records
 
 ```php
-// Create address with circular geofence
 $address = Samsara::addresses()->create([
-    'name' => 'Customer Site A',
+    'name'             => 'Distribution Center',
+    'formattedAddress' => '123 Warehouse Blvd, City, ST 12345',
+    'notes'            => 'Main loading dock on west side',
+]);
+```
+
+### Circular Geofences
+
+Pass a `circle` payload with center coordinates and a radius in meters.
+
+```php
+$address = Samsara::addresses()->create([
+    'name'             => 'Customer Site A',
     'formattedAddress' => '456 Main St, City, ST 12345',
     'geofence' => [
         'circle' => [
-            'latitude' => 37.7749,
-            'longitude' => -122.4194,
+            'latitude'     => 37.7749,
+            'longitude'    => -122.4194,
             'radiusMeters' => 200,
         ],
     ],
 ]);
+```
 
-// Create address with polygon geofence
+### Polygon Geofences
+
+Pass a `polygon` payload with three or more vertices.
+
+```php
 $address = Samsara::addresses()->create([
-    'name' => 'Warehouse Zone',
+    'name'             => 'Warehouse Zone',
     'formattedAddress' => '789 Industrial Ave, City, ST 12345',
     'geofence' => [
         'polygon' => [
@@ -71,70 +82,79 @@ $address = Samsara::addresses()->create([
 ]);
 ```
 
-## Query Builder
+A geofence is either a circle or a polygon, never both.
+
+## Updating Records
 
 ```php
-// Filter by tag
+$address = Samsara::addresses()->update('address-id', [
+    'name' => 'Main Distribution Center',
+]);
+```
+
+## Deleting Records
+
+```php
+Samsara::addresses()->delete('address-id');
+```
+
+## Filtering
+
+Addresses accept the standard query builder. See [the query builder reference](../query-builder.md) for the full method list.
+
+```php
 $addresses = Samsara::addresses()
     ->query()
     ->whereTag('delivery-locations')
-    ->get();
-
-// Get addresses created after a date
-$addresses = Samsara::addresses()
-    ->query()
     ->createdAfter('2024-01-01T00:00:00Z')
-    ->get();
-
-// Limit results
-$addresses = Samsara::addresses()
-    ->query()
     ->limit(50)
     ->get();
 ```
 
-## Address Entity
+## Helper Methods
 
-The `Address` entity provides helper methods:
+The `Address` entity exposes helpers for inspecting the geofence and the related entities attached to it.
 
 ```php
 $address = Samsara::addresses()->find('address-id');
 
-// Check geofence type
-$address->hasGeofence();     // bool
-$address->isCircleGeofence(); // bool
-$address->isPolygonGeofence(); // bool
+$address->hasGeofence();        // bool
+$address->isCircleGeofence();   // bool
+$address->isPolygonGeofence();  // bool
 
-// Check address type
-$address->isYard();      // bool
-$address->isShortHaul(); // bool
+$address->isYard();             // bool — checks `addressTypes` for 'yard'
+$address->isShortHaul();        // bool — checks `addressTypes` for 'shortHaul'
+$address->hasAddressType('customer'); // bool — generic check
 
-// Get related data
-$address->getGeofence();  // ?AddressGeofence
-$address->getTagIds();    // array<string>
-$address->getContactIds(); // array<string>
-
-// Basic properties
-$address->id;               // string
-$address->name;             // string
-$address->formattedAddress; // string
-$address->latitude;         // ?float
-$address->longitude;        // ?float
-$address->notes;            // ?string
+$address->getGeofence();        // ?AddressGeofence
+$address->getTagIds();          // array<int, string>
+$address->getContactIds();      // array<int, string>
 ```
 
-## Available Properties
+`getGeofence()` returns an `AddressGeofence` entity with its own helpers — `getCenter()`, `getRadius()`, `getVertices()`, `isCircle()`, and `isPolygon()`.
+
+## Properties
+
+The `Address` entity (`Samsara\Data\Address\Address`) exposes the following typed properties.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `id` | string | Address ID |
-| `name` | string | Address name |
-| `formattedAddress` | string | Formatted address string |
-| `latitude` | float | Latitude coordinate |
-| `longitude` | float | Longitude coordinate |
-| `notes` | string | Address notes |
-| `geofence` | object | Geofence configuration |
-| `tags` | array | Associated tags |
-| `contacts` | array | Associated contacts |
-| `addressTypes` | array | Address type classifications |
-| `externalIds` | array | External ID mappings |
+| `id` | `?string` | Address ID. |
+| `name` | `?string` | Address name. |
+| `formattedAddress` | `?string` | Full street address. |
+| `latitude` | `?float` | Latitude coordinate. |
+| `longitude` | `?float` | Longitude coordinate. |
+| `notes` | `?string` | Notes about the address. |
+| `createdAtTime` | `?string` | Creation timestamp (RFC 3339). |
+| `addressTypes` | `?array<int, string>` | Address type classifications (e.g., `yard`, `shortHaul`). |
+| `externalIds` | `?array<string, string>` | External ID mappings. |
+| `contacts` | `?array` | Associated contacts. Each entry is `{id, firstName?, lastName?}`. |
+| `tags` | `?array` | Associated tags. Each entry is `{id, name?, parentTagId?}`. |
+| `geofence` | `?array` | Raw geofence payload. Use `getGeofence()` for a typed wrapper. |
+
+## Related Resources
+
+- [Contacts](contacts.md) — attach a contact directory to your addresses.
+- [Tags](tags.md) — group addresses for filtering.
+- [Routes](routes.md) — addresses are referenced by route stops.
+- [Query Builder](../query-builder.md) — for filtering, pagination, and lazy iteration.
