@@ -8,11 +8,31 @@ permalink: /error-handling
 
 # Error Handling
 
-The Samsara SDK provides a comprehensive exception hierarchy for handling API errors.
+- [Introduction](#introduction)
+- [Exception Hierarchy](#exception-hierarchy)
+- [Catching Exceptions](#catching-exceptions)
+- [Exception Reference](#exception-reference)
+  - [AuthenticationException](#authenticationexception)
+  - [AuthorizationException](#authorizationexception)
+  - [NotFoundException](#notfoundexception)
+  - [UnsupportedOperationException](#unsupportedoperationexception)
+  - [ValidationException](#validationexception)
+  - [RateLimitException](#ratelimitexception)
+  - [ServerException](#serverexception)
+  - [InvalidSignatureException](#invalidsignatureexception)
+  - [ConnectionException](#connectionexception)
+- [Exception Context](#exception-context)
+- [Retry Logic](#retry-logic)
+- [Connection Errors](#connection-errors)
+- [Laravel Exception Handler](#laravel-exception-handler)
+
+## Introduction
+
+When the Samsara API returns an error, the SDK throws a typed exception you can catch by status family or by specific failure mode. Every exception extends `Samsara\Exceptions\SamsaraException`, so you may catch broadly or narrow down to the case you care about. The reference below maps each exception to the API response that triggers it, shows the context every exception carries, and walks through wiring SDK errors into Laravel's exception handler.
 
 ## Exception Hierarchy
 
-```
+```text
 SamsaraException (base)
 ├── AuthenticationException (401)
 ├── AuthorizationException (403)
@@ -20,12 +40,16 @@ SamsaraException (base)
 ├── UnsupportedOperationException
 ├── ValidationException (422)
 ├── RateLimitException (429)
-└── ServerException (5xx)
+├── ServerException (5xx)
+├── InvalidSignatureException (webhook verification)
+└── ConnectionException (reserved)
 ```
+
+Network failures (DNS errors, TCP timeouts) are not part of this hierarchy. They propagate as `Illuminate\Http\Client\ConnectionException` from the underlying HTTP client. See [Connection Errors](#connection-errors).
 
 ## Catching Exceptions
 
-### Basic Error Handling
+For most application code, catching the base exception is enough — every SDK error rolls up to it.
 
 ```php
 use Samsara\Facades\Samsara;
@@ -34,217 +58,199 @@ use Samsara\Exceptions\SamsaraException;
 try {
     $driver = Samsara::drivers()->find('driver-id');
 } catch (SamsaraException $e) {
-    // Handle any API error
-    Log::error('Samsara API error: ' . $e->getMessage());
+    Log::error('Samsara API error: '.$e->getMessage(), $e->getContext());
 }
 ```
 
-### Specific Exception Handling
+When you need to react differently per failure mode, branch on the specific cases. Two or three branches plus a fallback covers almost every real-world handler:
 
 ```php
-use Samsara\Facades\Samsara;
 use Samsara\Exceptions\AuthenticationException;
-use Samsara\Exceptions\AuthorizationException;
-use Samsara\Exceptions\NotFoundException;
-use Samsara\Exceptions\UnsupportedOperationException;
-use Samsara\Exceptions\ValidationException;
 use Samsara\Exceptions\RateLimitException;
-use Samsara\Exceptions\ServerException;
 use Samsara\Exceptions\SamsaraException;
 
 try {
-    $driver = Samsara::drivers()->create($data);
+    $driver = Samsara::drivers()->create($payload);
 } catch (AuthenticationException $e) {
-    // Invalid or expired API token (401)
-    Log::error('Invalid API token');
-
-} catch (AuthorizationException $e) {
-    // Insufficient permissions (403)
-    Log::error('Permission denied');
-
-} catch (NotFoundException $e) {
-    // Resource not found (404)
-    Log::warning('Resource not found');
-
-} catch (UnsupportedOperationException $e) {
-    // Operation not supported (e.g., vehicle creation/deletion)
-    Log::warning('Unsupported operation: ' . $e->getMessage());
-
-} catch (ValidationException $e) {
-    // Invalid request data (422)
-    $errors = $e->getErrors();
-    Log::warning('Validation failed', ['errors' => $errors]);
-
+    Log::error('Samsara token rejected', $e->getContext());
+    throw $e;
 } catch (RateLimitException $e) {
-    // Too many requests (429)
-    $retryAfter = $e->getRetryAfter();
-    Log::warning("Rate limited. Retry after {$retryAfter} seconds");
-
-} catch (ServerException $e) {
-    // Server error (5xx)
-    Log::error('Samsara server error: ' . $e->getMessage());
-
+    sleep($e->getRetryAfter() ?? 30);
+    $driver = Samsara::drivers()->create($payload);
 } catch (SamsaraException $e) {
-    // Other API errors
-    Log::error('API error: ' . $e->getMessage());
+    Log::error('Samsara API error', $e->getContext());
+    throw $e;
 }
 ```
 
-## Exception Details
+## Exception Reference
 
-### AuthenticationException (401)
+### AuthenticationException
 
-Thrown when the API token is invalid or expired.
+An `AuthenticationException` is thrown whenever Samsara returns a `401` — typically because your API token is missing, malformed, or has been revoked. Verify `SAMSARA_API_KEY` in your environment file before retrying.
 
 ```php
+use Samsara\Exceptions\AuthenticationException;
+
 try {
     $drivers = Samsara::drivers()->all();
 } catch (AuthenticationException $e) {
-    // Check your SAMSARA_API_KEY in .env
-    echo $e->getMessage(); // "Invalid API token"
+    // Refresh credentials, then retry.
 }
 ```
 
-### AuthorizationException (403)
+### AuthorizationException
 
-Thrown when the authenticated user lacks permission.
+Thrown when Samsara returns a `403`. The token is valid, but the authenticated user lacks the permissions required for the request.
 
 ```php
+use Samsara\Exceptions\AuthorizationException;
+
 try {
-    $driver = Samsara::drivers()->delete('driver-id');
+    Samsara::drivers()->delete('driver-id');
 } catch (AuthorizationException $e) {
-    echo $e->getMessage(); // "You don't have permission..."
+    Log::warning('Permission denied: '.$e->getMessage());
 }
 ```
 
-### NotFoundException (404)
+### NotFoundException
 
-Thrown when a requested resource doesn't exist.
+Thrown when Samsara returns a `404` for any method except `find()`. `find()` swallows 404s and returns `null` so you can branch on the absence of a record without a `try/catch`.
 
 ```php
-try {
-    $driver = Samsara::drivers()->find('invalid-id');
-} catch (NotFoundException $e) {
-    // Note: find() returns null for 404, doesn't throw
-}
+use Samsara\Exceptions\NotFoundException;
 
-// For other methods that throw on 404:
+$driver = Samsara::drivers()->find('missing-id');
+// $driver is null, no exception.
+
 try {
-    $driver = Samsara::drivers()->delete('invalid-id');
+    Samsara::drivers()->delete('missing-id');
 } catch (NotFoundException $e) {
-    echo $e->getMessage(); // "Driver not found"
+    // 404 from a non-find() method.
 }
 ```
 
 ### UnsupportedOperationException
 
-Thrown when a resource does not support the requested operation. Some Samsara API resources have restrictions that prevent certain CRUD operations. For example, vehicles cannot be created or deleted via the `/fleet/vehicles` endpoint.
+Unlike the rest of the hierarchy, `UnsupportedOperationException` is not tied to an HTTP status code. The SDK throws it before sending a request when the targeted resource fundamentally does not support the operation. The most common case is creating or deleting a vehicle through `/fleet/vehicles`, which the Samsara API does not allow.
 
 ```php
-use Samsara\Facades\Samsara;
 use Samsara\Exceptions\UnsupportedOperationException;
 
 try {
     Samsara::vehicles()->create(['name' => 'Truck 001']);
 } catch (UnsupportedOperationException $e) {
-    // The exception message includes guidance on the correct approach
+    // The exception message includes guidance on the correct approach.
     echo $e->getMessage();
-    // "Vehicles cannot be created via /fleet/vehicles. Vehicles are automatically
-    // created when a Samsara Vehicle Gateway is installed. To manually create
-    // vehicles, use the Assets API: $samsara->assets()->create(['type' => 'vehicle', ...])."
 }
 ```
 
-Unlike other exceptions in the hierarchy, this is not tied to an HTTP status code. It is thrown before any API request is made, indicating that the operation is fundamentally unsupported for the resource.
+### ValidationException
 
-### ValidationException (422)
-
-Thrown when request data fails validation.
+Thrown when Samsara returns a `422`. Call `getErrors()` to read the API's `errors` payload.
 
 ```php
+use Samsara\Exceptions\ValidationException;
+
 try {
-    $driver = Samsara::drivers()->create([
-        // Missing required fields
-    ]);
+    Samsara::drivers()->create([]);
 } catch (ValidationException $e) {
-    // Get validation errors
-    $errors = $e->getErrors();
-
-    // [
-    //     'name' => ['Name is required'],
-    //     'phone' => ['Invalid phone format'],
-    // ]
-
-    foreach ($errors as $field => $messages) {
-        echo "{$field}: " . implode(', ', $messages);
+    foreach ($e->getErrors() as $field => $messages) {
+        Log::warning("{$field}: ".implode(', ', $messages));
     }
 }
 ```
 
-### RateLimitException (429)
+> **Note:** `getErrors()` returns whatever the API placed in the `errors` key of the response body. Samsara's 422 responses sometimes return an empty array and place the human-readable detail in the message instead. Always inspect `$e->getMessage()` alongside `$e->getErrors()`.
 
-Thrown when you exceed the API rate limit.
+### RateLimitException
+
+Thrown when Samsara returns a `429`. `getRetryAfter()` returns the integer parsed from the `Retry-After` header, or `null` when the API did not include one.
 
 ```php
+use Samsara\Exceptions\RateLimitException;
+
 try {
     $drivers = Samsara::drivers()->all();
 } catch (RateLimitException $e) {
-    // Get retry-after value (seconds)
-    $retryAfter = $e->getRetryAfter();
-
-    if ($retryAfter) {
-        sleep($retryAfter);
-        // Retry the request
-    }
+    $wait = $e->getRetryAfter() ?? 30;
+    sleep($wait);
 }
 ```
 
-### ServerException (5xx)
+### ServerException
 
-Thrown for server-side errors.
+Thrown for any `5xx` response. The HTTP status is preserved on the exception via `getCode()`, which is helpful when you log or alert on these failures.
 
 ```php
+use Samsara\Exceptions\ServerException;
+
 try {
     $drivers = Samsara::drivers()->all();
 } catch (ServerException $e) {
-    // Log and alert, likely a temporary issue
-    Log::critical('Samsara API is down', [
+    Log::critical('Samsara API failure', [
         'message' => $e->getMessage(),
-        'code' => $e->getCode(),
+        'status'  => $e->getCode(),
     ]);
 }
 ```
 
+### InvalidSignatureException
+
+Thrown by `Samsara\Webhooks\WebhookSignatureVerifier` when an inbound webhook fails verification — missing headers, an expired timestamp, a configuration error, or a signature mismatch. Catch it in your webhook controller and respond with `401`.
+
+```php
+use Samsara\Exceptions\InvalidSignatureException;
+use Samsara\Webhooks\WebhookSignatureVerifier;
+
+try {
+    WebhookSignatureVerifier::make(config('samsara.webhook_secret'))
+        ->verifyFromRequest(
+            $request->getContent(),
+            $request->header('X-Samsara-Signature'),
+            $request->header('X-Samsara-Timestamp'),
+        );
+} catch (InvalidSignatureException $e) {
+    abort(401, $e->getMessage());
+}
+```
+
+See [Webhooks](resources/webhooks.md) for the full verification flow.
+
+### ConnectionException
+
+`Samsara\Exceptions\ConnectionException` is reserved for a future SDK release that wraps low-level network failures. The SDK does not currently throw it. Today, network errors propagate as `Illuminate\Http\Client\ConnectionException` from the underlying HTTP client — see [Connection Errors](#connection-errors).
+
 ## Exception Context
 
-All exceptions include context information:
+Every SDK exception (except `UnsupportedOperationException`, which never reaches the network) carries a `getContext()` array describing the failed request.
 
 ```php
 try {
-    $driver = Samsara::drivers()->find('driver-id');
+    Samsara::drivers()->find('driver-id');
 } catch (SamsaraException $e) {
     $context = $e->getContext();
-
     // [
-    //     'status' => 404,
+    //     'status'   => 404,
     //     'endpoint' => '/fleet/drivers',
-    //     'body' => [...],
+    //     'body'     => [...],
     // ]
 }
 ```
 
+Pass the context straight to your logger to capture the failed endpoint, status, and response body in a single record.
+
 ## Retry Logic
 
-The SDK includes automatic retry for transient failures. Configure in `config/samsara.php`:
+The SDK retries transient HTTP failures automatically. Configure the retry count in `config/samsara.php`:
 
 ```php
-'retry' => 3, // Number of retries
+'retry' => 3,
 ```
 
-For manual retry with exponential backoff:
+For application-level retry with exponential backoff — for example, when a long-running job hits a rate limit — wrap the call in a small helper:
 
 ```php
-use Samsara\Facades\Samsara;
 use Samsara\Exceptions\RateLimitException;
 use Samsara\Exceptions\ServerException;
 
@@ -256,11 +262,10 @@ function fetchWithRetry(callable $callback, int $maxAttempts = 3): mixed
         try {
             return $callback();
         } catch (RateLimitException $e) {
-            $retryAfter = $e->getRetryAfter() ?? pow(2, $attempt);
-            sleep($retryAfter);
+            sleep($e->getRetryAfter() ?? (2 ** $attempt));
             $attempt++;
         } catch (ServerException $e) {
-            sleep(pow(2, $attempt));
+            sleep(2 ** $attempt);
             $attempt++;
         }
     }
@@ -268,59 +273,69 @@ function fetchWithRetry(callable $callback, int $maxAttempts = 3): mixed
     throw new \RuntimeException('Max retry attempts exceeded');
 }
 
-// Usage
-$drivers = fetchWithRetry(fn() => Samsara::drivers()->all());
-```
-
-## Laravel Exception Handler
-
-Handle Samsara exceptions globally in `app/Exceptions/Handler.php`:
-
-```php
-use Samsara\Exceptions\SamsaraException;
-use Samsara\Exceptions\AuthenticationException;
-use Samsara\Exceptions\RateLimitException;
-
-public function register(): void
-{
-    $this->renderable(function (AuthenticationException $e) {
-        return response()->json([
-            'error' => 'Fleet API authentication failed',
-        ], 500);
-    });
-
-    $this->renderable(function (RateLimitException $e) {
-        return response()->json([
-            'error' => 'Fleet API rate limit exceeded',
-            'retry_after' => $e->getRetryAfter(),
-        ], 503);
-    });
-
-    $this->renderable(function (SamsaraException $e) {
-        Log::error('Samsara API error', [
-            'message' => $e->getMessage(),
-            'context' => $e->getContext(),
-        ]);
-
-        return response()->json([
-            'error' => 'Fleet API error',
-        ], 500);
-    });
-}
+$drivers = fetchWithRetry(fn () => Samsara::drivers()->all());
 ```
 
 ## Connection Errors
 
-Network issues throw Laravel's `ConnectionException`:
+DNS failures, TCP timeouts, and other transport-level errors come through Laravel's HTTP client as `Illuminate\Http\Client\ConnectionException`. They are not part of the SDK's exception hierarchy today.
 
 ```php
 use Illuminate\Http\Client\ConnectionException;
-use Samsara\Facades\Samsara;
 
 try {
     $drivers = Samsara::drivers()->all();
 } catch (ConnectionException $e) {
-    // Network timeout, DNS failure, etc.
-    Log::error('Cannot connect to Samsara API: ' . $e->getMessage());
+    Log::error('Cannot reach Samsara API: '.$e->getMessage());
 }
 ```
+
+A future release of the SDK may wrap these failures in `Samsara\Exceptions\ConnectionException`. Until then, catch the Laravel exception explicitly when you need to react to network problems.
+
+## Laravel Exception Handler
+
+Laravel 12 and 13 register exception behavior in `bootstrap/app.php` via the `withExceptions(...)` callback. Catch the SDK exceptions there to centralize the response your application returns when Samsara fails.
+
+```php
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Samsara\Exceptions\AuthenticationException;
+use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\SamsaraException;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        //
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (AuthenticationException $e) {
+            return response()->json([
+                'error' => 'Fleet API authentication failed',
+            ], 500);
+        });
+
+        $exceptions->render(function (RateLimitException $e) {
+            return response()->json([
+                'error'       => 'Fleet API rate limit exceeded',
+                'retry_after' => $e->getRetryAfter(),
+            ], 503);
+        });
+
+        $exceptions->render(function (SamsaraException $e) {
+            Log::error('Samsara API error', [
+                'message' => $e->getMessage(),
+                'context' => $e->getContext(),
+            ]);
+
+            return response()->json(['error' => 'Fleet API error'], 500);
+        });
+    })->create();
+```
+
+The closures are matched by type-hint, so order them from most specific to least specific. The base `SamsaraException` handler catches every other case.

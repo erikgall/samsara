@@ -2,33 +2,48 @@
 title: Getting Started
 layout: default
 nav_order: 2
-description: "Installation and quick start guide for the Samsara SDK"
+description: Install Samsara, configure your API token, and make your first call.
 permalink: /getting-started
 ---
 
 # Getting Started
 
-This guide will help you get started with the Samsara SDK for Laravel.
+- [Introduction](#introduction)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Basic Usage](#basic-usage)
+  - [Using the Facade](#using-the-facade)
+  - [Using Dependency Injection](#using-dependency-injection)
+  - [Creating a Fresh Instance](#creating-a-fresh-instance)
+- [Querying Records](#querying-records)
+- [Error Handling](#error-handling)
+- [Testing](#testing)
+- [Next Steps](#next-steps)
+
+## Introduction
+
+Samsara is a Laravel SDK for the Samsara Fleet Management API. You install the SDK with Composer, publish a single config file, drop your API token into `.env`, and then reach the API through the `Samsara` facade. The walk-through below covers each step and ends with a query that returns a typed `EntityCollection` from your fleet.
 
 ## Requirements
 
-- PHP 8.1 or higher
-- Laravel 10.x, 11.x, or 12.x
-- Samsara API token
+- PHP 8.2 or higher
+- Laravel 12.x or 13.x
+- A Samsara API token
 
 ## Installation
 
-Install the package via Composer:
+Install the SDK with Composer:
 
 ```bash
 composer require erikgall/samsara
 ```
 
-The package will auto-register its service provider and facade.
+Laravel auto-discovers the package's service provider and the `Samsara` facade alias, so no further registration is required.
 
 ## Configuration
 
-### 1. Publish the Configuration
+First, publish the configuration file:
 
 ```bash
 php artisan vendor:publish --provider="Samsara\SamsaraServiceProvider"
@@ -36,52 +51,50 @@ php artisan vendor:publish --provider="Samsara\SamsaraServiceProvider"
 
 This creates `config/samsara.php`.
 
-### 2. Set Your API Token
-
-Add your Samsara API token to your `.env` file:
+Next, set your API token in `.env`:
 
 ```env
 SAMSARA_API_KEY=your-api-token-here
 ```
 
-### 3. Optional: Configure Region
-
-For EU customers, set the region:
+If your fleet is on Samsara's EU infrastructure, also set the region:
 
 ```env
 SAMSARA_REGION=eu
 ```
 
-### 4. Optional: Configure Webhook Secret
-
-If you plan to receive webhooks from Samsara, add your webhook secret to your `.env` file:
+Finally, if you receive webhooks from Samsara, add the Base64-encoded secret you copied from the Samsara dashboard:
 
 ```env
 SAMSARA_WEBHOOK_SECRET=your-base64-encoded-secret
 ```
 
-See the [Webhooks Guide](resources/webhooks.md) for more details on setting up and verifying webhooks.
+See [configuration.md](configuration.md) for the full list of options and [resources/webhooks.md](resources/webhooks.md) for verifying webhook signatures.
 
 ## Basic Usage
 
 ### Using the Facade
 
+The `Samsara` facade resolves the singleton client registered by the service provider. Each resource accessor returns a resource object you can call directly or compose with the query builder.
+
 ```php
 use Samsara\Facades\Samsara;
 
-// Get all drivers
 $drivers = Samsara::drivers()->all();
 
-// Find a specific vehicle
 $vehicle = Samsara::vehicles()->find('vehicle-id');
 
-// Get vehicle stats
 $stats = Samsara::vehicleStats()
+    ->current()
     ->types(['gps', 'engineStates'])
     ->get();
 ```
 
+The `vehicleStats()` accessor returns a resource, not a builder. Chain through `current()`, `history()`, `feed()`, `gps()`, `engineStates()`, `fuelPercents()`, or `odometer()` before calling builder methods like `types()`, `between()`, or `get()`.
+
 ### Using Dependency Injection
+
+You may inject the `Samsara\Samsara` client directly. Laravel resolves it from the container as a singleton:
 
 ```php
 use Samsara\Samsara;
@@ -89,7 +102,7 @@ use Samsara\Samsara;
 class FleetController extends Controller
 {
     public function __construct(
-        protected Samsara $samsara
+        protected Samsara $samsara,
     ) {}
 
     public function index()
@@ -101,103 +114,58 @@ class FleetController extends Controller
 
 ### Creating a Fresh Instance
 
+For ad-hoc clients — for example, multi-tenant applications that hold a token per tenant — call `Samsara::make()`:
+
 ```php
 use Samsara\Samsara;
 
 $samsara = Samsara::make('your-api-token');
+
 $drivers = $samsara->drivers()->all();
 ```
 
-## Available Resources
-
-The SDK provides access to 40+ Samsara API endpoints:
-
-### Fleet
-- `drivers()` - Driver management
-- `vehicles()` - Vehicle management
-- `trailers()` - Trailer management
-- `equipment()` - Equipment management
-
-### Telematics
-- `vehicleStats()` - Vehicle telemetry data
-- `vehicleLocations()` - Real-time vehicle locations
-- `trips()` - Trip history
-
-### Safety
-- `hoursOfService()` - HOS logs, clocks, violations
-- `maintenance()` - DVIRs and defects
-- `safetyEvents()` - Safety event tracking
-
-### Dispatch
-- `routes()` - Route management
-- `addresses()` - Address/geofence management
-
-### Organization
-- `users()` - User management
-- `tags()` - Tag management
-- `contacts()` - Contact management
-
-### Integrations
-- `webhooks()` - Webhook management
-- `gateways()` - Gateway devices
-- `liveShares()` - Live sharing links
-
-### Industrial
-- `industrial()` - Industrial assets and data inputs
-- `assets()` - Asset management
-- `sensors()` - Legacy sensor data (v1 API)
-
-### Additional
-- `alerts()` - Alert configurations and incidents
-- `forms()` - Form submissions and templates
-- `fuelAndEnergy()` - Fuel and energy efficiency
-- `ifta()` - IFTA reporting
-- `workOrders()` - Maintenance work orders
-- `settings()` - Organization settings
-- And more...
-
-See the [README](../README.md) for a complete list of resources.
-
-## Query Builder
-
-Most resources support a fluent query builder:
+You may also pass per-instance config overrides:
 
 ```php
-use Samsara\Facades\Samsara;
+$samsara = Samsara::make('your-api-token', [
+    'timeout'  => 60,
+    'retry'    => 5,
+    'per_page' => 50,
+]);
+```
 
-// Filter by tags
+## Querying Records
+
+Most resources expose a `query()` method that returns the fluent query builder. The builder supports filtering, pagination, cursor pagination, and lazy iteration:
+
+```php
 $drivers = Samsara::drivers()
     ->query()
     ->whereTag('tag-123')
     ->get();
 
-// Time-based queries
-$stats = Samsara::vehicleStats()
-    ->between('2024-01-01', '2024-01-31')
-    ->types(['gps', 'fuelPercents'])
-    ->get();
-
-// Pagination
 $vehicles = Samsara::vehicles()
     ->query()
     ->limit(50)
     ->paginate();
 
-// Lazy loading for large datasets
 Samsara::vehicleStats()
+    ->history()
     ->types(['gps'])
+    ->between($start, $end)
     ->lazy()
     ->each(function ($stat) {
-        // Process each stat
+        // Stream one record at a time without loading the full result set.
     });
 ```
 
+See [query-builder.md](query-builder.md) for the full method reference, including cursor pagination, working with `EntityCollection`, and the underlying HTTP client escape hatch. For the full list of accessors on the facade, see [resources/index.md](resources/index.md).
+
 ## Error Handling
 
-The SDK throws specific exceptions for different error types:
+The SDK throws a typed exception per HTTP error class:
 
 ```php
-use Samsara\Facades\Samsara;
 use Samsara\Exceptions\AuthenticationException;
 use Samsara\Exceptions\NotFoundException;
 use Samsara\Exceptions\RateLimitException;
@@ -206,21 +174,21 @@ use Samsara\Exceptions\ValidationException;
 try {
     $driver = Samsara::drivers()->find('driver-id');
 } catch (AuthenticationException $e) {
-    // Invalid API token (401)
+    // 401: invalid or revoked token.
 } catch (NotFoundException $e) {
-    // Resource not found (404)
+    // 404: resource does not exist.
 } catch (RateLimitException $e) {
-    // Rate limited (429)
     $retryAfter = $e->getRetryAfter();
 } catch (ValidationException $e) {
-    // Validation errors (422)
     $errors = $e->getErrors();
 }
 ```
 
+See [error-handling.md](error-handling.md) for the full exception hierarchy and how to register handlers in Laravel 12's `bootstrap/app.php`.
+
 ## Testing
 
-Use `SamsaraFake` to mock API responses in tests:
+Use `SamsaraFake` to intercept calls in tests. The fake records every request and returns canned responses:
 
 ```php
 use Samsara\Facades\Samsara;
@@ -241,9 +209,11 @@ public function test_it_lists_drivers(): void
 }
 ```
 
+See [testing.md](testing.md) for the full fake API and `HttpFactory` patterns.
+
 ## Next Steps
 
-- [Configuration Guide](configuration.md) - All configuration options
-- [Query Builder Guide](query-builder.md) - Advanced querying
-- [Testing Guide](testing.md) - Testing with SamsaraFake
-- [Error Handling Guide](error-handling.md) - Exception handling
+- [Configuration](configuration.md) — every option and runtime override.
+- [Query Builder](query-builder.md) — filters, pagination, and lazy collections.
+- [Testing](testing.md) — testing with `SamsaraFake` and the HTTP factory.
+- [Error Handling](error-handling.md) — exception hierarchy and handler registration.

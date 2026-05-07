@@ -1,106 +1,117 @@
 ---
 title: Contacts
-layout: default
-parent: Resources
 nav_order: 15
-description: "Manage contacts for addresses and dispatch operations"
+description: Manage contacts associated with addresses and dispatch operations.
 permalink: /resources/contacts
 ---
 
-# Contacts Resource
+# Contacts
 
-Manage contacts for addresses and dispatch operations.
+- [Introduction](#introduction)
+- [Retrieving Records](#retrieving-records)
+- [Creating Records](#creating-records)
+- [Updating Records](#updating-records)
+- [Deleting Records](#deleting-records)
+- [Filtering](#filtering)
+- [Helper Methods](#helper-methods)
+- [Using Contacts with Addresses](#using-contacts-with-addresses)
+- [Properties](#properties)
+- [Related Resources](#related-resources)
 
-## Basic Usage
+## Introduction
+
+Contacts are the people you attach to addresses, dispatch jobs, and routes — typically the recipient or site lead at a customer location. Reach for this resource when you need to maintain a directory of those points of contact and link them to addresses you create.
+
+## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-// Get all contacts
 $contacts = Samsara::contacts()->all();
 
-// Find a contact
 $contact = Samsara::contacts()->find('contact-id');
+```
 
-// Create a contact
+## Creating Records
+
+```php
 $contact = Samsara::contacts()->create([
     'firstName' => 'Jane',
-    'lastName' => 'Doe',
-    'email' => 'jane.doe@customer.com',
-    'phone' => '+1-555-123-4567',
+    'lastName'  => 'Doe',
+    'email'     => 'jane.doe@customer.com',
+    'phone'     => '+1-555-123-4567',
 ]);
+```
 
-// Update a contact
+## Updating Records
+
+```php
 $contact = Samsara::contacts()->update('contact-id', [
     'phone' => '+1-555-987-6543',
 ]);
+```
 
-// Delete a contact
+## Deleting Records
+
+```php
 Samsara::contacts()->delete('contact-id');
 ```
 
-## Query Builder
+## Filtering
+
+Contacts accept the standard query builder. See [the query builder reference](../query-builder.md) for the full method list.
 
 ```php
-// Get all contacts with query builder
-$contacts = Samsara::contacts()
-    ->query()
-    ->get();
-
-// Limit results
 $contacts = Samsara::contacts()
     ->query()
     ->limit(100)
     ->get();
 ```
 
-## Contact Entity
+## Helper Methods
 
-The `Contact` entity provides helper methods:
+The `Contact` entity exposes one helper for assembling the contact's display name:
 
 ```php
 $contact = Samsara::contacts()->find('contact-id');
 
-// Get full name
-$contact->getFullName();  // "Jane Doe"
-
-// Basic properties
-$contact->id;        // string
-$contact->firstName; // ?string
-$contact->lastName;  // ?string
-$contact->email;     // ?string
-$contact->phone;     // ?string
+$contact->getFullName(); // "Jane Doe", or "Unknown" if both name fields are empty
 ```
-
-## Available Properties
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `id` | string | Contact ID |
-| `firstName` | string | First name |
-| `lastName` | string | Last name |
-| `email` | string | Email address |
-| `phone` | string | Phone number |
 
 ## Using Contacts with Addresses
 
-Contacts can be associated with addresses:
+Contacts are most useful when attached to an address. Pass an array of contact IDs when you create or update an address, then read them back through the address entity.
 
 ```php
-// Create an address with a contact
 $address = Samsara::addresses()->create([
-    'name' => 'Customer Warehouse',
+    'name'             => 'Customer Warehouse',
     'formattedAddress' => '123 Industrial Blvd, City, ST 12345',
-    'contactIds' => ['contact-123', 'contact-456'],
+    'contactIds'       => ['contact-123', 'contact-456'],
 ]);
 
-// Get contact IDs from an address
 $address = Samsara::addresses()->find('address-id');
-$contactIds = $address->getContactIds();
 
-// Fetch the full contact details
-foreach ($contactIds as $contactId) {
+foreach ($address->getContactIds() as $contactId) {
     $contact = Samsara::contacts()->find($contactId);
-    echo "{$contact->getFullName()}: {$contact->phone}";
+    echo "{$contact->getFullName()}: {$contact->phone}\n";
 }
 ```
+
+## Properties
+
+The `Contact` entity (`Samsara\Data\Contact\Contact`) exposes the following typed properties.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `?string` | Contact ID. |
+| `firstName` | `?string` | First name. |
+| `lastName` | `?string` | Last name. |
+| `email` | `?string` | Email address. |
+| `phone` | `?string` | Phone number. |
+
+## Related Resources
+
+- [Addresses](addresses.md) — attach contacts to a geofenced location.
+- [Routes](routes.md) — routes use contacts on their stops.
+- [Query Builder](../query-builder.md) — for filtering, pagination, and lazy iteration.
+- [Testing](../testing.md) — fake `Samsara::contacts()` calls in your tests.

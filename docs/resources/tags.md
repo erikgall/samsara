@@ -1,136 +1,140 @@
 ---
 title: Tags
-layout: default
-parent: Resources
 nav_order: 14
-description: "Manage tags for organizing and grouping resources"
+description: Manage tags for organizing and grouping fleet resources.
 permalink: /resources/tags
 ---
 
-# Tags Resource
+# Tags
 
-Manage tags for organizing and grouping resources like vehicles, drivers, and equipment.
+- [Introduction](#introduction)
+- [Retrieving Records](#retrieving-records)
+- [Creating Records](#creating-records)
+- [Updating Records](#updating-records)
+- [Deleting Records](#deleting-records)
+- [Filtering](#filtering)
+- [Hierarchical Tags](#hierarchical-tags)
+- [Using Tags For Filtering](#using-tags-for-filtering)
+- [Helper Methods](#helper-methods)
+- [Properties](#properties)
+- [Related Resources](#related-resources)
 
-## Basic Usage
+## Introduction
+
+Tags are labels that group every other resource in Samsara — vehicles, drivers, equipment, addresses, alerts. You create a tag once and reference it from anywhere a `whereTag()` filter is supported. Tags also nest: a parent tag (`Regions`) can hold child tags (`West`, `East`), which lets you filter at any level of the hierarchy.
+
+## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-// Get all tags
 $tags = Samsara::tags()->all();
 
-// Find a tag
 $tag = Samsara::tags()->find('tag-id');
+```
 
-// Create a tag
+## Creating Records
+
+```php
 $tag = Samsara::tags()->create([
     'name' => 'West Coast Fleet',
 ]);
 
-// Create a nested tag
-$tag = Samsara::tags()->create([
+// Create a child of an existing tag
+$child = Samsara::tags()->create([
     'name' => 'California',
     'parentTagId' => 'parent-tag-id',
 ]);
+```
 
-// Update a tag
+## Updating Records
+
+```php
 $tag = Samsara::tags()->update('tag-id', [
     'name' => 'West Coast Operations',
 ]);
+```
 
-// Delete a tag
+## Deleting Records
+
+```php
 Samsara::tags()->delete('tag-id');
 ```
 
-## Query Builder
+## Filtering
+
+The query builder reference lives in [Query Builder](../query-builder.md). The Tags resource supports the standard `limit()`, `cursor()`, and pagination methods.
 
 ```php
-// Get all tags with query builder
-$tags = Samsara::tags()
-    ->query()
-    ->get();
-
-// Limit results
 $tags = Samsara::tags()
     ->query()
     ->limit(50)
     ->get();
 ```
 
-## Tag Entity
-
-The `Tag` entity provides helper methods:
-
-```php
-$tag = Samsara::tags()->find('tag-id');
-
-// Check if tag has a parent
-$tag->hasParent();  // bool
-
-// Basic properties
-$tag->id;          // string
-$tag->name;        // string
-$tag->parentTagId; // ?string
-$tag->externalIds; // ?array
-```
-
-## Available Properties
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `id` | string | Tag ID |
-| `name` | string | Tag name |
-| `parentTagId` | string | Parent tag ID (for hierarchical tags) |
-| `externalIds` | array | External ID mappings |
-
 ## Hierarchical Tags
 
-Tags can be organized hierarchically:
+Tags model a parent/child tree. The pattern is to create the parent first, then pass its `id` as `parentTagId` on the child.
 
 ```php
-// Create parent tag
-$parentTag = Samsara::tags()->create([
+$parent = Samsara::tags()->create([
     'name' => 'Regions',
 ]);
 
-// Create child tags
-$westTag = Samsara::tags()->create([
+$west = Samsara::tags()->create([
     'name' => 'West',
-    'parentTagId' => $parentTag->id,
+    'parentTagId' => $parent->id,
 ]);
 
-$eastTag = Samsara::tags()->create([
+$east = Samsara::tags()->create([
     'name' => 'East',
-    'parentTagId' => $parentTag->id,
+    'parentTagId' => $parent->id,
 ]);
 
-// Check if a tag is a child
-if ($westTag->hasParent()) {
-    echo "Parent: {$westTag->parentTagId}";
+if ($west->hasParent()) {
+    echo "Parent: {$west->parentTagId}";
 }
 ```
 
-## Using Tags for Filtering
+## Using Tags For Filtering
 
-Tags are commonly used to filter other resources:
+Most other resources accept a `whereTag()` filter that takes a tag id (or array of ids). Use this whenever you want to scope a query to a slice of the fleet without listing each vehicle or driver explicitly.
 
 ```php
-// Filter vehicles by tag
 $vehicles = Samsara::vehicles()
     ->query()
     ->whereTag('west-coast-fleet')
     ->get();
 
-// Filter drivers by tag
 $drivers = Samsara::drivers()
     ->query()
     ->whereTag('delivery-drivers')
     ->get();
 
-// Filter safety events by tag
 $events = Samsara::safetyEvents()
     ->query()
     ->whereTag('monitored-fleet')
     ->between(now()->subDays(7), now())
     ->get();
 ```
+
+## Helper Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `hasParent()` | `bool` | True when the tag has a non-null `parentTagId`. |
+
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Tag id. |
+| `name` | `string` | Tag name. |
+| `parentTagId` | `?string` | Id of the parent tag, when the tag is a child. |
+| `externalIds` | `?array` | External system id mappings keyed by namespace. |
+
+## Related Resources
+
+- [Drivers](drivers.md) — filter drivers by tag.
+- [Vehicles](vehicles.md) — filter vehicles by tag.
+- [Addresses](addresses.md) — filter geofences by tag.

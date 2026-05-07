@@ -2,29 +2,47 @@
 title: Configuration
 layout: default
 nav_order: 3
-description: "Configuration options for the Samsara SDK"
+description: Configuration options and runtime overrides for the Samsara SDK.
 permalink: /configuration
 ---
 
 # Configuration
 
-This guide covers all configuration options for the Samsara SDK.
+- [Introduction](#introduction)
+- [Publishing the Configuration](#publishing-the-configuration)
+- [Configuration Options](#configuration-options)
+  - [API Key](#api-key)
+  - [Region](#region)
+  - [Timeout](#timeout)
+  - [Retry](#retry)
+  - [Per Page](#per-page)
+  - [Webhook Secret](#webhook-secret)
+- [Runtime Configuration](#runtime-configuration)
+  - [Switching Regions](#switching-regions)
+  - [Using a Different Token](#using-a-different-token)
+  - [Reading Configuration at Runtime](#reading-configuration-at-runtime)
+  - [Creating a Fresh Instance](#creating-a-fresh-instance)
+- [Environment-Specific Configuration](#environment-specific-configuration)
 
-## Publishing Configuration
+## Introduction
 
-Publish the configuration file:
+Samsara reads its configuration from `config/samsara.php`, which is merged into the published file when you run `vendor:publish`. The service provider passes `api_key`, `timeout`, `retry`, and `per_page` into the singleton client, and applies the EU base URL when `region` is `eu`. The reference below covers every config key and the runtime overrides the client exposes for switching regions, swapping tokens, and inspecting the active configuration.
+
+## Publishing the Configuration
+
+Publish the config file with the package's `samsara-config` tag:
 
 ```bash
 php artisan vendor:publish --provider="Samsara\SamsaraServiceProvider"
 ```
 
-This creates `config/samsara.php`.
+This creates `config/samsara.php` in your application. Edit it directly, or override individual values from `.env`.
 
 ## Configuration Options
 
 ### API Key
 
-The Samsara API token for authentication.
+Your Samsara API token. The service provider resolves the singleton client with this token, and every request authenticates with `Authorization: Bearer <token>`.
 
 ```php
 // config/samsara.php
@@ -32,15 +50,14 @@ The Samsara API token for authentication.
 ```
 
 ```env
-# .env
 SAMSARA_API_KEY=samsara_api_xxxxxxxxxxxxxxxx
 ```
 
-You can obtain an API token from the Samsara dashboard under **Settings -> Organization -> API Tokens**.
+You may obtain a token from the Samsara dashboard under **Settings -> Organization -> API Tokens**.
 
 ### Region
 
-The API region. Use `us` for United States or `eu` for European Union.
+The Samsara API region your fleet lives in. Use `us` for the US endpoint or `eu` for the EU endpoint. The service provider switches the client to the EU base URL when this value is `eu`; the default is `us`.
 
 ```php
 // config/samsara.php
@@ -48,7 +65,6 @@ The API region. Use `us` for United States or `eu` for European Union.
 ```
 
 ```env
-# .env
 SAMSARA_REGION=eu
 ```
 
@@ -59,7 +75,7 @@ SAMSARA_REGION=eu
 
 ### Timeout
 
-Request timeout in seconds.
+Request timeout in seconds. Increase this if you regularly query large time windows on `vehicleStats()` or `safetyEvents()` and see `Illuminate\Http\Client\ConnectionException` from the Laravel HTTP client.
 
 ```php
 // config/samsara.php
@@ -67,13 +83,12 @@ Request timeout in seconds.
 ```
 
 ```env
-# .env
 SAMSARA_TIMEOUT=60
 ```
 
 ### Retry
 
-Number of times to retry failed requests. Set to `0` to disable retries.
+By default, the SDK retries failed requests up to three times before throwing an exception. Set this to `0` to disable retries entirely — useful in tests or when you want to surface network failures immediately to your application's exception handler.
 
 ```php
 // config/samsara.php
@@ -81,13 +96,12 @@ Number of times to retry failed requests. Set to `0` to disable retries.
 ```
 
 ```env
-# .env
 SAMSARA_RETRY=5
 ```
 
 ### Per Page
 
-Default number of items per page for paginated requests.
+The default page size for paginated requests. The query builder uses this value when you call `paginate()` or `lazy()` without an explicit `perPage`. Lower it if you stream large result sets and need finer control over memory; raise it to reduce round trips when you know the total fits in fewer pages.
 
 ```php
 // config/samsara.php
@@ -95,13 +109,12 @@ Default number of items per page for paginated requests.
 ```
 
 ```env
-# .env
 SAMSARA_PER_PAGE=50
 ```
 
 ### Webhook Secret
 
-The Base64-encoded secret key for verifying webhook signatures.
+The Base64-encoded secret used by `VerifyWebhookSignature` middleware to verify webhook payloads from Samsara. Leave it unset if you do not receive webhooks.
 
 ```php
 // config/samsara.php
@@ -109,158 +122,90 @@ The Base64-encoded secret key for verifying webhook signatures.
 ```
 
 ```env
-# .env
 SAMSARA_WEBHOOK_SECRET=your-base64-encoded-secret
 ```
 
-You can obtain this secret from the Samsara dashboard when creating or viewing a webhook. See the [Webhooks Guide](resources/webhooks.md) for usage details.
-
-## Complete Configuration File
-
-```php
-<?php
-
-return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Samsara API Key
-    |--------------------------------------------------------------------------
-    |
-    | Your Samsara API token. You can obtain this from the Samsara Dashboard
-    | under Settings -> Organization -> API Tokens.
-    |
-    */
-
-    'api_key' => env('SAMSARA_API_KEY'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | API Region
-    |--------------------------------------------------------------------------
-    |
-    | The region for your Samsara API. Use 'us' for the US region
-    | (api.samsara.com) or 'eu' for the EU region (api.eu.samsara.com).
-    |
-    | Supported: "us", "eu"
-    |
-    */
-
-    'region' => env('SAMSARA_REGION', 'us'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Request Timeout
-    |--------------------------------------------------------------------------
-    |
-    | The number of seconds to wait for a response from the Samsara API
-    | before timing out.
-    |
-    */
-
-    'timeout' => env('SAMSARA_TIMEOUT', 30),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Retry Attempts
-    |--------------------------------------------------------------------------
-    |
-    | The number of times to retry a failed request before giving up.
-    | Set to 0 to disable retries.
-    |
-    */
-
-    'retry' => env('SAMSARA_RETRY', 3),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Default Items Per Page
-    |--------------------------------------------------------------------------
-    |
-    | The default number of items to retrieve per page when using
-    | paginated API endpoints.
-    |
-    */
-
-    'per_page' => env('SAMSARA_PER_PAGE', 100),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Webhook Secret
-    |--------------------------------------------------------------------------
-    |
-    | The Base64-encoded secret key for verifying webhook signatures. You can
-    | find this in the Samsara Dashboard when creating or viewing a webhook.
-    | This is used by the VerifyWebhookSignature middleware.
-    |
-    */
-
-    'webhook_secret' => env('SAMSARA_WEBHOOK_SECRET'),
-
-];
-```
+You may copy this secret from the Samsara dashboard when creating or viewing a webhook. See [resources/webhooks.md](resources/webhooks.md) for verification details.
 
 ## Runtime Configuration
 
 ### Switching Regions
 
-You can switch regions at runtime:
+If your application talks to fleets in both regions, you may switch endpoints at runtime:
 
 ```php
 use Samsara\Facades\Samsara;
 
-// Switch to EU endpoint
 Samsara::useEuEndpoint();
 
-// Switch back to US endpoint
+// Subsequent calls hit api.eu.samsara.com.
+$drivers = Samsara::drivers()->all();
+
 Samsara::useUsEndpoint();
 ```
 
+Both methods mutate the singleton client. Pair them with `withToken()` if each region has a different token.
+
 ### Using a Different Token
 
-You can use a different API token for specific requests:
+`withToken()` swaps the API token on the client. Subsequent calls authenticate with the new token until you swap it again or resolve a fresh instance:
 
 ```php
-use Samsara\Facades\Samsara;
-
-// Set a different token for subsequent requests
 Samsara::withToken('different-api-token');
 
-// All subsequent calls now use the new token
 $drivers = Samsara::drivers()->all();
 ```
 
-Or chain it for a single operation:
+You may also chain it for a single call. Because the singleton client is mutated, the new token persists for later calls in the same request lifecycle:
 
 ```php
-use Samsara\Facades\Samsara;
-
-// Use a different token for this specific request
 $drivers = Samsara::withToken('different-api-token')
     ->drivers()
     ->all();
 ```
 
+### Reading Configuration at Runtime
+
+The client exposes three read accessors useful for diagnostics and conditional logic:
+
+- `Samsara::getConfig(string $key, mixed $default = null): mixed` — reads a single config value (`timeout`, `retry`, `per_page`) the client was constructed with.
+- `Samsara::hasToken(): bool` — returns `true` if a token has been set, including via `withToken()`.
+- `Samsara::getBaseUrl(): string` — returns the active base URL, switching with `useUsEndpoint()` and `useEuEndpoint()`.
+
+```php
+if (! Samsara::hasToken()) {
+    abort(503, 'Samsara token is not configured.');
+}
+
+$timeout = Samsara::getConfig('timeout', 30);
+$baseUrl = Samsara::getBaseUrl();
+```
+
 ### Creating a Fresh Instance
 
-Create a new instance with custom configuration:
+`Samsara::make()` returns a brand-new client. Use it when you need an isolated instance — for example, in a multi-tenant application where each tenant holds its own token:
 
 ```php
 use Samsara\Samsara;
 
 $samsara = Samsara::make('api-token', [
-    'timeout' => 60,
-    'retry' => 5,
+    'timeout'  => 60,
+    'retry'    => 5,
     'per_page' => 50,
 ]);
 
-// Use EU endpoint
 $samsara->useEuEndpoint();
+
+$drivers = $samsara->drivers()->all();
 ```
+
+The fresh instance does not affect the singleton resolved by the `Samsara` facade.
 
 ## Environment-Specific Configuration
 
-### Development
+You may tune the SDK per environment by setting the env vars in the matching `.env` file.
+
+For local development, lower retries to surface failures fast:
 
 ```env
 # .env.local
@@ -269,7 +214,7 @@ SAMSARA_TIMEOUT=60
 SAMSARA_RETRY=1
 ```
 
-### Production
+For production, keep the defaults or raise the timeout for slower networks:
 
 ```env
 # .env.production
@@ -278,14 +223,10 @@ SAMSARA_TIMEOUT=30
 SAMSARA_RETRY=3
 ```
 
-### Testing
-
-For testing, use `SamsaraFake` instead of real API calls:
+For testing, swap the live client out entirely with the fake:
 
 ```php
-use Samsara\Facades\Samsara;
-
 $fake = Samsara::fake();
 ```
 
-See the [Testing Guide](testing.md) for more details.
+See [testing.md](testing.md) for the full fake API.

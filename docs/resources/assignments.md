@@ -1,34 +1,42 @@
 ---
 title: Assignments
-layout: default
-parent: Resources
 nav_order: 34
-description: "Manage driver, vehicle, and trailer assignments"
+description: Read driver-vehicle, driver-trailer, and trailer assignments.
 permalink: /resources/assignments
 ---
 
-# Assignments Resources
+# Assignments
 
-Manage various assignment types for drivers, vehicles, and trailers.
+- [Introduction](#introduction)
+- [Driver-Vehicle Assignments](#driver-vehicle-assignments)
+- [Driver-Trailer Assignments](#driver-trailer-assignments)
+- [Trailer Assignments (Legacy)](#trailer-assignments-legacy)
+- [Properties](#properties)
+- [Related Resources](#related-resources)
+
+## Introduction
+
+Assignments record which driver was paired with which vehicle or trailer over time. The SDK exposes four facade accessors: `driverVehicleAssignments()`, `driverTrailerAssignments()`, `trailerAssignments()`, and `carrierProposedAssignments()`. Reach for these resources when you need to reconstruct an audit trail of who drove what, or who pulled which trailer, over a given window. None of the four resources declare a typed entity — each returns generic `Samsara\Data\Entity` (`Fluent`) instances.
+
+For carrier-proposed driver-vehicle assignments, see the [Carrier Proposed Assignments](carrier-proposed-assignments.md) page.
 
 ## Driver-Vehicle Assignments
+
+`driverVehicleAssignments()` returns a query builder you can filter by driver, vehicle, or time range.
 
 ```php
 use Samsara\Facades\Samsara;
 
-// Get driver-vehicle assignments
 $assignments = Samsara::driverVehicleAssignments()
     ->query()
     ->get();
 
-// Filter by driver
-$assignments = Samsara::driverVehicleAssignments()
+$forDriver = Samsara::driverVehicleAssignments()
     ->query()
     ->whereDriver('driver-123')
     ->get();
 
-// Filter by vehicle
-$assignments = Samsara::driverVehicleAssignments()
+$forVehicle = Samsara::driverVehicleAssignments()
     ->query()
     ->whereVehicle('vehicle-456')
     ->get();
@@ -36,14 +44,14 @@ $assignments = Samsara::driverVehicleAssignments()
 
 ## Driver-Trailer Assignments
 
+The driver-trailer endpoint mirrors the driver-vehicle one.
+
 ```php
-// Get driver-trailer assignments
 $assignments = Samsara::driverTrailerAssignments()
     ->query()
     ->get();
 
-// Filter by driver
-$assignments = Samsara::driverTrailerAssignments()
+$forDriver = Samsara::driverTrailerAssignments()
     ->query()
     ->whereDriver('driver-123')
     ->get();
@@ -51,33 +59,33 @@ $assignments = Samsara::driverTrailerAssignments()
 
 ## Trailer Assignments (Legacy)
 
+> **Note:** Legacy v1 endpoint. Prefer driver-trailer assignments for new integrations.
+
+The legacy resource exposes a single helper that returns the assignment history for a single trailer.
+
 ```php
-// Get assignments for a specific trailer
 $assignments = Samsara::trailerAssignments()
     ->forTrailer('trailer-123');
 ```
 
-## Carrier Proposed Assignments
+## Properties
 
-```php
-// Get all carrier proposed assignments
-$assignments = Samsara::carrierProposedAssignments()->all();
+None of these four resources declare a typed entity. Records come back as generic `Samsara\Data\Entity` instances. The fields you can read off each row depend on the assignment kind — typical keys include:
 
-// Find a carrier proposed assignment
-$assignment = Samsara::carrierProposedAssignments()->find('assignment-id');
+| Key | Description |
+|-----|-------------|
+| `driver` | `{id, name?}` — the assigned driver. |
+| `vehicle` | `{id, name?}` — the assigned vehicle (driver-vehicle only). |
+| `trailer` | `{id, name?}` — the assigned trailer (driver-trailer / trailer only). |
+| `startTime` | RFC 3339 start timestamp. |
+| `endTime` | RFC 3339 end timestamp (when the assignment closed). |
 
-// Create a carrier proposed assignment
-$assignment = Samsara::carrierProposedAssignments()->create([
-    'driverId' => 'driver-123',
-    'vehicleId' => 'vehicle-456',
-    'startTime' => '2024-01-15T08:00:00Z',
-]);
+Read each key directly from the entity (`$row->driver`) or via `$row->get('key')`.
 
-// Update a carrier proposed assignment
-$assignment = Samsara::carrierProposedAssignments()->update('assignment-id', [
-    'endTime' => '2024-01-15T18:00:00Z',
-]);
+## Related Resources
 
-// Delete a carrier proposed assignment
-Samsara::carrierProposedAssignments()->delete('assignment-id');
-```
+- [Drivers](drivers.md) — the driver side of every assignment.
+- [Vehicles](vehicles.md) — the vehicle side of driver-vehicle assignments.
+- [Trailers](trailers.md) — the trailer side of driver-trailer assignments.
+- [Carrier Proposed Assignments](carrier-proposed-assignments.md) — proposed driver-vehicle assignments awaiting confirmation.
+- [Query Builder](../query-builder.md) — for filtering, pagination, and lazy iteration.
