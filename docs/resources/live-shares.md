@@ -1,128 +1,151 @@
 ---
 title: Live Shares
-layout: default
-parent: Resources
 nav_order: 18
-description: "Manage live sharing links for external visibility into fleet data"
+description: Time-limited share links that expose vehicle locations to non-Samsara users.
 permalink: /resources/live-shares
 ---
 
-# Live Sharing Links Resource
+# Live Shares
 
-Manage live sharing links for external visibility into fleet data.
+- [Introduction](#introduction)
+- [Retrieving Records](#retrieving-records)
+- [Creating Records](#creating-records)
+- [Updating Records](#updating-records)
+- [Deleting Records](#deleting-records)
+- [Filtering](#filtering)
+- [Helper Methods](#helper-methods)
+- [Properties](#properties)
+- [Common Use Cases](#common-use-cases)
+- [Related Resources](#related-resources)
 
-## Basic Usage
+## Introduction
+
+The `Samsara::liveShares()` resource manages live sharing links — time-limited URLs that let people without Samsara accounts watch a vehicle on a map. Each share has an expiration time, a list of shared assets, and a list of email recipients; revoke it by deleting the live share record.
+
+## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-// Get all live shares
-$liveShares = Samsara::liveShares()->all();
+$share = Samsara::liveShares()->find('live-share-id');
 
-// Find a live share
-$liveShare = Samsara::liveShares()->find('live-share-id');
+$shares = Samsara::liveShares()->all();
 
-// Create a live share
-$liveShare = Samsara::liveShares()->create([
-    'name' => 'Customer Fleet View',
-    'assets' => [
-        ['id' => 'vehicle-123', 'type' => 'vehicle'],
-        ['id' => 'vehicle-456', 'type' => 'vehicle'],
-    ],
-    'recipients' => [
-        ['email' => 'customer@example.com'],
-    ],
-    'expiresAt' => '2024-12-31T23:59:59Z',
-]);
-
-// Update a live share
-$liveShare = Samsara::liveShares()->update('live-share-id', [
-    'name' => 'Updated Fleet View',
-]);
-
-// Delete a live share
-Samsara::liveShares()->delete('live-share-id');
-```
-
-## Query Builder
-
-```php
-// Get all live shares with query builder
-$liveShares = Samsara::liveShares()
-    ->query()
-    ->get();
-
-// Limit results
-$liveShares = Samsara::liveShares()
+$active = Samsara::liveShares()
     ->query()
     ->limit(25)
     ->get();
 ```
 
-## LiveShare Entity
+`find()` returns `null` when the share does not exist; `all()` returns an `EntityCollection<int, LiveShare>`.
 
-The `LiveShare` entity provides helper methods:
+## Creating Records
 
 ```php
-$liveShare = Samsara::liveShares()->find('live-share-id');
-
-// Check status
-$liveShare->isActive();   // bool
-$liveShare->isExpired();  // bool
-
-// Basic properties
-$liveShare->id;            // string
-$liveShare->name;          // ?string
-$liveShare->url;           // ?string
-$liveShare->status;        // ?string ('active', 'expired')
-$liveShare->expiresAt;     // ?string
-$liveShare->createdAtTime; // ?string
-$liveShare->assets;        // ?array
-$liveShare->recipients;    // ?array
+$share = Samsara::liveShares()->create([
+    'name' => 'Customer Fleet View',
+    'assets' => [
+        ['id' => 'vehicle-id', 'type' => 'vehicle'],
+    ],
+    'recipients' => [
+        ['email' => 'customer@example.com'],
+    ],
+    'expiresAt' => now()->addDay()->toIso8601String(),
+]);
 ```
 
-## Available Properties
+`create()` returns the saved `LiveShare` entity.
+
+## Updating Records
+
+```php
+$share = Samsara::liveShares()->update('live-share-id', [
+    'name' => 'Renamed Fleet View',
+]);
+```
+
+## Deleting Records
+
+```php
+Samsara::liveShares()->delete('live-share-id');
+```
+
+`delete()` is the canonical way to revoke a live share early.
+
+## Filtering
+
+The `query()` method returns a fresh `Builder` rooted at `/live-shares`. Apply filters from the [query builder](../query-builder.md) reference; the live-shares endpoint accepts standard pagination and tag filters.
+
+```php
+$shares = Samsara::liveShares()
+    ->query()
+    ->whereTag('customer-tracking')
+    ->get();
+```
+
+## Helper Methods
+
+The `LiveShare` entity exposes two helpers:
+
+```php
+$share = Samsara::liveShares()->find('live-share-id');
+
+$share->isActive();   // bool
+$share->isExpired();  // bool
+```
+
+Both check `$share->status` against the literal strings `'active'` and `'expired'`.
+
+## Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `id` | string | Live share ID |
-| `name` | string | Live share name |
-| `url` | string | Shareable URL |
-| `status` | string | Status ('active' or 'expired') |
-| `expiresAt` | string | Expiration timestamp (RFC 3339) |
-| `createdAtTime` | string | Creation timestamp (RFC 3339) |
-| `assets` | array | Shared assets with id and type |
-| `recipients` | array | Share recipients with email |
+| `id` | `?string` | Live share ID. |
+| `name` | `?string` | Live share name. |
+| `url` | `?string` | Shareable URL handed to recipients. |
+| `status` | `?string` | `active` or `expired`. |
+| `expiresAt` | `?string` | RFC 3339 expiration timestamp. |
+| `createdAtTime` | `?string` | RFC 3339 creation timestamp. |
+| `assets` | `?array<int, array{id?: string, type?: string}>` | Assets exposed by the share. |
+| `recipients` | `?array<int, array{email?: string}>` | Email recipients. |
 
 ## Common Use Cases
 
-### Share Vehicle Location with Customers
+### Share a Delivery in Progress
+
+Hand a customer a tracking link that auto-expires once delivery is complete:
 
 ```php
-// Create a time-limited share for a delivery vehicle
 $share = Samsara::liveShares()->create([
-    'name' => "Delivery Tracking - Order #12345",
+    'name' => "Delivery Tracking — Order #12345",
     'assets' => [
         ['id' => $vehicle->id, 'type' => 'vehicle'],
     ],
     'recipients' => [
         ['email' => $customer->email],
     ],
-    'expiresAt' => now()->addHours(24)->toIso8601String(),
+    'expiresAt' => now()->addHours(4)->toIso8601String(),
 ]);
 
-// Get the shareable URL
 $trackingUrl = $share->url;
 ```
 
-### Clean Up Expired Shares
+### Sweep Expired Shares
+
+Remove revoked shares to keep the list short and recipients out of stale data:
 
 ```php
-$liveShares = Samsara::liveShares()->all();
-
-$liveShares->each(function ($share) {
-    if ($share->isExpired()) {
-        Samsara::liveShares()->delete($share->id);
-    }
-});
+Samsara::liveShares()
+    ->all()
+    ->each(function ($share) {
+        if ($share->isExpired()) {
+            Samsara::liveShares()->delete($share->id);
+        }
+    });
 ```
+
+## Related Resources
+
+- [Vehicles](vehicles.md) — the assets typically referenced from a live share.
+- [Vehicle Locations](vehicle-locations.md) — direct location queries inside the SDK.
+- [Webhooks](webhooks.md) — notify on share creation or expiration.
