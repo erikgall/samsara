@@ -8,7 +8,9 @@ permalink: /resources/
 
 # Resources
 
-Samsara organizes its API around resources — drivers, vehicles, trips, and so on. Each resource page below shows you how to retrieve, filter, and inspect that resource using the SDK. For the typed string values you will pass to filters and create payloads (event names, stat types, duty statuses), see the [Enums](../enums.md) reference.
+## Introduction
+
+Samsara organizes its API around resources — drivers, vehicles, trips, and so on. Reach for the page that matches the data you need: each one shows how to retrieve, filter, and inspect that resource through the `Samsara` facade. For the typed string values you will pass to filters and create payloads (event names, stat types, duty statuses), see the [Enums](../enums.md) reference. For the fluent API the resource pages chain against, see the [Query Builder](../query-builder.md).
 
 ## Fleet Resources
 

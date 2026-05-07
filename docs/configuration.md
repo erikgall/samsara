@@ -26,7 +26,7 @@ permalink: /configuration
 
 ## Introduction
 
-Samsara reads its configuration from `config/samsara.php`, which is merged into the published file when you run `vendor:publish`. The service provider passes `api_key`, `timeout`, `retry`, and `per_page` into the singleton client, and applies the EU base URL when `region` is `eu`. This page documents every config key and the runtime overrides the client exposes.
+Samsara reads its configuration from `config/samsara.php`, which is merged into the published file when you run `vendor:publish`. The service provider passes `api_key`, `timeout`, `retry`, and `per_page` into the singleton client, and applies the EU base URL when `region` is `eu`. The reference below covers every config key and the runtime overrides the client exposes for switching regions, swapping tokens, and inspecting the active configuration.
 
 ## Publishing the Configuration
 
@@ -151,8 +151,6 @@ Both methods mutate the singleton client. Pair them with `withToken()` if each r
 `withToken()` swaps the API token on the client. Subsequent calls authenticate with the new token until you swap it again or resolve a fresh instance:
 
 ```php
-use Samsara\Facades\Samsara;
-
 Samsara::withToken('different-api-token');
 
 $drivers = Samsara::drivers()->all();
@@ -175,8 +173,6 @@ The client exposes three read accessors useful for diagnostics and conditional l
 - `Samsara::getBaseUrl(): string` — returns the active base URL, switching with `useUsEndpoint()` and `useEuEndpoint()`.
 
 ```php
-use Samsara\Facades\Samsara;
-
 if (! Samsara::hasToken()) {
     abort(503, 'Samsara token is not configured.');
 }
@@ -230,8 +226,6 @@ SAMSARA_RETRY=3
 For testing, swap the live client out entirely with the fake:
 
 ```php
-use Samsara\Facades\Samsara;
-
 $fake = Samsara::fake();
 ```
 

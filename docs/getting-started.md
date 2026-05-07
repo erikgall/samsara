@@ -23,7 +23,7 @@ permalink: /getting-started
 
 ## Introduction
 
-This page walks you through installing Samsara, configuring your API token, and making your first API call. By the end, you will have a working `Samsara` facade and a query that returns a typed `EntityCollection` from your fleet.
+Samsara is a Laravel SDK for the Samsara Fleet Management API. You install the SDK with Composer, publish a single config file, drop your API token into `.env`, and then reach the API through the `Samsara` facade. The walk-through below covers each step and ends with a query that returns a typed `EntityCollection` from your fleet.
 
 ## Requirements
 

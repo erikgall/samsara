@@ -28,11 +28,11 @@ permalink: /error-handling
 
 ## Introduction
 
-When the Samsara API returns an error, the SDK throws a typed exception you can catch by status family or by specific failure mode. Every exception extends `Samsara\Exceptions\SamsaraException`, so you may catch broadly or narrow down to the case you care about. Reach for this page when you need to understand which exception covers which API response, how to inspect the error context, or how to wire the SDK exceptions into Laravel's exception handler.
+When the Samsara API returns an error, the SDK throws a typed exception you can catch by status family or by specific failure mode. Every exception extends `Samsara\Exceptions\SamsaraException`, so you may catch broadly or narrow down to the case you care about. The reference below maps each exception to the API response that triggers it, shows the context every exception carries, and walks through wiring SDK errors into Laravel's exception handler.
 
 ## Exception Hierarchy
 
-```
+```text
 SamsaraException (base)
 ├── AuthenticationException (401)
 ├── AuthorizationException (403)
