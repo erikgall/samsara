@@ -14,8 +14,8 @@ A comprehensive Laravel SDK for the [Samsara Fleet Management API](https://devel
 
 ## Requirements
 
-- PHP 8.1 or higher
-- Laravel 10.x, 11.x, or 12.x
+- PHP 8.2 or higher
+- Laravel 12.x or 13.x
 
 ## Installation
 

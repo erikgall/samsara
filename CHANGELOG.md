@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING**: Dropped support for Laravel 10 and 11. The package now supports Laravel 12 and 13.
+- **BREAKING**: Bumped minimum PHP version to 8.2 (was 8.1).
+- **Entity**: Defined a local `Entity::make()` factory so the SDK no longer depends on `Illuminate\Support\Fluent::make()`, which was only added in Laravel 12.9.
+
+### Added
+
+- Support for Laravel 13.x.
+- GitHub Actions test matrix covering PHP 8.2/8.3/8.4 against Laravel 12 and 13, including a `--prefer-lowest` cell that locks lower-bound compatibility.
+
 ## [1.0.4] - 2026-02-26
 
 ### Fixed
