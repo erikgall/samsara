@@ -1,35 +1,43 @@
 ---
 title: Tachograph
-layout: default
-parent: Resources
 nav_order: 29
-description: "Access tachograph data for EU compliance"
+description: Access tachograph data for EU compliance reporting.
 permalink: /resources/tachograph
 ---
 
-# Tachograph Resource (EU Only)
+# Tachograph
 
-Access tachograph data for EU compliance requirements.
+- [Introduction](#introduction)
+- [Driver Activity History](#driver-activity-history)
+- [Driver Files History](#driver-files-history)
+- [Vehicle Files History](#vehicle-files-history)
+- [Filtering](#filtering)
+- [Related Resources](#related-resources)
 
-> **Note:** This resource is only available for EU organizations using tachograph-equipped vehicles.
+## Introduction
+
+Tachograph endpoints expose the EU regulatory data captured by tachograph-equipped vehicles — driver activity (driving, rest, work, available), and the periodic driver- and vehicle-card files used to satisfy member-state audits. The resource is read-only and **only available for EU organizations**. North American fleets see empty responses.
+
+> **Note:** This resource does not expose `find()`, `all()`, or any of the create/update/delete verbs. Each method below returns a query builder you must drive with `between()` and the standard filters.
 
 ## Driver Activity History
 
+Driver activity returns the duty-status timeline (driving, work, rest, available) for one or more drivers across a time window.
+
 ```php
 use Samsara\Facades\Samsara;
-use Carbon\Carbon;
 
-// Get driver activity history
 $activities = Samsara::tachograph()
     ->driverActivityHistory()
-    ->between(Carbon::now()->subDays(7), Carbon::now())
+    ->between(now()->subDays(7), now())
     ->get();
 ```
 
 ## Driver Files History
 
+Driver files history returns the periodic driver-card downloads — the digital files the driver's card emits on a regulated cadence.
+
 ```php
-// Get driver files history
 $driverFiles = Samsara::tachograph()
     ->driverFilesHistory()
     ->between(now()->subDays(30), now())
@@ -38,35 +46,44 @@ $driverFiles = Samsara::tachograph()
 
 ## Vehicle Files History
 
+Vehicle files history returns the corresponding vehicle-unit downloads.
+
 ```php
-// Get vehicle files history
 $vehicleFiles = Samsara::tachograph()
     ->vehicleFilesHistory()
     ->between(now()->subDays(30), now())
     ->get();
 ```
 
-## Query Builder
+## Filtering
+
+Each builder accepts the filters described in [Query Builder](../query-builder.md). The most common combinations are by driver, vehicle, and tag.
 
 ```php
-// Filter by driver
+// Filter activity by driver
 $activities = Samsara::tachograph()
     ->driverActivityHistory()
-    ->whereDriver('driver-123')
+    ->whereDriver('driver-id')
     ->between(now()->subDays(7), now())
     ->get();
 
-// Filter by vehicle
+// Filter vehicle files by vehicle
 $vehicleFiles = Samsara::tachograph()
     ->vehicleFilesHistory()
-    ->whereVehicle('vehicle-456')
+    ->whereVehicle('vehicle-id')
     ->between(now()->subDays(30), now())
     ->get();
 
-// Filter by tag
+// Filter activity by tag
 $activities = Samsara::tachograph()
     ->driverActivityHistory()
     ->whereTag('eu-fleet')
     ->between(now()->subDays(7), now())
     ->get();
 ```
+
+## Related Resources
+
+- [Drivers](drivers.md) — driver records referenced by tachograph activity.
+- [Hours of Service](hours-of-service.md) — North American HOS equivalent.
+- [Vehicles](vehicles.md) — vehicles whose tachograph units produce the files.

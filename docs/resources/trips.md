@@ -1,47 +1,108 @@
 ---
 title: Trips
-layout: default
-parent: Resources
 nav_order: 7
-description: "Access trip data for vehicles and drivers"
+description: Access trip data for vehicles and drivers.
 permalink: /resources/trips
 ---
 
-# Trips Resource
+# Trips
 
-Access trip data for vehicles and drivers.
+- [Introduction](#introduction)
+- [Retrieving Records](#retrieving-records)
+- [Trip Status Filters](#trip-status-filters)
+- [Time-Based Queries](#time-based-queries)
+- [Streaming Large Datasets](#streaming-large-datasets)
+- [Filtering](#filtering)
+- [Helper Methods](#helper-methods)
+- [Properties](#properties)
+- [Related Resources](#related-resources)
 
-## Basic Usage
+## Introduction
+
+A Samsara trip is the engine-on to engine-off interval recorded by a vehicle gateway — distinct from a planned dispatch route. Trips carry the driver and vehicle that produced them, the start/end timestamps and locations, and the distance and driving time. The resource is read-only; trips are created and closed by the gateway, not by the API.
+
+## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 use Carbon\Carbon;
 
-// Get trips stream
 $trips = Samsara::trips()
     ->query()
     ->between(Carbon::now()->subDays(7), Carbon::now())
     ->get();
 ```
 
-## Query Builder
+## Trip Status Filters
+
+The resource ships two typed shortcuts that pre-filter on `completionStatus`.
 
 ```php
-// Filter by driver
+$completed = Samsara::trips()
+    ->completed()
+    ->between(now()->subDays(7), now())
+    ->get();
+
+$inProgress = Samsara::trips()
+    ->inProgress()
+    ->get();
+```
+
+## Time-Based Queries
+
+`between()` covers the common case. For explicit RFC 3339 strings use `startTime()` and `endTime()`.
+
+```php
+use Carbon\Carbon;
+
+$today = Samsara::trips()
+    ->query()
+    ->between(Carbon::today(), Carbon::now())
+    ->get();
+
+$range = Samsara::trips()
+    ->query()
+    ->startTime('2024-01-01T00:00:00Z')
+    ->endTime('2024-01-31T23:59:59Z')
+    ->get();
+```
+
+## Streaming Large Datasets
+
+For multi-month windows, use `lazy()` to iterate without loading every page into memory at once.
+
+```php
+Samsara::trips()
+    ->query()
+    ->between(now()->subYear(), now())
+    ->lazy(500)
+    ->each(function ($trip) {
+        DB::table('trip_archive')->insert([
+            'samsara_trip_start' => $trip->startTime,
+            'driver_id' => $trip->driver['id'] ?? null,
+            'vehicle_id' => $trip->vehicle['id'] ?? null,
+            'distance_meters' => $trip->distanceMeters,
+        ]);
+    });
+```
+
+## Filtering
+
+See [Query Builder](../query-builder.md) for the complete filter list. The most common Trip filters are by driver, vehicle, and tag.
+
+```php
 $trips = Samsara::trips()
     ->query()
-    ->whereDriver('driver-123')
+    ->whereDriver('driver-id')
     ->between(now()->subWeek(), now())
     ->get();
 
-// Filter by vehicle
 $trips = Samsara::trips()
     ->query()
     ->whereVehicle(['vehicle-1', 'vehicle-2'])
     ->between(now()->subDays(7), now())
     ->get();
 
-// Filter by tag
 $trips = Samsara::trips()
     ->query()
     ->whereTag('delivery-fleet')
@@ -49,82 +110,45 @@ $trips = Samsara::trips()
     ->get();
 ```
 
-## Trip Status Filters
+## Helper Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `getDistanceMiles()` | `?float` | Distance converted from `distanceMeters` to miles. |
+| `getDistanceKilometers()` | `?float` | Distance converted from `distanceMeters` to kilometers. |
+| `getDrivingTimeHours()` | `?float` | Driving time converted from `drivingTimeMs` to hours. |
+| `getDrivingTimeMinutes()` | `?float` | Driving time converted from `drivingTimeMs` to minutes. |
 
 ```php
-// Get completed trips only
-$completedTrips = Samsara::trips()
-    ->completed()
-    ->between(now()->subDays(7), now())
-    ->get();
-
-// Get in-progress trips only
-$inProgressTrips = Samsara::trips()
-    ->inProgress()
-    ->get();
-```
-
-## Time-Based Queries
-
-```php
-use Carbon\Carbon;
-
-// Get trips for today
-$todayTrips = Samsara::trips()
+$trip = Samsara::trips()
     ->query()
-    ->between(Carbon::today(), Carbon::now())
-    ->get();
+    ->between(now()->subDay(), now())
+    ->first();
 
-// Get trips for a specific date range
-$trips = Samsara::trips()
-    ->query()
-    ->startTime('2024-01-01T00:00:00Z')
-    ->endTime('2024-01-31T23:59:59Z')
-    ->get();
+$trip->getDistanceMiles();      // ?float
+$trip->getDrivingTimeHours();   // ?float
+$trip->driver['id'] ?? null;    // ?string
+$trip->vehicle['id'] ?? null;   // ?string
 ```
 
-## Lazy Loading Large Datasets
+## Properties
 
-```php
-// Stream through large trip datasets
-Samsara::trips()
-    ->query()
-    ->between(now()->subYear(), now())
-    ->lazy(500)
-    ->each(function ($trip) {
-        // Process each trip
-        DB::table('trip_archive')->insert([
-            'samsara_id' => $trip->getId(),
-            'driver_id' => $trip->driverId,
-            'distance' => $trip->distanceMeters,
-        ]);
-    });
-```
-
-## Trip Entity
-
-```php
-$trip = Samsara::trips()->query()->first();
-
-$trip->id;               // string
-$trip->driverId;         // ?string
-$trip->vehicleId;        // ?string
-$trip->startTime;        // string (ISO 8601)
-$trip->endTime;          // ?string (ISO 8601)
-$trip->distanceMeters;   // ?float
-$trip->completionStatus; // string ('completed' or 'inProgress')
-```
-
-## Available Properties
+The Trip entity exposes nested `driver` and `vehicle` arrays, not flat `driverId` / `vehicleId` keys.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `id` | string | Trip ID |
-| `driverId` | string | Driver ID |
-| `vehicleId` | string | Vehicle ID |
-| `startTime` | string | Trip start time (ISO 8601) |
-| `endTime` | string | Trip end time (ISO 8601) |
-| `distanceMeters` | float | Trip distance in meters |
-| `completionStatus` | string | 'completed' or 'inProgress' |
-| `startLocation` | object | Start location details |
-| `endLocation` | object | End location details |
+| `startTime` | `?string` | RFC 3339 trip start time. |
+| `endTime` | `?string` | RFC 3339 trip end time. |
+| `distanceMeters` | `?int` | Trip distance in meters. |
+| `drivingTimeMs` | `?int` | Driving time in milliseconds. |
+| `driver` | `?array{id?: string, name?: string}` | Associated driver. |
+| `vehicle` | `?array{id?: string, name?: string}` | Associated vehicle. |
+| `asset` | `?array{id?: string, name?: string}` | Associated asset (when the trip was made by a non-vehicle asset). |
+| `startLocation` | `?array{latitude?: float, longitude?: float}` | Trip start location. |
+| `endLocation` | `?array{latitude?: float, longitude?: float}` | Trip end location. |
+
+## Related Resources
+
+- [Vehicles](vehicles.md) — vehicles whose gateways produce trips.
+- [Drivers](drivers.md) — drivers attributed to each trip.
+- [Vehicle Stats](vehicle-stats.md) — engine-state and GPS samples that compose a trip.

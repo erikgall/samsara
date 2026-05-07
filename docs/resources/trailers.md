@@ -1,58 +1,75 @@
 ---
 title: Trailers
-layout: default
-parent: Resources
 nav_order: 3
-description: "Manage trailers in your Samsara fleet"
+description: Manage trailers in your Samsara fleet.
 permalink: /resources/trailers
 ---
 
-# Trailers Resource
+# Trailers
 
-Manage trailers in your Samsara fleet.
+- [Introduction](#introduction)
+- [Retrieving Records](#retrieving-records)
+- [Creating Records](#creating-records)
+- [Updating Records](#updating-records)
+- [Deleting Records](#deleting-records)
+- [Filtering](#filtering)
+- [External IDs](#external-ids)
+- [Helper Methods](#helper-methods)
+- [Properties](#properties)
+- [Related Resources](#related-resources)
 
-## Basic Usage
+## Introduction
+
+A trailer is a non-motorized asset tracked by a Samsara trailer gateway. Trailers carry their own tags, external ids, and license plate, and they appear on driver assignments and route stops independently of the towing vehicle. Use this resource to read and manage the trailer roster — telematics for the trailer gateway lives under [Vehicle Locations](vehicle-locations.md) and the dedicated trailer-stats endpoints.
+
+## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-// Get all trailers
 $trailers = Samsara::trailers()->all();
 
-// Find a trailer
 $trailer = Samsara::trailers()->find('trailer-id');
+```
 
-// Create a trailer
+## Creating Records
+
+```php
 $trailer = Samsara::trailers()->create([
     'name' => 'Trailer T-500',
-    'serialNumber' => 'SN12345678',
+    'assetSerialNumber' => 'SN12345678',
 ]);
+```
 
-// Update a trailer
+## Updating Records
+
+```php
 $trailer = Samsara::trailers()->update('trailer-id', [
-    'name' => 'Trailer T-500 Updated',
+    'name' => 'Trailer T-500 (refurbished)',
 ]);
+```
 
-// Delete a trailer
+## Deleting Records
+
+```php
 Samsara::trailers()->delete('trailer-id');
 ```
 
-## Query Builder
+## Filtering
+
+See [Query Builder](../query-builder.md) for the full filter list. The Trailers resource supports tag, parent-tag, and limit filters out of the box.
 
 ```php
-// Filter by tag
 $trailers = Samsara::trailers()
     ->query()
     ->whereTag('tag-id')
     ->get();
 
-// Filter by parent tag
 $trailers = Samsara::trailers()
     ->query()
     ->whereParentTag('parent-tag-id')
     ->get();
 
-// Limit results
 $trailers = Samsara::trailers()
     ->query()
     ->limit(10)
@@ -62,30 +79,32 @@ $trailers = Samsara::trailers()
 ## External IDs
 
 ```php
-// Find by external ID
 $trailer = Samsara::trailers()->findByExternalId('asset_id', 'TRL-12345');
 ```
 
-## Trailer Entity
+## Helper Methods
 
-```php
-$trailer = Samsara::trailers()->find('trailer-id');
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `getDisplayName()` | `string` | The trailer's `name`, or `"Unknown"` when null. |
+| `getExternalId(string $key)` | `?string` | Lookup an external id by namespace key. |
+| `getTagIds()` | `array<int, string>` | Flat list of tag ids associated with the trailer. |
 
-$trailer->id;           // string
-$trailer->name;         // string
-$trailer->serialNumber; // ?string
-$trailer->notes;        // ?string
-$trailer->tags;         // array
-$trailer->externalIds;  // array
-```
-
-## Available Properties
+## Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `id` | string | Trailer ID |
-| `name` | string | Trailer name |
-| `serialNumber` | string | Serial number |
-| `notes` | string | Notes |
-| `tags` | array | Associated tags |
-| `externalIds` | array | External ID mappings |
+| `id` | `?string` | Trailer id. |
+| `name` | `?string` | Trailer name. |
+| `assetSerialNumber` | `?string` | The trailer asset serial number. |
+| `licensePlate` | `?string` | License plate. |
+| `notes` | `?string` | Free-form notes. |
+| `enabledForMobile` | `?bool` | Whether the trailer appears in the driver app. |
+| `externalIds` | `?array<string, string>` | External id mappings keyed by namespace. |
+| `tags` | `?array` | Associated tags (each item exposes `id`, optional `name`, optional `parentTagId`). |
+
+## Related Resources
+
+- [Drivers](drivers.md) — drivers who tow trailers.
+- [Routes](routes.md) — routes that reference trailers as stops.
+- [Assignments](assignments.md) — trailer assignments to drivers and vehicles.
