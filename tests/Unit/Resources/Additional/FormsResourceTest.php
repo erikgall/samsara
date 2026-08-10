@@ -5,7 +5,7 @@ namespace Samsara\Tests\Unit\Resources\Additional;
 use Samsara\Samsara;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
-use Samsara\Data\EntityCollection;
+use Samsara\Data\Form\FormTemplate;
 use Samsara\Data\Form\FormSubmission;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Additional\FormsResource;
@@ -38,15 +38,16 @@ class FormsResourceTest extends TestCase
             '*/form-submissions' => $this->http->response([
                 'data' => [
                     'id'     => 'submission-123',
-                    'status' => 'draft',
+                    'status' => 'notStarted',
                 ],
-            ], 201),
+            ], 200),
         ]);
 
         $resource = new FormsResource($this->samsara);
 
         $submission = $resource->createSubmission([
-            'formTemplateId' => 'template-1',
+            'formTemplate' => ['id' => 'template-1'],
+            'status'       => 'notStarted',
         ]);
 
         $this->assertInstanceOf(FormSubmission::class, $submission);
@@ -57,17 +58,18 @@ class FormsResourceTest extends TestCase
     public function it_can_export_pdf(): void
     {
         $this->http->fake([
-            '*/form-submissions/pdf-exports' => $this->http->response([
+            '*/form-submissions/pdf-exports*' => $this->http->response([
                 'data' => [
-                    'id'     => 'export-123',
-                    'status' => 'pending',
+                    'id'        => 'export-123',
+                    'pdfId'     => 'pdf-123',
+                    'jobStatus' => 'pending',
                 ],
-            ], 201),
+            ], 202),
         ]);
 
         $resource = new FormsResource($this->samsara);
 
-        $result = $resource->exportPdf(['submissionIds' => ['submission-1']]);
+        $result = $resource->exportPdf('submission-1');
 
         $this->assertIsArray($result);
         $this->assertSame('export-123', $result['id']);
@@ -77,11 +79,11 @@ class FormsResourceTest extends TestCase
     public function it_can_get_pdf_export(): void
     {
         $this->http->fake([
-            '*/form-submissions/pdf-exports/export-123' => $this->http->response([
+            '*/form-submissions/pdf-exports*' => $this->http->response([
                 'data' => [
-                    'id'     => 'export-123',
-                    'status' => 'completed',
-                    'url'    => 'https://example.com/pdf',
+                    'id'        => 'export-123',
+                    'pdfId'     => 'pdf-123',
+                    'jobStatus' => 'completed',
                 ],
             ], 200),
         ]);
@@ -91,7 +93,7 @@ class FormsResourceTest extends TestCase
         $result = $resource->getPdfExport('export-123');
 
         $this->assertIsArray($result);
-        $this->assertSame('completed', $result['status']);
+        $this->assertSame('completed', $result['jobStatus']);
     }
 
     #[Test]
@@ -120,17 +122,18 @@ class FormsResourceTest extends TestCase
         $this->http->fake([
             '*/form-templates' => $this->http->response([
                 'data' => [
-                    ['id' => 'template-1', 'name' => 'Template 1'],
-                    ['id' => 'template-2', 'name' => 'Template 2'],
+                    ['id' => 'template-1', 'title' => 'Template 1'],
+                    ['id' => 'template-2', 'title' => 'Template 2'],
                 ],
+                'pagination' => ['hasNextPage' => false],
             ], 200),
         ]);
 
         $resource = new FormsResource($this->samsara);
 
-        $templates = $resource->templates();
+        $templates = $resource->templates()->get();
 
-        $this->assertInstanceOf(EntityCollection::class, $templates);
+        $this->assertInstanceOf(FormTemplate::class, $templates->first());
         $this->assertCount(2, $templates);
     }
 
@@ -138,20 +141,20 @@ class FormsResourceTest extends TestCase
     public function it_can_update_submission(): void
     {
         $this->http->fake([
-            '*/form-submissions/submission-123' => $this->http->response([
+            '*/form-submissions' => $this->http->response([
                 'data' => [
                     'id'     => 'submission-123',
-                    'status' => 'submitted',
+                    'status' => 'approved',
                 ],
             ], 200),
         ]);
 
         $resource = new FormsResource($this->samsara);
 
-        $submission = $resource->updateSubmission('submission-123', ['status' => 'submitted']);
+        $submission = $resource->updateSubmission('submission-123', ['status' => 'approved']);
 
         $this->assertInstanceOf(FormSubmission::class, $submission);
-        $this->assertSame('submitted', $submission->status);
+        $this->assertSame('approved', $submission->status);
     }
 
     #[Test]

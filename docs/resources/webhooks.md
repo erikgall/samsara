@@ -67,7 +67,7 @@ Samsara::webhooks()->delete('webhook-id');
 
 ## Filtering
 
-The resource exposes `query()` for filter chaining. See [Query Builder](../query-builder.md) for the full filter list.
+The resource exposes `query()` for filter chaining. See [Query Builder](../query-builder.html) for the full filter list.
 
 ```php
 $webhooks = Samsara::webhooks()
@@ -78,7 +78,7 @@ $webhooks = Samsara::webhooks()
 
 ## Webhook Events
 
-The `WebhookEvent` enum lists every supported event type. Pass the case via `->value` (the API expects the wire string).
+The `WebhookEvent` enum lists the 27 event types currently shipped by the package. Pass the case via `->value` (the API expects the wire string). Current upstream exposes eight more values; see [Enums](../enums.html#webhookevent).
 
 ```php
 use Samsara\Enums\WebhookEvent;
@@ -94,7 +94,7 @@ $webhook = Samsara::webhooks()->create([
 ]);
 ```
 
-The 27 supported events grouped by domain:
+The 27 package events grouped by domain:
 
 | Domain | Events |
 |--------|--------|
@@ -109,7 +109,7 @@ The 27 supported events grouped by domain:
 | Document / Form | `DocumentSubmitted`, `FormSubmitted`, `FormUpdated` |
 | Issues | `IssueCreated` |
 
-See [Enums](../enums.md#webhookevent) for the full case-to-value reference.
+See [Enums](../enums.html#webhookevent) for the full case-to-value reference.
 
 ## Webhook Security
 
@@ -166,7 +166,7 @@ public function handle(Request $request)
 $verifier->verify($payload, $signature, $timestamp);
 ```
 
-See [Error Handling](../error-handling.md) for details on `InvalidSignatureException`.
+See [Error Handling](../error-handling.html) for details on `InvalidSignatureException`.
 
 ### Boolean Validation
 
@@ -306,6 +306,6 @@ if ($webhook->hasEventType('VehicleCreated')) {
 
 ## Related Resources
 
-- [Error Handling](../error-handling.md) — `InvalidSignatureException` reference.
-- [Enums](../enums.md#webhookevent) — full `WebhookEvent` case list.
-- [Testing](../testing.md) — patterns for asserting webhook delivery in your test suite.
+- [Error Handling](../error-handling.html) — `InvalidSignatureException` reference.
+- [Enums](../enums.html#webhookevent) — full `WebhookEvent` case list.
+- [Testing](../testing.html) — patterns for asserting webhook delivery in your test suite.

@@ -87,7 +87,7 @@ Samsara::vehicles()->update('vehicle-id', [
 
 ## Filtering
 
-See [Query Builder](../query-builder.md) for the full filter list.
+See [Query Builder](../query-builder.html) for the full filter list.
 
 ```php
 $vehicles = Samsara::vehicles()
@@ -111,6 +111,8 @@ $vehicles = Samsara::vehicles()
 ```php
 $vehicle = Samsara::vehicles()->findByExternalId('fleet_id', 'TRUCK001');
 ```
+
+The SDK converts the pair to the item identifier `fleet_id:TRUCK001`. Vehicle queries are also the sole Fleet/platform operation with an OpenAPI `explode=true` array: an `attributes` array passed through `where()` is emitted as repeated keys (`attributes=a&attributes=b`).
 
 ## Helper Methods
 
@@ -142,7 +144,7 @@ $vehicle = Samsara::vehicles()->findByExternalId('fleet_id', 'TRUCK001');
 
 ## Related Resources
 
-- [Vehicle Stats](vehicle-stats.md) — telemetry data emitted by the gateway.
-- [Vehicle Locations](vehicle-locations.md) — GPS positions, current and historical.
-- [Trips](trips.md) — engine-on/engine-off intervals.
-- [Assets](assets.md) — create or delete vehicle records here.
+- [Vehicle Stats](vehicle-stats.html) — telemetry data emitted by the gateway.
+- [Vehicle Locations](vehicle-locations.html) — GPS positions, current and historical.
+- [Trips](trips.html) — engine-on/engine-off intervals.
+- [Assets](assets.html) — create or delete vehicle records here.

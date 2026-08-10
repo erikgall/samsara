@@ -17,7 +17,7 @@ class FuelAndEnergyResource extends Resource
     /**
      * The API endpoint for this resource.
      */
-    protected string $endpoint = '/fuel-energy';
+    protected string $endpoint = '/fuel-purchase';
 
     /**
      * Create a fuel purchase record.
@@ -27,9 +27,11 @@ class FuelAndEnergyResource extends Resource
      */
     public function createFuelPurchase(array $data): array
     {
-        $response = $this->client()->post('/fuel-purchases', $data);
-
-        $this->handleError($response);
+        $endpoint = '/fuel-purchase';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
     }
@@ -39,7 +41,8 @@ class FuelAndEnergyResource extends Resource
      */
     public function driverEfficiency(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fuel-energy/driver-efficiency/stream');
+        return $this->createBuilderWithEndpoint('/driver-efficiency/drivers')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -50,9 +53,11 @@ class FuelAndEnergyResource extends Resource
      */
     public function driversFuelEnergyReport(array $params): array
     {
-        $response = $this->client()->get('/fuel-energy/driver-reports', $params);
-
-        $this->handleError($response);
+        $endpoint = '/fleet/reports/drivers/fuel-energy';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, $params),
+            $endpoint
+        );
 
         return $response->json();
     }
@@ -62,7 +67,8 @@ class FuelAndEnergyResource extends Resource
      */
     public function vehicleEfficiency(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fuel-energy/vehicle-efficiency/stream');
+        return $this->createBuilderWithEndpoint('/driver-efficiency/vehicles')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -73,10 +79,20 @@ class FuelAndEnergyResource extends Resource
      */
     public function vehiclesFuelEnergyReport(array $params): array
     {
-        $response = $this->client()->get('/fuel-energy/vehicle-reports', $params);
-
-        $this->handleError($response);
+        $endpoint = '/fleet/reports/vehicles/fuel-energy';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, $params),
+            $endpoint
+        );
 
         return $response->json();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

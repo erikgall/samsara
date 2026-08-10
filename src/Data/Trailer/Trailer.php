@@ -13,11 +13,13 @@ use Samsara\Data\Entity;
  *
  * @property-read string|null $id Trailer ID
  * @property-read string|null $name Trailer name
- * @property-read string|null $assetSerialNumber Asset serial number
+ * @property-read string|null $trailerSerialNumber Trailer serial number
  * @property-read string|null $licensePlate License plate
  * @property-read string|null $notes Notes about the trailer
  * @property-read bool|null $enabledForMobile Whether enabled for mobile
+ * @property-read array{serial?: string, model?: string}|null $installedGateway Installed trailer gateway
  * @property-read array<string, string>|null $externalIds External ID mappings
+ * @property-read array<int, array<string, mixed>>|null $attributes Trailer attributes returned by item endpoints
  * @property-read array<int, array{id: string, name?: string, parentTagId?: string}>|null $tags Associated tags
  */
 class Trailer extends Entity

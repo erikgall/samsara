@@ -50,6 +50,23 @@ class GatewayTest extends TestCase
     }
 
     #[Test]
+    public function it_exposes_current_gateway_detail_fields(): void
+    {
+        $gateway = new Gateway([
+            'serial'              => 'ABCD-123-XYZ',
+            'model'               => 'VG34',
+            'accessoryDevices'    => [['serial' => 'ACC-1']],
+            'asset'               => ['id' => 'vehicle-1', 'name' => 'Truck 1'],
+            'connectionStatus'    => ['status' => 'Connected'],
+            'dataUsageLast30Days' => ['bytesUsed' => 1024],
+        ]);
+
+        $this->assertCount(1, $gateway->accessoryDevices);
+        $this->assertSame('vehicle-1', $gateway->asset['id']);
+        $this->assertSame('Connected', $gateway->connectionStatus['status']);
+    }
+
+    #[Test]
     public function it_extends_entity(): void
     {
         $gateway = new Gateway;

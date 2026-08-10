@@ -15,7 +15,9 @@ permalink: /resources/ifta
 
 ## Introduction
 
-The `Samsara::ifta()` resource calls Samsara's IFTA (International Fuel Tax Agreement) reporting endpoints. The four methods on `IftaResource` return raw decoded JSON (`array<string, mixed>`) — there are no typed entities, no query builder, and no CRUD. Reach for it once a quarter to gather miles-per-jurisdiction totals or to fetch a detail CSV for tax filing.
+The four explicit methods on `IftaResource` return raw decoded JSON (`array<string, mixed>`); there is no typed entity, query builder, or supported generic CRUD operation.
+
+The helpers implement `POST /ifta-detail/csv`, `GET /ifta-detail/csv/{id}`, `GET /fleet/reports/ifta/jurisdiction`, and `GET /fleet/reports/ifta/vehicle`.
 
 ## Jurisdiction and Vehicle Reports
 
@@ -49,8 +51,8 @@ CSV exports use a request-then-poll pattern: `detailCsv()` queues an export and 
 
 ```php
 $export = Samsara::ifta()->detailCsv([
-    'year' => 2026,
-    'quarter' => 1,
+    'startHour' => '2026-01-01T00:00:00Z',
+    'endHour' => '2026-04-01T00:00:00Z',
 ]);
 
 $status = Samsara::ifta()->getDetailCsv($export['id']);
@@ -73,6 +75,6 @@ Poll `getDetailCsv()` on a queued job (`Bus::dispatch(...)`); do not block the r
 
 ## Related Resources
 
-- [Fuel and Energy](fuel-and-energy.md) — fuel volume and consumption metrics.
-- [Trips](trips.md) — per-trip mileage that feeds IFTA totals.
-- [Error Handling](../error-handling.md) — exception types raised on failed requests.
+- [Fuel and Energy](fuel-and-energy.html) — fuel volume and consumption metrics.
+- [Trips](trips.html) — per-trip mileage that feeds IFTA totals.
+- [Error Handling](../error-handling.html) — exception types raised on failed requests.

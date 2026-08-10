@@ -35,16 +35,8 @@ class TrailersResource extends Resource
      */
     public function findByExternalId(string $key, string $value): ?Trailer
     {
-        $result = $this->query()
-            ->where("externalIds[{$key}]", $value)
-            ->first();
-
-        if ($result === null) {
-            return null;
-        }
-
-        /** @var Trailer */
-        return $result;
+        /** @var Trailer|null */
+        return $this->find("{$key}:{$value}");
     }
 
     /**
@@ -53,5 +45,15 @@ class TrailersResource extends Resource
     public function query(): Builder
     {
         return new Builder($this);
+    }
+
+    /**
+     * Get the inherited generic operations supported by this resource.
+     *
+     * @return array<int, string>
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all', 'find', 'create', 'update', 'delete'];
     }
 }

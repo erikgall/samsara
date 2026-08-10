@@ -13,7 +13,7 @@ use Samsara\Data\Entity;
  *
  * @property-read float|null $latitude Latitude coordinate
  * @property-read float|null $longitude Longitude coordinate
- * @property-read int|null $headingDegrees Heading in degrees (0-359)
+ * @property-read float|null $headingDegrees Heading in degrees (0-359)
  * @property-read float|null $speedMilesPerHour Speed in miles per hour
  * @property-read string|null $time Timestamp of the location reading
  * @property-read string|null $address Formatted address

@@ -6,10 +6,12 @@ use Samsara\Samsara;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Route\Route;
-use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
+use Samsara\Data\Route\RouteAuditLog;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Dispatch\RoutesResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the RoutesResource.
@@ -68,6 +70,22 @@ class RoutesResourceTest extends TestCase
 
         $this->assertInstanceOf(Route::class, $route);
         $this->assertSame('Morning Route', $route->name);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/routes'
+            && $request->data() === [
+                'name'  => 'Morning Route',
+                'stops' => [
+                    [
+                        'addressId'              => 'addr-1',
+                        'scheduledDepartureTime' => '2025-01-20T08:00:00Z',
+                    ],
+                    [
+                        'addressId'            => 'addr-2',
+                        'scheduledArrivalTime' => '2025-01-20T10:00:00Z',
+                    ],
+                ],
+            ]
+        );
     }
 
     #[Test]
@@ -81,6 +99,10 @@ class RoutesResourceTest extends TestCase
         $result = $resource->delete('route-1');
 
         $this->assertTrue($result);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'DELETE'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/routes/route-1'
+            && $request->data() === []
+        );
     }
 
     #[Test]
@@ -100,32 +122,25 @@ class RoutesResourceTest extends TestCase
 
         $this->assertInstanceOf(Route::class, $route);
         $this->assertSame('Evening Route', $route->name);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/routes/route-1'
+            && $request->data() === []
+        );
     }
 
     #[Test]
     public function it_can_get_all_routes(): void
     {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    [
-                        'id'   => 'route-1',
-                        'name' => 'Morning Route',
-                    ],
-                    [
-                        'id'   => 'route-2',
-                        'name' => 'Afternoon Route',
-                    ],
-                ],
-            ]),
-        ]);
-
         $resource = new RoutesResource($this->samsara);
-        $routes = $resource->all();
 
-        $this->assertInstanceOf(EntityCollection::class, $routes);
-        $this->assertCount(2, $routes);
-        $this->assertInstanceOf(Route::class, $routes->first());
+        try {
+            $resource->all();
+            $this->fail('Routes all() cannot supply required startTime and endTime.');
+        } catch (UnsupportedOperationException) {
+            $this->assertTrue(true);
+        }
+
+        $this->http->assertNothingSent();
     }
 
     #[Test]
@@ -163,6 +178,10 @@ class RoutesResourceTest extends TestCase
 
         $this->assertInstanceOf(Route::class, $route);
         $this->assertSame('Updated Route', $route->name);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'PATCH'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/routes/route-1'
+            && $request->data() === ['name' => 'Updated Route']
+        );
     }
 
     #[Test]
@@ -179,5 +198,80 @@ class RoutesResourceTest extends TestCase
         $resource = new RoutesResource($this->samsara);
 
         $this->assertSame(Route::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_maps_and_paginates_route_audit_logs_without_a_limit(): void
+    {
+        $this->http->fakeSequence()
+            ->push([
+                'data' => [[
+                    'changes' => [
+                        'before' => ['stops' => [['id' => 'stop-1', 'state' => 'scheduled']]],
+                        'after'  => ['stops' => [['id' => 'stop-1', 'state' => 'skipped']]],
+                    ],
+                    'operation' => 'stop skipped',
+                    'route'     => ['id' => 'route-1', 'name' => 'Morning Route'],
+                    'source'    => 'driver',
+                    'time'      => '2026-08-10T14:30:00Z',
+                    'type'      => 'route tracking',
+                ]],
+                'pagination' => ['endCursor' => 'audit-next', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data'       => [],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]);
+
+        $page = (new RoutesResource($this->samsara))
+            ->auditLogs()
+            ->expand('route')
+            ->paginate();
+        $page->nextPage();
+
+        $auditLog = $page->items()->first();
+        $this->assertSame(RouteAuditLog::class, $auditLog::class);
+        $this->assertSame('route-1', $auditLog->getRoute()->id);
+        $this->assertSame('skipped', $auditLog->changes['after']['stops'][0]['state']);
+        $this->http->assertSentCount(2);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/routes/audit-logs/feed'
+            && $request->data() === ['expand' => 'route']
+        );
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/routes/audit-logs/feed'
+            && $request->data() === ['after' => 'audit-next', 'expand' => 'route']
+        );
+    }
+
+    #[Test]
+    public function it_terminal_executes_route_list_with_required_times(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'   => 'route-1',
+                    'name' => 'Morning Route',
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new RoutesResource($this->samsara))
+            ->query()
+            ->between('2026-08-10T14:00:00Z', '2026-08-10T15:00:00Z')
+            ->where('include', 'routeTrackingDetails')
+            ->paginate(50);
+
+        $this->assertInstanceOf(Route::class, $page->items()->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/routes'
+            && $request->data() === [
+                'startTime' => '2026-08-10T14:00:00Z',
+                'endTime'   => '2026-08-10T15:00:00Z',
+                'include'   => 'routeTrackingDetails',
+                'limit'     => 50,
+            ]
+        );
     }
 }

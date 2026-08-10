@@ -6,9 +6,11 @@ use Samsara\Samsara;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use Samsara\Data\LiveShare\LiveShare;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 use Samsara\Resources\Integrations\LiveSharingLinksResource;
 
 /**
@@ -37,22 +39,33 @@ class LiveSharingLinksResourceTest extends TestCase
         $this->http->fake([
             '*/live-shares' => $this->http->response([
                 'data' => [
-                    'id'     => 'share-123',
-                    'name'   => 'New Share',
-                    'status' => 'active',
+                    'id'             => 'share-123',
+                    'name'           => 'New Share',
+                    'type'           => 'assetsLocation',
+                    'liveSharingUrl' => 'https://cloud.samsara.com/live/share-123',
                 ],
-            ], 201),
+            ], 200),
         ]);
 
         $resource = new LiveSharingLinksResource($this->samsara);
 
         $liveShare = $resource->create([
-            'name'   => 'New Share',
-            'assets' => [['id' => 'vehicle-1', 'type' => 'vehicle']],
+            'name'                     => 'New Share',
+            'type'                     => 'assetsLocation',
+            'assetsLocationLinkConfig' => ['assetIds' => ['vehicle-1']],
         ]);
 
         $this->assertInstanceOf(LiveShare::class, $liveShare);
         $this->assertSame('New Share', $liveShare->name);
+        $this->assertSame('https://cloud.samsara.com/live/share-123', $liveShare->liveSharingUrl);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/live-shares'
+            && $request->data() === [
+                'name'                     => 'New Share',
+                'type'                     => 'assetsLocation',
+                'assetsLocationLinkConfig' => ['assetIds' => ['vehicle-1']],
+            ]
+        );
     }
 
     #[Test]
@@ -69,7 +82,7 @@ class LiveSharingLinksResourceTest extends TestCase
     public function it_can_delete_a_live_share(): void
     {
         $this->http->fake([
-            '*/live-shares/share-123' => $this->http->response([], 204),
+            '*' => $this->http->response([], 204),
         ]);
 
         $resource = new LiveSharingLinksResource($this->samsara);
@@ -77,26 +90,26 @@ class LiveSharingLinksResourceTest extends TestCase
         $result = $resource->delete('share-123');
 
         $this->assertTrue($result);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'DELETE'
+            && parse_url($request->url(), PHP_URL_PATH) === '/live-shares'
+            && parse_url($request->url(), PHP_URL_QUERY) === 'id=share-123'
+            && $request->data() === []
+        );
     }
 
     #[Test]
     public function it_can_find_a_live_share(): void
     {
-        $this->http->fake([
-            '*/live-shares/share-123' => $this->http->response([
-                'data' => [
-                    'id'   => 'share-123',
-                    'name' => 'Test Share',
-                ],
-            ], 200),
-        ]);
-
         $resource = new LiveSharingLinksResource($this->samsara);
 
-        $liveShare = $resource->find('share-123');
+        try {
+            $resource->find('share-123');
+            $this->fail('Live sharing links do not support an item GET.');
+        } catch (UnsupportedOperationException) {
+            $this->assertTrue(true);
+        }
 
-        $this->assertInstanceOf(LiveShare::class, $liveShare);
-        $this->assertSame('share-123', $liveShare->id);
+        $this->http->assertNothingSent();
     }
 
     #[Test]
@@ -105,9 +118,20 @@ class LiveSharingLinksResourceTest extends TestCase
         $this->http->fake([
             '*/live-shares' => $this->http->response([
                 'data' => [
-                    ['id' => 'share-1', 'name' => 'Share 1'],
-                    ['id' => 'share-2', 'name' => 'Share 2'],
+                    [
+                        'id'             => 'share-1',
+                        'name'           => 'Share 1',
+                        'type'           => 'assetsLocation',
+                        'liveSharingUrl' => 'https://cloud.samsara.com/live/share-1',
+                    ],
+                    [
+                        'id'             => 'share-2',
+                        'name'           => 'Share 2',
+                        'type'           => 'assetsLocation',
+                        'liveSharingUrl' => 'https://cloud.samsara.com/live/share-2',
+                    ],
                 ],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
             ], 200),
         ]);
 
@@ -117,16 +141,23 @@ class LiveSharingLinksResourceTest extends TestCase
 
         $this->assertInstanceOf(EntityCollection::class, $result);
         $this->assertCount(2, $result);
+        $this->assertInstanceOf(LiveShare::class, $result->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/live-shares'
+            && $request->data() === []
+        );
     }
 
     #[Test]
     public function it_can_update_a_live_share(): void
     {
         $this->http->fake([
-            '*/live-shares/share-123' => $this->http->response([
+            '*' => $this->http->response([
                 'data' => [
-                    'id'   => 'share-123',
-                    'name' => 'Updated Share',
+                    'id'             => 'share-123',
+                    'name'           => 'Updated Share',
+                    'type'           => 'assetsLocation',
+                    'liveSharingUrl' => 'https://cloud.samsara.com/live/share-123',
                 ],
             ], 200),
         ]);
@@ -137,6 +168,11 @@ class LiveSharingLinksResourceTest extends TestCase
 
         $this->assertInstanceOf(LiveShare::class, $liveShare);
         $this->assertSame('Updated Share', $liveShare->name);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'PATCH'
+            && parse_url($request->url(), PHP_URL_PATH) === '/live-shares'
+            && parse_url($request->url(), PHP_URL_QUERY) === 'id=share-123'
+            && $request->data() === ['name' => 'Updated Share']
+        );
     }
 
     #[Test]
@@ -153,5 +189,39 @@ class LiveSharingLinksResourceTest extends TestCase
         $resource = new LiveSharingLinksResource($this->samsara);
 
         $this->assertSame(LiveShare::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_terminal_executes_filtered_live_share_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'             => 'share-1',
+                    'name'           => 'Share 1',
+                    'type'           => 'assetsOnRoute',
+                    'liveSharingUrl' => 'https://cloud.samsara.com/live/share-1',
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new LiveSharingLinksResource($this->samsara))
+            ->query()
+            ->where('ids', 'share-1,share-2')
+            ->where('type', 'assetsOnRoute')
+            ->after('share-cursor')
+            ->paginate(50);
+
+        $this->assertInstanceOf(LiveShare::class, $page->items()->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/live-shares'
+            && $request->data() == [
+                'ids'   => 'share-1,share-2',
+                'type'  => 'assetsOnRoute',
+                'after' => 'share-cursor',
+                'limit' => 50,
+            ]
+        );
     }
 }

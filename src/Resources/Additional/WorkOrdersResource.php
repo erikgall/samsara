@@ -4,8 +4,8 @@ namespace Samsara\Resources\Additional;
 
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
-use Samsara\Data\EntityCollection;
 use Samsara\Data\Maintenance\WorkOrder;
+use Samsara\Data\Maintenance\ServiceTask;
 
 /**
  * WorkOrders resource for the Samsara API.
@@ -33,21 +33,20 @@ class WorkOrdersResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))
+            ->withoutDefaultPageSize()
+            ->repeatQueryParameters('ids');
     }
 
     /**
      * Get all service tasks.
-     *
-     * @return EntityCollection<int, \Samsara\Data\Entity>
      */
-    public function serviceTasks(): EntityCollection
+    public function serviceTasks(): Builder
     {
-        $response = $this->client()->get('/maintenance/service-tasks');
-
-        $this->handleError($response);
-
-        return $this->mapToEntities($response->json('data', []));
+        return $this->createBuilderWithEndpoint('/maintenance/service-tasks')
+            ->withoutDefaultPageSize()
+            ->repeatQueryParameters('ids')
+            ->usingEntity(ServiceTask::class);
     }
 
     /**
@@ -55,7 +54,10 @@ class WorkOrdersResource extends Resource
      */
     public function stream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/maintenance/work-orders/stream');
+        return $this->createBuilderWithEndpoint('/maintenance/work-orders/stream')
+            ->withoutDefaultPageSize()
+            ->repeatQueryParameters('workOrderStatuses', 'assetIds', 'assignedUserIds')
+            ->usingEntity(WorkOrder::class);
     }
 
     /**
@@ -66,10 +68,20 @@ class WorkOrdersResource extends Resource
      */
     public function uploadInvoiceScan(array $data): array
     {
-        $response = $this->client()->post('/maintenance/invoice-scans', $data);
-
-        $this->handleError($response);
+        $endpoint = '/maintenance/invoice-scans';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all', 'create'];
     }
 }

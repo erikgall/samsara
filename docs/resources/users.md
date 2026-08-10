@@ -20,7 +20,7 @@ permalink: /resources/users
 
 ## Introduction
 
-Users are the people who sign in to the Samsara dashboard — admins, fleet managers, and other back-office accounts. They are distinct from drivers, who are the in-vehicle people that operate gateways and the driver app. If you are managing the dashboard roster, use this resource. For driver records, see [Drivers](drivers.md).
+Users are the people who sign in to the Samsara dashboard — admins, fleet managers, and other back-office accounts. They are distinct from drivers, who are the in-vehicle people that operate gateways and the driver app. If you are managing the dashboard roster, use this resource. For driver records, see [Drivers](drivers.html).
 
 ## Retrieving Records
 
@@ -61,7 +61,7 @@ Samsara::users()->delete('user-id');
 
 ## Filtering
 
-See [Query Builder](../query-builder.md) for the full filter list.
+See [Query Builder](../query-builder.html) for the full filter list.
 
 ```php
 $users = Samsara::users()
@@ -109,6 +109,6 @@ Common values you will see on `authType`:
 
 ## Related Resources
 
-- [Drivers](drivers.md) — the in-vehicle people, distinct from dashboard users.
-- [Tags](tags.md) — tag the roster for filtering.
-- [Contacts](contacts.md) — non-user contacts associated with your organization.
+- [Drivers](drivers.html) — the in-vehicle people, distinct from dashboard users.
+- [Tags](tags.html) — tag the roster for filtering.
+- [Contacts](contacts.html) — non-user contacts associated with your organization.

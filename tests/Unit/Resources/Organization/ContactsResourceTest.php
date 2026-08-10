@@ -3,10 +3,10 @@
 namespace Samsara\Tests\Unit\Resources\Organization;
 
 use Samsara\Samsara;
-use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Contact\Contact;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Organization\ContactsResource;
@@ -124,15 +124,6 @@ class ContactsResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_return_query_builder(): void
-    {
-        $resource = new ContactsResource($this->samsara);
-        $query = $resource->query();
-
-        $this->assertInstanceOf(Builder::class, $query);
-    }
-
-    #[Test]
     public function it_has_correct_endpoint(): void
     {
         $resource = new ContactsResource($this->samsara);
@@ -146,5 +137,27 @@ class ContactsResourceTest extends TestCase
         $resource = new ContactsResource($this->samsara);
 
         $this->assertSame(Contact::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_terminal_executes_the_current_contact_list_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data'       => [['id' => 'contact-1', 'firstName' => 'Ada']],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new ContactsResource($this->samsara))
+            ->query()
+            ->after('contact-cursor')
+            ->paginate(50);
+
+        $this->assertInstanceOf(Contact::class, $page->items()->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/contacts'
+            && $request->data() === ['limit' => 50, 'after' => 'contact-cursor']
+        );
     }
 }

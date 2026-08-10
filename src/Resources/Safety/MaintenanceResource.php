@@ -5,6 +5,7 @@ namespace Samsara\Resources\Safety;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Maintenance\Dvir;
+use Samsara\Data\Maintenance\Defect;
 
 /**
  * Maintenance resource for the Samsara API.
@@ -34,9 +35,13 @@ class MaintenanceResource extends Resource
      */
     public function createDvir(array $data): Dvir
     {
-        $response = $this->client()->post('/dvirs', $data);
+        $endpoint = '/fleet/dvirs';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
-        return new Dvir($response->json('data'));
+        return Dvir::make($response->json('data', []));
     }
 
     /**
@@ -44,7 +49,8 @@ class MaintenanceResource extends Resource
      */
     public function defects(): Builder
     {
-        return $this->createBuilderWithEndpoint('/defects/stream');
+        return $this->createBuilderWithEndpoint('/defects/stream')
+            ->usingEntity(Defect::class);
     }
 
     /**
@@ -60,6 +66,14 @@ class MaintenanceResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))->repeatQueryParameters('safetyStatus');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

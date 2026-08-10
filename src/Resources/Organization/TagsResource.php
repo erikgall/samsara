@@ -34,4 +34,14 @@ class TagsResource extends Resource
     {
         return new Builder($this);
     }
+
+    /**
+     * Get the inherited generic operations supported by this resource.
+     *
+     * @return array<int, string>
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all', 'find', 'create', 'update', 'delete'];
+    }
 }

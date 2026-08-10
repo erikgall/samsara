@@ -9,6 +9,7 @@ use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Additional\HubsResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the HubsResource class.
@@ -33,53 +34,31 @@ class HubsResourceTest extends TestCase
     #[Test]
     public function it_can_create_hub(): void
     {
-        $this->http->fake([
-            '*/hubs' => $this->http->response([
-                'data' => [
-                    'id'   => 'hub-123',
-                    'name' => 'New Hub',
-                ],
-            ], 201),
-        ]);
-
         $resource = new HubsResource($this->samsara);
 
-        $result = $resource->create(['name' => 'New Hub']);
+        $this->expectException(UnsupportedOperationException::class);
 
-        $this->assertSame('hub-123', $result->id);
+        $resource->create(['name' => 'New Hub']);
     }
 
     #[Test]
     public function it_can_delete_hub(): void
     {
-        $this->http->fake([
-            '*/hubs/hub-123' => $this->http->response([], 204),
-        ]);
-
         $resource = new HubsResource($this->samsara);
 
-        $result = $resource->delete('hub-123');
+        $this->expectException(UnsupportedOperationException::class);
 
-        $this->assertTrue($result);
+        $resource->delete('hub-123');
     }
 
     #[Test]
     public function it_can_find_hub(): void
     {
-        $this->http->fake([
-            '*/hubs/hub-123' => $this->http->response([
-                'data' => [
-                    'id'   => 'hub-123',
-                    'name' => 'Test Hub',
-                ],
-            ], 200),
-        ]);
-
         $resource = new HubsResource($this->samsara);
 
-        $result = $resource->find('hub-123');
+        $this->expectException(UnsupportedOperationException::class);
 
-        $this->assertSame('hub-123', $result->id);
+        $resource->find('hub-123');
     }
 
     #[Test]
@@ -115,20 +94,11 @@ class HubsResourceTest extends TestCase
     #[Test]
     public function it_can_update_hub(): void
     {
-        $this->http->fake([
-            '*/hubs/hub-123' => $this->http->response([
-                'data' => [
-                    'id'   => 'hub-123',
-                    'name' => 'Updated Hub',
-                ],
-            ], 200),
-        ]);
-
         $resource = new HubsResource($this->samsara);
 
-        $result = $resource->update('hub-123', ['name' => 'Updated Hub']);
+        $this->expectException(UnsupportedOperationException::class);
 
-        $this->assertSame('hub-123', $result->id);
+        $resource->update('hub-123', ['name' => 'Updated Hub']);
     }
 
     #[Test]

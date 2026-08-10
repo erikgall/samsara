@@ -33,7 +33,7 @@ class FuelAndEnergyResourceTest extends TestCase
     public function it_can_create_fuel_purchase(): void
     {
         $this->http->fake([
-            '*fuel-purchases' => $this->http->response([
+            '*fuel-purchase' => $this->http->response([
                 'data' => [
                     'id'     => 'purchase-123',
                     'amount' => 50.0,
@@ -66,7 +66,7 @@ class FuelAndEnergyResourceTest extends TestCase
     public function it_can_get_drivers_fuel_energy_report(): void
     {
         $this->http->fake([
-            '*fuel-energy/driver-reports*' => $this->http->response([
+            '*fleet/reports/drivers/fuel-energy*' => $this->http->response([
                 'data' => [
                     ['driverId' => 'driver-1', 'totalFuel' => 100],
                 ],
@@ -95,7 +95,7 @@ class FuelAndEnergyResourceTest extends TestCase
     public function it_can_get_vehicles_fuel_energy_report(): void
     {
         $this->http->fake([
-            '*fuel-energy/vehicle-reports*' => $this->http->response([
+            '*fleet/reports/vehicles/fuel-energy*' => $this->http->response([
                 'data' => [
                     ['vehicleId' => 'vehicle-1', 'totalFuel' => 500],
                 ],
@@ -115,6 +115,6 @@ class FuelAndEnergyResourceTest extends TestCase
     {
         $resource = new FuelAndEnergyResource($this->samsara);
 
-        $this->assertSame('/fuel-energy', $resource->getEndpoint());
+        $this->assertSame('/fuel-purchase', $resource->getEndpoint());
     }
 }

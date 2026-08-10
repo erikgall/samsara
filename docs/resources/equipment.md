@@ -1,7 +1,7 @@
 ---
 title: Equipment
 nav_order: 4
-description: Manage and track non-vehicle equipment in your Samsara fleet.
+description: Read and track non-vehicle equipment in your Samsara fleet.
 permalink: /resources/equipment
 ---
 
@@ -22,7 +22,9 @@ permalink: /resources/equipment
 
 ## Introduction
 
-Equipment covers the non-vehicle, non-trailer assets in your fleet — generators, light towers, attachments, and similar units that carry a Samsara gateway. Reach for this resource when you need a typed, equipment-specific entity (rather than the generic [Assets](assets.md) view) and when you want the per-equipment locations and stats sub-builders.
+Equipment covers the non-vehicle, non-trailer assets in your fleet — generators, light towers, attachments, and similar units that carry a Samsara gateway. Reach for this resource when you need a typed, equipment-specific entity (rather than the generic [Assets](assets.html) view) and when you want the per-equipment locations and stats sub-builders.
+
+The resource owns generic `all` and `find`. Generic `create`, `update`, and `delete` are capability-gated and fail locally. A beta equipment update endpoint exists at `/beta/fleet/equipment/{id}` but is not implemented by this resource.
 
 ## Retrieving Records
 
@@ -36,30 +38,19 @@ $item = Samsara::equipment()->find('equipment-id');
 
 ## Creating Records
 
-```php
-$item = Samsara::equipment()->create([
-    'name'        => 'Generator G-100',
-    'assetSerial' => 'GEN12345',
-]);
-```
+`create()` is unsupported and throws `UnsupportedOperationException` before an HTTP request.
 
 ## Updating Records
 
-```php
-$item = Samsara::equipment()->update('equipment-id', [
-    'name' => 'Generator G-100 Updated',
-]);
-```
+`update()` is unsupported and throws `UnsupportedOperationException` before an HTTP request.
 
 ## Deleting Records
 
-```php
-Samsara::equipment()->delete('equipment-id');
-```
+`delete()` is unsupported and throws `UnsupportedOperationException` before an HTTP request.
 
 ## Filtering
 
-Equipment accepts the standard query builder. See [the query builder reference](../query-builder.md) for the full method list.
+Equipment accepts the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
 
 ```php
 $equipment = Samsara::equipment()
@@ -71,10 +62,10 @@ $equipment = Samsara::equipment()
 
 ### By External ID
 
-`findByExternalId()` looks up a single record by an `externalIds[key]` mapping you control.
+Equipment external-ID lookup is not part of the current operation contract. `findByExternalId()` throws `UnsupportedOperationException`; use `find()` with a Samsara equipment ID.
 
 ```php
-$item = Samsara::equipment()->findByExternalId('asset_id', 'EQ-12345');
+$item = Samsara::equipment()->find('equipment-id');
 ```
 
 ## Equipment Locations
@@ -92,6 +83,8 @@ $history = Samsara::equipment()
     ->get();
 ```
 
+`locations()` returns `EquipmentLocationResult` snapshot objects; call `getLocation()` for an `EquipmentLocation`. `locationsFeed()` and `locationsHistory()` return `EquipmentLocationSeries`; call `getLocations()` for typed readings. All three omit the implicit configured page size because the official cursor operations have no `limit` parameter.
+
 ## Equipment Stats
 
 Stats follow the same three-builder shape as locations.
@@ -106,6 +99,8 @@ $history = Samsara::equipment()
     ->between(now()->subDays(7), now())
     ->get();
 ```
+
+`stats()` returns `EquipmentStats` snapshots. `statsFeed()` and `statsHistory()` return `EquipmentStatsSeries`, whose helpers expose collections of typed readings. These cursor builders also suppress only the implicit configured page size.
 
 ## Helper Methods
 
@@ -135,8 +130,8 @@ The `Equipment` entity (`Samsara\Data\Equipment\Equipment`) exposes the followin
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — vehicle equivalents with their own locations and stats sub-builders.
-- [Trailers](trailers.md) — trailer equivalents.
-- [Assets](assets.md) — combined view across all asset classes.
-- [Gateways](gateways.md) — typed reference to the installed gateway.
-- [Query Builder](../query-builder.md) — for filtering, pagination, and lazy iteration.
+- [Vehicles](vehicles.html) — vehicle equivalents with their own locations and stats sub-builders.
+- [Trailers](trailers.html) — trailer equivalents.
+- [Assets](assets.html) — combined view across all asset classes.
+- [Gateways](gateways.html) — typed reference to the installed gateway.
+- [Query Builder](../query-builder.html) — for filtering, pagination, and lazy iteration.

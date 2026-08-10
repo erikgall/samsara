@@ -5,6 +5,11 @@ namespace Samsara\Resources\Fleet;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Equipment\Equipment;
+use Samsara\Data\Equipment\EquipmentStats;
+use Samsara\Data\Equipment\EquipmentStatsSeries;
+use Samsara\Data\Equipment\EquipmentLocationResult;
+use Samsara\Data\Equipment\EquipmentLocationSeries;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Equipment resource for the Samsara API.
@@ -35,16 +40,12 @@ class EquipmentResource extends Resource
      */
     public function findByExternalId(string $key, string $value): ?Equipment
     {
-        $result = $this->query()
-            ->where("externalIds[{$key}]", $value)
-            ->first();
-
-        if ($result === null) {
-            return null;
-        }
-
-        /** @var Equipment */
-        return $result;
+        throw new UnsupportedOperationException(
+            'Equipment cannot be looked up by external ID in the current API contract. Use find() with a Samsara equipment ID.',
+            0,
+            null,
+            ['key' => $key, 'value' => $value]
+        );
     }
 
     /**
@@ -52,7 +53,9 @@ class EquipmentResource extends Resource
      */
     public function locations(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/equipment/locations');
+        return $this->createBuilderWithEndpoint('/fleet/equipment/locations')
+            ->withoutDefaultPageSize()
+            ->usingEntity(EquipmentLocationResult::class);
     }
 
     /**
@@ -60,7 +63,9 @@ class EquipmentResource extends Resource
      */
     public function locationsFeed(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/equipment/locations/feed');
+        return $this->createBuilderWithEndpoint('/fleet/equipment/locations/feed')
+            ->withoutDefaultPageSize()
+            ->usingEntity(EquipmentLocationSeries::class);
     }
 
     /**
@@ -68,7 +73,9 @@ class EquipmentResource extends Resource
      */
     public function locationsHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/equipment/locations/history');
+        return $this->createBuilderWithEndpoint('/fleet/equipment/locations/history')
+            ->withoutDefaultPageSize()
+            ->usingEntity(EquipmentLocationSeries::class);
     }
 
     /**
@@ -84,7 +91,9 @@ class EquipmentResource extends Resource
      */
     public function stats(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/equipment/stats');
+        return $this->createBuilderWithEndpoint('/fleet/equipment/stats')
+            ->withoutDefaultPageSize()
+            ->usingEntity(EquipmentStats::class);
     }
 
     /**
@@ -92,7 +101,9 @@ class EquipmentResource extends Resource
      */
     public function statsFeed(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/equipment/stats/feed');
+        return $this->createBuilderWithEndpoint('/fleet/equipment/stats/feed')
+            ->withoutDefaultPageSize()
+            ->usingEntity(EquipmentStatsSeries::class);
     }
 
     /**
@@ -100,6 +111,18 @@ class EquipmentResource extends Resource
      */
     public function statsHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/equipment/stats/history');
+        return $this->createBuilderWithEndpoint('/fleet/equipment/stats/history')
+            ->withoutDefaultPageSize()
+            ->usingEntity(EquipmentStatsSeries::class);
+    }
+
+    /**
+     * Get the inherited generic operations supported by this resource.
+     *
+     * @return array<int, string>
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all', 'find'];
     }
 }

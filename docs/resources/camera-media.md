@@ -19,15 +19,23 @@ permalink: /resources/camera-media
 
 Camera media exposes the dash camera footage Samsara records on safety events and on demand. Reach for this resource when you need to review video around an incident — a hard brake, a collision, or any safety event captured by a vehicle's camera. Footage is not returned synchronously: you submit a retrieval request, then poll for the status until the file is ready.
 
+The explicit helpers implement `GET /cameras/media` and `GET|POST /cameras/media/retrieval`. No generic CRUD capability is supported.
+
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-$media = Samsara::cameraMedia()->get();
+$response = Samsara::cameraMedia()->get([
+    'vehicleIds' => 'vehicle-id',
+    'startTime' => $start,
+    'endTime' => $end,
+]);
+
+$media = $response['data']['media'];
 ```
 
-The collection contains generic `Entity` instances describing the available media — read fields directly with `$item->mediaUrl`, `$item->cameraSerial`, etc.
+`get(array $parameters): array` preserves the complete response envelope, including nested `data.media` and top-level `pagination`. The `inputs`, `mediaTypes`, and `triggerReasons` arrays are serialized as repeated query keys.
 
 ## Requesting Footage
 
@@ -57,7 +65,7 @@ if ($status['status'] === 'completed') {
 }
 ```
 
-The same pattern applies to PDF exports on [forms](forms.md) and to CSV exports on the IFTA resource.
+The same pattern applies to PDF exports on [forms](forms.html) and to CSV exports on the IFTA resource.
 
 ## Retrieval Parameters
 
@@ -70,11 +78,11 @@ The same pattern applies to PDF exports on [forms](forms.md) and to CSV exports 
 
 ## Properties
 
-This resource does not declare a typed entity. `get()` returns generic `Samsara\Data\Entity` instances; `retrieve()` and `getRetrieval()` return raw `array<string, mixed>` payloads from the API.
+This resource has no generic entity surface. `get()` returns the full raw envelope; `retrieve()` and `getRetrieval()` return the raw `data` payload when present.
 
 ## Related Resources
 
-- [Safety Events](safety-events.md) — pair an event ID with `retrieve()` to grab its footage.
-- [Vehicles](vehicles.md) — the camera serial is exposed on the vehicle entity.
-- [Forms](forms.md) — the same request-then-poll pattern applies to PDF exports.
-- [Error Handling](../error-handling.md) — exceptions raised by HTTP failures.
+- [Safety Events](safety-events.html) — pair an event ID with `retrieve()` to grab its footage.
+- [Vehicles](vehicles.html) — the camera serial is exposed on the vehicle entity.
+- [Forms](forms.html) — the same request-then-poll pattern applies to PDF exports.
+- [Error Handling](../error-handling.html) — exceptions raised by HTTP failures.

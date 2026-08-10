@@ -20,16 +20,16 @@ class AssetTest extends TestCase
         $asset = new Asset([
             'id'            => '12345',
             'name'          => 'Forklift A',
-            'serial'        => 'SN12345',
+            'serialNumber'  => 'SN12345',
             'purchasePrice' => 25000.00,
-            'assetType'     => 'equipment',
+            'type'          => 'equipment',
         ]);
 
         $this->assertSame('12345', $asset->id);
         $this->assertSame('Forklift A', $asset->name);
-        $this->assertSame('SN12345', $asset->serial);
+        $this->assertSame('SN12345', $asset->serialNumber);
         $this->assertSame(25000.00, $asset->purchasePrice);
-        $this->assertSame('equipment', $asset->assetType);
+        $this->assertSame('equipment', $asset->type);
     }
 
     #[Test]
@@ -47,7 +47,7 @@ class AssetTest extends TestCase
     public function it_can_check_if_equipment(): void
     {
         $asset = new Asset([
-            'assetType' => 'equipment',
+            'type' => 'equipment',
         ]);
 
         $this->assertTrue($asset->isEquipment());
@@ -58,7 +58,7 @@ class AssetTest extends TestCase
     public function it_can_check_if_trailer(): void
     {
         $asset = new Asset([
-            'assetType' => 'trailer',
+            'type' => 'trailer',
         ]);
 
         $this->assertTrue($asset->isTrailer());
@@ -69,7 +69,7 @@ class AssetTest extends TestCase
     public function it_can_check_if_vehicle(): void
     {
         $asset = new Asset([
-            'assetType' => 'vehicle',
+            'type' => 'vehicle',
         ]);
 
         $this->assertTrue($asset->isVehicle());

@@ -19,14 +19,14 @@ class FormSubmissionTest extends TestCase
     {
         $submission = new FormSubmission([
             'id'              => '12345',
-            'formTemplateId'  => 'template-1',
-            'status'          => 'submitted',
+            'formTemplate'    => ['id' => 'template-1'],
+            'status'          => 'completed',
             'submittedAtTime' => '2024-04-10T07:06:25Z',
         ]);
 
         $this->assertSame('12345', $submission->id);
-        $this->assertSame('template-1', $submission->formTemplateId);
-        $this->assertSame('submitted', $submission->status);
+        $this->assertSame('template-1', $submission->formTemplate['id']);
+        $this->assertSame('completed', $submission->status);
         $this->assertSame('2024-04-10T07:06:25Z', $submission->submittedAtTime);
     }
 

@@ -1,0 +1,45 @@
+{
+  "snapshot": "contracts/samsara/samsara-api-2026-08-10.json",
+  "sha256": "a7255e2d5b7a94eea97e11f47db1c7b969931f639366bcae49e4922b02ba3fc6",
+  "source_url": "https://developers.samsara.com/openapi/samsara-api.json",
+  "retrieved_at": "2026-08-10T11:47:09-05:00",
+  "retrieval_timezone": "America/Chicago",
+  "raw_bytes": 4206874,
+  "http": {
+    "status": 200,
+    "date": "Mon, 10 Aug 2026 16:47:04 GMT",
+    "content_type": "application/json; charset=utf-8",
+    "etag": "W/\"40311a-FNzOZFT6SXU1AULxdChC0l9RNhU\"",
+    "last_modified": "2026-08-10T14:51:20.878Z"
+  },
+  "upstream": {
+    "openapi": "3.0.1",
+    "info_version": "2025-10-23",
+    "commit": null
+  },
+  "authority": {
+    "guide_url": "https://developers.samsara.com/docs/openapi-spec",
+    "api_catalog_url": "https://developers.samsara.com/.well-known/api-catalog"
+  },
+  "license": {
+    "declared_in_contract": null,
+    "terms_of_service_in_contract": null,
+    "website_terms_url": "https://www.samsara.com/legal/website-terms-of-service",
+    "note": "No open-source license was found. Samsara's website terms limit unmodified downloads to personal, informational, noncommercial use and restrict broader copying or distribution without prior written authorization. The SDK package's MIT license does not apply to this snapshot."
+  },
+  "validator": {
+    "name": "@apidevtools/swagger-cli",
+    "version": "4.0.4",
+    "command": "npx --yes --package=@apidevtools/swagger-cli@4.0.4 swagger-cli validate contracts/samsara/samsara-api-2026-08-10.json",
+    "result": "valid",
+    "exit_code": 0,
+    "output": "contracts/samsara/samsara-api-2026-08-10.json is valid",
+    "note": "The pinned validator emitted an abandonment notice recommending Redocly CLI."
+  },
+  "reference_resolution": {
+    "name": "swagger-client",
+    "version": "3.37.4",
+    "result": "pass",
+    "errors": 0
+  }
+}

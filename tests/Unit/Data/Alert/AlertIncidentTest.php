@@ -18,16 +18,15 @@ class AlertIncidentTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $incident = new AlertIncident([
-            'id'                   => '12345',
-            'alertConfigurationId' => 'config-1',
-            'status'               => 'triggered',
-            'triggeredAtTime'      => '2024-04-10T07:06:25Z',
+            'configurationId' => 'config-1',
+            'isResolved'      => false,
+            'happenedAtTime'  => '2024-04-10T07:06:25Z',
+            'incidentUrl'     => 'https://cloud.samsara.com/incidents/12345',
         ]);
 
-        $this->assertSame('12345', $incident->id);
-        $this->assertSame('config-1', $incident->alertConfigurationId);
-        $this->assertSame('triggered', $incident->status);
-        $this->assertSame('2024-04-10T07:06:25Z', $incident->triggeredAtTime);
+        $this->assertSame('config-1', $incident->configurationId);
+        $this->assertFalse($incident->isResolved);
+        $this->assertSame('2024-04-10T07:06:25Z', $incident->happenedAtTime);
     }
 
     #[Test]
@@ -56,7 +55,7 @@ class AlertIncidentTest extends TestCase
     public function it_can_check_if_resolved(): void
     {
         $incident = new AlertIncident([
-            'status' => 'resolved',
+            'isResolved' => true,
         ]);
 
         $this->assertTrue($incident->isResolved());

@@ -5,6 +5,7 @@ namespace Samsara\Resources\Dispatch;
 use Samsara\Query\Builder;
 use Samsara\Data\Route\Route;
 use Samsara\Resources\Resource;
+use Samsara\Data\Route\RouteAuditLog;
 
 /**
  * Routes resource for the Samsara API.
@@ -32,7 +33,9 @@ class RoutesResource extends Resource
      */
     public function auditLogs(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/routes/audit-logs/feed');
+        return $this->createBuilderWithEndpoint('/fleet/routes/audit-logs/feed')
+            ->withoutDefaultPageSize()
+            ->usingEntity(RouteAuditLog::class);
     }
 
     /**
@@ -41,5 +44,15 @@ class RoutesResource extends Resource
     public function query(): Builder
     {
         return new Builder($this);
+    }
+
+    /**
+     * Get the inherited generic operations supported by this resource.
+     *
+     * @return array<int, string>
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['find', 'create', 'update', 'delete'];
     }
 }

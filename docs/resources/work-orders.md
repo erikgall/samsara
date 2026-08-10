@@ -20,7 +20,9 @@ permalink: /resources/work-orders
 
 ## Introduction
 
-Work orders track the maintenance lifecycle for a vehicle or asset — what needs servicing, who is doing the work, and what tasks (oil change, tire rotation, brake inspection) the order covers. Use the standard CRUD methods for managing individual records, `query()` to filter on tags, `stream()` for back-fill across long windows, and `serviceTasks()` for the catalog of available tasks.
+Work orders track the maintenance lifecycle for a vehicle or asset — what needs servicing, who is doing the work, and what tasks (oil change, tire rotation, brake inspection) the order covers. Use `query()` to filter the collection, `stream()` for back-fill across long windows, and `serviceTasks()` for the catalog of available tasks.
+
+The resource owns generic `all` and `create`. Generic `find`, `update`, and `delete` are rejected because the current API uses collection-style identifiers that those generic signatures do not model. `query()`, `stream()`, `serviceTasks()`, and `uploadInvoiceScan()` implement the current read and upload paths.
 
 ## Retrieving Records
 
@@ -29,7 +31,7 @@ use Samsara\Facades\Samsara;
 
 $workOrders = Samsara::workOrders()->all();
 
-$workOrder = Samsara::workOrders()->find('work-order-id');
+$workOrder = Samsara::workOrders()->query()->where('ids', ['work-order-id'])->first();
 ```
 
 ## Creating Records
@@ -47,21 +49,15 @@ $workOrder = Samsara::workOrders()->create([
 
 ## Updating Records
 
-```php
-$workOrder = Samsara::workOrders()->update('work-order-id', [
-    'status' => 'completed',
-]);
-```
+The SDK does not yet expose the collection-style update operation. Generic `update()` throws locally.
 
 ## Deleting Records
 
-```php
-Samsara::workOrders()->delete('work-order-id');
-```
+The SDK does not yet expose the collection-style delete operation. Generic `delete()` throws locally.
 
 ## Filtering
 
-Use `query()` to apply filters to the standard endpoint. See [Query Builder](../query-builder.md) for the full filter list.
+Use `query()` to apply filters to the standard endpoint. See [Query Builder](../query-builder.html) for the full filter list.
 
 ```php
 $workOrders = Samsara::workOrders()
@@ -94,17 +90,19 @@ Samsara::workOrders()
 
 ## Service Tasks
 
-`serviceTasks()` returns the catalog of service-task definitions that work orders can reference. Each task is a generic `Entity` carrying at minimum an `id` and `name`.
+`serviceTasks()` returns a no-implicit-limit builder of `Samsara\Data\Maintenance\ServiceTask` objects. Arrays passed as `ids` use repeated query keys.
 
 ```php
-$serviceTasks = Samsara::workOrders()->serviceTasks();
+$serviceTasks = Samsara::workOrders()->serviceTasks()->get();
 
 foreach ($serviceTasks as $task) {
     echo "{$task->id}: {$task->name}\n";
 }
 ```
 
-> **Note:** `serviceTasks()` returns an `EntityCollection<int, Entity>`, not an `EntityCollection<int, WorkOrder>`. The shape of each item follows the `/maintenance/service-tasks` API response.
+The terminal `get()` call returns `EntityCollection<int, ServiceTask>`.
+
+The package's `MaintenanceStatus` enum contains four lowercase values, while the current upstream Work Orders schema defines eleven title-cased statuses. Treat status handling as a pending package-contract reconciliation.
 
 ## Invoice Scans
 
@@ -120,6 +118,6 @@ $result = Samsara::workOrders()->uploadInvoiceScan([
 
 ## Related Resources
 
-- [Maintenance](maintenance.md) — DVIRs and defects feeding into work orders.
-- [Vehicles](vehicles.md) — vehicles a work order targets.
-- [Issues](issues.md) — active vehicle and equipment issues.
+- [Maintenance](maintenance.html) — DVIRs and defects feeding into work orders.
+- [Vehicles](vehicles.html) — vehicles a work order targets.
+- [Issues](issues.html) — active vehicle and equipment issues.

@@ -14,29 +14,29 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class TripTest extends TestCase
 {
-    protected const METERS_PER_MILE = 1609.344;
-
     #[Test]
     public function it_can_be_created_with_attributes(): void
     {
         $trip = new Trip([
-            'startTime'      => '2024-04-10T07:06:25Z',
-            'endTime'        => '2024-04-10T09:30:00Z',
-            'distanceMeters' => 160934,
-            'drivingTimeMs'  => 8520000,
+            'tripStartTime'    => '2024-04-10T07:06:25Z',
+            'tripEndTime'      => '2024-04-10T09:30:00Z',
+            'createdAtTime'    => '2024-04-10T07:07:00Z',
+            'updatedAtTime'    => '2024-04-10T09:31:00Z',
+            'completionStatus' => 'completed',
         ]);
 
-        $this->assertSame('2024-04-10T07:06:25Z', $trip->startTime);
-        $this->assertSame('2024-04-10T09:30:00Z', $trip->endTime);
-        $this->assertSame(160934, $trip->distanceMeters);
-        $this->assertSame(8520000, $trip->drivingTimeMs);
+        $this->assertSame('2024-04-10T07:06:25Z', $trip->tripStartTime);
+        $this->assertSame('2024-04-10T09:30:00Z', $trip->tripEndTime);
+        $this->assertSame('2024-04-10T07:07:00Z', $trip->createdAtTime);
+        $this->assertSame('2024-04-10T09:31:00Z', $trip->updatedAtTime);
+        $this->assertSame('completed', $trip->completionStatus);
     }
 
     #[Test]
     public function it_can_be_created_with_make(): void
     {
         $trip = Trip::make([
-            'startTime' => '2024-04-10T07:06:25Z',
+            'tripStartTime' => '2024-04-10T07:06:25Z',
         ]);
 
         $this->assertInstanceOf(Trip::class, $trip);
@@ -46,56 +46,13 @@ class TripTest extends TestCase
     public function it_can_convert_to_array(): void
     {
         $data = [
-            'startTime'      => '2024-04-10T07:06:25Z',
-            'endTime'        => '2024-04-10T09:30:00Z',
-            'distanceMeters' => 160934,
+            'tripStartTime' => '2024-04-10T07:06:25Z',
+            'tripEndTime'   => '2024-04-10T09:30:00Z',
         ];
 
         $trip = new Trip($data);
 
         $this->assertSame($data, $trip->toArray());
-    }
-
-    #[Test]
-    public function it_can_get_distance_in_kilometers(): void
-    {
-        $trip = new Trip([
-            'distanceMeters' => 100000,
-        ]);
-
-        $this->assertSame(100.0, $trip->getDistanceKilometers());
-    }
-
-    #[Test]
-    public function it_can_get_distance_in_miles(): void
-    {
-        $trip = new Trip([
-            'distanceMeters' => 160934,
-        ]);
-
-        $miles = $trip->getDistanceMiles();
-
-        $this->assertEqualsWithDelta(100.0, $miles, 0.1);
-    }
-
-    #[Test]
-    public function it_can_get_driving_time_hours(): void
-    {
-        $trip = new Trip([
-            'drivingTimeMs' => 7200000, // 2 hours in ms
-        ]);
-
-        $this->assertSame(2.0, $trip->getDrivingTimeHours());
-    }
-
-    #[Test]
-    public function it_can_get_driving_time_minutes(): void
-    {
-        $trip = new Trip([
-            'drivingTimeMs' => 7200000, // 2 hours = 120 minutes in ms
-        ]);
-
-        $this->assertSame(120.0, $trip->getDrivingTimeMinutes());
     }
 
     #[Test]
@@ -109,19 +66,6 @@ class TripTest extends TestCase
         ]);
 
         $this->assertSame('asset-1', $trip->asset['id']);
-    }
-
-    #[Test]
-    public function it_can_have_driver(): void
-    {
-        $trip = new Trip([
-            'driver' => [
-                'id'   => 'driver-1',
-                'name' => 'John Smith',
-            ],
-        ]);
-
-        $this->assertSame('driver-1', $trip->driver['id']);
     }
 
     #[Test]
@@ -151,16 +95,14 @@ class TripTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_vehicle(): void
+    public function it_does_not_expose_helpers_for_fields_absent_from_the_current_contract(): void
     {
-        $trip = new Trip([
-            'vehicle' => [
-                'id'   => 'vehicle-1',
-                'name' => 'Truck 42',
-            ],
-        ]);
+        $trip = new Trip;
 
-        $this->assertSame('vehicle-1', $trip->vehicle['id']);
+        $this->assertFalse(method_exists($trip, 'getDistanceMiles'));
+        $this->assertFalse(method_exists($trip, 'getDistanceKilometers'));
+        $this->assertFalse(method_exists($trip, 'getDrivingTimeHours'));
+        $this->assertFalse(method_exists($trip, 'getDrivingTimeMinutes'));
     }
 
     #[Test]
@@ -169,23 +111,5 @@ class TripTest extends TestCase
         $trip = new Trip;
 
         $this->assertInstanceOf(Entity::class, $trip);
-    }
-
-    #[Test]
-    public function it_returns_null_distance_when_not_set(): void
-    {
-        $trip = new Trip;
-
-        $this->assertNull($trip->getDistanceMiles());
-        $this->assertNull($trip->getDistanceKilometers());
-    }
-
-    #[Test]
-    public function it_returns_null_driving_time_when_not_set(): void
-    {
-        $trip = new Trip;
-
-        $this->assertNull($trip->getDrivingTimeHours());
-        $this->assertNull($trip->getDrivingTimeMinutes());
     }
 }

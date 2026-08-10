@@ -50,6 +50,11 @@ interface QueryBuilderInterface
     public function limit(int $limit): static;
 
     /**
+     * Declare form/explode=true list parameters that use repeated query keys.
+     */
+    public function repeatQueryParameters(string ...$parameters): static;
+
+    /**
      * Filter by updated after timestamp.
      */
     public function updatedAfter(DateTimeInterface|string $time): static;

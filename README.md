@@ -1,12 +1,14 @@
 # Samsara SDK for Laravel
 
-A comprehensive Laravel SDK for the [Samsara Fleet Management API](https://developers.samsara.com/). Built with Laravel's HTTP client, this SDK provides a fluent, type-safe interface for all Samsara API endpoints.
+A Laravel SDK for selected [Samsara Fleet Management API](https://developers.samsara.com/) endpoints. It is built on Laravel's HTTP client and provides resource wrappers, typed and generic entities, raw-array helpers, and a fluent query builder.
+
+See the [documentation coverage and API-sync report](docs/api-sync/documentation-coverage.md) for the audited package surface and current upstream endpoint status as of 2026-08-10.
 
 ## Features
 
-- **40+ Resource Endpoints** - Full coverage of Samsara's API including Fleet, Telematics, Safety, Dispatch, Industrial, and more
+- **41 Resource Accessors** - Package wrappers across Fleet, Telematics, Safety, Dispatch, Industrial, and more
 - **Fluent Query Builder** - Filter, paginate, and stream data with an intuitive query interface
-- **Type-Safe Entities** - All API responses are mapped to strongly-typed entity classes
+- **Mixed Response Models** - Typed entities where the resource declares one, generic entities for other builders, and raw arrays for several report and legacy helpers
 - **Cursor Pagination** - Built-in support for Samsara's cursor-based pagination
 - **Lazy Collections** - Memory-efficient streaming for large datasets
 - **Webhook Signature Verification** - Middleware for validating incoming Samsara webhook requests
@@ -39,7 +41,7 @@ Add your Samsara API token to your `.env` file:
 
 ```env
 SAMSARA_API_KEY=your-api-token-here
-SAMSARA_REGION=us  # or 'eu' for European API
+SAMSARA_REGION=us  # 'us', 'eu', or 'ca'
 SAMSARA_WEBHOOK_SECRET=your-base64-encoded-secret
 ```
 
@@ -56,6 +58,8 @@ return [
 ];
 ```
 
+`per_page` is the implicit `limit` for `paginate()` and `lazy()` when the caller does not supply one. An explicit `paginate($perPage)`, `lazy($chunkSize)`, `limit()`, or `where('limit', ...)` value wins. Endpoint helpers whose official contract has cursors but no `limit` disable this default automatically.
+
 ## Quick Start
 
 ### Using the Facade
@@ -63,7 +67,7 @@ return [
 ```php
 use Samsara\Facades\Samsara;
 
-// Get all drivers
+// Get one response page of drivers
 $drivers = Samsara::drivers()->all();
 
 // Find a specific vehicle
@@ -100,13 +104,15 @@ use Samsara\Samsara;
 
 $samsara = new Samsara('your-api-token');
 
-// Use EU endpoint
-$samsara->useEuEndpoint();
+// Use the Canada endpoint (useEuEndpoint() and useUsEndpoint() are also available)
+$samsara->useCanadaEndpoint();
 
 $drivers = $samsara->drivers()->all();
 ```
 
 ## Available Resources
+
+This section inventories package accessors. Generic methods are capability-gated per resource; consult each resource page and the [capability matrix](docs/api-sync/documentation-coverage.md#exact-generic-capability-matrix) before using an operation.
 
 ### Fleet Resources
 
@@ -116,9 +122,8 @@ $drivers = Samsara::drivers()->all();
 $driver = Samsara::drivers()->find('driver-id');
 $driver = Samsara::drivers()->create(['name' => 'John Doe', ...]);
 $driver = Samsara::drivers()->update('driver-id', ['name' => 'Jane Doe']);
-$samsara->drivers()->delete('driver-id');
-$samsara->drivers()->activate('driver-id');
-$samsara->drivers()->deactivate('driver-id');
+Samsara::drivers()->activate('driver-id');
+Samsara::drivers()->deactivate('driver-id');
 
 // Vehicles
 $vehicles = Samsara::vehicles()->all();
@@ -156,7 +161,11 @@ $stats = Samsara::vehicleStats()
 $locations = Samsara::vehicleLocations()->current()->get();
 
 // Trips
-$trips = Samsara::trips()->query()->get();
+$trips = Samsara::trips()
+    ->query()
+    ->startTime($startTime)
+    ->where('ids', 'trip-1,trip-2')
+    ->get();
 ```
 
 ### Safety Resources
@@ -179,7 +188,7 @@ $defects = Samsara::maintenance()->defects()->get();
 
 ```php
 // Routes
-$routes = Samsara::routes()->all();
+$routes = Samsara::routes()->query()->between($startTime, $endTime)->get();
 $route = Samsara::routes()->create([...]);
 
 // Addresses
@@ -209,7 +218,7 @@ $assets = Samsara::industrial()->assets()->get();
 $inputs = Samsara::industrial()->dataInputs()->get();
 
 // Legacy Sensors (v1 API)
-$sensors = Samsara::sensors()->list(['groupId' => 123]);
+$sensors = Samsara::sensors()->list();
 ```
 
 ### Integration Resources
@@ -220,7 +229,7 @@ $webhooks = Samsara::webhooks()->all();
 $webhook = Samsara::webhooks()->create([
     'name' => 'My Webhook',
     'url' => 'https://example.com/webhook',
-    'eventTypes' => ['VehicleLocationUpdated'],
+    'eventTypes' => ['VehicleUpdated'],
 ]);
 
 // Gateways
@@ -235,20 +244,19 @@ $shares = Samsara::liveShares()->all();
 ```php
 // Alerts
 Samsara::alerts()->configurations()->get();
-Samsara::alerts()->incidents()->get();
 
 // Forms
 Samsara::forms()->submissions()->get();
-Samsara::forms()->templates();
+Samsara::forms()->templates()->get();
 
-// Fuel & Energy
-Samsara::fuelAndEnergy()->driverEfficiency()->get();
-
-// IFTA Reports
-Samsara::ifta()->jurisdictionReport()->get();
+// Current streaming endpoints
+Samsara::idling()->events()->get();
+Samsara::issues()->stream()->get();
 
 // And many more...
 ```
+
+The package also exposes alert incidents, Fuel and Energy, IFTA, Camera Media, Settings, Tachograph, Preview, and other helpers. Their resource pages give the exact implemented path, signature, and return shape. Operations present only in the 2026-08-10 official contract remain deferred and are not implied by an accessor or inherited method name.
 
 ## Query Builder
 
@@ -295,6 +303,8 @@ $drivers = Samsara::drivers()
 ->where('status', 'active')
 ```
 
+Dedicated list helpers such as `types()`, `expand()`, `withDecorations()`, and the `where*()` ID helpers use comma-separated query values. Endpoint helpers mark OpenAPI `explode=true` arrays explicitly and send repeated keys, such as `ids=a&ids=b`. Arbitrary arrays passed through `where()` retain Laravel's standard query encoding.
+
 ### Execution Methods
 
 ```php
@@ -304,7 +314,7 @@ $results = $query->get();
 // Get first result
 $first = $query->first();
 
-// Paginate with cursor
+// Paginate one page with cursor metadata
 $paginator = $query->paginate(100);
 
 // Lazy stream (memory efficient)
@@ -347,7 +357,7 @@ foreach ($drivers as $driver) {
 
 ## Entities
 
-All API responses are mapped to entity classes that extend `Illuminate\Support\Fluent`:
+Many collection and record responses are mapped to entity classes that extend `Illuminate\Support\Fluent`. Some multi-endpoint resources reuse one entity class for different payload shapes, and several helpers return generic entities or raw arrays; check the resource page before relying on a concrete type.
 
 ```php
 $driver = Samsara::drivers()->find('driver-id');
@@ -390,15 +400,12 @@ The SDK throws specific exceptions for different error types:
 ```php
 use Samsara\Exceptions\AuthenticationException;
 use Samsara\Exceptions\AuthorizationException;
-use Samsara\Exceptions\NotFoundException;
 use Samsara\Exceptions\ValidationException;
 use Samsara\Exceptions\RateLimitException;
 use Samsara\Exceptions\ServerException;
 
 try {
-    $driver = Samsara::drivers()->find('invalid-id');
-} catch (NotFoundException $e) {
-    // Handle 404
+    $drivers = Samsara::drivers()->all();
 } catch (RateLimitException $e) {
     $retryAfter = $e->getRetryAfter();
     // Handle rate limiting
@@ -407,6 +414,8 @@ try {
     // Handle validation errors
 }
 ```
+
+Supported generic resource operations, custom resource helpers, and all query-builder terminal methods use the same typed exception mapper. `find()` remains the exception: a 404 returns `null`. HTTP 400 and 422 responses become `ValidationException`; 401, 403, 404, 429, and 5xx responses use their status-specific SDK exceptions. Unsupported generic operations throw `UnsupportedOperationException` before any HTTP request.
 
 ## Webhook Signature Verification
 
@@ -419,11 +428,11 @@ Route::post('/samsara/webhook', WebhookController::class)
     ->middleware(VerifyWebhookSignature::class);
 ```
 
-The middleware uses the `webhook_secret` from your `config/samsara.php` by default. You can also pass a custom secret and tolerance (in seconds) as middleware parameters:
+The middleware uses the `webhook_secret` from your `config/samsara.php` by default. To configure a custom secret and tolerance (in seconds) without registering your own middleware alias, instantiate it directly:
 
 ```php
 Route::post('/samsara/webhook', WebhookController::class)
-    ->middleware('samsara.webhook:my-secret-key,600');
+    ->middleware(new VerifyWebhookSignature(base64_encode('my-secret-key'), 600));
 ```
 
 For detailed usage, custom secrets, and controller examples, see the [Webhooks documentation](docs/resources/webhooks.md).
@@ -433,18 +442,19 @@ For detailed usage, custom secrets, and controller examples, see the [Webhooks d
 The SDK includes a `SamsaraFake` class for testing:
 
 ```php
-use Samsara\Testing\SamsaraFake;
+use Samsara\Facades\Samsara;
 
 public function test_it_fetches_drivers(): void
 {
-    $fake = SamsaraFake::create();
+    $fake = Samsara::fake();
 
     $fake->fakeDrivers([
         ['id' => 'driver-1', 'name' => 'John Doe'],
         ['id' => 'driver-2', 'name' => 'Jane Doe'],
     ]);
 
-    $drivers = $fake->drivers()->all();
+    // The facade root and both container bindings now resolve to this fake.
+    $drivers = Samsara::drivers()->all();
 
     $this->assertCount(2, $drivers);
     $fake->assertRequested('/fleet/drivers');
@@ -462,7 +472,7 @@ $vehiclesData = Fixtures::vehicles();
 
 ## License
 
-This package is open-sourced software licensed under the [MIT license](LICENSE).
+This package is open-sourced software licensed under the MIT license.
 
 ## Credits
 

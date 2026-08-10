@@ -16,7 +16,7 @@ class SettingsResource extends Resource
     /**
      * The API endpoint for this resource.
      */
-    protected string $endpoint = '/settings';
+    protected string $endpoint = '/fleet/settings';
 
     /**
      * Get compliance settings.
@@ -25,9 +25,11 @@ class SettingsResource extends Resource
      */
     public function compliance(): array
     {
-        $response = $this->client()->get('/settings/compliance');
-
-        $this->handleError($response);
+        $endpoint = '/fleet/settings/compliance';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
     }
@@ -39,9 +41,11 @@ class SettingsResource extends Resource
      */
     public function driverApp(): array
     {
-        $response = $this->client()->get('/settings/driver-app');
-
-        $this->handleError($response);
+        $endpoint = '/fleet/settings/driver-app';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
     }
@@ -49,13 +53,15 @@ class SettingsResource extends Resource
     /**
      * Get safety settings.
      *
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     public function safety(): array
     {
-        $response = $this->client()->get('/settings/safety');
-
-        $this->handleError($response);
+        $endpoint = '/fleet/settings/safety';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
     }
@@ -68,9 +74,11 @@ class SettingsResource extends Resource
      */
     public function updateCompliance(array $data): array
     {
-        $response = $this->client()->patch('/settings/compliance', $data);
-
-        $this->handleError($response);
+        $endpoint = '/fleet/settings/compliance';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
     }
@@ -83,10 +91,20 @@ class SettingsResource extends Resource
      */
     public function updateDriverApp(array $data): array
     {
-        $response = $this->client()->patch('/settings/driver-app', $data);
-
-        $this->handleError($response);
+        $endpoint = '/fleet/settings/driver-app';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

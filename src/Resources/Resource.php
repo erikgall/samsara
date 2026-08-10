@@ -2,9 +2,12 @@
 
 namespace Samsara\Resources;
 
+use Closure;
 use Samsara\Samsara;
 use Samsara\Data\Entity;
 use Samsara\Query\Builder;
+use Samsara\Http\QueryString;
+use Samsara\Http\RequestExecutor;
 use Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Response;
 use Samsara\Exceptions\ServerException;
@@ -16,6 +19,7 @@ use Samsara\Exceptions\RateLimitException;
 use Samsara\Exceptions\ValidationException;
 use Samsara\Exceptions\AuthorizationException;
 use Samsara\Exceptions\AuthenticationException;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Base resource class for API endpoints.
@@ -42,6 +46,11 @@ abstract class Resource implements ResourceInterface
     protected Samsara $samsara;
 
     /**
+     * The shared HTTP request executor.
+     */
+    private ?RequestExecutor $requestExecutor = null;
+
+    /**
      * Create a new resource instance.
      */
     public function __construct(Samsara $samsara)
@@ -59,12 +68,16 @@ abstract class Resource implements ResourceInterface
      * @throws RateLimitException
      * @throws ServerException
      * @throws SamsaraException
+     * @throws UnsupportedOperationException
      */
     public function all(): EntityCollection
     {
-        $response = $this->client()->get($this->endpoint);
+        $this->ensureGenericOperationIsSupported('all', $this->endpoint);
 
-        $this->handleError($response);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($this->endpoint),
+            $this->endpoint
+        );
 
         $data = $response->json('data', []);
 
@@ -90,12 +103,16 @@ abstract class Resource implements ResourceInterface
      * @throws RateLimitException
      * @throws ServerException
      * @throws SamsaraException
+     * @throws UnsupportedOperationException
      */
     public function create(array $data): object
     {
-        $response = $this->client()->post($this->endpoint, $data);
+        $this->ensureGenericOperationIsSupported('create', $this->endpoint);
 
-        $this->handleError($response);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($this->endpoint, $data),
+            $this->endpoint
+        );
 
         $responseData = $response->json('data', $response->json());
 
@@ -111,12 +128,17 @@ abstract class Resource implements ResourceInterface
      * @throws RateLimitException
      * @throws ServerException
      * @throws SamsaraException
+     * @throws UnsupportedOperationException
      */
     public function delete(string $id): bool
     {
-        $response = $this->client()->delete("{$this->endpoint}/{$id}");
+        $endpoint = "{$this->endpoint}/{$id}";
+        $this->ensureGenericOperationIsSupported('delete', $endpoint);
 
-        $this->handleError($response);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->delete($endpoint),
+            $endpoint
+        );
 
         return $response->successful();
     }
@@ -129,28 +151,34 @@ abstract class Resource implements ResourceInterface
      * @throws RateLimitException
      * @throws ServerException
      * @throws SamsaraException
+     * @throws UnsupportedOperationException
      */
     public function find(string $id): ?object
     {
-        try {
-            $response = $this->client()->get("{$this->endpoint}/{$id}");
-        } catch (\Illuminate\Http\Client\RequestException $e) {
-            if ($e->response->status() === 404) {
-                return null;
-            }
+        $endpoint = "{$this->endpoint}/{$id}";
+        $this->ensureGenericOperationIsSupported('find', $endpoint);
 
-            throw $e;
-        }
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint),
+            $endpoint,
+            [404]
+        );
 
         if ($response->status() === 404) {
             return null;
         }
 
-        $this->handleError($response);
-
         $data = $response->json('data', $response->json());
 
         return $this->mapToEntity($data);
+    }
+
+    /**
+     * Get the configured default page size.
+     */
+    public function getDefaultPerPage(): int
+    {
+        return (int) $this->samsara->getConfig('per_page', 100);
     }
 
     /**
@@ -172,6 +200,14 @@ abstract class Resource implements ResourceInterface
     }
 
     /**
+     * Throw the SDK exception represented by an unsuccessful response.
+     */
+    public function throwIfError(Response $response): void
+    {
+        $this->handleError($response);
+    }
+
+    /**
      * Update an entity.
      *
      * @param  array<string, mixed>  $data
@@ -183,12 +219,17 @@ abstract class Resource implements ResourceInterface
      * @throws RateLimitException
      * @throws ServerException
      * @throws SamsaraException
+     * @throws UnsupportedOperationException
      */
     public function update(string $id, array $data): object
     {
-        $response = $this->client()->patch("{$this->endpoint}/{$id}", $data);
+        $endpoint = "{$this->endpoint}/{$id}";
+        $this->ensureGenericOperationIsSupported('update', $endpoint);
 
-        $this->handleError($response);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($endpoint, $data),
+            $endpoint
+        );
 
         $responseData = $response->json('data', $response->json());
 
@@ -204,12 +245,56 @@ abstract class Resource implements ResourceInterface
     }
 
     /**
+     * Execute a GET request with contract-aware query serialization.
+     *
+     * @param  array<string, mixed>  $query
+     * @param  array<string>  $repeatedQueryParameters
+     */
+    final protected function executeSdkGet(
+        string $endpoint,
+        array $query = [],
+        array $repeatedQueryParameters = [],
+    ): Response {
+        [$requestEndpoint, $requestQuery] = QueryString::prepare(
+            $endpoint,
+            $query,
+            $repeatedQueryParameters,
+        );
+
+        return $this->executeSdkRequest(
+            fn () => $requestQuery === []
+                ? $this->client()->get($requestEndpoint)
+                : $this->client()->get($requestEndpoint, $requestQuery),
+            $endpoint,
+        );
+    }
+
+    /**
+     * Execute an HTTP request through the resource's error mapper.
+     *
+     * @param  Closure(): Response  $request
+     * @param  array<int, int>  $ignoredStatuses
+     */
+    final protected function executeSdkRequest(
+        Closure $request,
+        string $endpoint,
+        array $ignoredStatuses = []
+    ): Response {
+        return ($this->requestExecutor ??= new RequestExecutor)->execute(
+            $request,
+            fn (Response $response) => $this->handleError($response),
+            $endpoint,
+            $ignoredStatuses
+        );
+    }
+
+    /**
      * Handle API error responses.
      *
      * @throws AuthenticationException When API returns 401
      * @throws AuthorizationException When API returns 403
      * @throws NotFoundException When API returns 404
-     * @throws ValidationException When API returns 422
+     * @throws ValidationException When API returns 400 or 422
      * @throws RateLimitException When API returns 429
      * @throws ServerException When API returns 5xx
      * @throws SamsaraException For other error responses
@@ -230,10 +315,16 @@ abstract class Resource implements ResourceInterface
         ];
 
         match ($status) {
-            401 => throw new AuthenticationException($message, null, $context),
-            403 => throw new AuthorizationException($message, null, $context),
-            404 => throw new NotFoundException($message, null, $context),
-            422 => throw new ValidationException($message, $body['errors'] ?? [], null, $context),
+            401      => throw new AuthenticationException($message, null, $context),
+            403      => throw new AuthorizationException($message, null, $context),
+            404      => throw new NotFoundException($message, null, $context),
+            400, 422 => throw new ValidationException(
+                $message,
+                is_array($body['errors'] ?? null) ? $body['errors'] : [],
+                null,
+                $context,
+                $status
+            ),
             429 => throw new RateLimitException(
                 $message,
                 $response->header('Retry-After') !== null ? (int) $response->header('Retry-After') : null,
@@ -273,5 +364,38 @@ abstract class Resource implements ResourceInterface
         $entityClass = $this->entity;
 
         return $entityClass::make($data);
+    }
+
+    /**
+     * Get the inherited generic operations supported by this resource.
+     *
+     * @return array<int, string>
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all', 'find', 'create', 'update', 'delete'];
+    }
+
+    /**
+     * Stop unsupported inherited operations before they reach the HTTP client.
+     */
+    private function ensureGenericOperationIsSupported(string $operation, string $endpoint): void
+    {
+        if (in_array($operation, $this->supportedGenericOperations(), true)) {
+            return;
+        }
+
+        $resource = static::class;
+
+        throw new UnsupportedOperationException(
+            "Generic operation [{$operation}] is not supported by resource [{$resource}].",
+            0,
+            null,
+            [
+                'resource'  => $resource,
+                'operation' => $operation,
+                'endpoint'  => $endpoint,
+            ]
+        );
     }
 }

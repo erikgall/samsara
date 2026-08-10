@@ -57,10 +57,11 @@ Next, set your API token in `.env`:
 SAMSARA_API_KEY=your-api-token-here
 ```
 
-If your fleet is on Samsara's EU infrastructure, also set the region:
+If your fleet is on Samsara's EU or Canada infrastructure, also set the region:
 
 ```env
 SAMSARA_REGION=eu
+# or: SAMSARA_REGION=ca
 ```
 
 Finally, if you receive webhooks from Samsara, add the Base64-encoded secret you copied from the Samsara dashboard:
@@ -69,7 +70,7 @@ Finally, if you receive webhooks from Samsara, add the Base64-encoded secret you
 SAMSARA_WEBHOOK_SECRET=your-base64-encoded-secret
 ```
 
-See [configuration.md](configuration.md) for the full list of options and [resources/webhooks.md](resources/webhooks.md) for verifying webhook signatures.
+See [configuration.md](configuration.html) for the full list of options and [resources/webhooks.md](resources/webhooks.html) for verifying webhook signatures.
 
 ## Basic Usage
 
@@ -159,32 +160,29 @@ Samsara::vehicleStats()
     });
 ```
 
-See [query-builder.md](query-builder.md) for the full method reference, including cursor pagination, working with `EntityCollection`, and the underlying HTTP client escape hatch. For the full list of accessors on the facade, see [resources/index.md](resources/index.md).
+See [query-builder.md](query-builder.html) for the full method reference, including cursor pagination, working with `EntityCollection`, and the underlying HTTP client escape hatch. For the full list of accessors on the facade, see [resources/index.md](resources/index.html).
 
 ## Error Handling
 
-The SDK throws a typed exception per HTTP error class:
+Supported generic resource operations, custom helpers, and query-builder terminal methods map HTTP failures to typed SDK exceptions. Unsupported generic operations fail locally before a request is sent.
 
 ```php
 use Samsara\Exceptions\AuthenticationException;
-use Samsara\Exceptions\NotFoundException;
 use Samsara\Exceptions\RateLimitException;
-use Samsara\Exceptions\ValidationException;
 
 try {
-    $driver = Samsara::drivers()->find('driver-id');
+    $drivers = Samsara::drivers()->all();
 } catch (AuthenticationException $e) {
     // 401: invalid or revoked token.
-} catch (NotFoundException $e) {
-    // 404: resource does not exist.
 } catch (RateLimitException $e) {
     $retryAfter = $e->getRetryAfter();
-} catch (ValidationException $e) {
-    $errors = $e->getErrors();
 }
+
+$driver = Samsara::drivers()->find('driver-id');
+// find() returns null for a 404.
 ```
 
-See [error-handling.md](error-handling.md) for the full exception hierarchy and how to register handlers in Laravel 12's `bootstrap/app.php`.
+See [error-handling.md](error-handling.html) for the full exception hierarchy and how to register handlers in Laravel 12's `bootstrap/app.php`.
 
 ## Testing
 
@@ -209,11 +207,11 @@ public function test_it_lists_drivers(): void
 }
 ```
 
-See [testing.md](testing.md) for the full fake API and `HttpFactory` patterns.
+See [testing.md](testing.html) for the full fake API and `HttpFactory` patterns.
 
 ## Next Steps
 
-- [Configuration](configuration.md) — every option and runtime override.
-- [Query Builder](query-builder.md) — filters, pagination, and lazy collections.
-- [Testing](testing.md) — testing with `SamsaraFake` and the HTTP factory.
-- [Error Handling](error-handling.md) — exception hierarchy and handler registration.
+- [Configuration](configuration.html) — every option and runtime override.
+- [Query Builder](query-builder.html) — filters, pagination, and lazy collections.
+- [Testing](testing.html) — testing with `SamsaraFake` and the HTTP factory.
+- [Error Handling](error-handling.html) — exception hierarchy and handler registration.

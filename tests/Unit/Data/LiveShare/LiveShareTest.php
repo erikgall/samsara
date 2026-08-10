@@ -18,16 +18,18 @@ class LiveShareTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $liveShare = new LiveShare([
-            'id'        => '12345',
-            'name'      => 'Fleet Live View',
-            'url'       => 'https://cloud.samsara.com/live/abc123',
-            'expiresAt' => '2024-04-15T00:00:00Z',
+            'id'             => '12345',
+            'name'           => 'Fleet Live View',
+            'liveSharingUrl' => 'https://cloud.samsara.com/live/abc123',
+            'expiresAtTime'  => '2999-04-15T00:00:00Z',
+            'type'           => 'assetsLocation',
         ]);
 
         $this->assertSame('12345', $liveShare->id);
         $this->assertSame('Fleet Live View', $liveShare->name);
-        $this->assertSame('https://cloud.samsara.com/live/abc123', $liveShare->url);
-        $this->assertSame('2024-04-15T00:00:00Z', $liveShare->expiresAt);
+        $this->assertSame('https://cloud.samsara.com/live/abc123', $liveShare->liveSharingUrl);
+        $this->assertSame('2999-04-15T00:00:00Z', $liveShare->expiresAtTime);
+        $this->assertSame('assetsLocation', $liveShare->type);
     }
 
     #[Test]
@@ -44,9 +46,7 @@ class LiveShareTest extends TestCase
     #[Test]
     public function it_can_check_if_active(): void
     {
-        $liveShare = new LiveShare([
-            'status' => 'active',
-        ]);
+        $liveShare = new LiveShare(['expiresAtTime' => '2999-01-01T00:00:00Z']);
 
         $this->assertTrue($liveShare->isActive());
         $this->assertFalse($liveShare->isExpired());
@@ -55,9 +55,7 @@ class LiveShareTest extends TestCase
     #[Test]
     public function it_can_check_if_expired(): void
     {
-        $liveShare = new LiveShare([
-            'status' => 'expired',
-        ]);
+        $liveShare = new LiveShare(['expiresAtTime' => '2000-01-01T00:00:00Z']);
 
         $this->assertTrue($liveShare->isExpired());
         $this->assertFalse($liveShare->isActive());
@@ -67,9 +65,9 @@ class LiveShareTest extends TestCase
     public function it_can_convert_to_array(): void
     {
         $data = [
-            'id'   => '12345',
-            'name' => 'Fleet Live View',
-            'url'  => 'https://cloud.samsara.com/live/abc123',
+            'id'             => '12345',
+            'name'           => 'Fleet Live View',
+            'liveSharingUrl' => 'https://cloud.samsara.com/live/abc123',
         ];
 
         $liveShare = new LiveShare($data);
@@ -78,40 +76,15 @@ class LiveShareTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_assets(): void
+    public function it_can_have_type_specific_configuration(): void
     {
         $liveShare = new LiveShare([
-            'assets' => [
-                ['id' => 'asset-1', 'type' => 'vehicle'],
-                ['id' => 'asset-2', 'type' => 'driver'],
+            'assetsLocationLinkConfig' => [
+                'assetIds' => ['vehicle-1', 'vehicle-2'],
             ],
         ]);
 
-        $this->assertCount(2, $liveShare->assets);
-    }
-
-    #[Test]
-    public function it_can_have_recipients(): void
-    {
-        $liveShare = new LiveShare([
-            'recipients' => [
-                ['email' => 'user@example.com'],
-            ],
-        ]);
-
-        $this->assertCount(1, $liveShare->recipients);
-    }
-
-    #[Test]
-    public function it_can_have_timestamps(): void
-    {
-        $liveShare = new LiveShare([
-            'createdAtTime' => '2024-04-10T07:06:25Z',
-            'expiresAt'     => '2024-04-15T00:00:00Z',
-        ]);
-
-        $this->assertSame('2024-04-10T07:06:25Z', $liveShare->createdAtTime);
-        $this->assertSame('2024-04-15T00:00:00Z', $liveShare->expiresAt);
+        $this->assertSame(['vehicle-1', 'vehicle-2'], $liveShare->assetsLocationLinkConfig['assetIds']);
     }
 
     #[Test]

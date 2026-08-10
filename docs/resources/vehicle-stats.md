@@ -51,9 +51,11 @@ $stats = Samsara::vehicleStats()
     ->get();
 ```
 
+Feed rows are `VehicleStatsSeries`, not snapshot `VehicleStats` objects.
+
 ### Historical Stats
 
-`history()` returns every sample inside a time window. Use it for back-fill, reporting, and audit work.
+`history()` selects the historical endpoint. `get()` returns one response page; use `lazy()` when back-fill or reporting must walk the full cursor sequence.
 
 ```php
 $stats = Samsara::vehicleStats()
@@ -62,6 +64,10 @@ $stats = Samsara::vehicleStats()
     ->between('2024-01-01', '2024-01-31')
     ->get();
 ```
+
+History rows are also `VehicleStatsSeries`. Use `getGpsReadings()`, `getEngineStateReadings()`, and `getFuelPercentReadings()` for typed reading collections. `current()`, `query()`, and the typed shortcuts return snapshot `VehicleStats` objects with scalar-value helpers such as `getGps()` and `getFuelPercent()`.
+
+The current, feed, and history cursor operations do not declare `limit`; their builders therefore omit the configured implicit page size while retaining any limit the caller sets explicitly.
 
 ## Typed Shortcuts
 
@@ -105,7 +111,7 @@ $stats = Samsara::vehicleStats()
     ->get();
 ```
 
-The `VehicleStatType` enum lists every supported stat type. Pass the enum's `value` (or the case via `->value`) — **do not pass enum cases directly to `types()`**, which expects an `array<string>|string`.
+The `VehicleStatType` enum lists the 52 stat types currently shipped by the package. Current upstream exposes 63 and has renamed several EV values; see [Enums](../enums.html#vehiclestattype). Pass an enum's `value` — **do not pass enum cases directly to `types()`**, which expects an `array<string>|string`.
 
 ```php
 use Samsara\Enums\VehicleStatType;
@@ -135,11 +141,11 @@ The most commonly requested stat types:
 | `defLevelMilliPercent` | DEF level as milli-percent. |
 | `obdEngineSeconds` | Cumulative engine seconds. |
 
-> **Note:** `VehicleStatType` defines 52 cases covering EV battery telemetry, spreader inputs, and tire pressures. See [Enums](../enums.md#vehiclestattype) for the complete list.
+> **Note:** `VehicleStatType` defines 52 cases covering EV battery telemetry, spreader inputs, and tire pressures. See [Enums](../enums.html#vehiclestattype) for the complete list.
 
 ## Filtering
 
-See [Query Builder](../query-builder.md) for the full filter list. The most common filters on stats are by vehicle, by tag, and with response decorations. Each chains onto a builder returned by `current()` / `history()` / `feed()` (or one of the typed shortcuts).
+See [Query Builder](../query-builder.html) for the full filter list. The most common filters on stats are by vehicle, by tag, and with response decorations. Each chains onto a builder returned by `current()` / `history()` / `feed()` (or one of the typed shortcuts).
 
 ```php
 // By vehicle
@@ -202,7 +208,7 @@ Samsara::vehicleStats()
     ->between($start, $end)
     ->lazy()
     ->each(function ($stat) {
-        // Process each sample
+        // $stat is VehicleStatsSeries for history/feed.
     });
 ```
 
@@ -231,7 +237,7 @@ $stat->getDefLevelMilliPercent();
 $stat->getObdEngineSeconds();
 ```
 
-The `EngineState` enum defines three cases — `OFF`, `ON`, `IDLE`. See [Enums](../enums.md#enginestate) for the full reference.
+The `EngineState` enum defines three cases — `OFF`, `ON`, `IDLE`. See [Enums](../enums.html#enginestate) for the full reference.
 
 ## GpsLocation Entity
 
@@ -247,7 +253,7 @@ $gps->speedMilesPerHour; // ?float
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — the vehicles whose gateways emit these samples.
-- [Vehicle Locations](vehicle-locations.md) — the GPS-only equivalent without the rest of the telemetry stream.
-- [Trips](trips.md) — engine-on/engine-off envelopes built from these samples.
-- [Enums](../enums.md#vehiclestattype) — the canonical `VehicleStatType` and `EngineState` references.
+- [Vehicles](vehicles.html) — the vehicles whose gateways emit these samples.
+- [Vehicle Locations](vehicle-locations.html) — the GPS-only equivalent without the rest of the telemetry stream.
+- [Trips](trips.html) — engine-on/engine-off envelopes built from these samples.
+- [Enums](../enums.html#vehiclestattype) — the canonical `VehicleStatType` and `EngineState` references.

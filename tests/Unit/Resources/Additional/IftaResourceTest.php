@@ -32,7 +32,7 @@ class IftaResourceTest extends TestCase
     public function it_can_get_detail_csv(): void
     {
         $this->http->fake([
-            '*ifta/csv-exports/export-123' => $this->http->response([
+            '*ifta-detail/csv/export-123' => $this->http->response([
                 'data' => [
                     'id'     => 'export-123',
                     'status' => 'completed',
@@ -53,7 +53,7 @@ class IftaResourceTest extends TestCase
     public function it_can_get_jurisdiction_report(): void
     {
         $this->http->fake([
-            '*ifta/jurisdiction-report*' => $this->http->response([
+            '*fleet/reports/ifta/jurisdiction*' => $this->http->response([
                 'data' => [
                     ['jurisdiction' => 'CA', 'miles' => 1000],
                 ],
@@ -72,7 +72,7 @@ class IftaResourceTest extends TestCase
     public function it_can_get_vehicle_report(): void
     {
         $this->http->fake([
-            '*ifta/vehicle-report*' => $this->http->response([
+            '*fleet/reports/ifta/vehicle*' => $this->http->response([
                 'data' => [
                     ['vehicleId' => 'vehicle-1', 'totalMiles' => 5000],
                 ],
@@ -91,7 +91,7 @@ class IftaResourceTest extends TestCase
     public function it_can_request_detail_csv(): void
     {
         $this->http->fake([
-            '*ifta/csv-exports' => $this->http->response([
+            '*ifta-detail/csv' => $this->http->response([
                 'data' => [
                     'id'     => 'export-123',
                     'status' => 'pending',
@@ -101,7 +101,10 @@ class IftaResourceTest extends TestCase
 
         $resource = new IftaResource($this->samsara);
 
-        $result = $resource->detailCsv(['year' => 2024, 'quarter' => 1]);
+        $result = $resource->detailCsv([
+            'startHour' => '2024-01-01T00:00:00Z',
+            'endHour'   => '2024-04-01T00:00:00Z',
+        ]);
 
         $this->assertIsArray($result);
         $this->assertSame('export-123', $result['id']);
@@ -112,6 +115,6 @@ class IftaResourceTest extends TestCase
     {
         $resource = new IftaResource($this->samsara);
 
-        $this->assertSame('/ifta', $resource->getEndpoint());
+        $this->assertSame('/ifta-detail/csv', $resource->getEndpoint());
     }
 }

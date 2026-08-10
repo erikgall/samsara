@@ -4,7 +4,6 @@ namespace Samsara\Tests\Unit\Resources\Additional;
 
 use Samsara\Samsara;
 use Samsara\Tests\TestCase;
-use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Additional\CameraMediaResource;
@@ -33,31 +32,34 @@ class CameraMediaResourceTest extends TestCase
     public function it_can_get_camera_media(): void
     {
         $this->http->fake([
-            '*/camera-media' => $this->http->response([
-                'data' => [
+            '*/cameras/media*' => $this->http->response([
+                'data' => ['media' => [
                     ['id' => 'media-1'],
                     ['id' => 'media-2'],
-                ],
+                ]],
+                'pagination' => ['hasNextPage' => false],
             ], 200),
         ]);
 
         $resource = new CameraMediaResource($this->samsara);
 
-        $result = $resource->get();
+        $result = $resource->get([
+            'vehicleIds' => 'vehicle-1',
+            'startTime'  => '2024-01-01T00:00:00Z',
+            'endTime'    => '2024-01-01T01:00:00Z',
+        ]);
 
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
+        $this->assertCount(2, $result['data']['media']);
+        $this->assertFalse($result['pagination']['hasNextPage']);
     }
 
     #[Test]
     public function it_can_get_retrieval_status(): void
     {
         $this->http->fake([
-            '*/camera-media/retrieve/retrieval-123' => $this->http->response([
+            '*/cameras/media/retrieval*' => $this->http->response([
                 'data' => [
-                    'id'     => 'retrieval-123',
-                    'status' => 'completed',
-                    'url'    => 'https://example.com/video.mp4',
+                    'media' => [['id' => 'media-1']],
                 ],
             ], 200),
         ]);
@@ -67,19 +69,19 @@ class CameraMediaResourceTest extends TestCase
         $result = $resource->getRetrieval('retrieval-123');
 
         $this->assertIsArray($result);
-        $this->assertSame('completed', $result['status']);
+        $this->assertSame('media-1', $result['media'][0]['id']);
     }
 
     #[Test]
     public function it_can_request_media_retrieval(): void
     {
         $this->http->fake([
-            '*/camera-media/retrieve' => $this->http->response([
+            '*/cameras/media/retrieval' => $this->http->response([
                 'data' => [
-                    'id'     => 'retrieval-123',
-                    'status' => 'pending',
+                    'retrievalId' => 'retrieval-123',
+                    'quotaStatus' => 'available',
                 ],
-            ], 201),
+            ], 200),
         ]);
 
         $resource = new CameraMediaResource($this->samsara);
@@ -88,10 +90,11 @@ class CameraMediaResourceTest extends TestCase
             'vehicleId' => 'vehicle-1',
             'startTime' => '2024-01-01T00:00:00Z',
             'endTime'   => '2024-01-01T01:00:00Z',
+            'mediaType' => 'videoHighRes',
         ]);
 
         $this->assertIsArray($result);
-        $this->assertSame('retrieval-123', $result['id']);
+        $this->assertSame('retrieval-123', $result['retrievalId']);
     }
 
     #[Test]
@@ -99,6 +102,6 @@ class CameraMediaResourceTest extends TestCase
     {
         $resource = new CameraMediaResource($this->samsara);
 
-        $this->assertSame('/camera-media', $resource->getEndpoint());
+        $this->assertSame('/cameras/media', $resource->getEndpoint());
     }
 }

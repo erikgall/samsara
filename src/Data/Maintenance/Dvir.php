@@ -16,6 +16,11 @@ use Samsara\Data\Entity;
  * @property-read string|null $safetyStatus Safety status (safe, unsafe, resolved)
  * @property-read string|null $startTime Start time (RFC 3339)
  * @property-read string|null $endTime End time (RFC 3339)
+ * @property-read string|null $dvirSubmissionBeginTime Stream submission start time (RFC 3339)
+ * @property-read string|null $dvirSubmissionTime Stream submission time (RFC 3339)
+ * @property-read string|null $updatedAtTime Stream update time (RFC 3339)
+ * @property-read array<int, string>|null $defectIds Stream defect IDs
+ * @property-read string|null $formattedAddress Stream location address
  * @property-read int|null $odometerMeters Odometer reading in meters
  * @property-read string|null $licensePlate License plate
  * @property-read string|null $mechanicNotes Mechanic notes
@@ -28,6 +33,7 @@ use Samsara\Data\Entity;
  * @property-read array{signedAtTime?: string}|null $thirdSignature Third signature
  * @property-read array<int, array{id?: string, defectType?: string}>|null $vehicleDefects Vehicle defects
  * @property-read array<int, array{id?: string, defectType?: string}>|null $trailerDefects Trailer defects
+ * @property-read array<int, array<string, mixed>>|null $walkaroundPhotos Stream walkaround photos
  */
 class Dvir extends Entity
 {

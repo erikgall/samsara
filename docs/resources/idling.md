@@ -15,7 +15,7 @@ permalink: /resources/idling
 
 ## Introduction
 
-The `Samsara::idling()` resource exposes the `/idling/events` stream so you may report on vehicles left running while parked. It is read-only and returns generic `Entity` instances (a `Fluent` wrapper around the API payload), since `IdlingResource` does not declare a typed `$entity`. Reach for it when you build fuel-waste reports, idle-time leaderboards, or notify-on-idle alerts that supplement the [Alerts](alerts.md) resource.
+The `Samsara::idling()` resource exposes the `/idling/events` stream so you may report on vehicles left running while parked. It is builder-only: all generic CRUD operations are rejected. Rows are generic `Entity` instances. Reach for it when you build fuel-waste reports, idle-time leaderboards, or notify-on-idle alerts that supplement the [Alerts](alerts.html) resource.
 
 ## Retrieving Records
 
@@ -46,7 +46,7 @@ Samsara::idling()
 
 ## Filtering
 
-The full set of operators lives on the [query builder](../query-builder.md) page. The idling builder commonly accepts:
+The full set of operators lives on the [query builder](../query-builder.html) page. The idling builder commonly accepts:
 
 ```php
 $events = Samsara::idling()
@@ -76,7 +76,7 @@ Read keys with array access (`$event['durationMs']`) or magic-property access (`
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — resolve the vehicle from `$event->vehicle['id']`.
-- [Vehicle Stats](vehicle-stats.md) — pair idle intervals with `engineStates` history.
-- [Speeding](speeding.md) — companion stream for behaviour reporting.
-- [Error Handling](../error-handling.md) — exceptions raised by the underlying request.
+- [Vehicles](vehicles.html) — resolve the vehicle from `$event->vehicle['id']`.
+- [Vehicle Stats](vehicle-stats.html) — pair idle intervals with `engineStates` history.
+- [Speeding](speeding.html) — companion stream for behaviour reporting.
+- [Error Handling](../error-handling.html) — exceptions raised by the underlying request.

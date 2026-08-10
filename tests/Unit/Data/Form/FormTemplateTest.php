@@ -19,15 +19,15 @@ class FormTemplateTest extends TestCase
     {
         $template = new FormTemplate([
             'id'          => '12345',
-            'name'        => 'Pre-Trip Inspection',
+            'title'       => 'Pre-Trip Inspection',
             'description' => 'Standard pre-trip inspection form',
-            'revision'    => 1,
+            'revisionId'  => 'revision-1',
         ]);
 
         $this->assertSame('12345', $template->id);
-        $this->assertSame('Pre-Trip Inspection', $template->name);
+        $this->assertSame('Pre-Trip Inspection', $template->title);
         $this->assertSame('Standard pre-trip inspection form', $template->description);
-        $this->assertSame(1, $template->revision);
+        $this->assertSame('revision-1', $template->revisionId);
     }
 
     #[Test]
@@ -45,8 +45,8 @@ class FormTemplateTest extends TestCase
     public function it_can_convert_to_array(): void
     {
         $data = [
-            'id'   => '12345',
-            'name' => 'Pre-Trip Inspection',
+            'id'    => '12345',
+            'title' => 'Pre-Trip Inspection',
         ];
 
         $template = new FormTemplate($data);
@@ -58,13 +58,13 @@ class FormTemplateTest extends TestCase
     public function it_can_have_field_definitions(): void
     {
         $template = new FormTemplate([
-            'fieldDefinitions' => [
+            'fields' => [
                 ['name' => 'Notes', 'type' => 'text'],
                 ['name' => 'Rating', 'type' => 'number'],
             ],
         ]);
 
-        $this->assertCount(2, $template->fieldDefinitions);
+        $this->assertCount(2, $template->fields);
     }
 
     #[Test]

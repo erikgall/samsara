@@ -3,10 +3,11 @@
 namespace Samsara\Tests\Unit\Resources\Fleet;
 
 use Samsara\Samsara;
-use Samsara\Query\Builder;
+use ReflectionMethod;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Vehicle\Vehicle;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Fleet\VehiclesResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
@@ -46,11 +47,9 @@ class VehiclesResourceTest extends TestCase
         $this->http->fake([
             '*' => $this->http->response([
                 'data' => [
-                    [
-                        'id'          => '123',
-                        'name'        => 'Truck 001',
-                        'externalIds' => ['fleet_code' => 'FL-123'],
-                    ],
+                    'id'          => '123',
+                    'name'        => 'Truck 001',
+                    'externalIds' => ['fleet_code' => 'FL-123'],
                 ],
             ]),
         ]);
@@ -60,6 +59,9 @@ class VehiclesResourceTest extends TestCase
 
         $this->assertInstanceOf(Vehicle::class, $vehicle);
         $this->assertSame('123', $vehicle->id);
+        $this->http->assertSent(fn (Request $request) => $request->method() === 'GET'
+            && $request->url() === 'https://api.samsara.com/fleet/vehicles/fleet_code:FL-123'
+            && $request->data() === []);
     }
 
     #[Test]
@@ -67,7 +69,12 @@ class VehiclesResourceTest extends TestCase
     {
         $this->http->fake([
             '*' => $this->http->response([
-                'data' => ['id' => '123', 'name' => 'Truck 001', 'vin' => 'VIN123'],
+                'data' => [
+                    'id'                 => '123',
+                    'name'               => 'Truck 001',
+                    'vin'                => 'VIN123',
+                    'grossVehicleWeight' => ['unit' => 'lb', 'weight' => 26000],
+                ],
             ]),
         ]);
 
@@ -77,6 +84,7 @@ class VehiclesResourceTest extends TestCase
         $this->assertInstanceOf(Vehicle::class, $vehicle);
         $this->assertSame('123', $vehicle->id);
         $this->assertSame('Truck 001', $vehicle->name);
+        $this->assertSame(26000, $vehicle->grossVehicleWeight['weight']);
     }
 
     #[Test]
@@ -98,15 +106,6 @@ class VehiclesResourceTest extends TestCase
         $this->assertCount(2, $vehicles);
         $this->assertInstanceOf(Vehicle::class, $vehicles->first());
         $this->assertSame('Truck 001', $vehicles->first()->name);
-    }
-
-    #[Test]
-    public function it_can_return_query_builder(): void
-    {
-        $resource = new VehiclesResource($this->samsara);
-        $query = $resource->query();
-
-        $this->assertInstanceOf(Builder::class, $query);
     }
 
     #[Test]
@@ -148,15 +147,15 @@ class VehiclesResourceTest extends TestCase
     public function it_returns_null_when_external_id_not_found(): void
     {
         $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [],
-            ]),
+            '*' => $this->http->response([], 404),
         ]);
 
         $resource = new VehiclesResource($this->samsara);
         $vehicle = $resource->findByExternalId('fleet_code', 'NONEXISTENT');
 
         $this->assertNull($vehicle);
+        $this->http->assertSent(fn (Request $request) => $request->url()
+            === 'https://api.samsara.com/fleet/vehicles/fleet_code:NONEXISTENT');
     }
 
     #[Test]
@@ -173,10 +172,38 @@ class VehiclesResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_terminal_executes_the_current_vehicle_list_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data'       => [['id' => 'vehicle-1', 'name' => 'Truck A']],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new VehiclesResource($this->samsara))
+            ->query()
+            ->whereParentTag(['parent-1', 'parent-2'])
+            ->whereTag(['tag-1', 'tag-2'])
+            ->whereAttribute(['attribute-1', 'attribute-2'])
+            ->where('attributes', ['make', 'model'])
+            ->updatedAfter('2026-08-10T14:00:00Z')
+            ->createdAfter('2026-08-09T14:00:00Z')
+            ->after('vehicle-cursor')
+            ->paginate(50);
+
+        $this->assertInstanceOf(Vehicle::class, $page->items()->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && $request->url()
+            === 'https://api.samsara.com/fleet/vehicles?attributes=make&attributes=model&parentTagIds=parent-1%2Cparent-2&tagIds=tag-1%2Ctag-2&attributeValueIds=attribute-1%2Cattribute-2&updatedAfterTime=2026-08-10T14%3A00%3A00Z&createdAfterTime=2026-08-09T14%3A00%3A00Z&limit=50&after=vehicle-cursor'
+        );
+    }
+
+    #[Test]
     public function it_throws_exception_when_creating_vehicle(): void
     {
         $this->expectException(UnsupportedOperationException::class);
-        $this->expectExceptionMessage('Vehicles cannot be created via /fleet/vehicles');
+        $this->expectExceptionMessage('Generic operation [create] is not supported');
 
         $resource = new VehiclesResource($this->samsara);
         $resource->create([
@@ -189,9 +216,22 @@ class VehiclesResourceTest extends TestCase
     public function it_throws_exception_when_deleting_vehicle(): void
     {
         $this->expectException(UnsupportedOperationException::class);
-        $this->expectExceptionMessage('Vehicles cannot be deleted via the Samsara API');
+        $this->expectExceptionMessage('Generic operation [delete] is not supported');
 
         $resource = new VehiclesResource($this->samsara);
         $resource->delete('123');
+    }
+
+    #[Test]
+    public function it_uses_the_shared_generic_operation_gate(): void
+    {
+        $this->assertSame(
+            \Samsara\Resources\Resource::class,
+            (new ReflectionMethod(VehiclesResource::class, 'create'))->getDeclaringClass()->getName()
+        );
+        $this->assertSame(
+            \Samsara\Resources\Resource::class,
+            (new ReflectionMethod(VehiclesResource::class, 'delete'))->getDeclaringClass()->getName()
+        );
     }
 }

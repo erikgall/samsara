@@ -15,11 +15,11 @@ permalink: /resources/issues
 
 ## Introduction
 
-The `Samsara::issues()` resource exposes the `/issues/stream` feed of vehicle and equipment fault data — diagnostic trouble codes, low-battery flags, and similar maintenance signals. It is read-only and returns generic `Entity` instances, since `IssuesResource` does not declare a typed `$entity`.
+The `Samsara::issues()` resource exposes the `/issues/stream` feed of vehicle and equipment fault data. Stream rows are generic `Entity` instances. The only supported generic mutation is `create()` on the resource's configured endpoint; `all`, `find`, `update`, and `delete` are rejected.
 
 ## Retrieving Records
 
-Issues are streamed through the `stream()` builder. The base CRUD methods are inherited but the upstream endpoint does not honour them — treat the resource as builder-only.
+Read issues through the `stream()` builder. Use `create()` only for the package-owned create operation.
 
 ```php
 use Samsara\Facades\Samsara;
@@ -46,7 +46,7 @@ Samsara::issues()
 
 ## Filtering
 
-The full operator list lives on the [query builder](../query-builder.md) page. The issues stream commonly accepts:
+The full operator list lives on the [query builder](../query-builder.html) page. The issues stream commonly accepts:
 
 ```php
 $issues = Samsara::issues()
@@ -76,7 +76,7 @@ Read keys with array access (`$issue['description']`) or magic-property access (
 
 ## Related Resources
 
-- [Maintenance](maintenance.md) — DVIRs and defect tracking.
-- [Work Orders](work-orders.md) — translate issues into scheduled work.
-- [Alerts](alerts.md) — notify on issue creation.
-- [Error Handling](../error-handling.md) — exceptions raised by the underlying request.
+- [Maintenance](maintenance.html) — DVIRs and defect tracking.
+- [Work Orders](work-orders.html) — translate issues into scheduled work.
+- [Alerts](alerts.html) — notify on issue creation.
+- [Error Handling](../error-handling.html) — exceptions raised by the underlying request.

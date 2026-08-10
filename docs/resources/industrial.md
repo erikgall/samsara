@@ -19,7 +19,7 @@ permalink: /resources/industrial
 
 ## Introduction
 
-The `Samsara::industrial()` resource manages industrial assets — non-vehicle equipment such as CNC machines, generators, and tank farms — alongside the data inputs and data points that those assets emit. Use this resource (not [Assets](assets.md)) when you monitor machinery and stationary equipment connected through Samsara's industrial gateways.
+The `Samsara::industrial()` resource manages industrial assets — non-vehicle equipment such as CNC machines, generators, and tank farms — alongside the data inputs and data points that those assets emit. Use this resource (not [Assets](assets.html)) when you monitor machinery and stationary equipment connected through Samsara's industrial gateways.
 
 ## Retrieving Records
 
@@ -28,7 +28,7 @@ The default builder targets `/industrial/assets` and returns typed `IndustrialAs
 ```php
 use Samsara\Facades\Samsara;
 
-$asset = Samsara::industrial()->find('asset-id');
+$asset = Samsara::industrial()->query()->where('ids', 'asset-id')->first();
 
 $assets = Samsara::industrial()->all();
 
@@ -68,11 +68,11 @@ $asset = Samsara::industrial()->updateAsset('asset-id', [
 Samsara::industrial()->deleteAsset('asset-id');
 ```
 
-`deleteAsset()` returns `true` on a successful response and raises a typed exception otherwise (see [Error Handling](../error-handling.md)).
+`deleteAsset()` returns `true` on a successful response and raises a typed exception otherwise (see [Error Handling](../error-handling.html)).
 
 ## Data Inputs and Data Points
 
-`IndustrialResource` exposes additional builders for the telemetry that industrial assets emit. Each builder is a generic `Builder` — its results are unwrapped into generic `Entity` instances, since only the assets endpoint is typed.
+`IndustrialResource` exposes endpoint-specific builders for the telemetry that industrial assets emit. `dataInputs()` and all three data-point builders return `DataInput`; nested point envelopes are hydrated as `DataPoint` objects.
 
 ```php
 $inputs = Samsara::industrial()
@@ -97,13 +97,15 @@ $history = Samsara::industrial()
 | Builder | Endpoint | Use it for |
 |---------|----------|------------|
 | `dataInputs()` | `/industrial/data-inputs` | Discover data inputs configured on an asset. |
-| `dataPoints()` | `/industrial/data-points` | Latest readings per data input. |
-| `dataPointsFeed()` | `/industrial/data-points/feed` | Cursor feed of newly recorded readings. |
-| `dataPointsHistory()` | `/industrial/data-points/history` | Reading history over an explicit `between()` window. |
+| `dataPoints()` | `/industrial/data-inputs/data-points` | Latest readings per data input. |
+| `dataPointsFeed()` | `/industrial/data-inputs/data-points/feed` | Cursor feed of newly recorded readings. |
+| `dataPointsHistory()` | `/industrial/data-inputs/data-points/history` | Reading history over an explicit `between()` window. |
+
+The three data-point builders omit the configured implicit page size because their official cursor contracts do not declare `limit`.
 
 ## Filtering
 
-Refer to the [query builder](../query-builder.md) for the full operator reference. The asset builder accepts the standard filters:
+Refer to the [query builder](../query-builder.html) for the full operator reference. The asset builder accepts the standard filters:
 
 ```php
 $assets = Samsara::industrial()
@@ -125,11 +127,11 @@ $assets = Samsara::industrial()
 | `location` | `?array{latitude?: float, longitude?: float}` | Asset location. |
 | `tags` | `?array<int, array{id?: string, name?: string}>` | Tags assigned to the asset. |
 
-The data-input and data-point builders return generic `Entity` instances rather than typed classes. Inspect their payloads via `$entity->toArray()` or array access.
+`DataInput` hydrates singular `fftSpectraPoint`, `j1939D1StatusPoint`, `locationPoint`, `numberPoint`, and `stringPoint` fields and their plural series variants as `DataPoint` objects.
 
 ## Related Resources
 
-- [Assets](assets.md) — non-powered tracker assets (vs. industrial machines).
-- [Sensors](sensors.md) — legacy v1 sensor endpoints for older industrial gateways.
-- [Tags](tags.md) — group industrial assets for filtering.
-- [Query Builder](../query-builder.md) — operators available on every builder.
+- [Assets](assets.html) — non-powered tracker assets (vs. industrial machines).
+- [Sensors](sensors.html) — legacy v1 sensor endpoints for older industrial gateways.
+- [Tags](tags.html) — group industrial assets for filtering.
+- [Query Builder](../query-builder.html) — operators available on every builder.

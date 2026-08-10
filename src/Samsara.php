@@ -57,6 +57,11 @@ use Samsara\Resources\Additional\CarrierProposedAssignmentsResource;
 class Samsara
 {
     /**
+     * The base URL for the Canada region API.
+     */
+    protected const CANADA_BASE_URL = 'https://api.ca.samsara.com';
+
+    /**
      * The base URL for the EU region API.
      */
     protected const EU_BASE_URL = 'https://api.eu.samsara.com';
@@ -490,6 +495,16 @@ class Samsara
     {
         /** @var TripsResource */
         return $this->resource(TripsResource::class);
+    }
+
+    /**
+     * Switch to the Canada API endpoint.
+     */
+    public function useCanadaEndpoint(): static
+    {
+        $this->baseUrl = self::CANADA_BASE_URL;
+
+        return $this;
     }
 
     /**

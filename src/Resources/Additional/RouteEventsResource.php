@@ -18,7 +18,7 @@ class RouteEventsResource extends Resource
     /**
      * The API endpoint for this resource.
      */
-    protected string $endpoint = '/route-events';
+    protected string $endpoint = '/route-events/stream';
 
     /**
      * The entity class for this resource.
@@ -33,5 +33,13 @@ class RouteEventsResource extends Resource
     public function query(): Builder
     {
         return new Builder($this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all'];
     }
 }

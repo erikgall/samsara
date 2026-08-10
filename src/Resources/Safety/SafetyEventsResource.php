@@ -5,6 +5,7 @@ namespace Samsara\Resources\Safety;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Safety\SafetyEvent;
+use Samsara\Data\Safety\SafetyEventActivity;
 
 /**
  * Safety events resource for the Samsara API.
@@ -32,7 +33,9 @@ class SafetyEventsResource extends Resource
      */
     public function auditLogs(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/safety-events/audit-logs/feed');
+        return $this->createBuilderWithEndpoint('/fleet/safety-events/audit-logs/feed')
+            ->withoutDefaultPageSize()
+            ->usingEntity(SafetyEventActivity::class);
     }
 
     /**
@@ -40,6 +43,14 @@ class SafetyEventsResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))->withoutDefaultPageSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

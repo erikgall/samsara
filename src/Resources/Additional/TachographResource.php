@@ -17,14 +17,15 @@ class TachographResource extends Resource
     /**
      * The API endpoint for this resource.
      */
-    protected string $endpoint = '/tachograph';
+    protected string $endpoint = '/fleet/drivers/tachograph-activity/history';
 
     /**
      * Get a query builder for driver activity history.
      */
     public function driverActivityHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/tachograph/driver-activity-history');
+        return $this->createBuilderWithEndpoint('/fleet/drivers/tachograph-activity/history')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -32,7 +33,8 @@ class TachographResource extends Resource
      */
     public function driverFilesHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/tachograph/driver-files/history');
+        return $this->createBuilderWithEndpoint('/fleet/drivers/tachograph-files/history')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -40,6 +42,15 @@ class TachographResource extends Resource
      */
     public function vehicleFilesHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/tachograph/vehicle-files/history');
+        return $this->createBuilderWithEndpoint('/fleet/vehicles/tachograph-files/history')
+            ->withoutDefaultPageSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

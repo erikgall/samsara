@@ -16,7 +16,7 @@ class IftaResource extends Resource
     /**
      * The API endpoint for this resource.
      */
-    protected string $endpoint = '/ifta';
+    protected string $endpoint = '/ifta-detail/csv';
 
     /**
      * Request a detail CSV export.
@@ -26,9 +26,11 @@ class IftaResource extends Resource
      */
     public function detailCsv(array $params): array
     {
-        $response = $this->client()->post('/ifta/csv-exports', $params);
-
-        $this->handleError($response);
+        $endpoint = '/ifta-detail/csv';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $params),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
     }
@@ -40,9 +42,11 @@ class IftaResource extends Resource
      */
     public function getDetailCsv(string $id): array
     {
-        $response = $this->client()->get("/ifta/csv-exports/{$id}");
-
-        $this->handleError($response);
+        $endpoint = "/ifta-detail/csv/{$id}";
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
     }
@@ -55,9 +59,11 @@ class IftaResource extends Resource
      */
     public function jurisdictionReport(array $params): array
     {
-        $response = $this->client()->get('/ifta/jurisdiction-report', $params);
-
-        $this->handleError($response);
+        $endpoint = '/fleet/reports/ifta/jurisdiction';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, $params),
+            $endpoint
+        );
 
         return $response->json();
     }
@@ -70,10 +76,20 @@ class IftaResource extends Resource
      */
     public function vehicleReport(array $params): array
     {
-        $response = $this->client()->get('/ifta/vehicle-report', $params);
-
-        $this->handleError($response);
+        $endpoint = '/fleet/reports/ifta/vehicle';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, $params),
+            $endpoint
+        );
 
         return $response->json();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

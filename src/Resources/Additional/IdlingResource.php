@@ -26,4 +26,12 @@ class IdlingResource extends Resource
     {
         return new Builder($this);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
+    }
 }

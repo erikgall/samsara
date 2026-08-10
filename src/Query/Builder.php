@@ -2,9 +2,14 @@
 
 namespace Samsara\Query;
 
+use Closure;
 use DateTimeInterface;
+use Samsara\Data\Entity;
+use Samsara\Http\QueryString;
 use Samsara\Resources\Resource;
+use Samsara\Http\RequestExecutor;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\LazyCollection;
 use Samsara\Concerns\InteractsWithTime;
 use Samsara\Contracts\QueryBuilderInterface;
@@ -34,6 +39,11 @@ class Builder implements QueryBuilderInterface
     protected array $decorations = [];
 
     /**
+     * Whether pagination should apply the configured default page size.
+     */
+    protected bool $defaultPageSizeEnabled = true;
+
+    /**
      * The optional endpoint override.
      */
     protected ?string $endpoint = null;
@@ -58,9 +68,23 @@ class Builder implements QueryBuilderInterface
     protected ?int $limit = null;
 
     /**
+     * Form/explode=true list parameters that use repeated query keys.
+     *
+     * @var array<string>
+     */
+    protected array $repeatedQueryParameters = [];
+
+    /**
      * The resource instance.
      */
     protected Resource $resource;
+
+    /**
+     * The endpoint-specific response mapper.
+     *
+     * @var (Closure(array<string, mixed>): Entity)|null
+     */
+    protected ?Closure $responseMapper = null;
 
     /**
      * The stat types to fetch.
@@ -117,15 +141,15 @@ class Builder implements QueryBuilderInterface
         }
 
         if (! empty($this->types)) {
-            $query['types'] = implode(',', $this->types);
+            $query['types'] = $this->serializeList($this->types);
         }
 
         if (! empty($this->expand)) {
-            $query['expand'] = $this->expand;
+            $query['expand'] = $this->serializeList($this->expand);
         }
 
         if (! empty($this->decorations)) {
-            $query['decorations'] = $this->decorations;
+            $query['decorations'] = $this->serializeList($this->decorations);
         }
 
         return $query;
@@ -180,10 +204,7 @@ class Builder implements QueryBuilderInterface
      */
     public function get(): EntityCollection
     {
-        $response = $this->resource->client()->get(
-            $this->getEndpoint(),
-            $this->buildQuery()
-        );
+        $response = $this->executeRequest();
 
         $data = $response->json('data', []);
 
@@ -203,10 +224,9 @@ class Builder implements QueryBuilderInterface
      */
     public function getWithPagination(): Pagination\CursorPaginator
     {
-        $response = $this->resource->client()->get(
-            $this->getEndpoint(),
-            $this->buildQuery()
-        );
+        $this->applyDefaultPerPage();
+
+        $response = $this->executeRequest();
 
         $data = $response->json('data', []);
         $pagination = $response->json('pagination', []);
@@ -230,6 +250,8 @@ class Builder implements QueryBuilderInterface
             $builder->limit($chunkSize);
         }
 
+        $builder->applyDefaultPerPage();
+
         return LazyCollection::make(function () use ($builder) {
             $cursor = null;
 
@@ -238,16 +260,13 @@ class Builder implements QueryBuilderInterface
                     $builder->after($cursor);
                 }
 
-                $response = $this->resource->client()->get(
-                    $this->getEndpoint(),
-                    $builder->buildQuery()
-                );
+                $response = $builder->executeRequest();
 
                 $data = $response->json('data', []);
                 $pagination = $response->json('pagination', []);
 
                 foreach ($data as $item) {
-                    yield $this->mapToEntity($item);
+                    yield $builder->mapToEntity($item);
                 }
 
                 $cursor = $pagination['endCursor'] ?? null;
@@ -267,6 +286,18 @@ class Builder implements QueryBuilderInterface
     }
 
     /**
+     * Map endpoint response items with a custom callback.
+     *
+     * @param  callable(array<string, mixed>): Entity  $mapper
+     */
+    public function mapUsing(callable $mapper): static
+    {
+        $this->responseMapper = Closure::fromCallable($mapper);
+
+        return $this;
+    }
+
+    /**
      * Paginate the query results.
      *
      * @param  int|null  $perPage  The number of items per page
@@ -278,6 +309,19 @@ class Builder implements QueryBuilderInterface
         }
 
         return $this->getWithPagination();
+    }
+
+    /**
+     * Declare form/explode=true list parameters that use repeated query keys.
+     */
+    public function repeatQueryParameters(string ...$parameters): static
+    {
+        $this->repeatedQueryParameters = array_values(array_unique([
+            ...$this->repeatedQueryParameters,
+            ...$parameters,
+        ]));
+
+        return $this;
     }
 
     /**
@@ -321,6 +365,18 @@ class Builder implements QueryBuilderInterface
     }
 
     /**
+     * Map endpoint response items into the selected entity class.
+     *
+     * @param  class-string<Entity>  $entityClass
+     */
+    public function usingEntity(string $entityClass): static
+    {
+        return $this->mapUsing(
+            fn (array $data): Entity => $entityClass::make($data)
+        );
+    }
+
+    /**
      * Add a custom filter.
      */
     public function where(string $key, mixed $value): static
@@ -337,9 +393,7 @@ class Builder implements QueryBuilderInterface
      */
     public function whereAttribute(array|string $attributeValueIds): static
     {
-        $this->filters['attributeValueIds'] = is_array($attributeValueIds)
-            ? $attributeValueIds
-            : [$attributeValueIds];
+        $this->filters['attributeValueIds'] = $this->serializeList($attributeValueIds);
 
         return $this;
     }
@@ -351,7 +405,7 @@ class Builder implements QueryBuilderInterface
      */
     public function whereDriver(array|string $driverIds): static
     {
-        $this->filters['driverIds'] = is_array($driverIds) ? $driverIds : [$driverIds];
+        $this->filters['driverIds'] = $this->serializeList($driverIds);
 
         return $this;
     }
@@ -363,9 +417,7 @@ class Builder implements QueryBuilderInterface
      */
     public function whereParentTag(array|string $parentTagIds): static
     {
-        $this->filters['parentTagIds'] = is_array($parentTagIds)
-            ? $parentTagIds
-            : [$parentTagIds];
+        $this->filters['parentTagIds'] = $this->serializeList($parentTagIds);
 
         return $this;
     }
@@ -377,7 +429,7 @@ class Builder implements QueryBuilderInterface
      */
     public function whereTag(array|string $tagIds): static
     {
-        $this->filters['tagIds'] = is_array($tagIds) ? $tagIds : [$tagIds];
+        $this->filters['tagIds'] = $this->serializeList($tagIds);
 
         return $this;
     }
@@ -389,7 +441,7 @@ class Builder implements QueryBuilderInterface
      */
     public function whereVehicle(array|string $vehicleIds): static
     {
-        $this->filters['vehicleIds'] = is_array($vehicleIds) ? $vehicleIds : [$vehicleIds];
+        $this->filters['vehicleIds'] = $this->serializeList($vehicleIds);
 
         return $this;
     }
@@ -402,6 +454,16 @@ class Builder implements QueryBuilderInterface
     public function withDecorations(array|string $decorations): static
     {
         $this->decorations = is_array($decorations) ? $decorations : [$decorations];
+
+        return $this;
+    }
+
+    /**
+     * Disable automatic configured page-size injection for this query.
+     */
+    public function withoutDefaultPageSize(): static
+    {
+        $this->defaultPageSizeEnabled = false;
 
         return $this;
     }
@@ -430,8 +492,60 @@ class Builder implements QueryBuilderInterface
      */
     protected function mapToEntity(array $data): object
     {
+        if ($this->responseMapper !== null) {
+            return ($this->responseMapper)($data);
+        }
+
         $entityClass = $this->resource->getEntityClass();
 
         return $entityClass::make($data);
+    }
+
+    /**
+     * Apply the configured page size when no limit was explicitly selected.
+     */
+    private function applyDefaultPerPage(): void
+    {
+        if (
+            $this->defaultPageSizeEnabled
+            && $this->limit === null
+            && ! array_key_exists('limit', $this->filters)
+        ) {
+            $this->limit($this->resource->getDefaultPerPage());
+        }
+    }
+
+    /**
+     * Execute a query through the configured client and map HTTP errors.
+     */
+    private function executeRequest(): Response
+    {
+        $endpoint = $this->getEndpoint();
+        [$requestEndpoint, $query] = QueryString::prepare(
+            $endpoint,
+            $this->buildQuery(),
+            $this->repeatedQueryParameters,
+        );
+
+        return (new RequestExecutor)->execute(
+            fn () => $query === []
+                ? $this->resource->client()->get($requestEndpoint)
+                : $this->resource->client()->get($requestEndpoint, $query),
+            fn (Response $response) => $this->resource->throwIfError($response),
+            $endpoint,
+        );
+    }
+
+    /**
+     * Serialize a dedicated list parameter for form/explode=false query encoding.
+     *
+     * @param  array<string>|string  $values
+     * @return array<string>|string
+     */
+    private function serializeList(array|string $values): array|string
+    {
+        return is_array($values) && $values !== []
+            ? implode(',', $values)
+            : $values;
     }
 }

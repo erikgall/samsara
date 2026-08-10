@@ -29,7 +29,8 @@ use Carbon\Carbon;
 
 $trips = Samsara::trips()
     ->query()
-    ->between(Carbon::now()->subDays(7), Carbon::now())
+    ->startTime(Carbon::now()->subDays(7))
+    ->where('ids', 'trip-1,trip-2')
     ->get();
 ```
 
@@ -40,7 +41,7 @@ The resource ships two typed shortcuts that pre-filter on `completionStatus`.
 ```php
 $completed = Samsara::trips()
     ->completed()
-    ->between(now()->subDays(7), now())
+    ->startTime(now()->subDays(7))
     ->get();
 
 $inProgress = Samsara::trips()
@@ -50,20 +51,20 @@ $inProgress = Samsara::trips()
 
 ## Time-Based Queries
 
-`between()` covers the common case. For explicit RFC 3339 strings use `startTime()` and `endTime()`.
+The official stream requires `startTime`; pass comma-separated trip IDs through `where('ids', 'id1,id2')` when filtering by ID. The operation does not accept `limit`, so the builder suppresses the implicit configured page size.
 
 ```php
 use Carbon\Carbon;
 
 $today = Samsara::trips()
     ->query()
-    ->between(Carbon::today(), Carbon::now())
+    ->startTime(Carbon::today())
     ->get();
 
 $range = Samsara::trips()
     ->query()
-    ->startTime('2024-01-01T00:00:00Z')
-    ->endTime('2024-01-31T23:59:59Z')
+    ->startTime('2026-01-01T00:00:00Z')
+    ->where('ids', 'trip-1,trip-2')
     ->get();
 ```
 
@@ -74,8 +75,8 @@ For multi-month windows, use `lazy()` to iterate without loading every page into
 ```php
 Samsara::trips()
     ->query()
-    ->between(now()->subYear(), now())
-    ->lazy(500)
+    ->startTime(now()->subYear())
+    ->lazy()
     ->each(function ($trip) {
         DB::table('trip_archive')->insert([
             'samsara_trip_start' => $trip->startTime,
@@ -88,25 +89,25 @@ Samsara::trips()
 
 ## Filtering
 
-See [Query Builder](../query-builder.md) for the complete filter list. The most common Trip filters are by driver, vehicle, and tag.
+See [Query Builder](../query-builder.html) for the complete filter list. The most common Trip filters are by driver, vehicle, and tag.
 
 ```php
 $trips = Samsara::trips()
     ->query()
     ->whereDriver('driver-id')
-    ->between(now()->subWeek(), now())
+    ->startTime(now()->subWeek())
     ->get();
 
 $trips = Samsara::trips()
     ->query()
     ->whereVehicle(['vehicle-1', 'vehicle-2'])
-    ->between(now()->subDays(7), now())
+    ->startTime(now()->subDays(7))
     ->get();
 
 $trips = Samsara::trips()
     ->query()
     ->whereTag('delivery-fleet')
-    ->between(now()->subDays(7), now())
+    ->startTime(now()->subDays(7))
     ->get();
 ```
 
@@ -122,7 +123,7 @@ $trips = Samsara::trips()
 ```php
 $trip = Samsara::trips()
     ->query()
-    ->between(now()->subDay(), now())
+    ->startTime(now()->subDay())
     ->first();
 
 $trip->getDistanceMiles();      // ?float
@@ -149,6 +150,6 @@ The Trip entity exposes nested `driver` and `vehicle` arrays, not flat `driverId
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — vehicles whose gateways produce trips.
-- [Drivers](drivers.md) — drivers attributed to each trip.
-- [Vehicle Stats](vehicle-stats.md) — engine-state and GPS samples that compose a trip.
+- [Vehicles](vehicles.html) — vehicles whose gateways produce trips.
+- [Drivers](drivers.html) — drivers attributed to each trip.
+- [Vehicle Stats](vehicle-stats.html) — engine-state and GPS samples that compose a trip.

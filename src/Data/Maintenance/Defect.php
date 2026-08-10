@@ -12,7 +12,7 @@ use Samsara\Data\Entity;
  * @author Erik Galloway <erik@erikgall.com>
  *
  * @property-read string|null $id Defect ID
- * @property-read string|null $defectType Type of defect
+ * @property-read string|null $defectTypeId Defect type ID
  * @property-read string|null $comment Comment on the defect
  * @property-read bool|null $isResolved Whether the defect is resolved
  * @property-read string|null $createdAtTime Creation time (RFC 3339)

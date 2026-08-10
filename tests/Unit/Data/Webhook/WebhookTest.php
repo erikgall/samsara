@@ -21,14 +21,16 @@ class WebhookTest extends TestCase
             'id'         => '12345',
             'name'       => 'Fleet Alerts Webhook',
             'url'        => 'https://example.com/webhooks/samsara',
-            'secret'     => 'webhook-secret-key',
-            'eventTypes' => ['vehicleCreated', 'vehicleUpdated'],
+            'secretKey'  => 'webhook-secret-key',
+            'version'    => '2021-06-09',
+            'eventTypes' => ['VehicleCreated', 'VehicleUpdated'],
         ]);
 
         $this->assertSame('12345', $webhook->id);
         $this->assertSame('Fleet Alerts Webhook', $webhook->name);
         $this->assertSame('https://example.com/webhooks/samsara', $webhook->url);
-        $this->assertSame('webhook-secret-key', $webhook->secret);
+        $this->assertSame('webhook-secret-key', $webhook->secretKey);
+        $this->assertSame('2021-06-09', $webhook->version);
         $this->assertCount(2, $webhook->eventTypes);
     }
 
@@ -44,36 +46,14 @@ class WebhookTest extends TestCase
     }
 
     #[Test]
-    public function it_can_check_if_active(): void
-    {
-        $webhook = new Webhook([
-            'status' => 'active',
-        ]);
-
-        $this->assertTrue($webhook->isActive());
-        $this->assertFalse($webhook->isPaused());
-    }
-
-    #[Test]
     public function it_can_check_if_has_event_type(): void
     {
         $webhook = new Webhook([
-            'eventTypes' => ['vehicleCreated', 'vehicleUpdated'],
+            'eventTypes' => ['VehicleCreated', 'VehicleUpdated'],
         ]);
 
-        $this->assertTrue($webhook->hasEventType('vehicleCreated'));
-        $this->assertFalse($webhook->hasEventType('driverCreated'));
-    }
-
-    #[Test]
-    public function it_can_check_if_paused(): void
-    {
-        $webhook = new Webhook([
-            'status' => 'paused',
-        ]);
-
-        $this->assertTrue($webhook->isPaused());
-        $this->assertFalse($webhook->isActive());
+        $this->assertTrue($webhook->hasEventType('VehicleCreated'));
+        $this->assertFalse($webhook->hasEventType('vehicleCreated'));
     }
 
     #[Test]
@@ -104,15 +84,12 @@ class WebhookTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_timestamps(): void
+    public function it_does_not_expose_status_helpers_absent_from_the_current_contract(): void
     {
-        $webhook = new Webhook([
-            'createdAtTime' => '2024-04-10T07:06:25Z',
-            'updatedAtTime' => '2024-04-11T10:00:00Z',
-        ]);
+        $webhook = new Webhook;
 
-        $this->assertSame('2024-04-10T07:06:25Z', $webhook->createdAtTime);
-        $this->assertSame('2024-04-11T10:00:00Z', $webhook->updatedAtTime);
+        $this->assertFalse(method_exists($webhook, 'isActive'));
+        $this->assertFalse(method_exists($webhook, 'isPaused'));
     }
 
     #[Test]
@@ -128,6 +105,6 @@ class WebhookTest extends TestCase
     {
         $webhook = new Webhook;
 
-        $this->assertFalse($webhook->hasEventType('vehicleCreated'));
+        $this->assertFalse($webhook->hasEventType('VehicleCreated'));
     }
 }

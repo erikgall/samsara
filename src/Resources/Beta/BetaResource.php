@@ -5,12 +5,13 @@ namespace Samsara\Resources\Beta;
 use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
-use Samsara\Data\EntityCollection;
+use Samsara\Data\Safety\SafetyScore;
+use Samsara\Data\Trailer\TrailerStats;
 
 /**
  * Beta resource for the Samsara API.
  *
- * Provides access to beta/preview endpoints that are not yet stable.
+ * Provides access to beta endpoints that are not yet stable.
  * These endpoints may change without notice.
  *
  * @author Erik Galloway <erik@erikgall.com>
@@ -30,11 +31,19 @@ class BetaResource extends Resource
     protected string $entity = Entity::class;
 
     /**
-     * Get AEMP fleet data.
+     * Get AEMP fleet data for a page.
+     *
+     * @return array<string, mixed>
      */
-    public function aempFleet(): Builder
+    public function aempFleet(string $pageNumber): array
     {
-        return $this->createBuilderWithEndpoint('/aemp/fleet');
+        $endpoint = '/beta/aemp/Fleet/'.rawurlencode($pageNumber);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint),
+            $endpoint
+        );
+
+        return $response->json();
     }
 
     /**
@@ -45,38 +54,46 @@ class BetaResource extends Resource
      */
     public function createIndustrialJob(array $data): array
     {
-        $response = $this->client()->post('/industrial/jobs', $data);
+        $endpoint = '/beta/industrial/jobs';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
-        $this->handleError($response);
-
+        /** @var array<string, mixed> */
         return $response->json('data', $response->json());
     }
 
     /**
-     * Create a reading.
+     * Create readings. The current contract returns no response body.
      *
      * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
      */
-    public function createReading(array $data): array
+    public function createReading(array $data): bool
     {
-        $response = $this->client()->post('/readings', $data);
+        $endpoint = '/readings';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
-        $this->handleError($response);
-
-        return $response->json('data', $response->json());
+        return $response->successful();
     }
 
     /**
      * Delete an industrial job.
+     *
+     * @return array<string, mixed>
      */
-    public function deleteIndustrialJob(string $id): bool
+    public function deleteIndustrialJob(string $id): array
     {
-        $response = $this->client()->delete("/industrial/jobs/{$id}");
+        $endpoint = '/beta/industrial/jobs?id='.rawurlencode($id);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->delete($endpoint),
+            $endpoint
+        );
 
-        $this->handleError($response);
-
-        return $response->successful();
+        return $response->json();
     }
 
     /**
@@ -84,21 +101,16 @@ class BetaResource extends Resource
      */
     public function detectionsStream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/detections/stream');
+        return $this->createBuilderWithEndpoint('/detections/stream')
+            ->withoutDefaultPageSize();
     }
 
     /**
      * Get devices.
-     *
-     * @return EntityCollection<int, Entity>
      */
-    public function devices(): EntityCollection
+    public function devices(): Builder
     {
-        $response = $this->client()->get('/devices');
-
-        $this->handleError($response);
-
-        return $this->mapToEntities($response->json('data', []));
+        return $this->createBuilderWithEndpoint('/devices');
     }
 
     /**
@@ -106,7 +118,8 @@ class BetaResource extends Resource
      */
     public function hosEldEvents(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/hos/eld-events');
+        return $this->createBuilderWithEndpoint('/beta/fleet/hos/drivers/eld-events')
+            ->limit(25);
     }
 
     /**
@@ -114,7 +127,8 @@ class BetaResource extends Resource
      */
     public function industrialJobs(): Builder
     {
-        return $this->createBuilderWithEndpoint('/industrial/jobs');
+        return $this->createBuilderWithEndpoint('/beta/industrial/jobs')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -122,35 +136,25 @@ class BetaResource extends Resource
      */
     public function qualificationsRecords(): Builder
     {
-        return $this->createBuilderWithEndpoint('/qualifications/records');
+        return $this->createBuilderWithEndpoint('/qualification-records');
     }
 
     /**
      * Get qualification types.
-     *
-     * @return EntityCollection<int, Entity>
      */
-    public function qualificationsTypes(): EntityCollection
+    public function qualificationsTypes(): Builder
     {
-        $response = $this->client()->get('/qualifications/types');
-
-        $this->handleError($response);
-
-        return $this->mapToEntities($response->json('data', []));
+        return $this->createBuilderWithEndpoint('/qualification-types')
+            ->withoutDefaultPageSize();
     }
 
     /**
      * Get readings definitions.
-     *
-     * @return EntityCollection<int, Entity>
      */
-    public function readingsDefinitions(): EntityCollection
+    public function readingsDefinitions(): Builder
     {
-        $response = $this->client()->get('/readings/definitions');
-
-        $this->handleError($response);
-
-        return $this->mapToEntities($response->json('data', []));
+        return $this->createBuilderWithEndpoint('/readings/definitions')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -158,7 +162,8 @@ class BetaResource extends Resource
      */
     public function readingsHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/readings/history');
+        return $this->createBuilderWithEndpoint('/readings/history')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -166,21 +171,16 @@ class BetaResource extends Resource
      */
     public function readingsLatest(): Builder
     {
-        return $this->createBuilderWithEndpoint('/readings/latest');
+        return $this->createBuilderWithEndpoint('/readings/latest')
+            ->withoutDefaultPageSize();
     }
 
     /**
      * Get reports configs.
-     *
-     * @return EntityCollection<int, Entity>
      */
-    public function reportsConfigs(): EntityCollection
+    public function reportsConfigs(): Builder
     {
-        $response = $this->client()->get('/reports/configs');
-
-        $this->handleError($response);
-
-        return $this->mapToEntities($response->json('data', []));
+        return $this->createBuilderWithEndpoint('/reports/configs');
     }
 
     /**
@@ -204,7 +204,9 @@ class BetaResource extends Resource
      */
     public function safetyScoresDrivers(): Builder
     {
-        return $this->createBuilderWithEndpoint('/safety-scores/drivers');
+        return $this->createBuilderWithEndpoint('/safety-scores/drivers')
+            ->withoutDefaultPageSize()
+            ->usingEntity(SafetyScore::class);
     }
 
     /**
@@ -212,7 +214,8 @@ class BetaResource extends Resource
      */
     public function safetyScoresVehicles(): Builder
     {
-        return $this->createBuilderWithEndpoint('/safety-scores/vehicles');
+        return $this->createBuilderWithEndpoint('/safety-scores/vehicles')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -220,7 +223,9 @@ class BetaResource extends Resource
      */
     public function trailerStatsCurrent(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/trailers/stats');
+        return $this->createBuilderWithEndpoint('/fleet/trailers/stats')
+            ->withoutDefaultPageSize()
+            ->usingEntity(TrailerStats::class);
     }
 
     /**
@@ -228,7 +233,8 @@ class BetaResource extends Resource
      */
     public function trailerStatsFeed(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/trailers/stats/feed');
+        return $this->createBuilderWithEndpoint('/fleet/trailers/stats/feed')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -236,7 +242,8 @@ class BetaResource extends Resource
      */
     public function trailerStatsHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/trailers/stats/history');
+        return $this->createBuilderWithEndpoint('/fleet/trailers/stats/history')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -244,21 +251,17 @@ class BetaResource extends Resource
      */
     public function trainingAssignments(): Builder
     {
-        return $this->createBuilderWithEndpoint('/training/assignments');
+        return $this->createBuilderWithEndpoint('/training-assignments/stream')
+            ->withoutDefaultPageSize();
     }
 
     /**
      * Get training courses.
-     *
-     * @return EntityCollection<int, Entity>
      */
-    public function trainingCourses(): EntityCollection
+    public function trainingCourses(): Builder
     {
-        $response = $this->client()->get('/training/courses');
-
-        $this->handleError($response);
-
-        return $this->mapToEntities($response->json('data', []));
+        return $this->createBuilderWithEndpoint('/training-courses')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -269,10 +272,13 @@ class BetaResource extends Resource
      */
     public function updateIndustrialJob(string $id, array $data): array
     {
-        $response = $this->client()->patch("/industrial/jobs/{$id}", $data);
+        $endpoint = '/beta/industrial/jobs?id='.rawurlencode($id);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($endpoint, $data),
+            $endpoint
+        );
 
-        $this->handleError($response);
-
+        /** @var array<string, mixed> */
         return $response->json('data', $response->json());
     }
 
@@ -281,6 +287,15 @@ class BetaResource extends Resource
      */
     public function vehicleImmobilizerStream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/immobilizer/stream');
+        return $this->createBuilderWithEndpoint('/fleet/vehicles/immobilizer/stream')
+            ->withoutDefaultPageSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

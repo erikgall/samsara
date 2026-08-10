@@ -21,7 +21,7 @@ permalink: /resources/routes
 
 ## Introduction
 
-The `Samsara::routes()` resource manages dispatched routes — ordered sets of stops scheduled against a hub or plan. Each route exposes its scheduled window, distance, duration, and an array of stop entries; the typed `Route` entity also surfaces helpers for unit conversion and pinned/edited flags. The lifecycle events emitted as drivers run a route live on the [Route Events](route-events.md) resource.
+The `Samsara::routes()` resource manages dispatched routes — ordered sets of stops scheduled against a hub or plan. Each route exposes its scheduled window, distance, duration, and an array of stop entries; the typed `Route` entity also surfaces helpers for unit conversion and pinned/edited flags. The lifecycle events emitted as drivers run a route live on the [Route Events](route-events.html) resource.
 
 ## Retrieving Records
 
@@ -30,15 +30,13 @@ use Samsara\Facades\Samsara;
 
 $route = Samsara::routes()->find('route-id');
 
-$routes = Samsara::routes()->all();
-
 $weekly = Samsara::routes()
     ->query()
     ->between(now()->startOfWeek(), now()->endOfWeek())
     ->get();
 ```
 
-`find()` returns `null` when the route does not exist; `all()` and the builder return an `EntityCollection<int, Route>`.
+`find()` returns `null` when the route does not exist. Collection reads must use `query()` with the required time window; generic `all()` is unsupported and fails locally. Generic `find`, `create`, `update`, and `delete` remain supported.
 
 ## Creating Records
 
@@ -97,11 +95,11 @@ $logs = Samsara::routes()
     ->get();
 ```
 
-The audit-log stream returns generic `Entity` instances since `auditLogs()` reuses the resource's `$entity` declaration only nominally — the payload shape is the audit-log shape, not a `Route`.
+Audit-log rows are mapped to `Samsara\Data\Route\RouteAuditLog`. The builder suppresses the implicit page size because the feed accepts cursors but no `limit`.
 
 ## Filtering
 
-Refer to the [query builder](../query-builder.md) for the full operator reference. The routes builder commonly accepts:
+Refer to the [query builder](../query-builder.html) for the full operator reference. The routes builder commonly accepts:
 
 ```php
 $routes = Samsara::routes()
@@ -112,7 +110,7 @@ $routes = Samsara::routes()
     ->get();
 ```
 
-The companion `RouteState` enum (`CANCELLED`, `COMPLETED`, `IN_PROGRESS`, `NOT_STARTED`, `SKIPPED`) maps the lifecycle states reported by Samsara — see [Enums](../enums.md#routestate) for the full case-to-value mapping.
+The package also exposes a `RouteState` enum (`CANCELLED`, `COMPLETED`, `IN_PROGRESS`, `NOT_STARTED`, `SKIPPED`). The current upstream route schema does not expose a matching top-level state field; route-stop states use a different value set. Do not treat this enum as a current upstream wire contract without validating the endpoint payload.
 
 ## Helper Methods
 
@@ -159,7 +157,7 @@ The `Route` entity exposes the following `@property-read` keys:
 | `quantities` | `?array<int, array{name?: string, value?: float\|int}>` | Per-route quantity totals. |
 | `settings` | `?array{routeCompletionCondition?: string, routeStartingCondition?: string, sequencingMethod?: string}` | Route settings. |
 
-> **Note:** The entity does not expose flat `driverId`, `vehicleId`, `actualStartTime`, `actualEndTime`, `status`, or `notes` keys. Driver and vehicle data live on the per-stop payload returned by the upstream API; lifecycle state lives on the [Route Events](route-events.md) stream.
+> **Note:** The entity does not expose flat `driverId`, `vehicleId`, `actualStartTime`, `actualEndTime`, `status`, or `notes` keys. Driver and vehicle data live on the per-stop payload returned by the upstream API; lifecycle state lives on the [Route Events](route-events.html) stream.
 
 ### Route Stops
 
@@ -180,8 +178,8 @@ The `Route` entity exposes the following `@property-read` keys:
 
 ## Related Resources
 
-- [Route Events](route-events.md) — lifecycle events emitted as drivers run a route.
-- [Addresses](addresses.md) — referenced via `hubLocationId` on each stop.
-- [Hubs](hubs.md) — the hub that owns a route.
-- [Trips](trips.md) — the vehicle-centric record of the same drive.
-- [Enums](../enums.md#routestate) — `RouteState` reference.
+- [Route Events](route-events.html) — lifecycle events emitted as drivers run a route.
+- [Addresses](addresses.html) — referenced via `hubLocationId` on each stop.
+- [Hubs](hubs.html) — the hub that owns a route.
+- [Trips](trips.html) — the vehicle-centric record of the same drive.
+- [Enums](../enums.html#routestate) — `RouteState` reference.

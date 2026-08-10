@@ -3,10 +3,10 @@
 namespace Samsara\Tests\Unit\Resources\Fleet;
 
 use Samsara\Samsara;
-use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Trailer\Trailer;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Fleet\TrailersResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
@@ -80,11 +80,9 @@ class TrailersResourceTest extends TestCase
         $this->http->fake([
             '*' => $this->http->response([
                 'data' => [
-                    [
-                        'id'          => '123',
-                        'name'        => 'Trailer 001',
-                        'externalIds' => ['fleet_code' => 'TR-123'],
-                    ],
+                    'id'          => '123',
+                    'name'        => 'Trailer 001',
+                    'externalIds' => ['fleet_code' => 'TR-123'],
                 ],
             ]),
         ]);
@@ -94,6 +92,9 @@ class TrailersResourceTest extends TestCase
 
         $this->assertInstanceOf(Trailer::class, $trailer);
         $this->assertSame('123', $trailer->id);
+        $this->http->assertSent(fn (Request $request) => $request->method() === 'GET'
+            && $request->url() === 'https://api.samsara.com/fleet/trailers/fleet_code:TR-123'
+            && $request->data() === []);
     }
 
     #[Test]
@@ -135,15 +136,6 @@ class TrailersResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_return_query_builder(): void
-    {
-        $resource = new TrailersResource($this->samsara);
-        $query = $resource->query();
-
-        $this->assertInstanceOf(Builder::class, $query);
-    }
-
-    #[Test]
     public function it_can_update_trailer(): void
     {
         $this->http->fake([
@@ -182,15 +174,15 @@ class TrailersResourceTest extends TestCase
     public function it_returns_null_when_external_id_not_found(): void
     {
         $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [],
-            ]),
+            '*' => $this->http->response([], 404),
         ]);
 
         $resource = new TrailersResource($this->samsara);
         $trailer = $resource->findByExternalId('fleet_code', 'NONEXISTENT');
 
         $this->assertNull($trailer);
+        $this->http->assertSent(fn (Request $request) => $request->url()
+            === 'https://api.samsara.com/fleet/trailers/fleet_code:NONEXISTENT');
     }
 
     #[Test]
@@ -204,5 +196,34 @@ class TrailersResourceTest extends TestCase
         $trailer = $resource->find('999');
 
         $this->assertNull($trailer);
+    }
+
+    #[Test]
+    public function it_terminal_executes_the_current_trailer_list_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data'       => [['id' => 'trailer-1', 'name' => 'Trailer A']],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new TrailersResource($this->samsara))
+            ->query()
+            ->whereTag(['tag-1', 'tag-2'])
+            ->whereParentTag(['parent-1', 'parent-2'])
+            ->after('trailer-cursor')
+            ->paginate(50);
+
+        $this->assertInstanceOf(Trailer::class, $page->items()->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/trailers'
+            && $request->data() === [
+                'tagIds'       => 'tag-1,tag-2',
+                'parentTagIds' => 'parent-1,parent-2',
+                'limit'        => 50,
+                'after'        => 'trailer-cursor',
+            ]
+        );
     }
 }

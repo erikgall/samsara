@@ -90,7 +90,12 @@ class Samsara extends Facade
      */
     public static function fake(): SamsaraFake
     {
-        return SamsaraFake::create();
+        static::getFacadeRoot();
+
+        $fake = SamsaraFake::create();
+        static::swap($fake);
+
+        return $fake;
     }
 
     /**

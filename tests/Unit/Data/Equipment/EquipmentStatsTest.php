@@ -7,6 +7,7 @@ use Samsara\Tests\TestCase;
 use Samsara\Enums\EngineState;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Equipment\EquipmentStats;
+use Samsara\Data\Equipment\EquipmentGpsLocation;
 
 /**
  * Unit tests for the EquipmentStats entity.
@@ -141,16 +142,21 @@ class EquipmentStatsTest extends TestCase
                 'latitude'          => 37.7749,
                 'longitude'         => -122.4194,
                 'time'              => '2025-01-17T10:00:00Z',
-                'headingDegrees'    => 180,
+                'headingDegrees'    => 180.0,
                 'speedMilesPerHour' => 25.5,
+                'address'           => ['name' => 'Main Yard'],
             ],
         ]);
 
         $gps = $stats->getGps();
 
         $this->assertNotNull($gps);
+        $this->assertInstanceOf(EquipmentGpsLocation::class, $gps);
         $this->assertSame(37.7749, $gps->latitude);
         $this->assertSame(-122.4194, $gps->longitude);
+        $this->assertSame(180.0, $gps->headingDegrees);
+        $this->assertSame(25.5, $gps->speedMilesPerHour);
+        $this->assertSame(['name' => 'Main Yard'], $gps->address);
     }
 
     #[Test]

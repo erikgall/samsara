@@ -3,10 +3,10 @@
 namespace Samsara\Tests\Unit\Resources\Organization;
 
 use Samsara\Samsara;
-use Samsara\Query\Builder;
 use Samsara\Data\User\User;
 use Samsara\Tests\TestCase;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Organization\UsersResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
@@ -122,15 +122,6 @@ class UsersResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_return_query_builder(): void
-    {
-        $resource = new UsersResource($this->samsara);
-        $query = $resource->query();
-
-        $this->assertInstanceOf(Builder::class, $query);
-    }
-
-    #[Test]
     public function it_can_update_user(): void
     {
         $this->http->fake([
@@ -163,5 +154,27 @@ class UsersResourceTest extends TestCase
         $resource = new UsersResource($this->samsara);
 
         $this->assertSame(User::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_terminal_executes_the_current_user_list_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data'       => [['id' => 'user-1', 'name' => 'Ada', 'authType' => 'saml']],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new UsersResource($this->samsara))
+            ->query()
+            ->after('user-cursor')
+            ->paginate(50);
+
+        $this->assertInstanceOf(User::class, $page->items()->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/users'
+            && $request->data() === ['limit' => 50, 'after' => 'user-cursor']
+        );
     }
 }

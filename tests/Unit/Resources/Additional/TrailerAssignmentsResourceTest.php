@@ -4,9 +4,10 @@ namespace Samsara\Tests\Unit\Resources\Additional;
 
 use Samsara\Samsara;
 use Samsara\Tests\TestCase;
-use Samsara\Data\EntityCollection;
+use Samsara\Data\Trailer\Trailer;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 use Samsara\Resources\Additional\TrailerAssignmentsResource;
 
 /**
@@ -30,42 +31,24 @@ class TrailerAssignmentsResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_all_assignments(): void
-    {
-        $this->http->fake([
-            '*/v1/fleet/trailers/assignments' => $this->http->response([
-                'data' => [
-                    ['id' => 'assignment-1'],
-                    ['id' => 'assignment-2'],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new TrailerAssignmentsResource($this->samsara);
-
-        $result = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
-    }
-
-    #[Test]
     public function it_can_get_assignments_for_trailer(): void
     {
         $this->http->fake([
-            '*v1/fleet/trailers/trailer-123/assignments*' => $this->http->response([
-                'data' => [
-                    ['id' => 'assignment-1', 'trailerId' => 'trailer-123'],
+            '*v1/fleet/trailers/123/assignments*' => $this->http->response([
+                'id'                 => 123,
+                'name'               => 'Trailer 123',
+                'trailerAssignments' => [
+                    ['driverId' => 456],
                 ],
             ], 200),
         ]);
 
         $resource = new TrailerAssignmentsResource($this->samsara);
 
-        $result = $resource->forTrailer('trailer-123');
+        $result = $resource->forTrailer(123);
 
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(1, $result);
+        $this->assertInstanceOf(Trailer::class, $result);
+        $this->assertSame(123, $result->get('id'));
     }
 
     #[Test]
@@ -74,5 +57,22 @@ class TrailerAssignmentsResourceTest extends TestCase
         $resource = new TrailerAssignmentsResource($this->samsara);
 
         $this->assertSame('/v1/fleet/trailers/assignments', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_rejects_generic_all_for_the_wrapped_collection_shape(): void
+    {
+        $this->http->fake();
+
+        $resource = new TrailerAssignmentsResource($this->samsara);
+
+        try {
+            $resource->all();
+            $this->fail('Expected the generic all operation to be rejected.');
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('all', $exception->getContext()['operation']);
+        }
+
+        $this->http->assertNothingSent();
     }
 }

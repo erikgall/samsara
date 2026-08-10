@@ -4,6 +4,7 @@ namespace Samsara\Resources\Industrial;
 
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
+use Samsara\Data\Industrial\DataInput;
 use Samsara\Data\Industrial\IndustrialAsset;
 
 /**
@@ -42,12 +43,8 @@ class IndustrialResource extends Resource
      */
     public function createAsset(array $data): IndustrialAsset
     {
-        $response = $this->client()->post('/industrial/assets', $data);
-
-        $this->handleError($response);
-
         /** @var IndustrialAsset */
-        return $this->mapToEntity($response->json('data', $response->json()));
+        return $this->create($data);
     }
 
     /**
@@ -55,7 +52,8 @@ class IndustrialResource extends Resource
      */
     public function dataInputs(): Builder
     {
-        return $this->createBuilderWithEndpoint('/industrial/data-inputs');
+        return $this->createBuilderWithEndpoint('/industrial/data-inputs')
+            ->usingEntity(DataInput::class);
     }
 
     /**
@@ -63,7 +61,9 @@ class IndustrialResource extends Resource
      */
     public function dataPoints(): Builder
     {
-        return $this->createBuilderWithEndpoint('/industrial/data-points');
+        return $this->createBuilderWithEndpoint('/industrial/data-inputs/data-points')
+            ->withoutDefaultPageSize()
+            ->usingEntity(DataInput::class);
     }
 
     /**
@@ -71,7 +71,9 @@ class IndustrialResource extends Resource
      */
     public function dataPointsFeed(): Builder
     {
-        return $this->createBuilderWithEndpoint('/industrial/data-points/feed');
+        return $this->createBuilderWithEndpoint('/industrial/data-inputs/data-points/feed')
+            ->withoutDefaultPageSize()
+            ->usingEntity(DataInput::class);
     }
 
     /**
@@ -79,7 +81,9 @@ class IndustrialResource extends Resource
      */
     public function dataPointsHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/industrial/data-points/history');
+        return $this->createBuilderWithEndpoint('/industrial/data-inputs/data-points/history')
+            ->withoutDefaultPageSize()
+            ->usingEntity(DataInput::class);
     }
 
     /**
@@ -87,11 +91,7 @@ class IndustrialResource extends Resource
      */
     public function deleteAsset(string $id): bool
     {
-        $response = $this->client()->delete("/industrial/assets/{$id}");
-
-        $this->handleError($response);
-
-        return $response->successful();
+        return $this->delete($id);
     }
 
     /**
@@ -99,7 +99,8 @@ class IndustrialResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))
+            ->usingEntity(IndustrialAsset::class);
     }
 
     /**
@@ -109,11 +110,15 @@ class IndustrialResource extends Resource
      */
     public function updateAsset(string $id, array $data): IndustrialAsset
     {
-        $response = $this->client()->patch("/industrial/assets/{$id}", $data);
-
-        $this->handleError($response);
-
         /** @var IndustrialAsset */
-        return $this->mapToEntity($response->json('data', $response->json()));
+        return $this->update($id, $data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all', 'create', 'delete', 'update'];
     }
 }

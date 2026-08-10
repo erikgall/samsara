@@ -48,6 +48,18 @@ class TripsResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))
+            ->withoutDefaultPageSize()
+            ->usingEntity(Trip::class);
+    }
+
+    /**
+     * Get the inherited generic operations supported by this resource.
+     *
+     * @return array<int, string>
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

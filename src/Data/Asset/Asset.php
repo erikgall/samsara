@@ -13,8 +13,8 @@ use Samsara\Data\Entity;
  *
  * @property-read string|null $id Asset ID
  * @property-read string|null $name Asset name
- * @property-read string|null $serial Serial number
- * @property-read string|null $assetType Asset type (vehicle, trailer, equipment)
+ * @property-read string|null $serialNumber Serial number
+ * @property-read string|null $type Asset type (vehicle, trailer, equipment)
  * @property-read float|null $purchasePrice Purchase price
  * @property-read array{id?: string, serial?: string}|null $gateway Gateway info
  * @property-read array{latitude?: float, longitude?: float}|null $location Current location
@@ -29,7 +29,7 @@ class Asset extends Entity
      */
     public function isEquipment(): bool
     {
-        return $this->assetType === 'equipment';
+        return $this->type === 'equipment';
     }
 
     /**
@@ -37,7 +37,7 @@ class Asset extends Entity
      */
     public function isTrailer(): bool
     {
-        return $this->assetType === 'trailer';
+        return $this->type === 'trailer';
     }
 
     /**
@@ -45,6 +45,6 @@ class Asset extends Entity
      */
     public function isVehicle(): bool
     {
-        return $this->assetType === 'vehicle';
+        return $this->type === 'vehicle';
     }
 }

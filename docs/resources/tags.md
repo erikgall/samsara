@@ -63,7 +63,7 @@ Samsara::tags()->delete('tag-id');
 
 ## Filtering
 
-The query builder reference lives in [Query Builder](../query-builder.md). The Tags resource supports the standard `limit()`, `cursor()`, and pagination methods.
+The query builder reference lives in [Query Builder](../query-builder.html). The Tags resource supports `limit()`, `after()`, and the standard pagination methods. `cursor()` is a method on the returned `CursorPaginator`, not on the builder.
 
 ```php
 $tags = Samsara::tags()
@@ -135,6 +135,6 @@ $events = Samsara::safetyEvents()
 
 ## Related Resources
 
-- [Drivers](drivers.md) — filter drivers by tag.
-- [Vehicles](vehicles.md) — filter vehicles by tag.
-- [Addresses](addresses.md) — filter geofences by tag.
+- [Drivers](drivers.html) — filter drivers by tag.
+- [Vehicles](vehicles.html) — filter vehicles by tag.
+- [Addresses](addresses.html) — filter geofences by tag.

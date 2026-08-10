@@ -15,11 +15,13 @@ permalink: /resources/route-events
 
 ## Introduction
 
-The `Samsara::routeEvents()` resource exposes the `/route-events` stream of lifecycle events emitted as drivers progress through dispatched routes — stop arrivals, departures, route starts, route completions, and similar transitions. `RouteEventsResource` declares `$entity = Entity::class`, so each result is a generic `Fluent` instance with the keys returned by the API.
+The `Samsara::routeEvents()` resource exposes lifecycle events emitted as drivers progress through dispatched routes. `RouteEventsResource` declares `$entity = Entity::class`, so each result is a generic `Fluent` instance.
+
+`query()` and the supported generic `all()` target `GET /route-events/stream`. Other generic operations are rejected before HTTP.
 
 ## Retrieving Records
 
-Use the `query()` builder for the stream. The base `find()`, `create()`, `update()`, and `delete()` methods are inherited but route events are emitted by Samsara, not authored by you.
+Use the `query()` builder for filters and cursors. Route events are emitted by Samsara, so `find()`, `create()`, `update()`, and `delete()` are unsupported.
 
 ```php
 use Samsara\Facades\Samsara;
@@ -46,7 +48,7 @@ Samsara::routeEvents()
 
 ## Filtering
 
-Refer to the [query builder](../query-builder.md) for the full operator reference. The route-events stream commonly accepts:
+Refer to the [query builder](../query-builder.html) for the full operator reference. The route-events stream commonly accepts:
 
 ```php
 $events = Samsara::routeEvents()
@@ -77,7 +79,7 @@ Read keys with array access (`$event['eventType']`) or magic-property access (`$
 
 ## Related Resources
 
-- [Routes](routes.md) — the parent route entity.
-- [Trips](trips.md) — vehicle-centric trip data that overlaps with route events.
-- [Webhooks](webhooks.md) — push delivery for route lifecycle changes.
-- [Error Handling](../error-handling.md) — exceptions raised by the underlying request.
+- [Routes](routes.html) — the parent route entity.
+- [Trips](trips.html) — vehicle-centric trip data that overlaps with route events.
+- [Webhooks](webhooks.html) — push delivery for route lifecycle changes.
+- [Error Handling](../error-handling.html) — exceptions raised by the underlying request.

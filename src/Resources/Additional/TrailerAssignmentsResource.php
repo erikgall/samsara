@@ -3,7 +3,7 @@
 namespace Samsara\Resources\Additional;
 
 use Samsara\Resources\Resource;
-use Samsara\Data\EntityCollection;
+use Samsara\Data\Trailer\Trailer;
 
 /**
  * TrailerAssignments resource for the Samsara API (Legacy v1).
@@ -22,14 +22,24 @@ class TrailerAssignmentsResource extends Resource
     /**
      * Get assignments for a specific trailer.
      *
-     * @return EntityCollection<int, \Samsara\Data\Entity>
+     * @param  array<string, mixed>  $params
      */
-    public function forTrailer(string $trailerId): EntityCollection
+    public function forTrailer(int $trailerId, array $params = []): Trailer
     {
-        $response = $this->client()->get("/v1/fleet/trailers/{$trailerId}/assignments");
+        $endpoint = "/v1/fleet/trailers/{$trailerId}/assignments";
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, $params),
+            $endpoint
+        );
 
-        $this->handleError($response);
+        return Trailer::make($response->json());
+    }
 
-        return $this->mapToEntities($response->json('data', []));
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

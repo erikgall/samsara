@@ -103,6 +103,24 @@ class AssetLocationTest extends TestCase
     }
 
     #[Test]
+    public function it_reads_coordinates_from_the_current_location_wrapper(): void
+    {
+        $location = AssetLocation::make([
+            'asset'          => ['id' => 'asset-1'],
+            'happenedAtTime' => '2026-08-10T12:00:00Z',
+            'location'       => [
+                'latitude'  => 35.8456,
+                'longitude' => -86.3903,
+            ],
+        ]);
+
+        $this->assertSame([
+            'latitude'  => 35.8456,
+            'longitude' => -86.3903,
+        ], $location->getCoordinates());
+    }
+
+    #[Test]
     public function it_returns_null_coordinates_when_not_set(): void
     {
         $location = new AssetLocation;

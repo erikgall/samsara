@@ -11,19 +11,21 @@ use Samsara\Data\Entity;
  *
  * @author Erik Galloway <erik@erikgall.com>
  *
- * @property-read string|null $id Alert incident ID
- * @property-read string|null $alertConfigurationId Alert configuration ID
- * @property-read string|null $status Incident status (triggered, resolved, dismissed)
- * @property-read string|null $triggeredAtTime Trigger time (RFC 3339)
+ * @property-read string|null $configurationId Alert configuration ID
+ * @property-read bool|null $isResolved Whether the incident is resolved
+ * @property-read string|null $happenedAtTime Incident time (RFC 3339)
  * @property-read string|null $resolvedAtTime Resolution time (RFC 3339)
- * @property-read array{id?: string, name?: string}|null $driver Associated driver
- * @property-read array{id?: string, name?: string}|null $vehicle Associated vehicle
- * @property-read array{latitude?: float, longitude?: float}|null $location Incident location
+ * @property-read string|null $updatedAtTime Last update time (RFC 3339)
+ * @property-read string|null $incidentUrl Cloud dashboard URL
+ * @property-read array<int, array<string, mixed>>|null $conditions Incident conditions
+ * @property-read string|null $status Deprecated legacy payload field not returned by the current API
  */
 class AlertIncident extends Entity
 {
     /**
      * Check if the incident is dismissed.
+     *
+     * @deprecated The current API does not expose a dismissed status.
      */
     public function isDismissed(): bool
     {
@@ -35,11 +37,13 @@ class AlertIncident extends Entity
      */
     public function isResolved(): bool
     {
-        return $this->status === 'resolved';
+        return $this->get('isResolved') === true;
     }
 
     /**
      * Check if the incident is triggered.
+     *
+     * @deprecated The current API does not expose a triggered status.
      */
     public function isTriggered(): bool
     {

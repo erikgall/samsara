@@ -16,7 +16,7 @@ use Samsara\Data\Entity;
  * @property-read int|null $durationMs Duration of violation in milliseconds
  * @property-read string|null $violationStartTime Violation start time (RFC 3339)
  * @property-read array{id?: string, name?: string}|null $driver Driver information
- * @property-read array{date?: string, timezone?: string}|null $day Day information
+ * @property-read array{startTime?: string, endTime?: string}|null $day Violation day window
  */
 class HosViolation extends Entity
 {

@@ -6,10 +6,11 @@ use Samsara\Samsara;
 use Samsara\Query\Builder;
 use Samsara\Data\Trip\Trip;
 use Samsara\Tests\TestCase;
-use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Telematics\TripsResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the TripsResource.
@@ -64,31 +65,16 @@ class TripsResourceTest extends TestCase
     #[Test]
     public function it_can_get_all_trips(): void
     {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    [
-                        'startTime'      => '2024-01-01T08:00:00Z',
-                        'endTime'        => '2024-01-01T10:00:00Z',
-                        'distanceMeters' => 50000,
-                        'drivingTimeMs'  => 7200000,
-                    ],
-                    [
-                        'startTime'      => '2024-01-01T12:00:00Z',
-                        'endTime'        => '2024-01-01T14:00:00Z',
-                        'distanceMeters' => 75000,
-                        'drivingTimeMs'  => 5400000,
-                    ],
-                ],
-            ]),
-        ]);
-
         $resource = new TripsResource($this->samsara);
-        $trips = $resource->all();
 
-        $this->assertInstanceOf(EntityCollection::class, $trips);
-        $this->assertCount(2, $trips);
-        $this->assertInstanceOf(Trip::class, $trips->first());
+        try {
+            $resource->all();
+            $this->fail('Trips all() cannot supply the required startTime and ids query.');
+        } catch (UnsupportedOperationException) {
+            $this->assertTrue(true);
+        }
+
+        $this->http->assertNothingSent();
     }
 
     #[Test]
@@ -114,5 +100,134 @@ class TripsResourceTest extends TestCase
         $resource = new TripsResource($this->samsara);
 
         $this->assertSame(Trip::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_paginates_the_base_trip_query_without_an_unsupported_limit(): void
+    {
+        $this->http->fakeSequence()
+            ->push([
+                'data' => [[
+                    'tripStartTime'    => '2026-08-10T14:00:00Z',
+                    'createdAtTime'    => '2026-08-10T14:00:05Z',
+                    'updatedAtTime'    => '2026-08-10T14:15:00Z',
+                    'completionStatus' => 'inProgress',
+                    'asset'            => ['id' => 'vehicle-1', 'name' => 'Truck 1'],
+                    'startLocation'    => ['latitude' => 35.8, 'longitude' => -86.3],
+                ]],
+                'pagination' => ['endCursor' => 'trip-next', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data'       => [],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]);
+
+        $page = (new TripsResource($this->samsara))
+            ->query()
+            ->where('includeAsset', true)
+            ->where('completionStatus', 'all')
+            ->between('2026-08-10T14:00:00Z', '2026-08-10T15:00:00Z')
+            ->where('queryBy', 'tripStartTime')
+            ->where('ids', 'vehicle-1')
+            ->paginate();
+        $page->nextPage();
+
+        $this->assertInstanceOf(Trip::class, $page->items()->first());
+        $this->http->assertSentCount(2);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/trips/stream'
+            && $request->data() === [
+                'includeAsset'     => true,
+                'completionStatus' => 'all',
+                'startTime'        => '2026-08-10T14:00:00Z',
+                'endTime'          => '2026-08-10T15:00:00Z',
+                'queryBy'          => 'tripStartTime',
+                'ids'              => 'vehicle-1',
+            ]
+        );
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/trips/stream'
+            && $request->data() === [
+                'includeAsset'     => true,
+                'completionStatus' => 'all',
+                'startTime'        => '2026-08-10T14:00:00Z',
+                'endTime'          => '2026-08-10T15:00:00Z',
+                'queryBy'          => 'tripStartTime',
+                'ids'              => 'vehicle-1',
+                'after'            => 'trip-next',
+            ]
+        );
+    }
+
+    #[Test]
+    public function it_terminal_executes_completed_trips_with_required_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'tripStartTime'    => '2026-08-10T14:00:00Z',
+                    'tripEndTime'      => '2026-08-10T14:30:00Z',
+                    'createdAtTime'    => '2026-08-10T14:00:05Z',
+                    'updatedAtTime'    => '2026-08-10T14:30:05Z',
+                    'completionStatus' => 'completed',
+                    'asset'            => ['id' => 'vehicle-1', 'name' => 'Truck 1'],
+                    'startLocation'    => ['latitude' => 35.8, 'longitude' => -86.3],
+                    'endLocation'      => ['latitude' => 35.9, 'longitude' => -86.4],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new TripsResource($this->samsara))
+            ->completed()
+            ->startTime('2026-08-10T14:00:00Z')
+            ->where('ids', 'vehicle-1,vehicle-2')
+            ->paginate();
+
+        $trip = $page->items()->first();
+        $this->assertInstanceOf(Trip::class, $trip);
+        $this->assertSame('2026-08-10T14:00:00Z', $trip->tripStartTime);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/trips/stream'
+            && $request->data() === [
+                'completionStatus' => 'completed',
+                'startTime'        => '2026-08-10T14:00:00Z',
+                'ids'              => 'vehicle-1,vehicle-2',
+            ]
+        );
+    }
+
+    #[Test]
+    public function it_terminal_executes_in_progress_trips_with_required_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'tripStartTime'    => '2026-08-10T14:00:00Z',
+                    'createdAtTime'    => '2026-08-10T14:00:05Z',
+                    'updatedAtTime'    => '2026-08-10T14:15:00Z',
+                    'completionStatus' => 'inProgress',
+                    'asset'            => ['id' => 'vehicle-1', 'name' => 'Truck 1'],
+                    'startLocation'    => ['latitude' => 35.8, 'longitude' => -86.3],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $trips = (new TripsResource($this->samsara))
+            ->inProgress()
+            ->startTime('2026-08-10T14:00:00Z')
+            ->where('ids', 'vehicle-1')
+            ->get();
+
+        $this->assertInstanceOf(Trip::class, $trips->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/trips/stream'
+            && $request->data() === [
+                'completionStatus' => 'inProgress',
+                'startTime'        => '2026-08-10T14:00:00Z',
+                'ids'              => 'vehicle-1',
+            ]
+        );
     }
 }

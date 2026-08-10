@@ -22,7 +22,9 @@ permalink: /resources/assets
 
 ## Introduction
 
-The Assets resource covers the non-vehicle, non-trailer side of your fleet — generators, reefers, containers, and other tracked equipment. Reach for it when you need a single inventory across asset types, or when you need to read depreciation and input streams that are not exposed on the per-class resources. For typed access to vehicles, trailers, or fleet equipment, use [Vehicles](vehicles.md), [Trailers](trailers.md), or [Equipment](equipment.md) instead.
+The Assets resource covers the non-vehicle, non-trailer side of your fleet — generators, reefers, containers, and other tracked equipment. Reach for it when you need a single inventory across asset types, or when you need to read depreciation and input streams that are not exposed on the per-class resources. For typed access to vehicles, trailers, or fleet equipment, use [Vehicles](vehicles.html), [Trailers](trailers.html), or [Equipment](equipment.html) instead.
+
+`all()`, `query()`, and `create()` use `/assets`. The resource overrides `update()` and `delete()` to use `/assets?id={id}`. `find()` is unsupported and throws before HTTP.
 
 ## Retrieving Records
 
@@ -30,21 +32,19 @@ The Assets resource covers the non-vehicle, non-trailer side of your fleet — g
 use Samsara\Facades\Samsara;
 
 $assets = Samsara::assets()->all();
-
-$asset = Samsara::assets()->find('asset-id');
 ```
 
 ## Creating Records
 
 ```php
 $asset = Samsara::assets()->create([
-    'name'      => 'Forklift A',
-    'assetType' => 'equipment',
-    'serial'    => 'FL-12345',
+    'name'   => 'Forklift A',
+    'type'   => 'equipment',
+    'serialNumber' => 'FL-12345',
 ]);
 ```
 
-The `assetType` field accepts any value from the [`AssetType` enum](#asset-types).
+Request and response DTOs use `type` and `serialNumber`.
 
 ## Updating Records
 
@@ -54,15 +54,19 @@ $asset = Samsara::assets()->update('asset-id', [
 ]);
 ```
 
+The request is `PATCH /assets?id=asset-id`.
+
 ## Deleting Records
 
 ```php
 Samsara::assets()->delete('asset-id');
 ```
 
+The request is `DELETE /assets?id=asset-id`.
+
 ## Filtering
 
-Assets accept the standard query builder. See [the query builder reference](../query-builder.md) for the full method list.
+Assets accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
 
 ```php
 $assets = Samsara::assets()
@@ -93,6 +97,8 @@ $locations = Samsara::assets()
     ->get();
 ```
 
+`depreciation()` uses `/assets/depreciation` and maps generic `Entity`; `inputsStream()` uses `/assets/inputs/stream` and maps generic `Entity`; `locationAndSpeedStream()` maps `AssetLocation`. The first two no-limit cursor builders suppress the implicit page size.
+
 ## Legacy Endpoints
 
 Two legacy v1 endpoints remain available for parity with older integrations. They return the raw v1 response body as an array — they do not produce typed `Asset` entities.
@@ -111,7 +117,7 @@ $reefers = Samsara::assets()->reefers([
 
 ## Asset Types
 
-The `Samsara\Enums\AssetType` enum lists the asset types Samsara recognizes. Pass either the enum value or its raw string anywhere `assetType` is accepted.
+The `Samsara\Enums\AssetType` enum is the package's current value set; it is not the current upstream `/assets` request enum.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -123,14 +129,14 @@ The `Samsara\Enums\AssetType` enum lists the asset types Samsara recognizes. Pas
 | `TRAILER` | `trailer` | Trailer. |
 | `UNPOWERED` | `unpowered` | Unpowered asset (e.g., dollies, chassis). |
 
-See the [enum reference](../enums.md) for the canonical value mapping across the SDK.
+Current upstream `type` values are `uncategorized`, `trailer`, `equipment`, `unpowered`, and `vehicle`. Only three overlap with the package enum; the package omits `uncategorized` and `vehicle`, and adds four values that the current schema does not accept. See [Enums](../enums.html) for the package mapping.
 
 ## Helper Methods
 
 The `Asset` entity exposes type-check helpers:
 
 ```php
-$asset = Samsara::assets()->find('asset-id');
+$asset = Samsara::assets()->all()->first();
 
 $asset->isVehicle();   // bool
 $asset->isTrailer();   // bool
@@ -145,8 +151,8 @@ The `Asset` entity (`Samsara\Data\Asset\Asset`) exposes the following typed prop
 |----------|------|-------------|
 | `id` | `?string` | Asset ID. |
 | `name` | `?string` | Asset name. |
-| `serial` | `?string` | Serial number. |
-| `assetType` | `?string` | Asset type — see [`AssetType`](#asset-types). |
+| `serialNumber` | `?string` | Serial number. |
+| `type` | `?string` | Asset type — see [`AssetType`](#asset-types). |
 | `purchasePrice` | `?float` | Purchase price. |
 | `gateway` | `?array` | Installed gateway info — `{id, serial}`. |
 | `location` | `?array` | Current location — `{latitude, longitude}`. |
@@ -156,8 +162,8 @@ The `Asset` entity (`Samsara\Data\Asset\Asset`) exposes the following typed prop
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — vehicle-specific resource with richer typed data.
-- [Trailers](trailers.md) — trailer-specific resource.
-- [Equipment](equipment.md) — equipment-specific resource.
-- [Tags](tags.md) — group assets for filtering.
-- [Query Builder](../query-builder.md) — for filtering, pagination, and lazy iteration.
+- [Vehicles](vehicles.html) — vehicle-specific resource with richer typed data.
+- [Trailers](trailers.html) — trailer-specific resource.
+- [Equipment](equipment.html) — equipment-specific resource.
+- [Tags](tags.html) — group assets for filtering.
+- [Query Builder](../query-builder.html) — for filtering, pagination, and lazy iteration.

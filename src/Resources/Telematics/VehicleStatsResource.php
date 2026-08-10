@@ -5,6 +5,7 @@ namespace Samsara\Resources\Telematics;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Vehicle\VehicleStats;
+use Samsara\Data\Vehicle\VehicleStatsSeries;
 
 /**
  * Vehicle stats resource for the Samsara API.
@@ -48,7 +49,9 @@ class VehicleStatsResource extends Resource
      */
     public function feed(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/stats/feed');
+        return $this->createBuilderWithEndpoint('/fleet/vehicles/stats/feed')
+            ->withoutDefaultPageSize()
+            ->usingEntity(VehicleStatsSeries::class);
     }
 
     /**
@@ -72,7 +75,9 @@ class VehicleStatsResource extends Resource
      */
     public function history(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/stats/history');
+        return $this->createBuilderWithEndpoint('/fleet/vehicles/stats/history')
+            ->withoutDefaultPageSize()
+            ->usingEntity(VehicleStatsSeries::class);
     }
 
     /**
@@ -88,6 +93,18 @@ class VehicleStatsResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))
+            ->withoutDefaultPageSize()
+            ->usingEntity(VehicleStats::class);
+    }
+
+    /**
+     * Get the inherited generic operations supported by this resource.
+     *
+     * @return array<int, string>
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

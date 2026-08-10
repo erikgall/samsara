@@ -3,10 +3,10 @@
 namespace Samsara\Tests\Unit\Resources\Dispatch;
 
 use Samsara\Samsara;
-use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Address\Address;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Dispatch\AddressesResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
@@ -129,15 +129,6 @@ class AddressesResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_return_query_builder(): void
-    {
-        $resource = new AddressesResource($this->samsara);
-        $query = $resource->query();
-
-        $this->assertInstanceOf(Builder::class, $query);
-    }
-
-    #[Test]
     public function it_can_update_address(): void
     {
         $this->http->fake([
@@ -170,5 +161,36 @@ class AddressesResourceTest extends TestCase
         $resource = new AddressesResource($this->samsara);
 
         $this->assertSame(Address::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_terminal_executes_the_current_address_list_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data'       => [['id' => 'addr-1', 'name' => 'Warehouse']],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new AddressesResource($this->samsara))
+            ->query()
+            ->whereParentTag(['parent-1', 'parent-2'])
+            ->whereTag(['tag-1', 'tag-2'])
+            ->createdAfter('2026-08-10T14:00:00Z')
+            ->after('address-cursor')
+            ->paginate(50);
+
+        $this->assertInstanceOf(Address::class, $page->items()->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/addresses'
+            && $request->data() === [
+                'parentTagIds'     => 'parent-1,parent-2',
+                'tagIds'           => 'tag-1,tag-2',
+                'createdAfterTime' => '2026-08-10T14:00:00Z',
+                'limit'            => 50,
+                'after'            => 'address-cursor',
+            ]
+        );
     }
 }

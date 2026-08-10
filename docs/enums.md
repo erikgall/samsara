@@ -24,13 +24,15 @@ permalink: /enums
 
 ## Introduction
 
-The SDK ships strongly-typed enums for the string values the Samsara API returns or accepts. Every enum is a string-backed `BackedEnum` whose `value` matches the wire string. You may pass enum cases anywhere the API accepts the matching string, except where noted (see the [VehicleStatType](#vehiclestattype) caveat about `Builder::types()`).
+The SDK ships 12 string-backed `BackedEnum` classes. The tables below are exact package truth as of this audit; they are not a blanket guarantee that every value matches the current upstream API. Several enums are stale, incomplete, or not represented by a current upstream schema, and resource methods generally expect raw strings rather than enum cases.
 
 ## AlertType
 
 `Samsara\Enums\AlertType`
 
-Categorizes the alert configurations returned by the [Alerts](resources/alerts.md) resource. Use it when you want to compare or filter the `alertType` field on an `AlertConfiguration` against a known case rather than a raw string.
+Categorizes the alert configurations returned by the [Alerts](resources/alerts.html) resource. Use it when you want to compare or filter the `alertType` field on an `AlertConfiguration` against a known case rather than a raw string.
+
+> **Upstream status:** Current alert-configuration requests use triggers, actions, scope, and related fields rather than a single `alertType` enum. The package entity helpers also test `speed` and `fuelLevel`, while this enum declares `speeding` and `fuel`.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -55,7 +57,9 @@ Categorizes the alert configurations returned by the [Alerts](resources/alerts.m
 
 `Samsara\Enums\AssetType`
 
-Identifies what kind of asset a record describes on the [Assets](resources/assets.md) resource.
+Identifies what kind of asset a record describes on the [Assets](resources/assets.html) resource.
+
+> **Upstream status:** Current `/assets` requests use `type` with `uncategorized`, `trailer`, `equipment`, `unpowered`, or `vehicle`. The package enum overlaps only on `trailer`, `equipment`, and `unpowered`.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -73,6 +77,8 @@ Identifies what kind of asset a record describes on the [Assets](resources/asset
 
 Classifies driver-submitted documents on the documents endpoint. Used wherever a `documentType` field is returned for a driver document or document-submission webhook.
 
+> **Upstream status:** Current `GET /fleet/document-types` returns organization-defined objects; it is not a fixed enum matching these package values.
+
 | Case | Value | Description |
 |------|-------|-------------|
 | `BILL_OF_LADING` | `billOfLading` | A bill of lading. |
@@ -89,7 +95,7 @@ Classifies driver-submitted documents on the documents endpoint. Used wherever a
 
 `Samsara\Enums\DriverActivationStatus`
 
-The activation state of a record returned by the [Drivers](resources/drivers.md) resource. Pass either case to the driver-status filter when you need to scope a query.
+The activation state of a record returned by the [Drivers](resources/drivers.html) resource. Pass either case to the driver-status filter when you need to scope a query.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -100,7 +106,9 @@ The activation state of a record returned by the [Drivers](resources/drivers.md)
 
 `Samsara\Enums\DutyStatus`
 
-The duty status reported on hours-of-service logs. See the [Hours of Service](resources/hours-of-service.md) resource.
+The duty status reported on hours-of-service logs. See the [Hours of Service](resources/hours-of-service.html) resource.
+
+> **Known mismatch:** Current upstream and the package's `HosLog` mapper use `sleeperBed`; the enum value is `sleeperBerth`. `HosLog::getDutyStatus()` therefore returns `null` for a source-tested `sleeperBed` payload.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -115,7 +123,7 @@ The duty status reported on hours-of-service logs. See the [Hours of Service](re
 
 `Samsara\Enums\EngineState`
 
-The engine state returned by `vehicleStats()->engineStates()`. See the [Vehicle Stats](resources/vehicle-stats.md) resource. The wire values are capitalized — `Idle`, `Off`, `On` — not lowercase.
+The engine state returned by `vehicleStats()->engineStates()`. See the [Vehicle Stats](resources/vehicle-stats.html) resource. The wire values are capitalized — `Idle`, `Off`, `On` — not lowercase.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -127,7 +135,9 @@ The engine state returned by `vehicleStats()->engineStates()`. See the [Vehicle 
 
 `Samsara\Enums\HosLogType`
 
-The kind of hours-of-service log a record represents. See the [Hours of Service](resources/hours-of-service.md) resource.
+The kind of hours-of-service log a record represents. See the [Hours of Service](resources/hours-of-service.html) resource.
+
+> **Upstream status:** The current HOS schemas do not define a matching nine-value log-type enum. Treat this as package vocabulary until reconciled.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -145,7 +155,9 @@ The kind of hours-of-service log a record represents. See the [Hours of Service]
 
 `Samsara\Enums\MaintenanceStatus`
 
-The status of a maintenance record on the [Maintenance](resources/maintenance.md) resource.
+The status of a maintenance record on the [Maintenance](resources/maintenance.html) resource.
+
+> **Upstream status:** Current Work Orders define 11 title-cased values: `Assigned`, `Cancelled`, `Closed`, `Completed`, `Estimate`, `In Progress`, `On Hold`, `Open`, `Pending Approval`, `Pending Parts`, and `Planning`. This four-value lowercase package enum is not that wire contract.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -158,7 +170,9 @@ The status of a maintenance record on the [Maintenance](resources/maintenance.md
 
 `Samsara\Enums\RouteState`
 
-The state of a route or stop returned by the [Routes](resources/routes.md) resource.
+The state of a route or stop returned by the [Routes](resources/routes.html) resource.
+
+> **Upstream status:** Current route responses do not expose a matching top-level state enum. Route-stop states use `unassigned`, `scheduled`, `en route`, `skipped`, `arrived`, and `departed`.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -172,7 +186,9 @@ The state of a route or stop returned by the [Routes](resources/routes.md) resou
 
 `Samsara\Enums\SafetyEventType`
 
-Identifies the kind of safety event returned by the [Safety Events](resources/safety-events.md) resource.
+Identifies the kind of safety event returned by the [Safety Events](resources/safety-events.html) resource.
+
+> **Upstream status:** Current and legacy safety-event responses use `behaviorLabels`; the current schema does not define this package enum as the event-type wire contract.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -201,9 +217,11 @@ Identifies the kind of safety event returned by the [Safety Events](resources/sa
 
 `Samsara\Enums\VehicleStatType`
 
-The full list of telemetry channels exposed by the [Vehicle Stats](resources/vehicle-stats.md) resource.
+The 52 telemetry-channel values currently shipped by the package.
 
-> **Warning:** `Builder::types()` is typed as `array<string>|string` only. Do not pass enum cases to it directly — pass the wire string values shown below (for example `'gps'` or `'engineStates'`). See the [Query Builder](query-builder.md) reference for the canonical chaining pattern through `vehicleStats()->current()`, `history()`, `feed()`, `gps()`, `engineStates()`, `fuelPercents()`, or `odometer()`.
+> **Warning:** `Builder::types()` is typed as `array<string>|string` only. Do not pass enum cases to it directly — pass the wire string values shown below (for example `'gps'` or `'engineStates'`). See the [Query Builder](query-builder.html) reference for the canonical chaining pattern through `vehicleStats()->current()`, `history()`, `feed()`, `gps()`, `engineStates()`, `fuelPercents()`, or `odometer()`.
+
+Current upstream exposes 63 values. The package omits auxiliary inputs, immobilizer, fault-code, and other channels, and several EV values use older plural-unit spellings such as `MilliAmps`/`MilliVolts` instead of current `MilliAmp`/`MilliVolt`. See [Documentation Coverage](api-sync/documentation-coverage.html#enum-gaps) for the exact drift set.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -264,7 +282,9 @@ The full list of telemetry channels exposed by the [Vehicle Stats](resources/veh
 
 `Samsara\Enums\WebhookEvent`
 
-The valid event types for Samsara webhook subscriptions. See the [Webhooks](resources/webhooks.md) resource. The enum exposes three helpers: `WebhookEvent::all()` returns every wire value as an `array<int, string>`, `WebhookEvent::collect()` returns a Laravel `Collection` of cases, and `WebhookEvent::values()` returns a `Collection` of wire values.
+The valid event types for Samsara webhook subscriptions. See the [Webhooks](resources/webhooks.html) resource. The enum exposes three helpers: `WebhookEvent::all()` returns every wire value as an `array<int, string>`, `WebhookEvent::collect()` returns a Laravel `Collection` of cases, and `WebhookEvent::values()` returns a `Collection` of wire values.
+
+The package has 27 cases. Current upstream has eight additional values: `AlertIncident`, `AlertObjectEvent`, `MissingDvirPastDue`, `ShipmentTrackingEvent`, `SuddenFuelLevelDrop`, `SuddenFuelLevelRise`, `VisualSearchMatch`, and `WorkOrderCreatedOrChanged`.
 
 | Case | Value | Description |
 |------|-------|-------------|

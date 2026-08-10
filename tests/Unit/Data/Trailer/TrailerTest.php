@@ -18,15 +18,15 @@ class TrailerTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $trailer = new Trailer([
-            'id'                => '112',
-            'name'              => 'Trailer A7',
-            'assetSerialNumber' => 'ABC123',
-            'licensePlate'      => 'XHK1234',
+            'id'                  => '112',
+            'name'                => 'Trailer A7',
+            'trailerSerialNumber' => 'ABC123',
+            'licensePlate'        => 'XHK1234',
         ]);
 
         $this->assertSame('112', $trailer->id);
         $this->assertSame('Trailer A7', $trailer->name);
-        $this->assertSame('ABC123', $trailer->assetSerialNumber);
+        $this->assertSame('ABC123', $trailer->trailerSerialNumber);
         $this->assertSame('XHK1234', $trailer->licensePlate);
     }
 
@@ -110,6 +110,17 @@ class TrailerTest extends TestCase
         ]);
 
         $this->assertSame('F12345', $trailer->externalIds['fleetId']);
+    }
+
+    #[Test]
+    public function it_can_have_item_response_attributes(): void
+    {
+        $trailer = new Trailer([
+            'attributes' => [['id' => 'attribute-1', 'name' => 'Reefer', 'value' => 'yes']],
+        ]);
+
+        $this->assertCount(1, $trailer->attributes);
+        $this->assertSame('Reefer', $trailer->attributes[0]['name']);
     }
 
     #[Test]

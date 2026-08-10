@@ -7,6 +7,7 @@ use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Preview\PreviewResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the PreviewResource class.
@@ -32,58 +33,74 @@ class PreviewResourceTest extends TestCase
     public function it_can_create_driver_auth_token(): void
     {
         $this->http->fake([
-            '*/fleet/drivers/driver-123/auth-token' => $this->http->response([
+            '*' => $this->http->response([
                 'data' => [
-                    'token' => 'abc123token',
+                    'token'          => 'abc123token',
+                    'expirationTime' => 1786370400,
                 ],
-            ], 201),
+            ], 200),
         ]);
 
         $resource = new PreviewResource($this->samsara);
 
-        $result = $resource->createDriverAuthToken('driver-123', ['expiresIn' => 3600]);
+        $result = $resource->createDriverAuthToken([
+            'code' => '123456789012',
+            'id'   => 123,
+        ]);
 
         $this->assertIsArray($result);
         $this->assertSame('abc123token', $result['token']);
+        $this->assertSame(1786370400, $result['expirationTime']);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/preview/fleet/drivers/create-auth-token'
+            && $request->data() === ['code' => '123456789012', 'id' => 123]);
     }
 
     #[Test]
     public function it_can_lock_vehicle(): void
     {
         $this->http->fake([
-            '*/fleet/vehicles/vehicle-123/lock' => $this->http->response([
-                'data' => [
-                    'id'     => 'vehicle-123',
-                    'locked' => true,
-                ],
-            ], 200),
+            '*' => $this->http->response(null, 200),
         ]);
 
         $resource = new PreviewResource($this->samsara);
 
         $result = $resource->lockVehicle('vehicle-123');
 
-        $this->assertIsArray($result);
-        $this->assertTrue($result['locked']);
+        $this->assertTrue($result);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'PUT'
+            && parse_url($request->url(), PHP_URL_PATH) === '/preview/fleet/vehicles/vehicle-123/lock'
+            && $request->data() === []);
     }
 
     #[Test]
     public function it_can_unlock_vehicle(): void
     {
         $this->http->fake([
-            '*/fleet/vehicles/vehicle-123/unlock' => $this->http->response([
-                'data' => [
-                    'id'     => 'vehicle-123',
-                    'locked' => false,
-                ],
-            ], 200),
+            '*' => $this->http->response(null, 204),
         ]);
 
         $resource = new PreviewResource($this->samsara);
 
         $result = $resource->unlockVehicle('vehicle-123');
 
-        $this->assertIsArray($result);
-        $this->assertFalse($result['locked']);
+        $this->assertTrue($result);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'DELETE'
+            && parse_url($request->url(), PHP_URL_PATH) === '/preview/fleet/vehicles/vehicle-123/lock'
+            && $request->data() === []);
+    }
+
+    #[Test]
+    public function it_rejects_phantom_generic_operations_on_the_preview_root(): void
+    {
+        $this->http->fake();
+        $resource = new PreviewResource($this->samsara);
+
+        try {
+            $resource->all();
+            $this->fail('Expected the inherited all operation to be rejected.');
+        } catch (UnsupportedOperationException) {
+            $this->http->assertNothingSent();
+        }
     }
 }

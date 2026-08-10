@@ -4,7 +4,10 @@ namespace Samsara\Resources\Safety;
 
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
-use Samsara\Data\HoursOfService\HosLog;
+use Samsara\Data\HoursOfService\HosDailyLog;
+use Samsara\Data\HoursOfService\HosLogsForDriver;
+use Samsara\Data\HoursOfService\HosViolationGroup;
+use Samsara\Data\HoursOfService\HosClocksForDriver;
 
 /**
  * Hours of Service resource for the Samsara API.
@@ -23,16 +26,17 @@ class HoursOfServiceResource extends Resource
     /**
      * The entity class for this resource.
      *
-     * @var class-string<HosLog>
+     * @var class-string<HosLogsForDriver>
      */
-    protected string $entity = HosLog::class;
+    protected string $entity = HosLogsForDriver::class;
 
     /**
      * Get a query builder for HOS clocks.
      */
     public function clocks(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/hos/clocks');
+        return $this->createBuilderWithEndpoint('/fleet/hos/clocks')
+            ->usingEntity(HosClocksForDriver::class);
     }
 
     /**
@@ -40,7 +44,9 @@ class HoursOfServiceResource extends Resource
      */
     public function dailyLogs(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/hos/daily-logs');
+        return $this->createBuilderWithEndpoint('/fleet/hos/daily-logs')
+            ->withoutDefaultPageSize()
+            ->usingEntity(HosDailyLog::class);
     }
 
     /**
@@ -56,7 +62,9 @@ class HoursOfServiceResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))
+            ->withoutDefaultPageSize()
+            ->usingEntity(HosLogsForDriver::class);
     }
 
     /**
@@ -64,6 +72,16 @@ class HoursOfServiceResource extends Resource
      */
     public function violations(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/hos/violations');
+        return $this->createBuilderWithEndpoint('/fleet/hos/violations')
+            ->withoutDefaultPageSize()
+            ->usingEntity(HosViolationGroup::class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all'];
     }
 }

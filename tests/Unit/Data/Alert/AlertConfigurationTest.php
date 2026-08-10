@@ -18,17 +18,15 @@ class AlertConfigurationTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $alert = new AlertConfiguration([
-            'id'          => '12345',
-            'name'        => 'Speed Alert',
-            'alertType'   => 'speed',
-            'enabled'     => true,
-            'description' => 'Alerts when vehicle exceeds speed limit',
+            'id'            => '12345',
+            'name'          => 'Speed Alert',
+            'isEnabled'     => true,
+            'createdAtTime' => '2024-04-10T07:06:25Z',
         ]);
 
         $this->assertSame('12345', $alert->id);
         $this->assertSame('Speed Alert', $alert->name);
-        $this->assertSame('speed', $alert->alertType);
-        $this->assertTrue($alert->enabled);
+        $this->assertTrue($alert->isEnabled);
     }
 
     #[Test]
@@ -46,7 +44,7 @@ class AlertConfigurationTest extends TestCase
     public function it_can_check_if_enabled(): void
     {
         $alert = new AlertConfiguration([
-            'enabled' => true,
+            'isEnabled' => true,
         ]);
 
         $this->assertTrue($alert->isEnabled());
@@ -151,7 +149,7 @@ class AlertConfigurationTest extends TestCase
     public function it_returns_false_when_not_enabled(): void
     {
         $alert = new AlertConfiguration([
-            'enabled' => false,
+            'isEnabled' => false,
         ]);
 
         $this->assertFalse($alert->isEnabled());

@@ -3,14 +3,16 @@
 namespace Samsara\Tests\Unit\Resources\Fleet;
 
 use Samsara\Samsara;
-use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Driver\Driver;
-use Illuminate\Support\Collection;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
+use Samsara\Data\Driver\DriverQrCode;
 use PHPUnit\Framework\Attributes\Test;
+use Samsara\Data\Driver\DriverAuthToken;
 use Samsara\Resources\Fleet\DriversResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Data\Driver\DriverRemoteSignOutResult;
 
 /**
  * Unit tests for the DriversResource.
@@ -50,6 +52,10 @@ class DriversResourceTest extends TestCase
 
         $this->assertInstanceOf(Driver::class, $driver);
         $this->assertSame('active', $driver->driverActivationStatus);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'PATCH'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers/123'
+            && $request->data() === ['driverActivationStatus' => 'active']
+        );
     }
 
     #[Test]
@@ -65,14 +71,33 @@ class DriversResourceTest extends TestCase
     {
         $this->http->fake([
             '*' => $this->http->response([
-                'token' => 'abc123xyz',
+                'data' => [
+                    'expirationTime' => 1_786_380_000_000,
+                    'token'          => 'abc123xyz',
+                ],
             ]),
         ]);
 
         $resource = new DriversResource($this->samsara);
-        $token = $resource->createAuthToken('123');
+        try {
+            $token = $resource->createAuthToken([
+                'code'     => 'driver-code-1234',
+                'driverId' => 123,
+            ]);
+        } catch (\TypeError) {
+            $this->fail('createAuthToken must accept the staged-v2 request body array.');
+        }
 
-        $this->assertSame('abc123xyz', $token);
+        $this->assertTrue($token instanceof DriverAuthToken, 'Expected a typed driver auth token.');
+        $this->assertSame('abc123xyz', $token->token);
+        $this->assertSame(1_786_380_000_000, $token->expirationTime);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers/auth-token'
+            && $request->data() === [
+                'code'     => 'driver-code-1234',
+                'driverId' => 123,
+            ]
+        );
     }
 
     #[Test]
@@ -105,17 +130,22 @@ class DriversResourceTest extends TestCase
         $this->http->fake([
             '*' => $this->http->response([
                 'data' => [
-                    'id'   => 'qr-123',
-                    'name' => 'New QR Code',
+                    'driverId'   => 494123,
+                    'qrCodeLink' => 'https://cloud.samsara.com/qr_code/qr-123',
                 ],
             ]),
         ]);
 
         $resource = new DriversResource($this->samsara);
-        $qrCode = $resource->createQrCode(['name' => 'New QR Code']);
+        $qrCode = $resource->createQrCode(['driverId' => 494123]);
 
-        $this->assertIsObject($qrCode);
-        $this->assertSame('qr-123', $qrCode->id);
+        $this->assertSame(DriverQrCode::class, $qrCode::class);
+        $this->assertSame(494123, $qrCode->driverId);
+        $this->assertSame('https://cloud.samsara.com/qr_code/qr-123', $qrCode->qrCodeLink);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/drivers/qr-codes'
+            && $request->data() === ['driverId' => 494123]
+        );
     }
 
     #[Test]
@@ -136,6 +166,10 @@ class DriversResourceTest extends TestCase
 
         $this->assertInstanceOf(Driver::class, $driver);
         $this->assertSame('deactivated', $driver->driverActivationStatus);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'PATCH'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers/123'
+            && $request->data() === ['driverActivationStatus' => 'deactivated']
+        );
     }
 
     #[Test]
@@ -146,9 +180,13 @@ class DriversResourceTest extends TestCase
         ]);
 
         $resource = new DriversResource($this->samsara);
-        $result = $resource->deleteQrCode('qr-123');
+        $result = $resource->deleteQrCode(494123);
 
         $this->assertTrue($result);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'DELETE'
+            && parse_url($request->url(), PHP_URL_PATH) === '/drivers/qr-codes'
+            && $request->data() === ['driverId' => 494123]
+        );
     }
 
     #[Test]
@@ -167,6 +205,10 @@ class DriversResourceTest extends TestCase
 
         $this->assertInstanceOf(EntityCollection::class, $drivers);
         $this->assertCount(1, $drivers);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers'
+            && $request->data() === ['driverActivationStatus' => 'active']
+        );
     }
 
     #[Test]
@@ -185,28 +227,38 @@ class DriversResourceTest extends TestCase
 
         $this->assertInstanceOf(EntityCollection::class, $drivers);
         $this->assertCount(1, $drivers);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers'
+            && $request->data() === ['driverActivationStatus' => 'deactivated']
+        );
     }
 
     #[Test]
     public function it_can_find_driver_by_external_id(): void
     {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    [
-                        'id'          => '123',
-                        'name'        => 'John Smith',
-                        'externalIds' => ['payroll' => 'PAY-123'],
-                    ],
+        $this->http->fake(fn (Request $request) => $this->http->response([
+            'data' => parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers'
+                ? [[
+                    'id'          => '123',
+                    'name'        => 'John Smith',
+                    'externalIds' => ['payroll' => 'PAY-123'],
+                ]]
+                : [
+                    'id'          => '123',
+                    'name'        => 'John Smith',
+                    'externalIds' => ['payroll' => 'PAY-123'],
                 ],
-            ]),
-        ]);
+        ]));
 
         $resource = new DriversResource($this->samsara);
         $driver = $resource->findByExternalId('payroll', 'PAY-123');
 
         $this->assertInstanceOf(Driver::class, $driver);
         $this->assertSame('123', $driver->id);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers/payroll:PAY-123'
+            && $request->data() === []
+        );
     }
 
     #[Test]
@@ -253,41 +305,43 @@ class DriversResourceTest extends TestCase
         $this->http->fake([
             '*' => $this->http->response([
                 'data' => [
-                    ['id' => 'qr-1', 'name' => 'QR Code 1'],
-                    ['id' => 'qr-2', 'name' => 'QR Code 2'],
+                    ['driverId' => 494123, 'qrCodeLink' => 'https://cloud.samsara.com/qr_code/qr-1'],
+                    ['driverId' => 494124, 'qrCodeLink' => 'https://cloud.samsara.com/qr_code/qr-2'],
                 ],
             ]),
         ]);
 
         $resource = new DriversResource($this->samsara);
-        $qrCodes = $resource->getQrCodes();
+        $qrCodes = $resource->getQrCodes([494123, 494124]);
 
-        $this->assertInstanceOf(Collection::class, $qrCodes);
+        $this->assertInstanceOf(EntityCollection::class, $qrCodes);
         $this->assertCount(2, $qrCodes);
+        $firstQrCode = $qrCodes->first();
+        $this->assertSame(DriverQrCode::class, $firstQrCode::class);
+        $this->assertSame(494123, $firstQrCode->driverId);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/drivers/qr-codes'
+            && $request->data() === ['driverIds' => '494123,494124']
+        );
     }
 
     #[Test]
     public function it_can_remote_sign_out_driver(): void
     {
         $this->http->fake([
-            '*' => $this->http->response([]),
+            '*' => $this->http->response(['driverName' => 'John Smith']),
         ]);
 
         $resource = new DriversResource($this->samsara);
 
-        // Should not throw an exception
-        $resource->remoteSignOut('123');
+        $result = $resource->remoteSignOut('123');
 
-        $this->assertTrue(true);
-    }
-
-    #[Test]
-    public function it_can_return_query_builder(): void
-    {
-        $resource = new DriversResource($this->samsara);
-        $query = $resource->query();
-
-        $this->assertInstanceOf(Builder::class, $query);
+        $this->assertTrue($result instanceof DriverRemoteSignOutResult, 'Expected a typed sign-out result.');
+        $this->assertSame('John Smith', $result->driverName);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers/remote-sign-out'
+            && $request->data() === ['driverId' => '123']
+        );
     }
 
     #[Test]
@@ -342,14 +396,53 @@ class DriversResourceTest extends TestCase
     public function it_returns_null_when_external_id_not_found(): void
     {
         $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [],
-            ]),
+            '*' => $this->http->response([], 404),
         ]);
 
         $resource = new DriversResource($this->samsara);
         $driver = $resource->findByExternalId('payroll', 'NONEXISTENT');
 
         $this->assertNull($driver);
+        $this->http->assertSent(fn (Request $request): bool => parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers/payroll:NONEXISTENT'
+        );
+    }
+
+    #[Test]
+    public function it_terminal_executes_the_current_driver_list_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data'       => [['id' => 'driver-1', 'name' => 'Ada Driver']],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new DriversResource($this->samsara))
+            ->query()
+            ->where('driverActivationStatus', 'active')
+            ->whereParentTag(['parent-1', 'parent-2'])
+            ->whereTag(['tag-1', 'tag-2'])
+            ->whereAttribute(['attribute-1', 'attribute-2'])
+            ->where('attributes', 'driver:licenseClass')
+            ->updatedAfter('2026-08-10T14:00:00Z')
+            ->createdAfter('2026-08-09T14:00:00Z')
+            ->after('driver-cursor')
+            ->paginate(50);
+
+        $this->assertInstanceOf(Driver::class, $page->items()->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers'
+            && $request->data() === [
+                'driverActivationStatus' => 'active',
+                'parentTagIds'           => 'parent-1,parent-2',
+                'tagIds'                 => 'tag-1,tag-2',
+                'attributeValueIds'      => 'attribute-1,attribute-2',
+                'attributes'             => 'driver:licenseClass',
+                'updatedAfterTime'       => '2026-08-10T14:00:00Z',
+                'createdAfterTime'       => '2026-08-09T14:00:00Z',
+                'limit'                  => 50,
+                'after'                  => 'driver-cursor',
+            ]
+        );
     }
 }

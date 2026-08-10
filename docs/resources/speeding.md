@@ -15,11 +15,11 @@ permalink: /resources/speeding
 
 ## Introduction
 
-The `Samsara::speeding()` resource exposes the `/speeding-intervals/stream` feed of intervals during which a vehicle exceeded the posted limit. It is read-only and returns generic `Entity` instances, since `SpeedingResource` does not declare a typed `$entity`. Pair it with [Safety Events](safety-events.md) when you build coaching dashboards or monthly safety reports.
+The `Samsara::speeding()` resource exposes the `/speeding-intervals/stream` feed of intervals during which a vehicle exceeded the posted limit. It is read-only and returns generic `Entity` instances, since `SpeedingResource` does not declare a typed `$entity`. Pair it with [Safety Events](safety-events.html) when you build coaching dashboards or monthly safety reports.
 
 ## Retrieving Records
 
-Speeding intervals are streamed through the `intervalsStream()` builder. The base CRUD methods are inherited but the upstream endpoint does not honour them — treat the resource as builder-only.
+Speeding intervals are streamed through the `intervalsStream()` builder. All generic CRUD operations are rejected before HTTP.
 
 ```php
 use Samsara\Facades\Samsara;
@@ -46,7 +46,7 @@ Samsara::speeding()
 
 ## Filtering
 
-Refer to the [query builder](../query-builder.md) for the full operator reference. The speeding builder commonly accepts:
+Refer to the [query builder](../query-builder.html) for the full operator reference. The speeding builder commonly accepts:
 
 ```php
 $intervals = Samsara::speeding()
@@ -78,7 +78,7 @@ Read keys with array access (`$interval['maxSpeedMph']`) or magic-property acces
 
 ## Related Resources
 
-- [Safety Events](safety-events.md) — coaching events that complement the speeding stream.
-- [Vehicles](vehicles.md) — resolve `$interval->vehicle['id']`.
-- [Drivers](drivers.md) — resolve `$interval->driver['id']`.
-- [Error Handling](../error-handling.md) — exceptions raised by the underlying request.
+- [Safety Events](safety-events.html) — coaching events that complement the speeding stream.
+- [Vehicles](vehicles.html) — resolve `$interval->vehicle['id']`.
+- [Drivers](drivers.html) — resolve `$interval->driver['id']`.
+- [Error Handling](../error-handling.html) — exceptions raised by the underlying request.

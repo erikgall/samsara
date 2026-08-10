@@ -51,7 +51,7 @@ Then add your API token to `.env`:
 SAMSARA_API_KEY=your-api-token-here
 ```
 
-For EU customers, set `SAMSARA_REGION=eu`. See [configuration.md](configuration.md) for every option, including timeout, retry, default page size, and the webhook secret.
+Set `SAMSARA_REGION=eu` for EU customers or `SAMSARA_REGION=ca` for Canada. See [configuration.md](configuration.html) for every option, including timeout, retry, the active `per_page` default, and the webhook secret.
 
 ## Your First Query
 
@@ -77,12 +77,13 @@ $stats = Samsara::vehicleStats()
 
 ## Where to Next
 
-- [Getting Started](getting-started.md) — install, configure, and walk through dependency injection.
-- [Configuration](configuration.md) — every config key, env var, and runtime override.
-- [Query Builder](query-builder.md) — filtering, pagination, lazy collections, and the underlying HTTP client.
-- [Error Handling](error-handling.md) — exception hierarchy and Laravel 12 exception handler integration.
-- [Testing](testing.md) — `SamsaraFake` and HTTP-level fakes.
-- [Resources](resources/index.md) — every resource the SDK exposes.
+- [Getting Started](getting-started.html) — install, configure, and walk through dependency injection.
+- [Configuration](configuration.html) — every config key, env var, and runtime override.
+- [Query Builder](query-builder.html) — filtering, pagination, lazy collections, and the underlying HTTP client.
+- [Error Handling](error-handling.html) — exception hierarchy and Laravel 12 exception handler integration.
+- [Testing](testing.html) — `SamsaraFake` and HTTP-level fakes.
+- [Resources](resources/index.html) — every resource the SDK exposes.
+- [Documentation Coverage](api-sync/documentation-coverage.html) — package-versus-upstream coverage and pending synchronization gaps.
 
 ## Requirements
 
@@ -92,4 +93,4 @@ $stats = Samsara::vehicleStats()
 
 ## License
 
-The SDK is open-sourced software licensed under the [MIT license](https://github.com/erikgall/samsara/blob/main/LICENSE).
+The SDK is open-sourced software licensed under the MIT license.

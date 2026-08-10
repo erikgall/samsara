@@ -28,7 +28,7 @@ permalink: /error-handling
 
 ## Introduction
 
-When the Samsara API returns an error, the SDK throws a typed exception you can catch by status family or by specific failure mode. Every exception extends `Samsara\Exceptions\SamsaraException`, so you may catch broadly or narrow down to the case you care about. The reference below maps each exception to the API response that triggers it, shows the context every exception carries, and walks through wiring SDK errors into Laravel's exception handler.
+Supported generic resource operations, custom resource helpers, and query-builder terminal methods all run HTTP failures through one typed exception mapper. Those exceptions extend `Samsara\Exceptions\SamsaraException`, so you may catch broadly or narrow down to the case you care about. The mapper also runs after the configured retry policy is exhausted and records the effective endpoint in exception context.
 
 ## Exception Hierarchy
 
@@ -38,7 +38,7 @@ SamsaraException (base)
 ├── AuthorizationException (403)
 ├── NotFoundException (404)
 ├── UnsupportedOperationException
-├── ValidationException (422)
+├── ValidationException (400 or 422)
 ├── RateLimitException (429)
 ├── ServerException (5xx)
 ├── InvalidSignatureException (webhook verification)
@@ -107,7 +107,7 @@ Thrown when Samsara returns a `403`. The token is valid, but the authenticated u
 use Samsara\Exceptions\AuthorizationException;
 
 try {
-    Samsara::drivers()->delete('driver-id');
+    Samsara::webhooks()->delete('webhook-id');
 } catch (AuthorizationException $e) {
     Log::warning('Permission denied: '.$e->getMessage());
 }
@@ -115,7 +115,7 @@ try {
 
 ### NotFoundException
 
-Thrown when Samsara returns a `404` for any method except `find()`. `find()` swallows 404s and returns `null` so you can branch on the absence of a record without a `try/catch`.
+Thrown when a direct resource operation maps a `404`, except for `find()`. `find()` swallows 404s and returns `null` so you can branch on the absence of a record without a `try/catch`.
 
 ```php
 use Samsara\Exceptions\NotFoundException;
@@ -124,7 +124,7 @@ $driver = Samsara::drivers()->find('missing-id');
 // $driver is null, no exception.
 
 try {
-    Samsara::drivers()->delete('missing-id');
+    Samsara::webhooks()->delete('missing-id');
 } catch (NotFoundException $e) {
     // 404 from a non-find() method.
 }
@@ -132,7 +132,7 @@ try {
 
 ### UnsupportedOperationException
 
-Unlike the rest of the hierarchy, `UnsupportedOperationException` is not tied to an HTTP status code. The SDK throws it before sending a request when the targeted resource fundamentally does not support the operation. The most common case is creating or deleting a vehicle through `/fleet/vehicles`, which the Samsara API does not allow.
+Unlike the rest of the hierarchy, `UnsupportedOperationException` is not tied to an HTTP status code. Every integrated resource declares which generic operations it owns from `all`, `find`, `create`, `update`, and `delete`; the SDK rejects all other inherited generic calls before sending a request. The exception context includes the resource class, operation, and base endpoint.
 
 ```php
 use Samsara\Exceptions\UnsupportedOperationException;
@@ -147,7 +147,7 @@ try {
 
 ### ValidationException
 
-Thrown when Samsara returns a `422`. Call `getErrors()` to read the API's `errors` payload.
+Thrown when Samsara returns a `400` or `422`. The original status is preserved in `getCode()`. Call `getErrors()` to read the API's `errors` payload.
 
 ```php
 use Samsara\Exceptions\ValidationException;
@@ -161,7 +161,7 @@ try {
 }
 ```
 
-> **Note:** `getErrors()` returns whatever the API placed in the `errors` key of the response body. Samsara's 422 responses sometimes return an empty array and place the human-readable detail in the message instead. Always inspect `$e->getMessage()` alongside `$e->getErrors()`.
+> **Note:** `getErrors()` returns whatever the API placed in the `errors` key of the response body. A response may instead place the human-readable detail in `message`; always inspect `$e->getMessage()` alongside `$e->getErrors()`.
 
 ### RateLimitException
 
@@ -215,7 +215,7 @@ try {
 }
 ```
 
-See [Webhooks](resources/webhooks.md) for the full verification flow.
+See [Webhooks](resources/webhooks.html) for the full verification flow.
 
 ### ConnectionException
 
@@ -223,16 +223,16 @@ See [Webhooks](resources/webhooks.md) for the full verification flow.
 
 ## Exception Context
 
-Every SDK exception (except `UnsupportedOperationException`, which never reaches the network) carries a `getContext()` array describing the failed request.
+HTTP exceptions created by the shared request executor carry a `getContext()` array describing the failed request. Unsupported generic operations also provide local operation context. Other exceptions in the namespace may return an empty context.
 
 ```php
 try {
-    Samsara::drivers()->find('driver-id');
+    Samsara::drivers()->query()->whereTag('tag-id')->get();
 } catch (SamsaraException $e) {
     $context = $e->getContext();
     // [
     //     'status'   => 404,
-    //     'endpoint' => '/fleet/drivers',
+    //     'endpoint' => '/fleet/drivers?tagIds=tag-id',
     //     'body'     => [...],
     // ]
 }

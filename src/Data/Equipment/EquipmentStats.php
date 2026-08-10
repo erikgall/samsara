@@ -15,6 +15,8 @@ use Samsara\Enums\EngineState;
  * @property-read string|null $id Equipment ID
  * @property-read string|null $name Equipment name
  * @property-read array{value: int, time?: string}|null $engineRpm Engine RPM
+ * @property-read array{value: int, time?: string}|null $engineSeconds Engine seconds
+ * @property-read array{value: string, time?: string}|null $engineState Engine state
  * @property-read array{value: int, time?: string}|null $fuelPercent Fuel percentage
  * @property-read array{value: int, time?: string}|null $gpsOdometerMeters GPS odometer reading
  * @property-read array{value: int, time?: string}|null $gatewayEngineSeconds Gateway engine seconds
@@ -22,7 +24,7 @@ use Samsara\Enums\EngineState;
  * @property-read array{value: string, time?: string}|null $gatewayEngineState Gateway engine state
  * @property-read array{value: string, time?: string}|null $obdEngineState OBD engine state
  * @property-read array{value: int, time?: string}|null $engineTotalIdleTimeMinutes Total engine idle time
- * @property-read array{latitude: float, longitude: float, time: string, headingDegrees?: int, speedMilesPerHour?: float}|null $gps GPS location data
+ * @property-read array{latitude: float, longitude: float, time: string, headingDegrees?: float, speedMilesPerHour?: float, address?: array{id?: string, name?: string}, reverseGeo?: array<string, mixed>}|null $gps GPS location data
  */
 class EquipmentStats extends Entity
 {
@@ -75,7 +77,7 @@ class EquipmentStats extends Entity
     /**
      * Get the GPS location as an entity.
      */
-    public function getGps(): ?EquipmentLocation
+    public function getGps(): ?EquipmentGpsLocation
     {
         $gps = $this->get('gps');
 
@@ -83,7 +85,7 @@ class EquipmentStats extends Entity
             return null;
         }
 
-        return new EquipmentLocation($gps);
+        return new EquipmentGpsLocation($gps);
     }
 
     /**

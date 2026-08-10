@@ -13,11 +13,15 @@ use Samsara\Data\Entity;
  *
  * @property-read string|null $id Alert configuration ID
  * @property-read string|null $name Alert name
- * @property-read string|null $alertType Alert type (speed, geofence, idle, fuelLevel)
- * @property-read string|null $description Alert description
- * @property-read bool|null $enabled Whether the alert is enabled
- * @property-read array{email?: bool, sms?: bool}|null $notificationSettings Notification settings
- * @property-read array<int, string>|null $tagIds Tag IDs
+ * @property-read bool|null $isEnabled Whether the alert is enabled
+ * @property-read string|null $createdAtTime Creation time (RFC 3339)
+ * @property-read string|null $lastModifiedAtTime Last modification time (RFC 3339)
+ * @property-read array<int, array<string, mixed>>|null $actions Alert actions
+ * @property-read array<string, string>|null $externalIds External identifiers
+ * @property-read array<string, mixed>|null $operationalSettings Operational settings
+ * @property-read array<string, mixed>|null $scope Alert scope
+ * @property-read array<int, array<string, mixed>>|null $triggers Alert triggers
+ * @property-read string|null $alertType Deprecated legacy payload field not returned by the current API
  */
 class AlertConfiguration extends Entity
 {
@@ -26,7 +30,7 @@ class AlertConfiguration extends Entity
      */
     public function isEnabled(): bool
     {
-        return $this->get('enabled') === true;
+        return $this->get('isEnabled') === true;
     }
 
     /**

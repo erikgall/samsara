@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
 /**
@@ -17,4 +18,20 @@ class CarrierProposedAssignmentsResource extends Resource
      * The API endpoint for this resource.
      */
     protected string $endpoint = '/fleet/carrier-proposed-assignments';
+
+    /**
+     * Create a query builder for cursor-aware assignment access.
+     */
+    public function query(): Builder
+    {
+        return new Builder($this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all', 'create', 'delete'];
+    }
 }

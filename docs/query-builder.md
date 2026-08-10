@@ -24,7 +24,7 @@ permalink: /query-builder
 
 ## Introduction
 
-The query builder is the fluent interface you reach for whenever you need to filter, paginate, or stream records from a Samsara resource. You start a builder by calling `query()` on a resource, or by calling a builder-returning helper such as `current()` or `history()` on resources that expose multiple endpoints. Resources like [Vehicle Stats](resources/vehicle-stats.md) also expose typed shortcuts (`current()`, `history()`, `feed()`, `gps()`, `engineStates()`, etc.) that return a pre-configured builder — prefer those when you know which endpoint or stat type you want.
+The query builder is the fluent interface you reach for whenever you need to filter, paginate, or stream records from a Samsara resource. You start a builder by calling `query()` on a resource, or by calling a builder-returning helper such as `current()` or `history()` on resources that expose multiple endpoints. Resources like [Vehicle Stats](resources/vehicle-stats.html) also expose typed shortcuts (`current()`, `history()`, `feed()`, `gps()`, `engineStates()`, etc.) that return a pre-configured builder — prefer those when you know which endpoint or stat type you want.
 
 ## Building Queries
 
@@ -76,6 +76,10 @@ $drivers = Samsara::drivers()
 | `whereAttribute($attributeValueIds)` | `array<string>\|string` | Filter by attribute value IDs. |
 | `where($key, $value)` | `string`, `mixed` | Add an arbitrary query parameter for endpoints whose filters the SDK does not yet wrap. |
 
+Dedicated list helpers serialize non-empty arrays as comma-separated values: `types()`, `expand()`, `withDecorations()`, `whereAttribute()`, `whereDriver()`, `whereParentTag()`, `whereTag()`, and `whereVehicle()`. Arbitrary arrays passed through `where()` retain Laravel's standard bracketed encoding.
+
+Endpoint helpers use `repeatQueryParameters()` when the official operation declares a form/`explode=true` array. Those values move into the URL as repeated RFC 3986 keys (`ids=a&ids=b`) while all other query values remain unchanged. The only Fleet/platform example is vehicle attribute filters; Safety/operations uses repeated keys for alert configuration IDs, incident configuration IDs, Camera Media lists, DVIR safety status, service-task IDs, work-order IDs, and work-order-stream status/asset/assignee lists. Call `repeatQueryParameters()` directly only when building a custom endpoint whose contract requires that encoding.
+
 ## Modifiers
 
 Modifiers shape the response — the time window, the stat types you want, and any decorations or expansions the API offers.
@@ -116,17 +120,17 @@ $stats = Samsara::vehicleStats()
     ->get();
 ```
 
-> **Note:** `types()` accepts string values only. To use the [`VehicleStatType`](enums.md#vehiclestattype) enum, unwrap each case explicitly: `->types([VehicleStatType::GPS->value])`.
+> **Note:** `types()` accepts string values only. To use the [`VehicleStatType`](enums.html#vehiclestattype) enum, unwrap each case explicitly: `->types([VehicleStatType::GPS->value])`.
 
 ### Decorations
 
-`withDecorations()` asks the API to enrich the response with derived values such as reverse-geocoded addresses.
+`withDecorations()` asks the API to add other stat values at the time of each primary stat.
 
 ```php
 $stats = Samsara::vehicleStats()
-    ->current()
-    ->types(['gps'])
-    ->withDecorations(['address', 'reverseGeo'])
+    ->history()
+    ->types(['engineStates'])
+    ->withDecorations(['gps', 'fuelPercents'])
     ->get();
 ```
 
@@ -163,7 +167,9 @@ $page = Samsara::vehicles()
 
 ### Cursor-Based Pagination
 
-`paginate()` returns a `Samsara\Query\Pagination\CursorPaginator`. The paginator is iterable, countable, and exposes the cursor metadata returned by the API.
+`paginate()` makes one request and returns a `Samsara\Query\Pagination\CursorPaginator`. The paginator is iterable, countable, and exposes the cursor metadata returned by the API. When no explicit limit exists, `paginate()` and `lazy()` apply the configured `per_page`. Explicit method arguments, `limit()`, and `where('limit', ...)` take precedence.
+
+Some official cursor endpoints accept `after` but no `limit`. Their resource helpers call `withoutDefaultPageSize()`, so pagination sends no implicit limit while still honoring a limit the caller explicitly supplies. Fleet/platform currently has 15 such helpers. The opt-out persists when `nextPage()` and `lazy()` clone the builder.
 
 ```php
 $paginator = Samsara::vehicles()
@@ -180,6 +186,8 @@ if ($paginator->hasMorePages()) {
 ```
 
 `nextPage()` returns `?CursorPaginator` — `null` when `hasMorePages()` is `false` or when the API did not return an end cursor. Always guard with `hasMorePages()` before dereferencing the result.
+
+Samsara's current pagination guidance says to continue whenever `hasNextPage` is true, even when the current `data` array is short or empty. Cursors expire after 30 days. For `/feed` endpoints, wait at least five seconds before polling again after a response with `hasNextPage: false`.
 
 | Method | Returns | Description |
 |---|---|---|
@@ -204,7 +212,7 @@ The builder defers HTTP work until you call a terminal method. Each terminal met
 
 | Method | Returns | When to use it |
 |---|---|---|
-| `get()` | `EntityCollection` | Eager fetch of every result the query selects (subject to `limit()`). |
+| `get()` | `EntityCollection` | Eager fetch of the `data` array from one HTTP response. It does not walk subsequent cursors. |
 | `first()` | `?object` | The first result, or `null` when the result set is empty. Internally applies `limit(1)`. |
 | `paginate(?int $perPage = null)` | `CursorPaginator` | A page of results plus the cursor metadata for navigation. |
 | `lazy(?int $chunkSize = null)` | `LazyCollection` | A memory-efficient stream that walks every page until the API stops returning a cursor. |
@@ -234,6 +242,10 @@ Samsara::vehicleStats()
         // Process each stat without loading every page into memory.
     });
 ```
+
+All builder terminal methods (`get()`, `first()`, `paginate()`, `getWithPagination()`, and every request made by `lazy()`) use the same typed HTTP error boundary as supported generic resource operations and custom helpers. The exception context records the effective endpoint, including the query string used for repeated-key parameters.
+
+Endpoint builders may also select an endpoint-specific result shape through `usingEntity()` or `mapUsing()`. That mapping persists across eager, paginated, and lazy execution, which is why snapshot and time-series endpoints can return distinct DTOs instead of reusing a resource-wide entity class.
 
 ## Working with Results
 

@@ -28,9 +28,11 @@ class SensorsResource extends Resource
      */
     public function cargo(array $data): array
     {
-        $response = $this->client()->post('/v1/sensors/cargo', $data);
-
-        $this->handleError($response);
+        $endpoint = '/v1/sensors/cargo';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json();
     }
@@ -43,9 +45,11 @@ class SensorsResource extends Resource
      */
     public function door(array $data): array
     {
-        $response = $this->client()->post('/v1/sensors/door', $data);
-
-        $this->handleError($response);
+        $endpoint = '/v1/sensors/door';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json();
     }
@@ -58,9 +62,11 @@ class SensorsResource extends Resource
      */
     public function history(array $data): array
     {
-        $response = $this->client()->post('/v1/sensors/history', $data);
-
-        $this->handleError($response);
+        $endpoint = '/v1/sensors/history';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json();
     }
@@ -73,9 +79,11 @@ class SensorsResource extends Resource
      */
     public function humidity(array $data): array
     {
-        $response = $this->client()->post('/v1/sensors/humidity', $data);
-
-        $this->handleError($response);
+        $endpoint = '/v1/sensors/humidity';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json();
     }
@@ -83,14 +91,15 @@ class SensorsResource extends Resource
     /**
      * List all sensors.
      *
-     * @param  array<string, mixed>  $data
      * @return EntityCollection<int, Entity>
      */
-    public function list(array $data): EntityCollection
+    public function list(): EntityCollection
     {
-        $response = $this->client()->post('/v1/sensors/list', $data);
-
-        $this->handleError($response);
+        $endpoint = '/v1/sensors/list';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint),
+            $endpoint
+        );
 
         $sensors = $response->json('sensors', []);
 
@@ -105,10 +114,20 @@ class SensorsResource extends Resource
      */
     public function temperature(array $data): array
     {
-        $response = $this->client()->post('/v1/sensors/temperature', $data);
-
-        $this->handleError($response);
+        $endpoint = '/v1/sensors/temperature';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

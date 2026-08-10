@@ -26,54 +26,63 @@ permalink: /resources/beta
 
 ## Introduction
 
-Beta resources expose Samsara API endpoints that are still under development. Reach them through `Samsara::beta()`, which returns a `BetaResource` instance. Methods that return a `Builder` plug into the standard [query builder](../query-builder.md) for filtering, time bounds, and pagination. Methods that return an `EntityCollection` issue an immediate request and return a flat collection of generic `Entity` instances. The mutating helpers (`createIndustrialJob`, `updateIndustrialJob`, `deleteIndustrialJob`, `createReading`) call the underlying HTTP client directly and return the raw decoded JSON.
+`Samsara::beta()` returns a `BetaResource`. Despite the class name, its helpers mix GA and beta operations. All read helpers except `aempFleet()` return a `Builder`; the AEMP method preserves its raw wrapper and mutators return raw arrays or success booleans.
+
+Current upstream staging and path review:
+
+- Detections, devices, reports, and vehicle-immobilizer stream include beta operations.
+- Readings definitions/history/latest, safety scores, qualifications, training, and trailer stats include GA operations.
+- AEMP is now `/beta/aemp/Fleet/{pageNumber}`; industrial jobs use the `/beta/industrial/jobs` collection path; HOS ELD events use `/beta/fleet/hos/drivers/eld-events`.
+- Qualifications use `/qualification-records` and `/qualification-types`; training uses `/training-assignments`, `/training-assignments/stream`, and `/training-courses`.
+
+The method reference below records implemented package behavior. Additive official operations not listed here remain deferred.
 
 ## Method Reference
 
 ### AEMP and Industrial Jobs
 
-#### `aempFleet(): Builder`
+#### `aempFleet(string $pageNumber): array`
 
-Returns a query builder for the `/aemp/fleet` endpoint, the AEMP fleet feed.
+Calls `GET /beta/aemp/Fleet/{pageNumber}` and preserves the raw AEMP Fleet wrapper.
 
 ```php
 use Samsara\Facades\Samsara;
 
-$fleet = Samsara::beta()->aempFleet()->get();
+$fleet = Samsara::beta()->aempFleet('1');
 ```
 
 #### `industrialJobs(): Builder`
 
-Returns a query builder for `/industrial/jobs`.
+Returns a no-implicit-limit query builder for `/beta/industrial/jobs`.
 
 ```php
-$jobs = Samsara::beta()->industrialJobs()->whereTag('crane-fleet')->get();
+$jobs = Samsara::beta()->industrialJobs()->get();
 ```
 
 #### `createIndustrialJob(array $data): array`
 
-`POST /industrial/jobs`. Returns the decoded `data` payload.
+`POST /beta/industrial/jobs`. The request body must contain a nested `job` payload. Returns the decoded `data` payload.
 
 ```php
-$job = Samsara::beta()->createIndustrialJob([
+$job = Samsara::beta()->createIndustrialJob(['job' => [
     'name' => 'Crane lift — bay 4',
     'machineId' => 'machine-id',
-]);
+]]);
 ```
 
 #### `updateIndustrialJob(string $id, array $data): array`
 
-`PATCH /industrial/jobs/{id}`. Returns the decoded `data` payload.
+`PATCH /beta/industrial/jobs?id={id}`. Supply the nested `job` payload. Returns the decoded `data` payload.
 
 ```php
-$job = Samsara::beta()->updateIndustrialJob('job-id', [
+$job = Samsara::beta()->updateIndustrialJob('job-id', ['job' => [
     'name' => 'Crane lift — bay 4 (rescheduled)',
-]);
+]]);
 ```
 
-#### `deleteIndustrialJob(string $id): bool`
+#### `deleteIndustrialJob(string $id): array`
 
-`DELETE /industrial/jobs/{id}`. Returns `true` when the API responds with a successful status code.
+`DELETE /beta/industrial/jobs?id={id}`. Returns the decoded response array.
 
 ```php
 $deleted = Samsara::beta()->deleteIndustrialJob('job-id');
@@ -91,12 +100,12 @@ $detections = Samsara::beta()->detectionsStream()->lazy();
 
 ### Devices
 
-#### `devices(): EntityCollection`
+#### `devices(): Builder`
 
-`GET /devices`. Returns an `EntityCollection` of generic `Entity` instances.
+Returns a builder for `GET /devices`.
 
 ```php
-$devices = Samsara::beta()->devices();
+$devices = Samsara::beta()->devices()->get();
 
 foreach ($devices as $device) {
     logger()->info($device['serial']);
@@ -107,7 +116,7 @@ foreach ($devices as $device) {
 
 #### `hosEldEvents(): Builder`
 
-Returns a query builder for `/fleet/hos/eld-events`.
+Returns a query builder for `/beta/fleet/hos/drivers/eld-events` with the operation's default limit of 25.
 
 ```php
 $events = Samsara::beta()
@@ -121,28 +130,28 @@ $events = Samsara::beta()
 
 #### `qualificationsRecords(): Builder`
 
-Returns a query builder for `/qualifications/records`.
+Returns a query builder for `/qualification-records`.
 
 ```php
 $records = Samsara::beta()->qualificationsRecords()->get();
 ```
 
-#### `qualificationsTypes(): EntityCollection`
+#### `qualificationsTypes(): Builder`
 
-`GET /qualifications/types`. Returns an `EntityCollection` of generic `Entity` instances.
+Returns a no-implicit-limit builder for `GET /qualification-types`.
 
 ```php
-$types = Samsara::beta()->qualificationsTypes();
+$types = Samsara::beta()->qualificationsTypes()->get();
 ```
 
 ### Readings
 
-#### `readingsDefinitions(): EntityCollection`
+#### `readingsDefinitions(): Builder`
 
-`GET /readings/definitions`. Returns an `EntityCollection` of generic `Entity` instances.
+Returns a no-implicit-limit builder for `GET /readings/definitions`.
 
 ```php
-$definitions = Samsara::beta()->readingsDefinitions();
+$definitions = Samsara::beta()->readingsDefinitions()->get();
 ```
 
 #### `readingsHistory(): Builder`
@@ -164,25 +173,25 @@ Returns a query builder for `/readings/latest`.
 $latest = Samsara::beta()->readingsLatest()->get();
 ```
 
-#### `createReading(array $data): array`
+#### `createReading(array $data): bool`
 
-`POST /readings`. Returns the decoded `data` payload.
+`POST /readings`. The official request requires a top-level `data` envelope; the helper returns whether the empty-body response was successful.
 
 ```php
-$reading = Samsara::beta()->createReading([
+$created = Samsara::beta()->createReading(['data' => [[
     'definitionId' => 'definition-id',
     'value' => 42,
-]);
+]]]);
 ```
 
 ### Reports
 
-#### `reportsConfigs(): EntityCollection`
+#### `reportsConfigs(): Builder`
 
-`GET /reports/configs`. Returns an `EntityCollection` of generic `Entity` instances.
+Returns a builder for `GET /reports/configs`.
 
 ```php
-$configs = Samsara::beta()->reportsConfigs();
+$configs = Samsara::beta()->reportsConfigs()->get();
 ```
 
 #### `reportsDatasets(): Builder`
@@ -258,25 +267,25 @@ $history = Samsara::beta()
 
 #### `trainingAssignments(): Builder`
 
-Returns a query builder for `/training/assignments`.
+Returns a no-implicit-limit query builder for `/training-assignments/stream`.
 
 ```php
 $assignments = Samsara::beta()->trainingAssignments()->get();
 ```
 
-#### `trainingCourses(): EntityCollection`
+#### `trainingCourses(): Builder`
 
-`GET /training/courses`. Returns an `EntityCollection` of generic `Entity` instances.
+Returns a no-implicit-limit builder for `GET /training-courses`.
 
 ```php
-$courses = Samsara::beta()->trainingCourses();
+$courses = Samsara::beta()->trainingCourses()->get();
 ```
 
 ### Vehicle Immobilizer
 
 #### `vehicleImmobilizerStream(): Builder`
 
-Returns a query builder for `/fleet/vehicles/immobilizer/stream`, the lock/unlock state feed. Pair it with the operational [Preview](preview.md) `lockVehicle()` and `unlockVehicle()` calls.
+Returns a query builder for `/fleet/vehicles/immobilizer/stream`, the lock/unlock state feed. Preview control operations remain contract-stage and unsuitable for business-critical use.
 
 ```php
 $stream = Samsara::beta()->vehicleImmobilizerStream()->lazy();
@@ -284,7 +293,7 @@ $stream = Samsara::beta()->vehicleImmobilizerStream()->lazy();
 
 ## Related Resources
 
-- [Resources Index](index.md) — full list of stable resources.
-- [Preview Resources](preview.md) — operational lock and unlock commands paired with `vehicleImmobilizerStream()`.
-- [Legacy Resources](legacy.md) — v1 endpoints that still proxy through the SDK.
-- [Query Builder](../query-builder.md) — filtering, pagination, and lazy iteration over the `Builder` returns above.
+- [Resources Index](index.html) — full list of stable resources.
+- [Preview Resources](preview.html) — operational lock and unlock commands paired with `vehicleImmobilizerStream()`.
+- [Legacy Resources](legacy.html) — v1 endpoints that still proxy through the SDK.
+- [Query Builder](../query-builder.html) — filtering, pagination, and lazy iteration over the `Builder` returns above.

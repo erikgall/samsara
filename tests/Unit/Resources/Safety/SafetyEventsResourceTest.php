@@ -5,11 +5,11 @@ namespace Samsara\Tests\Unit\Resources\Safety;
 use Samsara\Samsara;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
-use Samsara\Data\EntityCollection;
 use Samsara\Data\Safety\SafetyEvent;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Safety\SafetyEventsResource;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the SafetyEventsResource.
@@ -37,34 +37,6 @@ class SafetyEventsResourceTest extends TestCase
         $resource = new SafetyEventsResource($this->samsara);
 
         $this->assertInstanceOf(SafetyEventsResource::class, $resource);
-    }
-
-    #[Test]
-    public function it_can_get_all_events(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    [
-                        'id'        => 'event-1',
-                        'eventType' => 'harshBraking',
-                        'time'      => '2024-01-01T12:00:00Z',
-                    ],
-                    [
-                        'id'        => 'event-2',
-                        'eventType' => 'harshAcceleration',
-                        'time'      => '2024-01-01T14:00:00Z',
-                    ],
-                ],
-            ]),
-        ]);
-
-        $resource = new SafetyEventsResource($this->samsara);
-        $events = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $events);
-        $this->assertCount(2, $events);
-        $this->assertInstanceOf(SafetyEvent::class, $events->first());
     }
 
     #[Test]
@@ -99,5 +71,23 @@ class SafetyEventsResourceTest extends TestCase
         $resource = new SafetyEventsResource($this->samsara);
 
         $this->assertSame(SafetyEvent::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_rejects_the_unsupported_generic_all_operation_before_http(): void
+    {
+        $this->http->fake();
+
+        $resource = new SafetyEventsResource($this->samsara);
+
+        try {
+            $resource->all();
+            $this->fail('Expected the generic all operation to be rejected.');
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('all', $exception->getContext()['operation']);
+            $this->assertSame(SafetyEventsResource::class, $exception->getContext()['resource']);
+        }
+
+        $this->http->assertNothingSent();
     }
 }

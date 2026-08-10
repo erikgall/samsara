@@ -6,6 +6,7 @@ use Samsara\Samsara;
 use Samsara\Tests\TestCase;
 use Samsara\SamsaraServiceProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Http\Client\Factory as HttpFactory;
 
 /**
  * Unit tests for the Samsara service provider.
@@ -67,6 +68,70 @@ class SamsaraServiceProviderTest extends TestCase
         $samsara = $this->app->make('samsara');
 
         $this->assertInstanceOf(Samsara::class, $samsara);
+    }
+
+    #[Test]
+    public function it_uses_canada_endpoint_when_region_is_ca(): void
+    {
+        $this->app['config']->set('samsara.region', 'ca');
+        $this->app['config']->set('samsara.retry', 0);
+        $this->app->forgetInstance(Samsara::class);
+
+        $http = new HttpFactory;
+        $http->fake(['*' => $http->response(['data' => []])]);
+        $samsara = $this->app->make(Samsara::class);
+        $samsara->setHttpFactory($http);
+        $samsara->drivers()->query()->get();
+
+        $this->assertSame('https://api.ca.samsara.com', $samsara->getBaseUrl());
+        $http->assertSent(fn ($request) => str_starts_with(
+            $request->url(),
+            'https://api.ca.samsara.com/fleet/drivers'
+        ));
+    }
+
+    #[Test]
+    public function it_uses_configured_per_page_when_lazily_loading_without_an_explicit_limit(): void
+    {
+        $this->app['config']->set('samsara.per_page', 50);
+        $this->app['config']->set('samsara.retry', 0);
+        $this->app->forgetInstance(Samsara::class);
+
+        $http = new HttpFactory;
+        $http->fake([
+            '*' => $http->response([
+                'data'       => [],
+                'pagination' => ['endCursor' => null, 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $samsara = $this->app->make(Samsara::class);
+        $samsara->setHttpFactory($http);
+        $samsara->drivers()->query()->lazy()->all();
+
+        $http->assertSent(fn ($request) => ($request->data()['limit'] ?? null) === 50);
+    }
+
+    #[Test]
+    public function it_uses_configured_per_page_when_paginating_without_an_explicit_limit(): void
+    {
+        $this->app['config']->set('samsara.per_page', 50);
+        $this->app['config']->set('samsara.retry', 0);
+        $this->app->forgetInstance(Samsara::class);
+
+        $http = new HttpFactory;
+        $http->fake([
+            '*' => $http->response([
+                'data'       => [],
+                'pagination' => ['endCursor' => null, 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $samsara = $this->app->make(Samsara::class);
+        $samsara->setHttpFactory($http);
+        $samsara->drivers()->query()->paginate();
+
+        $http->assertSent(fn ($request) => ($request->data()['limit'] ?? null) === 50);
     }
 
     #[Test]

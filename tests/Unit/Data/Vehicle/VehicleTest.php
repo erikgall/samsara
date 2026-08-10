@@ -164,6 +164,38 @@ class VehicleTest extends TestCase
     }
 
     #[Test]
+    public function it_can_have_current_auxiliary_and_sensor_fields(): void
+    {
+        $vehicle = new Vehicle([
+            'auxInputType1'                => 'boom',
+            'auxInputType13'               => 'custom',
+            'isRemotePrivacyButtonEnabled' => true,
+            'sensorConfiguration'          => ['doorSensor' => true],
+        ]);
+
+        $this->assertSame('boom', $vehicle->auxInputType1);
+        $this->assertSame('custom', $vehicle->auxInputType13);
+        $this->assertTrue($vehicle->isRemotePrivacyButtonEnabled);
+        $this->assertTrue($vehicle->sensorConfiguration['doorSensor']);
+    }
+
+    #[Test]
+    public function it_can_have_current_vehicle_weight_fields(): void
+    {
+        $vehicle = new Vehicle([
+            'vehicleWeight'            => 26000,
+            'vehicleWeightInKilograms' => 11793,
+            'vehicleWeightInPounds'    => 26000,
+            'grossVehicleWeight'       => ['unit' => 'lb', 'weight' => 26000],
+        ]);
+
+        $this->assertSame(26000, $vehicle->vehicleWeight);
+        $this->assertSame(11793, $vehicle->vehicleWeightInKilograms);
+        $this->assertSame(26000, $vehicle->vehicleWeightInPounds);
+        $this->assertSame('lb', $vehicle->grossVehicleWeight['unit']);
+    }
+
+    #[Test]
     public function it_can_have_esn(): void
     {
         $vehicle = new Vehicle([
@@ -199,16 +231,6 @@ class VehicleTest extends TestCase
 
         $this->assertIsArray($vehicle->gateway);
         $this->assertSame('ABCD-123-XYZ', $vehicle->gateway['serial']);
-    }
-
-    #[Test]
-    public function it_can_have_gross_vehicle_weight(): void
-    {
-        $vehicle = new Vehicle([
-            'grossVehicleWeight' => 26000,
-        ]);
-
-        $this->assertSame(26000, $vehicle->grossVehicleWeight);
     }
 
     #[Test]

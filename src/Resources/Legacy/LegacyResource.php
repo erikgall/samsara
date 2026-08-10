@@ -35,11 +35,7 @@ class LegacyResource extends Resource
      */
     public function assetLocations(array $data): array
     {
-        $response = $this->client()->post('/v1/fleet/assets/locations', $data);
-
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->postLegacy('/v1/fleet/assets/locations', $data);
     }
 
     /**
@@ -50,11 +46,7 @@ class LegacyResource extends Resource
      */
     public function assetReefers(array $data): array
     {
-        $response = $this->client()->post('/v1/fleet/assets/reefers', $data);
-
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->postLegacy('/v1/fleet/assets/reefers', $data);
     }
 
     /**
@@ -65,11 +57,7 @@ class LegacyResource extends Resource
      */
     public function dispatchRoutes(array $data): array
     {
-        $response = $this->client()->get('/v1/fleet/dispatch/routes', $data);
-
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->getLegacy('/v1/fleet/dispatch/routes', $data);
     }
 
     /**
@@ -80,11 +68,9 @@ class LegacyResource extends Resource
      */
     public function driverSafetyScore(string $driverId, array $params): array
     {
-        $response = $this->client()->get("/v1/fleet/drivers/{$driverId}/safety/score", $params);
+        $endpoint = '/v1/fleet/drivers/'.rawurlencode($driverId).'/safety/score';
 
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->getLegacy($endpoint, $params);
     }
 
     /**
@@ -95,11 +81,7 @@ class LegacyResource extends Resource
      */
     public function fleetAssets(array $data): array
     {
-        $response = $this->client()->post('/v1/fleet/assets', $data);
-
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->postLegacy('/v1/fleet/assets', $data);
     }
 
     /**
@@ -110,11 +92,7 @@ class LegacyResource extends Resource
      */
     public function hosAuthenticationLogs(array $data): array
     {
-        $response = $this->client()->post('/v1/fleet/hos_authentication_logs', $data);
-
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->postLegacy('/v1/fleet/hos_authentication_logs', $data);
     }
 
     /**
@@ -125,11 +103,7 @@ class LegacyResource extends Resource
      */
     public function machines(array $data): array
     {
-        $response = $this->client()->post('/v1/machines/list', $data);
-
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->postLegacy('/v1/machines/list', $data);
     }
 
     /**
@@ -140,11 +114,7 @@ class LegacyResource extends Resource
      */
     public function maintenanceList(array $data): array
     {
-        $response = $this->client()->post('/v1/fleet/maintenance/list', $data);
-
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->postLegacy('/v1/fleet/maintenance/list', $data);
     }
 
     /**
@@ -155,11 +125,7 @@ class LegacyResource extends Resource
      */
     public function messages(array $data): array
     {
-        $response = $this->client()->post('/v1/fleet/messages', $data);
-
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->postLegacy('/v1/fleet/messages', $data);
     }
 
     /**
@@ -170,11 +136,7 @@ class LegacyResource extends Resource
      */
     public function trips(array $data): array
     {
-        $response = $this->client()->post('/v1/fleet/trips', $data);
-
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->postLegacy('/v1/fleet/trips', $data);
     }
 
     /**
@@ -185,11 +147,9 @@ class LegacyResource extends Resource
      */
     public function vehicleHarshEvent(string $vehicleId, array $params): array
     {
-        $response = $this->client()->get("/v1/fleet/vehicles/{$vehicleId}/safety/harsh_event", $params);
+        $endpoint = '/v1/fleet/vehicles/'.rawurlencode($vehicleId).'/safety/harsh_event';
 
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->getLegacy($endpoint, $params);
     }
 
     /**
@@ -200,11 +160,9 @@ class LegacyResource extends Resource
      */
     public function vehicleSafetyScore(string $vehicleId, array $params): array
     {
-        $response = $this->client()->get("/v1/fleet/vehicles/{$vehicleId}/safety/score", $params);
+        $endpoint = '/v1/fleet/vehicles/'.rawurlencode($vehicleId).'/safety/score';
 
-        $this->handleError($response);
-
-        return $response->json();
+        return $this->getLegacy($endpoint, $params);
     }
 
     /**
@@ -215,9 +173,45 @@ class LegacyResource extends Resource
      */
     public function visionCameras(array $data): array
     {
-        $response = $this->client()->post('/v1/industrial/vision/cameras', $data);
+        return $this->postLegacy('/v1/industrial/vision/cameras', $data);
+    }
 
-        $this->handleError($response);
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
+    }
+
+    /**
+     * Execute a legacy GET request through the shared SDK boundary.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function getLegacy(string $endpoint, array $data): array
+    {
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, $data),
+            $endpoint
+        );
+
+        return $response->json();
+    }
+
+    /**
+     * Execute a legacy POST request through the shared SDK boundary.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function postLegacy(string $endpoint, array $data): array
+    {
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json();
     }

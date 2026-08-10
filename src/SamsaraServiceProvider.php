@@ -63,6 +63,8 @@ class SamsaraServiceProvider extends ServiceProvider implements DeferrableProvid
 
             if (($config['region'] ?? 'us') === 'eu') {
                 $samsara->useEuEndpoint();
+            } elseif (($config['region'] ?? 'us') === 'ca') {
+                $samsara->useCanadaEndpoint();
             }
 
             return $samsara;

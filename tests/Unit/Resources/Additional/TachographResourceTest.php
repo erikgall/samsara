@@ -64,6 +64,6 @@ class TachographResourceTest extends TestCase
     {
         $resource = new TachographResource($this->samsara);
 
-        $this->assertSame('/tachograph', $resource->getEndpoint());
+        $this->assertSame('/fleet/drivers/tachograph-activity/history', $resource->getEndpoint());
     }
 }

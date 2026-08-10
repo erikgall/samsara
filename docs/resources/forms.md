@@ -23,7 +23,9 @@ permalink: /resources/forms
 
 ## Introduction
 
-Forms expose the inspections, checklists, and reports your drivers fill out from the Samsara app. The resource has two distinct shapes: `submissions()` returns a query builder over completed `FormSubmission` records, while `templates()` returns the template definitions immediately as an `EntityCollection` (no builder, no `->get()`). Reach for forms when you need to ingest driver-submitted data, generate PDFs of submissions, or inspect the templates available to your fleet.
+Forms expose the inspections, checklists, and reports your drivers fill out from the Samsara app. `submissions()`, `submissionsStream()`, and `templates()` all return builders. Submission builders map `FormSubmission`; template builders map `FormTemplate`.
+
+The resource owns only generic `create`; use `updateSubmission()` for a collection-path update. PDF start and poll both use `/form-submissions/pdf-exports`, with `id` and `pdfId` query parameters respectively.
 
 ## Retrieving Records
 
@@ -39,10 +41,10 @@ $submissions = Samsara::forms()->submissions()->get();
 
 ### Form Templates
 
-`templates()` is a direct accessor — it issues the request and returns an `EntityCollection<FormTemplate>` immediately.
+`templates()` returns a no-implicit-limit builder of `FormTemplate` objects.
 
 ```php
-$templates = Samsara::forms()->templates();
+$templates = Samsara::forms()->templates()->get();
 ```
 
 ### Form Submissions Stream
@@ -82,11 +84,11 @@ $submission = Samsara::forms()->updateSubmission('submission-id', [
 
 ## Deleting Records
 
-> **Note:** The Samsara API does not support deleting form submissions through this resource.
+Generic `delete()` is unsupported and throws before HTTP.
 
 ## Filtering
 
-Submissions accept the standard query builder. See [the query builder reference](../query-builder.md) for the full method list.
+Submissions accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
 
 ```php
 $submissions = Samsara::forms()
@@ -100,12 +102,10 @@ You can also call `Samsara::forms()->query()` directly for the same builder if y
 
 ## PDF Exports
 
-PDF generation follows the **request-then-poll** pattern (the same pattern used by [camera media](camera-media.md)). You submit an export request and receive an export ID, then poll `getPdfExport()` until the file is ready.
+PDF generation follows the **request-then-poll** pattern (the same pattern used by [camera media](camera-media.html)). You submit an export request and receive an export ID, then poll `getPdfExport()` until the file is ready.
 
 ```php
-$export = Samsara::forms()->exportPdf([
-    'formSubmissionIds' => ['submission-1', 'submission-2'],
-]);
+$export = Samsara::forms()->exportPdf('submission-id');
 
 $exportId = $export['id'];
 
@@ -119,7 +119,7 @@ Both methods return raw `array<string, mixed>` payloads from the API.
 The `FormSubmission` entity exposes status helpers:
 
 ```php
-$submission = Samsara::forms()->submissions()->find('submission-id');
+$submission = Samsara::forms()->submissions()->where('ids', ['submission-id'])->first();
 
 $submission->isDraft();     // bool
 $submission->isSubmitted(); // bool
@@ -141,7 +141,7 @@ The `FormSubmission` entity (`Samsara\Data\Form\FormSubmission`) exposes the fol
 | `updatedAtTime` | `?string` | Last update timestamp (RFC 3339). |
 | `submittedAtTime` | `?string` | Submission timestamp (RFC 3339). |
 
-The `FormTemplate` entity (`Samsara\Data\Form\FormTemplate`) exposes:
+`templates()->get()` returns `Samsara\Data\Form\FormTemplate` entities with these properties:
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -155,7 +155,7 @@ The `FormTemplate` entity (`Samsara\Data\Form\FormTemplate`) exposes:
 
 ## Related Resources
 
-- [Drivers](drivers.md) — driver records referenced from submissions.
-- [Vehicles](vehicles.md) — vehicle records referenced from submissions.
-- [Camera Media](camera-media.md) — same request-then-poll pattern for video exports.
-- [Query Builder](../query-builder.md) — filters and pagination.
+- [Drivers](drivers.html) — driver records referenced from submissions.
+- [Vehicles](vehicles.html) — vehicle records referenced from submissions.
+- [Camera Media](camera-media.html) — same request-then-poll pattern for video exports.
+- [Query Builder](../query-builder.html) — filters and pagination.

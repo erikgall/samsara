@@ -20,14 +20,14 @@ class GpsLocationTest extends TestCase
         $gps = new GpsLocation([
             'latitude'          => 37.765363,
             'longitude'         => -122.4029238,
-            'headingDegrees'    => 180,
+            'headingDegrees'    => 180.0,
             'speedMilesPerHour' => 65.5,
             'time'              => '2024-01-15T10:00:00Z',
         ]);
 
         $this->assertSame(37.765363, $gps->latitude);
         $this->assertSame(-122.4029238, $gps->longitude);
-        $this->assertSame(180, $gps->headingDegrees);
+        $this->assertSame(180.0, $gps->headingDegrees);
         $this->assertSame(65.5, $gps->speedMilesPerHour);
         $this->assertSame('2024-01-15T10:00:00Z', $gps->time);
     }

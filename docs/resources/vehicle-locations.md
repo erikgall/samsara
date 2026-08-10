@@ -19,11 +19,13 @@ permalink: /resources/vehicle-locations
 
 Vehicle locations expose the GPS coordinates each vehicle gateway emits — the latest known position, a polling feed for low-latency updates, and a historical track for arbitrary time windows. Pick `current()` for an at-a-glance map, `feed()` for incremental polling, and `history()` for back-fill or audit work.
 
-> **Note:** `VehicleLocationsResource` does not declare a typed `$entity`. Each result is a generic `Entity` (a `Fluent` instance) keyed by the response shape documented in [Properties](#properties). There are no `getLatitude()` / `getLongitude()` helpers on the result; access keys directly with `$location->latitude`.
+The current snapshot and the feed/history series use different DTOs. `current()` and `query()` produce `VehicleLocationResult`; `feed()` and `history()` produce `VehicleLocationSeries`. All builders omit the configured implicit page size because these cursor endpoints have no official `limit`.
 
 ## Current Locations
 
 `current()` returns the latest known location for each vehicle.
+
+`query()` is an alias for a new builder rooted at the same current-locations endpoint.
 
 ```php
 use Samsara\Facades\Samsara;
@@ -58,7 +60,7 @@ $feed = Samsara::vehicleLocations()
 
 ## Location History
 
-`history()` accepts a time window and returns every sample for it.
+`history()` accepts a time window. `get()` returns one response page; use `lazy()` to walk every cursor page in a long window.
 
 ```php
 use Carbon\Carbon;
@@ -78,15 +80,17 @@ $history = Samsara::vehicleLocations()
 Samsara::vehicleLocations()
     ->history()
     ->between(Carbon::now()->subMonth(), Carbon::now())
-    ->lazy(500)
-    ->each(function ($location) {
-        // Process each sample
+    ->lazy()
+    ->each(function ($series) {
+        foreach ($series->getLocations() as $location) {
+            // Process each typed VehicleLocation sample.
+        }
     });
 ```
 
 ## Filtering
 
-See [Query Builder](../query-builder.md) for the full filter list. The most common filters are by vehicle, tag, and parent tag — all chainable on any of the three shortcuts above.
+See [Query Builder](../query-builder.html) for the full filter list. The most common filters are by vehicle, tag, and parent tag — all chainable on any of the three shortcuts above.
 
 ```php
 $locations = Samsara::vehicleLocations()
@@ -108,7 +112,7 @@ $locations = Samsara::vehicleLocations()
 
 ## Properties
 
-The response is a generic `Entity` with the following keys.
+The snapshot response is `Samsara\Data\Vehicle\VehicleLocationResult` with the following keys.
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -116,10 +120,10 @@ The response is a generic `Entity` with the following keys.
 | `name` | `?string` | Vehicle name at the time of the sample. |
 | `location` | `?array` | The latest location payload — `latitude`, `longitude`, `heading`, `speed`, `time`, optional `reverseGeo`. |
 
-> **Note:** Sub-keys inside `location` (such as `latitude` or `time`) come straight from the Samsara response. They are accessible as array keys, not as typed properties.
+Call `$result->getLocation()` to obtain a typed `VehicleLocation`. Feed/history results expose `id`, `name`, and a `locations` array; `$series->getLocations()` returns `EntityCollection<int, VehicleLocation>`.
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — the vehicles whose gateways emit these samples.
-- [Vehicle Stats](vehicle-stats.md) — pair location with telemetry (engine state, fuel) on the same vehicle.
-- [Trips](trips.md) — engine-on/engine-off trip envelopes built from location and stats data.
+- [Vehicles](vehicles.html) — the vehicles whose gateways emit these samples.
+- [Vehicle Stats](vehicle-stats.html) — pair location with telemetry (engine state, fuel) on the same vehicle.
+- [Trips](trips.html) — engine-on/engine-off trip envelopes built from location and stats data.

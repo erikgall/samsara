@@ -18,6 +18,7 @@ use Samsara\Resources\Dispatch\AddressesResource;
 use Samsara\Resources\Industrial\SensorsResource;
 use Samsara\Resources\Organization\UsersResource;
 use Samsara\Resources\Safety\MaintenanceResource;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Safety\SafetyEventsResource;
 use Samsara\Resources\Industrial\IndustrialResource;
 use Samsara\Resources\Integrations\GatewaysResource;
@@ -107,6 +108,25 @@ class SamsaraTest extends TestCase
 
         $this->assertSame($samsara, $result);
         $this->assertTrue($samsara->hasToken());
+    }
+
+    #[Test]
+    public function it_can_switch_to_canada_endpoint_and_send_requests_there(): void
+    {
+        $http = new HttpFactory;
+        $http->fake(['*' => $http->response(['data' => []])]);
+        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara->setHttpFactory($http);
+
+        $result = $samsara->useCanadaEndpoint();
+        $samsara->drivers()->query()->get();
+
+        $this->assertSame($samsara, $result);
+        $this->assertSame('https://api.ca.samsara.com', $samsara->getBaseUrl());
+        $http->assertSent(fn ($request) => str_starts_with(
+            $request->url(),
+            'https://api.ca.samsara.com/fleet/drivers'
+        ));
     }
 
     #[Test]

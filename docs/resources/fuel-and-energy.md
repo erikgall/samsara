@@ -18,7 +18,9 @@ permalink: /resources/fuel-and-energy
 
 ## Introduction
 
-Fuel and Energy aggregates the fuel use, energy consumption, and efficiency metrics Samsara computes from vehicle telemetry and fuel-card transactions. Reach for this resource when you need to feed mileage and fuel data into reporting, or to record purchases that did not flow through a connected fuel card. Every method on this resource is time-bounded — you must always pass a start and end window.
+Fuel and Energy aggregates the fuel use, energy consumption, and efficiency metrics Samsara computes from vehicle telemetry and fuel-card transactions. Report and efficiency methods are time-bounded; `createFuelPurchase()` is a mutation rather than a time-window query.
+
+The explicit helpers use `/driver-efficiency/drivers`, `/driver-efficiency/vehicles`, `/fleet/reports/drivers/fuel-energy`, `/fleet/reports/vehicles/fuel-energy`, and singular `/fuel-purchase`. Generic CRUD is unsupported.
 
 ## Fuel and Energy Reports
 
@@ -28,31 +30,33 @@ Reports return a raw `array<string, mixed>` payload from the API. Use them when 
 use Samsara\Facades\Samsara;
 
 $driverReport = Samsara::fuelAndEnergy()->driversFuelEnergyReport([
-    'startTime' => '2024-01-01T00:00:00Z',
-    'endTime'   => '2024-01-31T23:59:59Z',
+    'startDate' => '2026-01-01',
+    'endDate'   => '2026-01-31',
 ]);
 
 $vehicleReport = Samsara::fuelAndEnergy()->vehiclesFuelEnergyReport([
-    'startTime' => '2024-01-01T00:00:00Z',
-    'endTime'   => '2024-01-31T23:59:59Z',
+    'startDate' => '2026-01-01',
+    'endDate'   => '2026-01-31',
 ]);
 ```
 
 ## Efficiency Streams
 
-The efficiency endpoints expose a query builder that streams events between two timestamps. `between()` is required.
+The efficiency endpoints expose query builders whose date window uses `startDate` and `endDate`.
 
 ```php
 use Carbon\Carbon;
 
 $driverEfficiency = Samsara::fuelAndEnergy()
     ->driverEfficiency()
-    ->between(Carbon::now()->subDays(30), Carbon::now())
+    ->where('startDate', Carbon::now()->subDays(30)->toDateString())
+    ->where('endDate', Carbon::now()->toDateString())
     ->get();
 
 $vehicleEfficiency = Samsara::fuelAndEnergy()
     ->vehicleEfficiency()
-    ->between(Carbon::now()->subDays(30), Carbon::now())
+    ->where('startDate', Carbon::now()->subDays(30)->toDateString())
+    ->where('endDate', Carbon::now()->toDateString())
     ->get();
 ```
 
@@ -79,19 +83,21 @@ $purchase = Samsara::fuelAndEnergy()->createFuelPurchase([
 
 ## Filtering
 
-The efficiency builders support the standard filters from the query builder. See [the query builder reference](../query-builder.md) for the full method list. `between()` is still required.
+The efficiency builders support the standard filters from the query builder. See [the query builder reference](../query-builder.html) for the full method list. Supply `startDate` and `endDate` with `where()`.
 
 ```php
 $vehicleEfficiency = Samsara::fuelAndEnergy()
     ->vehicleEfficiency()
     ->whereVehicle('vehicle-123')
-    ->between(now()->subDays(30), now())
+    ->where('startDate', now()->subDays(30)->toDateString())
+    ->where('endDate', now()->toDateString())
     ->get();
 
 $driverEfficiency = Samsara::fuelAndEnergy()
     ->driverEfficiency()
     ->whereTag('long-haul-fleet')
-    ->between(now()->subDays(30), now())
+    ->where('startDate', now()->subDays(30)->toDateString())
+    ->where('endDate', now()->toDateString())
     ->get();
 ```
 
@@ -99,8 +105,8 @@ $driverEfficiency = Samsara::fuelAndEnergy()
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `startTime` | `string` | Report start time (RFC 3339). Required. |
-| `endTime` | `string` | Report end time (RFC 3339). Required. |
+| `startDate` | `string` | Report start date. Required. |
+| `endDate` | `string` | Report end date. Required. |
 | `tagIds` | `array<int, string>` | Filter by tag IDs. |
 | `vehicleIds` | `array<int, string>` | Filter by vehicle IDs. |
 | `driverIds` | `array<int, string>` | Filter by driver IDs. |
@@ -111,7 +117,7 @@ This resource does not declare a typed entity. Reports and `createFuelPurchase()
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — vehicle records referenced from efficiency rows.
-- [Drivers](drivers.md) — driver records referenced from efficiency rows.
-- [IFTA](ifta.md) — IFTA mileage and fuel tax reporting.
-- [Query Builder](../query-builder.md) — `between()` and time-bounded queries.
+- [Vehicles](vehicles.html) — vehicle records referenced from efficiency rows.
+- [Drivers](drivers.html) — driver records referenced from efficiency rows.
+- [IFTA](ifta.html) — IFTA mileage and fuel tax reporting.
+- [Query Builder](../query-builder.html) — `between()` and time-bounded queries.

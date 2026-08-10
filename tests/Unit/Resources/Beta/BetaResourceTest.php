@@ -3,12 +3,16 @@
 namespace Samsara\Tests\Unit\Resources\Beta;
 
 use Samsara\Samsara;
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
-use Samsara\Data\EntityCollection;
+use Samsara\Data\Safety\SafetyScore;
 use PHPUnit\Framework\Attributes\Test;
+use Samsara\Data\Trailer\TrailerStats;
 use Samsara\Resources\Beta\BetaResource;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the BetaResource class.
@@ -31,334 +35,308 @@ class BetaResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_create_industrial_job(): void
+    public function it_creates_an_industrial_job_using_the_beta_collection(): void
     {
+        $body = [
+            'job' => [
+                'id'        => 'job-123',
+                'name'      => 'Test Job',
+                'startDate' => '2026-08-10',
+                'endDate'   => '2026-08-11',
+            ],
+        ];
         $this->http->fake([
-            '*/industrial/jobs' => $this->http->response([
-                'data' => [
-                    'id' => 'job-123',
-                ],
-            ], 201),
+            '*' => $this->http->response(['data' => $body['job']]),
         ]);
-
         $resource = new BetaResource($this->samsara);
 
-        $result = $resource->createIndustrialJob(['name' => 'Test Job']);
+        $result = $resource->createIndustrialJob($body);
 
-        $this->assertIsArray($result);
         $this->assertSame('job-123', $result['id']);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/beta/industrial/jobs'
+            && $request->data() === $body);
     }
 
     #[Test]
-    public function it_can_create_reading(): void
+    public function it_creates_readings_without_inventing_a_response_body(): void
     {
+        $body = [
+            'data' => [[
+                'readingId' => 'reading-1',
+                'entityId'  => 'asset-1',
+                'time'      => '2026-08-10T12:00:00Z',
+                'value'     => 100,
+            ]],
+        ];
         $this->http->fake([
-            '*/readings' => $this->http->response([
-                'data' => [
-                    'id' => 'reading-123',
-                ],
-            ], 201),
+            '*' => $this->http->response(null, 201),
         ]);
-
         $resource = new BetaResource($this->samsara);
 
-        $result = $resource->createReading(['definitionId' => 'def-1', 'value' => 100]);
+        $result = $resource->createReading($body);
 
-        $this->assertIsArray($result);
-        $this->assertSame('reading-123', $result['id']);
+        $this->assertTrue($result);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/readings'
+            && $request->data() === $body);
     }
 
     #[Test]
-    public function it_can_delete_industrial_job(): void
+    public function it_deletes_an_industrial_job_using_the_required_query_id(): void
     {
         $this->http->fake([
-            '*/industrial/jobs/job-123' => $this->http->response([], 204),
+            '*' => $this->http->response(['id' => 'job-123', 'uuid' => 'job-uuid']),
         ]);
-
         $resource = new BetaResource($this->samsara);
 
         $result = $resource->deleteIndustrialJob('job-123');
 
-        $this->assertTrue($result);
+        $this->assertSame('job-123', $result['id']);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'DELETE'
+            && parse_url($request->url(), PHP_URL_PATH) === '/beta/industrial/jobs'
+            && $this->queryFor($request->url()) === ['id' => 'job-123']);
     }
 
+    /**
+     * @param  class-string<Entity>  $expectedClass
+     * @param  array<string, string>  $expectedQuery
+     */
     #[Test]
-    public function it_can_get_aemp_fleet(): void
-    {
+    #[DataProvider('paginatedBuilderContracts')]
+    public function it_executes_paginated_builder_contracts(
+        string $method,
+        string $path,
+        string $expectedClass,
+        array $expectedQuery
+    ): void {
+        $item = match ($expectedClass) {
+            TrailerStats::class => [
+                'id'                => 'trailer-1',
+                'gpsOdometerMeters' => ['value' => 1234],
+            ],
+            SafetyScore::class => [
+                'driverId'    => 'driver-1',
+                'driverScore' => 91,
+            ],
+            default => ['id' => 'entity-1'],
+        };
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data'       => [$item],
+                'pagination' => ['hasNextPage' => false],
+            ]),
+        ]);
         $resource = new BetaResource($this->samsara);
 
-        $builder = $resource->aempFleet();
+        $builder = $this->configureBuilder($resource, $method);
+        $result = $builder->after('cursor-1')->paginate();
 
-        $this->assertInstanceOf(Builder::class, $builder);
+        $entity = $result->items()->first();
+        $this->assertSame($expectedClass, $entity::class);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === $path
+            && $this->queryFor($request->url()) === $expectedQuery);
     }
 
     #[Test]
-    public function it_can_get_detections_stream(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->detectionsStream();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_devices(): void
+    public function it_gets_aemp_fleet_from_the_current_page_path(): void
     {
         $this->http->fake([
-            '*/devices' => $this->http->response([
-                'data' => [
-                    ['id' => 'device-1'],
-                    ['id' => 'device-2'],
-                ],
-            ], 200),
+            '*' => $this->http->response(['Fleet' => ['links' => []]]),
         ]);
-
         $resource = new BetaResource($this->samsara);
 
-        $result = $resource->devices();
+        $result = $resource->aempFleet('7');
 
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
+        $this->assertSame(['Fleet' => ['links' => []]], $result);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/beta/aemp/Fleet/7');
     }
 
     #[Test]
-    public function it_can_get_hos_eld_events(): void
+    public function it_rejects_phantom_generic_operations_on_the_beta_root(): void
     {
+        $this->http->fake();
         $resource = new BetaResource($this->samsara);
 
-        $builder = $resource->hosEldEvents();
-
-        $this->assertInstanceOf(Builder::class, $builder);
+        try {
+            $resource->all();
+            $this->fail('Expected the inherited all operation to be rejected.');
+        } catch (UnsupportedOperationException) {
+            $this->http->assertNothingSent();
+        }
     }
 
     #[Test]
-    public function it_can_get_industrial_jobs(): void
+    public function it_updates_an_industrial_job_using_the_required_query_id(): void
     {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->industrialJobs();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_qualifications_records(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->qualificationsRecords();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_qualifications_types(): void
-    {
+        $body = [
+            'job' => [
+                'id'        => 'job-123',
+                'name'      => 'Updated Job',
+                'startDate' => '2026-08-10',
+                'endDate'   => '2026-08-11',
+            ],
+            'keepHistory' => true,
+        ];
         $this->http->fake([
-            '*/qualifications/types' => $this->http->response([
-                'data' => [
-                    ['id' => 'type-1'],
-                    ['id' => 'type-2'],
-                ],
-            ], 200),
+            '*' => $this->http->response(['data' => $body['job']]),
         ]);
-
         $resource = new BetaResource($this->samsara);
 
-        $result = $resource->qualificationsTypes();
+        $result = $resource->updateIndustrialJob('job-123', $body);
 
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
-    }
-
-    #[Test]
-    public function it_can_get_readings_definitions(): void
-    {
-        $this->http->fake([
-            '*/readings/definitions' => $this->http->response([
-                'data' => [
-                    ['id' => 'def-1'],
-                    ['id' => 'def-2'],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new BetaResource($this->samsara);
-
-        $result = $resource->readingsDefinitions();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
-    }
-
-    #[Test]
-    public function it_can_get_readings_history(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->readingsHistory();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_readings_latest(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->readingsLatest();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_reports_configs(): void
-    {
-        $this->http->fake([
-            '*/reports/configs' => $this->http->response([
-                'data' => [
-                    ['id' => 'config-1'],
-                    ['id' => 'config-2'],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new BetaResource($this->samsara);
-
-        $result = $resource->reportsConfigs();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
-    }
-
-    #[Test]
-    public function it_can_get_reports_datasets(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->reportsDatasets();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_reports_runs(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->reportsRuns();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_safety_scores_drivers(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->safetyScoresDrivers();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_safety_scores_vehicles(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->safetyScoresVehicles();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_trailer_stats_current(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->trailerStatsCurrent();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_trailer_stats_feed(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->trailerStatsFeed();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_trailer_stats_history(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->trailerStatsHistory();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_training_assignments(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->trainingAssignments();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_training_courses(): void
-    {
-        $this->http->fake([
-            '*/training/courses' => $this->http->response([
-                'data' => [
-                    ['id' => 'course-1'],
-                    ['id' => 'course-2'],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new BetaResource($this->samsara);
-
-        $result = $resource->trainingCourses();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
-    }
-
-    #[Test]
-    public function it_can_get_vehicle_immobilizer_stream(): void
-    {
-        $resource = new BetaResource($this->samsara);
-
-        $builder = $resource->vehicleImmobilizerStream();
-
-        $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_update_industrial_job(): void
-    {
-        $this->http->fake([
-            '*/industrial/jobs/job-123' => $this->http->response([
-                'data' => [
-                    'id'   => 'job-123',
-                    'name' => 'Updated Job',
-                ],
-            ], 200),
-        ]);
-
-        $resource = new BetaResource($this->samsara);
-
-        $result = $resource->updateIndustrialJob('job-123', ['name' => 'Updated Job']);
-
-        $this->assertIsArray($result);
         $this->assertSame('Updated Job', $result['name']);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'PATCH'
+            && parse_url($request->url(), PHP_URL_PATH) === '/beta/industrial/jobs'
+            && $this->queryFor($request->url()) === ['id' => 'job-123']
+            && $request->data() === $body);
+    }
+
+    #[Test]
+    public function it_uses_the_current_qualification_records_path_and_serialization(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['data' => [['id' => 'record-1']]]),
+        ]);
+        $resource = new BetaResource($this->samsara);
+
+        $result = $resource->qualificationsRecords()->where('ids', 'record-1,record-2')->get();
+
+        $this->assertSame(Entity::class, $result->first()::class);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/qualification-records'
+            && $this->queryFor($request->url()) === ['ids' => 'record-1,record-2']);
+    }
+
+    /**
+     * @return array<string, array{string, string, class-string<Entity>, array<string, string>}>
+     */
+    public static function paginatedBuilderContracts(): array
+    {
+        return [
+            'detections' => [
+                'detectionsStream',
+                '/detections/stream',
+                Entity::class,
+                [
+                    'startTime' => '2026-08-10T12:00:00Z',
+                    'driverIds' => 'driver-1,driver-2',
+                    'after'     => 'cursor-1',
+                ],
+            ],
+            'devices'        => ['devices', '/devices', Entity::class, ['limit' => '100', 'after' => 'cursor-1']],
+            'hos eld events' => [
+                'hosEldEvents',
+                '/beta/fleet/hos/drivers/eld-events',
+                Entity::class,
+                [
+                    'startTime' => '2026-08-10T12:00:00Z',
+                    'endTime'   => '2026-08-10T13:00:00Z',
+                    'driverIds' => 'driver-1,driver-2',
+                    'limit'     => '25',
+                    'after'     => 'cursor-1',
+                ],
+            ],
+            'industrial jobs'     => ['industrialJobs', '/beta/industrial/jobs', Entity::class, ['after' => 'cursor-1']],
+            'qualification types' => [
+                'qualificationsTypes',
+                '/qualification-types',
+                Entity::class,
+                ['entityType' => 'worker', 'after' => 'cursor-1'],
+            ],
+            'reading definitions' => ['readingsDefinitions', '/readings/definitions', Entity::class, ['after' => 'cursor-1']],
+            'reading history'     => [
+                'readingsHistory',
+                '/readings/history',
+                Entity::class,
+                ['readingId' => 'reading-1', 'entityType' => 'asset', 'after' => 'cursor-1'],
+            ],
+            'reading snapshot' => [
+                'readingsLatest',
+                '/readings/latest',
+                Entity::class,
+                ['readingIds' => 'reading-1', 'entityType' => 'asset', 'after' => 'cursor-1'],
+            ],
+            'report configs'       => ['reportsConfigs', '/reports/configs', Entity::class, ['limit' => '100', 'after' => 'cursor-1']],
+            'report datasets'      => ['reportsDatasets', '/reports/datasets', Entity::class, ['limit' => '100', 'after' => 'cursor-1']],
+            'report runs'          => ['reportsRuns', '/reports/runs', Entity::class, ['limit' => '100', 'after' => 'cursor-1']],
+            'driver safety scores' => [
+                'safetyScoresDrivers',
+                '/safety-scores/drivers',
+                SafetyScore::class,
+                [
+                    'startTime' => '2026-08-10T12:00:00Z',
+                    'endTime'   => '2026-08-10T13:00:00Z',
+                    'driverIds' => 'driver-1,driver-2',
+                    'after'     => 'cursor-1',
+                ],
+            ],
+            'vehicle safety scores' => [
+                'safetyScoresVehicles',
+                '/safety-scores/vehicles',
+                Entity::class,
+                [
+                    'startTime'  => '2026-08-10T12:00:00Z',
+                    'endTime'    => '2026-08-10T13:00:00Z',
+                    'vehicleIds' => 'vehicle-1,vehicle-2',
+                    'after'      => 'cursor-1',
+                ],
+            ],
+            'trailer stats snapshot' => ['trailerStatsCurrent', '/fleet/trailers/stats', TrailerStats::class, ['after' => 'cursor-1']],
+            'trailer stats feed'     => ['trailerStatsFeed', '/fleet/trailers/stats/feed', Entity::class, ['after' => 'cursor-1']],
+            'trailer stats history'  => ['trailerStatsHistory', '/fleet/trailers/stats/history', Entity::class, ['after' => 'cursor-1']],
+            'training assignments'   => [
+                'trainingAssignments',
+                '/training-assignments/stream',
+                Entity::class,
+                ['startTime' => '2026-08-10T12:00:00Z', 'after' => 'cursor-1'],
+            ],
+            'training courses'    => ['trainingCourses', '/training-courses', Entity::class, ['after' => 'cursor-1']],
+            'vehicle immobilizer' => [
+                'vehicleImmobilizerStream',
+                '/fleet/vehicles/immobilizer/stream',
+                Entity::class,
+                ['after' => 'cursor-1'],
+            ],
+        ];
+    }
+
+    private function configureBuilder(BetaResource $resource, string $method): Builder
+    {
+        $builder = $resource->{$method}();
+
+        return match ($method) {
+            'detectionsStream' => $builder
+                ->startTime('2026-08-10T12:00:00Z')
+                ->whereDriver(['driver-1', 'driver-2']),
+            'hosEldEvents', 'safetyScoresDrivers' => $builder
+                ->between('2026-08-10T12:00:00Z', '2026-08-10T13:00:00Z')
+                ->whereDriver(['driver-1', 'driver-2']),
+            'safetyScoresVehicles' => $builder
+                ->between('2026-08-10T12:00:00Z', '2026-08-10T13:00:00Z')
+                ->whereVehicle(['vehicle-1', 'vehicle-2']),
+            'qualificationsTypes' => $builder->where('entityType', 'worker'),
+            'readingsHistory'     => $builder
+                ->where('readingId', 'reading-1')
+                ->where('entityType', 'asset'),
+            'readingsLatest' => $builder
+                ->where('readingIds', 'reading-1')
+                ->where('entityType', 'asset'),
+            'trainingAssignments' => $builder->startTime('2026-08-10T12:00:00Z'),
+            default               => $builder,
+        };
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function queryFor(string $url): array
+    {
+        parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
+
+        /** @var array<string, string> $query */
+        return $query;
     }
 }

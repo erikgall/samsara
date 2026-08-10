@@ -100,7 +100,7 @@ Samsara::addresses()->delete('address-id');
 
 ## Filtering
 
-Addresses accept the standard query builder. See [the query builder reference](../query-builder.md) for the full method list.
+Addresses accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
 
 ```php
 $addresses = Samsara::addresses()
@@ -154,7 +154,7 @@ The `Address` entity (`Samsara\Data\Address\Address`) exposes the following type
 
 ## Related Resources
 
-- [Contacts](contacts.md) — attach a contact directory to your addresses.
-- [Tags](tags.md) — group addresses for filtering.
-- [Routes](routes.md) — addresses are referenced by route stops.
-- [Query Builder](../query-builder.md) — for filtering, pagination, and lazy iteration.
+- [Contacts](contacts.html) — attach a contact directory to your addresses.
+- [Tags](tags.html) — group addresses for filtering.
+- [Routes](routes.html) — addresses are referenced by route stops.
+- [Query Builder](../query-builder.html) — for filtering, pagination, and lazy iteration.

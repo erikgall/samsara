@@ -16,6 +16,8 @@ use Samsara\Enums\DriverActivationStatus;
  * @property-read string|null $name Driver name
  * @property-read string|null $username Login username
  * @property-read string|null $phone Phone number
+ * @property-read string|null $email Email address
+ * @property-read string|null $dateOfBirth Date of birth
  * @property-read string|null $licenseNumber Driver's license number
  * @property-read string|null $licenseState License state abbreviation
  * @property-read string|null $timezone Home terminal timezone
@@ -29,13 +31,25 @@ use Samsara\Enums\DriverActivationStatus;
  * @property-read string|null $tachographCardNumber Tachograph card number
  * @property-read string|null $eldExemptReason ELD exempt reason
  * @property-read bool|null $eldExempt Whether driver is ELD exempt
+ * @property-read bool|null $eldAdverseWeatherExemptionEnabled Adverse-weather exemption enabled
+ * @property-read bool|null $eldBigDayExemptionEnabled Big-day exemption enabled
+ * @property-read int|null $eldDayStartHour ELD day start hour
  * @property-read bool|null $eldPcEnabled Personal conveyance enabled
  * @property-read bool|null $eldYmEnabled Yard move enabled
+ * @property-read bool|null $hasDrivingFeaturesHidden Driving features hidden
+ * @property-read bool|null $hasVehicleUnpinningEnabled Vehicle unpinning enabled
+ * @property-read bool|null $isDeactivated Whether the driver is deactivated
+ * @property-read bool|null $waitingTimeDutyStatusEnabled Waiting-time duty status enabled
  * @property-read array<string, string>|null $externalIds External ID mappings
+ * @property-read array<int, array<string, mixed>>|null $attributes Driver attributes
  * @property-read array<int, array{id: string, name?: string, parentTagId?: string}>|null $tags Associated tags
  * @property-read array{rulesets?: array<int, array{name?: string, cycle?: string}>}|null $eldSettings ELD settings
  * @property-read array{carrierName?: string, dotNumber?: int, homeTerminalAddress?: string, homeTerminalName?: string, mainOfficeAddress?: string}|null $carrierSettings Carrier settings
  * @property-read array{id: string, name?: string}|null $staticAssignedVehicle Static assigned vehicle
+ * @property-read array{id?: string, name?: string}|null $peerGroupTag Peer group tag
+ * @property-read array{id?: string, name?: string}|null $trailerGroupTag Trailer group tag
+ * @property-read array{id?: string, name?: string}|null $vehicleGroupTag Vehicle group tag
+ * @property-read string|null $usDriverRulesetOverride US driver ruleset override
  */
 class Driver extends Entity
 {

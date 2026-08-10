@@ -5,7 +5,7 @@ namespace Samsara\Exceptions;
 use Throwable;
 
 /**
- * Exception thrown when API request validation fails (422 Unprocessable Entity).
+ * Exception thrown when an API request fails validation.
  *
  * @author Erik Galloway <erik@erikgall.com>
  */
@@ -25,14 +25,16 @@ class ValidationException extends SamsaraException
      * @param  array<string, array<int, string>>  $errors  The validation errors
      * @param  Throwable|null  $previous  The previous exception
      * @param  array<string, mixed>  $context  Additional context
+     * @param  int  $status  The HTTP response status
      */
     public function __construct(
         string $message = 'Validation failed',
         array $errors = [],
         ?Throwable $previous = null,
-        array $context = []
+        array $context = [],
+        int $status = 422
     ) {
-        parent::__construct($message, 422, $previous, $context);
+        parent::__construct($message, $status, $previous, $context);
         $this->errors = $errors;
     }
 

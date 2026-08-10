@@ -3,12 +3,15 @@
 namespace Samsara\Tests\Unit\Resources\Integrations;
 
 use Samsara\Samsara;
+use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Vehicle\Gateway;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Integrations\GatewaysResource;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the GatewaysResource class.
@@ -47,11 +50,14 @@ class GatewaysResourceTest extends TestCase
 
         $gateway = $resource->create([
             'serial' => 'ABC123',
-            'model'  => 'VG34',
         ]);
 
         $this->assertInstanceOf(Gateway::class, $gateway);
         $this->assertSame('ABC123', $gateway->serial);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/gateways'
+            && $request->data() === ['serial' => 'ABC123']
+        );
     }
 
     #[Test]
@@ -66,6 +72,10 @@ class GatewaysResourceTest extends TestCase
         $result = $resource->delete('gateway-123');
 
         $this->assertTrue($result);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'DELETE'
+            && parse_url($request->url(), PHP_URL_PATH) === '/gateways/gateway-123'
+            && $request->data() === []
+        );
     }
 
     #[Test]
@@ -86,6 +96,20 @@ class GatewaysResourceTest extends TestCase
 
         $this->assertInstanceOf(EntityCollection::class, $result);
         $this->assertCount(2, $result);
+        $this->assertInstanceOf(Gateway::class, $result->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/gateways'
+            && $request->data() === []
+        );
+    }
+
+    #[Test]
+    public function it_exposes_a_query_builder_for_cursor_pagination(): void
+    {
+        $resource = new GatewaysResource($this->samsara);
+
+        $this->assertTrue(method_exists($resource, 'query'));
+        $this->assertInstanceOf(Builder::class, $resource->query());
     }
 
     #[Test]
@@ -102,5 +126,59 @@ class GatewaysResourceTest extends TestCase
         $resource = new GatewaysResource($this->samsara);
 
         $this->assertSame(Gateway::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_paginates_gateways_without_an_unsupported_limit(): void
+    {
+        $this->http->fakeSequence()
+            ->push([
+                'data' => [[
+                    'id'     => 'gateway-1',
+                    'serial' => 'ABC123',
+                    'model'  => 'VG34',
+                ]],
+                'pagination' => ['endCursor' => 'gateway-next', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data'       => [],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]);
+
+        $page = (new GatewaysResource($this->samsara))
+            ->query()
+            ->where('models', 'VG34,VG55')
+            ->paginate();
+        $page->nextPage();
+
+        $this->assertInstanceOf(Gateway::class, $page->items()->first());
+        $this->http->assertSentCount(2);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/gateways'
+            && $request->data() === ['models' => 'VG34,VG55']
+        );
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/gateways'
+            && $request->data() === ['models' => 'VG34,VG55', 'after' => 'gateway-next']
+        );
+    }
+
+    #[Test]
+    public function it_rejects_unsupported_item_lookup_and_update_without_http(): void
+    {
+        $resource = new GatewaysResource($this->samsara);
+
+        foreach (['find', 'update'] as $operation) {
+            try {
+                $operation === 'find'
+                    ? $resource->find('gateway-123')
+                    : $resource->update('gateway-123', ['serial' => 'DEF456']);
+                $this->fail("Gateway {$operation} must fail before sending HTTP.");
+            } catch (UnsupportedOperationException) {
+                $this->assertTrue(true);
+            }
+        }
+
+        $this->http->assertNothingSent();
     }
 }

@@ -12,13 +12,12 @@ permalink: /resources/carrier-proposed-assignments
 - [Creating Records](#creating-records)
 - [Updating Records](#updating-records)
 - [Deleting Records](#deleting-records)
-- [Filtering](#filtering)
 - [Properties](#properties)
 - [Related Resources](#related-resources)
 
 ## Introduction
 
-Carrier-proposed assignments represent assignment suggestions a carrier surfaces to drivers — pairings of a driver with a vehicle or trailer that the driver may accept on the Samsara Driver app. The resource exposes the standard CRUD methods inherited from the base `Resource` class against the `/fleet/carrier-proposed-assignments` endpoint. Reach for the regular [Assignments](assignments.md) resource when you need to read or manage driver, vehicle, and trailer assignments that have already been confirmed.
+Carrier-proposed assignments represent assignment suggestions a carrier surfaces to drivers. The resource supports generic `all`, `create`, and `delete`, plus `query()` for cursor-aware collection access. `find()` and `update()` are rejected locally. Reach for [Assignments](assignments.html) when you need confirmed assignments.
 
 ## Retrieving Records
 
@@ -26,17 +25,6 @@ Carrier-proposed assignments represent assignment suggestions a carrier surfaces
 use Samsara\Facades\Samsara;
 
 $proposals = Samsara::carrierProposedAssignments()->all();
-
-$proposal = Samsara::carrierProposedAssignments()->find('proposal-id');
-```
-
-You may also build a query when you need cursor pagination or query parameters supported by the endpoint:
-
-```php
-$proposals = Samsara::carrierProposedAssignments()
-    ->query()
-    ->limit(50)
-    ->paginate();
 ```
 
 ## Creating Records
@@ -52,11 +40,7 @@ The accepted payload shape is dictated by the Samsara API. Pass the same keys yo
 
 ## Updating Records
 
-```php
-$proposal = Samsara::carrierProposedAssignments()->update('proposal-id', [
-    'vehicleId' => 'replacement-vehicle-id',
-]);
-```
+`update()` is unsupported and throws `UnsupportedOperationException` before HTTP.
 
 ## Deleting Records
 
@@ -64,15 +48,13 @@ $proposal = Samsara::carrierProposedAssignments()->update('proposal-id', [
 Samsara::carrierProposedAssignments()->delete('proposal-id');
 ```
 
-## Filtering
-
-The resource inherits the generic [query builder](../query-builder.md). Endpoint-specific filters depend on the Samsara API; consult the [Samsara developer reference](https://developers.samsara.com/) for the supported parameters.
-
 ## Properties
 
 The resource returns a generic `Entity` (a `Fluent` instance) keyed by the fields the Samsara API includes in the response. Access values with array syntax or `Fluent` accessors:
 
 ```php
+$proposal = $proposals->first();
+
 $proposal['id'];
 $proposal['driverId'];
 $proposal['vehicleId'];
@@ -80,7 +62,7 @@ $proposal['vehicleId'];
 
 ## Related Resources
 
-- [Assignments](assignments.md) — driver, vehicle, and trailer assignments after they are confirmed.
-- [Drivers](drivers.md) — the drivers a proposal targets.
-- [Vehicles](vehicles.md) — the vehicles a proposal references.
-- [Trailers](trailers.md) — the trailers a proposal references.
+- [Assignments](assignments.html) — driver, vehicle, and trailer assignments after they are confirmed.
+- [Drivers](drivers.html) — the drivers a proposal targets.
+- [Vehicles](vehicles.html) — the vehicles a proposal references.
+- [Trailers](trailers.html) — the trailers a proposal references.

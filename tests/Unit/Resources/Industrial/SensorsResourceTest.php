@@ -8,6 +8,7 @@ use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Industrial\SensorsResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the SensorsResource class (Legacy v1).
@@ -46,10 +47,11 @@ class SensorsResourceTest extends TestCase
 
         $resource = new SensorsResource($this->samsara);
 
-        $result = $resource->cargo(['groupId' => 123, 'sensors' => [1]]);
+        $result = $resource->cargo(['sensors' => [1]]);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('sensors', $result);
+        $this->assertPostWasSent('/v1/sensors/cargo', ['sensors' => [1]]);
     }
 
     #[Test]
@@ -69,10 +71,11 @@ class SensorsResourceTest extends TestCase
 
         $resource = new SensorsResource($this->samsara);
 
-        $result = $resource->door(['groupId' => 123, 'sensors' => [1]]);
+        $result = $resource->door(['sensors' => [1]]);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('sensors', $result);
+        $this->assertPostWasSent('/v1/sensors/door', ['sensors' => [1]]);
     }
 
     #[Test]
@@ -92,10 +95,11 @@ class SensorsResourceTest extends TestCase
 
         $resource = new SensorsResource($this->samsara);
 
-        $result = $resource->humidity(['groupId' => 123, 'sensors' => [1]]);
+        $result = $resource->humidity(['sensors' => [1]]);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('sensors', $result);
+        $this->assertPostWasSent('/v1/sensors/humidity', ['sensors' => [1]]);
     }
 
     #[Test]
@@ -115,15 +119,22 @@ class SensorsResourceTest extends TestCase
         $resource = new SensorsResource($this->samsara);
 
         $result = $resource->history([
-            'groupId' => 123,
             'startMs' => 1609459200000,
             'endMs'   => 1609545600000,
+            'stepMs'  => 60000,
             'series'  => ['ambientTemperature'],
             'sensors' => [1],
         ]);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('results', $result);
+        $this->assertPostWasSent('/v1/sensors/history', [
+            'startMs' => 1609459200000,
+            'endMs'   => 1609545600000,
+            'stepMs'  => 60000,
+            'series'  => ['ambientTemperature'],
+            'sensors' => [1],
+        ]);
     }
 
     #[Test]
@@ -143,10 +154,11 @@ class SensorsResourceTest extends TestCase
 
         $resource = new SensorsResource($this->samsara);
 
-        $result = $resource->temperature(['groupId' => 123, 'sensors' => [1]]);
+        $result = $resource->temperature(['sensors' => [1]]);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('sensors', $result);
+        $this->assertPostWasSent('/v1/sensors/temperature', ['sensors' => [1]]);
     }
 
     #[Test]
@@ -163,10 +175,11 @@ class SensorsResourceTest extends TestCase
 
         $resource = new SensorsResource($this->samsara);
 
-        $result = $resource->list(['groupId' => 123]);
+        $result = $resource->list();
 
         $this->assertInstanceOf(EntityCollection::class, $result);
         $this->assertCount(2, $result);
+        $this->assertPostWasSent('/v1/sensors/list', []);
     }
 
     #[Test]
@@ -175,5 +188,29 @@ class SensorsResourceTest extends TestCase
         $resource = new SensorsResource($this->samsara);
 
         $this->assertSame('/v1/sensors', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_rejects_phantom_generic_operations(): void
+    {
+        $this->http->fake();
+        $resource = new SensorsResource($this->samsara);
+
+        try {
+            $resource->all();
+            $this->fail('Expected the inherited all operation to be rejected.');
+        } catch (UnsupportedOperationException) {
+            $this->http->assertNothingSent();
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $body
+     */
+    private function assertPostWasSent(string $path, array $body): void
+    {
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === $path
+            && $request->data() === $body);
     }
 }

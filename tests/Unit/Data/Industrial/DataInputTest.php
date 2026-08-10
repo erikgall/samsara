@@ -6,6 +6,7 @@ use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Industrial\DataInput;
+use Samsara\Data\Industrial\DataPoint;
 
 /**
  * Unit tests for the DataInput entity.
@@ -56,5 +57,25 @@ class DataInputTest extends TestCase
         $input = new DataInput;
 
         $this->assertInstanceOf(Entity::class, $input);
+    }
+
+    #[Test]
+    public function it_hydrates_current_singular_and_plural_data_points(): void
+    {
+        $input = DataInput::make([
+            'id'          => 'input-1',
+            'numberPoint' => [
+                'time'  => '2026-08-10T12:00:00Z',
+                'value' => 98.6,
+            ],
+            'stringPoints' => [
+                ['time' => '2026-08-10T12:00:01Z', 'value' => 'running'],
+            ],
+        ]);
+
+        $this->assertInstanceOf(DataPoint::class, $input->numberPoint);
+        $this->assertSame(98.6, $input->numberPoint->value);
+        $this->assertInstanceOf(DataPoint::class, $input->stringPoints[0]);
+        $this->assertSame('running', $input->stringPoints[0]->value);
     }
 }

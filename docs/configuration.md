@@ -26,7 +26,7 @@ permalink: /configuration
 
 ## Introduction
 
-Samsara reads its configuration from `config/samsara.php`, which is merged into the published file when you run `vendor:publish`. The service provider passes `api_key`, `timeout`, `retry`, and `per_page` into the singleton client, and applies the EU base URL when `region` is `eu`. The reference below covers every config key and the runtime overrides the client exposes for switching regions, swapping tokens, and inspecting the active configuration.
+Samsara reads its configuration from `config/samsara.php`, which is merged into the published file when you run `vendor:publish`. The service provider passes `api_key`, `timeout`, `retry`, and `per_page` into the singleton client and applies the selected US, EU, or Canada base URL. The reference below covers every config key and the runtime overrides the client exposes for switching regions, swapping tokens, and inspecting the active configuration.
 
 ## Publishing the Configuration
 
@@ -57,7 +57,7 @@ You may obtain a token from the Samsara dashboard under **Settings -> Organizati
 
 ### Region
 
-The Samsara API region your fleet lives in. Use `us` for the US endpoint or `eu` for the EU endpoint. The service provider switches the client to the EU base URL when this value is `eu`; the default is `us`.
+The Samsara API region your fleet lives in. Use `us`, `eu`, or `ca`. The default is `us`; unknown values also fall back to the US endpoint.
 
 ```php
 // config/samsara.php
@@ -72,6 +72,9 @@ SAMSARA_REGION=eu
 |--------|-------------|
 | `us` | `https://api.samsara.com` |
 | `eu` | `https://api.eu.samsara.com` |
+| `ca` | `https://api.ca.samsara.com` |
+
+The same three endpoints are available at runtime through `useUsEndpoint()`, `useEuEndpoint()`, and `useCanadaEndpoint()`.
 
 ### Timeout
 
@@ -101,7 +104,7 @@ SAMSARA_RETRY=5
 
 ### Per Page
 
-The default page size for paginated requests. The query builder uses this value when you call `paginate()` or `lazy()` without an explicit `perPage`. Lower it if you stream large result sets and need finer control over memory; raise it to reduce round trips when you know the total fits in fewer pages.
+This value supplies the implicit `limit` for `paginate()` and `lazy()` when the caller did not set a limit. Explicit `paginate($perPage)`, `lazy($chunkSize)`, `limit()`, and `where('limit', ...)` values take precedence. Builders for official cursor endpoints that do not accept `limit` opt out automatically with `withoutDefaultPageSize()`.
 
 ```php
 // config/samsara.php
@@ -125,13 +128,13 @@ The Base64-encoded secret used by `VerifyWebhookSignature` middleware to verify 
 SAMSARA_WEBHOOK_SECRET=your-base64-encoded-secret
 ```
 
-You may copy this secret from the Samsara dashboard when creating or viewing a webhook. See [resources/webhooks.md](resources/webhooks.md) for verification details.
+You may copy this secret from the Samsara dashboard when creating or viewing a webhook. See [resources/webhooks.md](resources/webhooks.html) for verification details.
 
 ## Runtime Configuration
 
 ### Switching Regions
 
-If your application talks to fleets in both regions, you may switch endpoints at runtime:
+If your application talks to fleets in more than one region, you may switch endpoints at runtime:
 
 ```php
 use Samsara\Facades\Samsara;
@@ -142,6 +145,8 @@ Samsara::useEuEndpoint();
 $drivers = Samsara::drivers()->all();
 
 Samsara::useUsEndpoint();
+
+Samsara::useCanadaEndpoint();
 ```
 
 Both methods mutate the singleton client. Pair them with `withToken()` if each region has a different token.
@@ -170,7 +175,7 @@ The client exposes three read accessors useful for diagnostics and conditional l
 
 - `Samsara::getConfig(string $key, mixed $default = null): mixed` — reads a single config value (`timeout`, `retry`, `per_page`) the client was constructed with.
 - `Samsara::hasToken(): bool` — returns `true` if a token has been set, including via `withToken()`.
-- `Samsara::getBaseUrl(): string` — returns the active base URL, switching with `useUsEndpoint()` and `useEuEndpoint()`.
+- `Samsara::getBaseUrl(): string` — returns the active base URL, switching with `useUsEndpoint()`, `useEuEndpoint()`, and `useCanadaEndpoint()`.
 
 ```php
 if (! Samsara::hasToken()) {
@@ -223,10 +228,12 @@ SAMSARA_TIMEOUT=30
 SAMSARA_RETRY=3
 ```
 
-For testing, swap the live client out entirely with the fake:
+For testing, replace the facade root and both container bindings with a fake client:
 
 ```php
 $fake = Samsara::fake();
 ```
 
-See [testing.md](testing.md) for the full fake API.
+`Samsara::fake()` returns the `SamsaraFake` and swaps it into the facade, the `Samsara\Samsara` binding, and the `samsara` alias. Both `$fake->drivers()->all()` and later `Samsara::drivers()->all()` calls use the same fake.
+
+See [testing.md](testing.html) for the full fake API.

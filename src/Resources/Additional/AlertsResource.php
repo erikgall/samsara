@@ -4,6 +4,7 @@ namespace Samsara\Resources\Additional;
 
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
+use Samsara\Data\Alert\AlertIncident;
 use Samsara\Data\Alert\AlertConfiguration;
 
 /**
@@ -42,9 +43,10 @@ class AlertsResource extends Resource
      */
     public function createConfiguration(array $data): AlertConfiguration
     {
-        $response = $this->client()->post('/alerts/configurations', $data);
-
-        $this->handleError($response);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($this->endpoint, $data),
+            $this->endpoint
+        );
 
         /** @var AlertConfiguration */
         return $this->mapToEntity($response->json('data', $response->json()));
@@ -52,14 +54,15 @@ class AlertsResource extends Resource
 
     /**
      * Delete alert configurations.
-     *
-     * @param  array<int, string>  $ids
      */
-    public function deleteConfigurations(array $ids): bool
+    public function deleteConfigurations(string $id): bool
     {
-        $response = $this->client()->delete('/alerts/configurations', ['ids' => $ids]);
-
-        $this->handleError($response);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()
+                ->withQueryParameters(['id' => $id])
+                ->delete($this->endpoint),
+            $this->endpoint
+        );
 
         return $response->successful();
     }
@@ -69,7 +72,10 @@ class AlertsResource extends Resource
      */
     public function incidents(): Builder
     {
-        return $this->createBuilderWithEndpoint('/alerts/incidents');
+        return $this->createBuilderWithEndpoint('/alerts/incidents/stream')
+            ->withoutDefaultPageSize()
+            ->repeatQueryParameters('configurationIds')
+            ->usingEntity(AlertIncident::class);
     }
 
     /**
@@ -77,7 +83,9 @@ class AlertsResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))
+            ->withoutDefaultPageSize()
+            ->repeatQueryParameters('ids');
     }
 
     /**
@@ -87,11 +95,21 @@ class AlertsResource extends Resource
      */
     public function updateConfiguration(string $id, array $data): AlertConfiguration
     {
-        $response = $this->client()->patch("/alerts/configurations/{$id}", $data);
-
-        $this->handleError($response);
+        $payload = [...$data, 'id' => $id];
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($this->endpoint, $payload),
+            $this->endpoint
+        );
 
         /** @var AlertConfiguration */
         return $this->mapToEntity($response->json('data', $response->json()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all', 'create'];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Samsara\Data\LiveShare;
 
+use DateTimeImmutable;
 use Samsara\Data\Entity;
 
 /**
@@ -13,12 +14,13 @@ use Samsara\Data\Entity;
  *
  * @property-read string|null $id Live share ID
  * @property-read string|null $name Live share name
- * @property-read string|null $url Live share URL
- * @property-read string|null $status Live share status (active, expired)
- * @property-read string|null $expiresAt Expiration time (RFC 3339)
- * @property-read string|null $createdAtTime Creation time (RFC 3339)
- * @property-read array<int, array{id?: string, type?: string}>|null $assets Shared assets
- * @property-read array<int, array{email?: string}>|null $recipients Share recipients
+ * @property-read string|null $liveSharingUrl Live share URL
+ * @property-read string|null $type Live share type
+ * @property-read string|null $description Live share description
+ * @property-read string|null $expiresAtTime Expiration time (RFC 3339)
+ * @property-read array<string, mixed>|null $assetsLocationLinkConfig Assets-location configuration
+ * @property-read array<string, mixed>|null $assetsNearLocationLinkConfig Assets-near-location configuration
+ * @property-read array<string, mixed>|null $assetsOnRouteLinkConfig Assets-on-route configuration
  */
 class LiveShare extends Entity
 {
@@ -27,7 +29,7 @@ class LiveShare extends Entity
      */
     public function isActive(): bool
     {
-        return $this->status === 'active';
+        return ! $this->isExpired();
     }
 
     /**
@@ -35,6 +37,10 @@ class LiveShare extends Entity
      */
     public function isExpired(): bool
     {
-        return $this->status === 'expired';
+        if ($this->expiresAtTime === null) {
+            return false;
+        }
+
+        return new DateTimeImmutable($this->expiresAtTime) <= new DateTimeImmutable;
     }
 }

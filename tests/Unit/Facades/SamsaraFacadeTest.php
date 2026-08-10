@@ -32,6 +32,55 @@ class SamsaraFacadeTest extends TestCase
     }
 
     #[Test]
+    public function fake_replaces_deferred_facade_class_and_alias_bindings(): void
+    {
+        $originalFacadeApplication = \Illuminate\Support\Facades\Facade::getFacadeApplication();
+        $originalContainer = \Illuminate\Container\Container::getInstance();
+
+        try {
+            $app = new \Illuminate\Foundation\Application(dirname(__DIR__, 3));
+            $app->instance('config', new \Illuminate\Config\Repository([
+                'samsara' => [
+                    'api_key'  => 'test-token',
+                    'region'   => 'us',
+                    'timeout'  => 30,
+                    'retry'    => 0,
+                    'per_page' => 100,
+                ],
+            ]));
+            $app->setDeferredServices([
+                Samsara::class => \Samsara\SamsaraServiceProvider::class,
+                'samsara'      => \Samsara\SamsaraServiceProvider::class,
+            ]);
+
+            \Illuminate\Support\Facades\Facade::clearResolvedInstances();
+            \Illuminate\Support\Facades\Facade::setFacadeApplication($app);
+
+            $fake = SamsaraFacade::fake();
+            $alias = $app->make('samsara');
+
+            $this->assertSame($fake, SamsaraFacade::getFacadeRoot());
+            $this->assertSame($fake, $app->make(Samsara::class));
+            $this->assertSame($fake, $alias);
+        } finally {
+            \Illuminate\Support\Facades\Facade::clearResolvedInstances();
+            \Illuminate\Support\Facades\Facade::setFacadeApplication($originalFacadeApplication);
+            \Illuminate\Container\Container::setInstance($originalContainer);
+        }
+    }
+
+    #[Test]
+    public function fake_replaces_resolved_facade_and_container_singleton(): void
+    {
+        SamsaraFacade::getFacadeRoot();
+
+        $fake = SamsaraFacade::fake();
+
+        $this->assertSame($fake, SamsaraFacade::getFacadeRoot());
+        $this->assertSame($fake, $this->app->make(Samsara::class));
+    }
+
+    #[Test]
     public function it_can_call_client_method(): void
     {
         $this->app->forgetInstance(Samsara::class);

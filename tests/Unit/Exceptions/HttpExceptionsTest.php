@@ -124,6 +124,20 @@ class HttpExceptionsTest extends TestCase
     }
 
     #[Test]
+    public function validation_exception_can_preserve_the_actual_http_status(): void
+    {
+        $exception = new ValidationException(
+            'Validation failed',
+            [],
+            null,
+            ['status' => 400],
+            400
+        );
+
+        $this->assertSame(400, $exception->getCode());
+    }
+
+    #[Test]
     public function validation_exception_can_store_errors(): void
     {
         $errors = [

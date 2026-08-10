@@ -6,9 +6,12 @@ use Samsara\Samsara;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Vehicle\VehicleStats;
+use Samsara\Data\Vehicle\VehicleStatsSeries;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 use Samsara\Resources\Telematics\VehicleStatsResource;
 
 /**
@@ -42,66 +45,120 @@ class VehicleStatsResourceTest extends TestCase
     #[Test]
     public function it_can_create_engine_states_query_with_types(): void
     {
-        $resource = new VehicleStatsResource($this->samsara);
-        $query = $resource->engineStates();
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'          => 'vehicle-1',
+                    'name'        => 'Truck 1',
+                    'engineState' => ['value' => 'On', 'time' => '2026-08-10T15:00:00Z'],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
 
-        $this->assertInstanceOf(Builder::class, $query);
-        $queryParams = $query->buildQuery();
-        $this->assertStringContainsString('engineStates', $queryParams['types'] ?? '');
+        $resource = new VehicleStatsResource($this->samsara);
+        $page = $resource->engineStates()->paginate();
+
+        $this->assertInstanceOf(VehicleStats::class, $page->items()->first());
+        $this->assertSame('On', $page->items()->first()->engineState['value']);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/stats'
+            && $request->data() === ['types' => 'engineStates']
+        );
     }
 
     #[Test]
     public function it_can_create_fuel_percents_query_with_types(): void
     {
-        $resource = new VehicleStatsResource($this->samsara);
-        $query = $resource->fuelPercents();
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'          => 'vehicle-1',
+                    'name'        => 'Truck 1',
+                    'fuelPercent' => ['value' => 75, 'time' => '2026-08-10T15:00:00Z'],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
 
-        $this->assertInstanceOf(Builder::class, $query);
-        $queryParams = $query->buildQuery();
-        $this->assertStringContainsString('fuelPercents', $queryParams['types'] ?? '');
+        $resource = new VehicleStatsResource($this->samsara);
+        $page = $resource->fuelPercents()->paginate();
+
+        $this->assertSame(75, $page->items()->first()->getFuelPercent());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/stats'
+            && $request->data() === ['types' => 'fuelPercents']
+        );
     }
 
     #[Test]
     public function it_can_create_gps_query_with_types(): void
     {
-        $resource = new VehicleStatsResource($this->samsara);
-        $query = $resource->gps();
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'   => 'vehicle-1',
+                    'name' => 'Truck 1',
+                    'gps'  => [
+                        'latitude'          => 35.8,
+                        'longitude'         => -86.3,
+                        'time'              => '2026-08-10T15:00:00Z',
+                        'headingDegrees'    => 180,
+                        'speedMilesPerHour' => 40.0,
+                    ],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
 
-        $this->assertInstanceOf(Builder::class, $query);
-        $queryParams = $query->buildQuery();
-        $this->assertStringContainsString('gps', $queryParams['types'] ?? '');
+        $resource = new VehicleStatsResource($this->samsara);
+        $page = $resource->gps()->paginate();
+
+        $this->assertSame(35.8, $page->items()->first()->getGps()->latitude);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/stats'
+            && $request->data() === ['types' => 'gps']
+        );
     }
 
     #[Test]
     public function it_can_create_odometer_query_with_types(): void
     {
-        $resource = new VehicleStatsResource($this->samsara);
-        $query = $resource->odometer();
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'                => 'vehicle-1',
+                    'name'              => 'Truck 1',
+                    'obdOdometerMeters' => ['value' => 1000, 'time' => '2026-08-10T15:00:00Z'],
+                    'gpsOdometerMeters' => ['value' => 1001, 'time' => '2026-08-10T15:00:00Z'],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
 
-        $this->assertInstanceOf(Builder::class, $query);
-        $queryParams = $query->buildQuery();
-        $this->assertStringContainsString('obdOdometerMeters', $queryParams['types'] ?? '');
+        $resource = new VehicleStatsResource($this->samsara);
+        $page = $resource->odometer()->paginate();
+
+        $this->assertSame(1000, $page->items()->first()->getObdOdometerMeters());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/stats'
+            && $request->data() === ['types' => 'obdOdometerMeters,gpsOdometerMeters']
+        );
     }
 
     #[Test]
     public function it_can_get_all_stats(): void
     {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    ['id' => '1', 'name' => 'Truck 001', 'gps' => ['latitude' => 37.7749, 'longitude' => -122.4194]],
-                    ['id' => '2', 'name' => 'Truck 002', 'fuelPercent' => ['value' => 75]],
-                ],
-            ]),
-        ]);
-
         $resource = new VehicleStatsResource($this->samsara);
-        $stats = $resource->all();
 
-        $this->assertInstanceOf(EntityCollection::class, $stats);
-        $this->assertCount(2, $stats);
-        $this->assertInstanceOf(VehicleStats::class, $stats->first());
-        $this->assertSame('Truck 001', $stats->first()->name);
+        try {
+            $resource->all();
+            $this->fail('Vehicle stats all() cannot supply required types.');
+        } catch (UnsupportedOperationException) {
+            $this->assertTrue(true);
+        }
+
+        $this->http->assertNothingSent();
     }
 
     #[Test]
@@ -144,20 +201,41 @@ class VehicleStatsResourceTest extends TestCase
     public function it_feed_hits_correct_endpoint(): void
     {
         $this->http->fake([
-            'samsara.com/fleet/vehicles/stats/feed*' => $this->http->response([
-                'data' => [
-                    ['id' => '2', 'name' => 'Truck 002', 'fuelPercent' => ['value' => 75]],
-                ],
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'           => 'vehicle-2',
+                    'name'         => 'Truck 2',
+                    'fuelPercents' => [[
+                        'value'       => 75,
+                        'time'        => '2026-08-10T15:00:00Z',
+                        'decorations' => ['gps' => ['value' => ['latitude' => 35.8456, 'longitude' => -86.3903]]],
+                    ]],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
             ]),
-            '*' => $this->http->response(['data' => []], 200),
         ]);
 
         $resource = new VehicleStatsResource($this->samsara);
-        $stats = $resource->feed()->get();
+        $page = $resource->feed()
+            ->types(['fuelPercents', 'gps'])
+            ->withDecorations('gps')
+            ->after('stats-feed-cursor')
+            ->paginate();
 
+        $stats = $page->items();
         $this->assertInstanceOf(EntityCollection::class, $stats);
         $this->assertCount(1, $stats);
-        $this->assertSame('2', $stats->first()->getId());
+        $this->assertInstanceOf(VehicleStatsSeries::class, $stats->first());
+        $this->assertSame(75, $stats->first()->getFuelPercentReadings()->first()->value);
+        $this->assertSame(35.8456, $stats->first()->getFuelPercentReadings()->first()->decorations['gps']['value']['latitude']);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/stats/feed'
+            && $request->data() === [
+                'after'       => 'stats-feed-cursor',
+                'types'       => 'fuelPercents,gps',
+                'decorations' => 'gps',
+            ]
+        );
     }
 
     #[Test]
@@ -180,19 +258,95 @@ class VehicleStatsResourceTest extends TestCase
     public function it_history_hits_correct_endpoint(): void
     {
         $this->http->fake([
-            'samsara.com/fleet/vehicles/stats/history*' => $this->http->response([
-                'data' => [
-                    ['id' => '1', 'name' => 'Truck 001', 'gps' => ['latitude' => 37.7749]],
-                ],
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'   => 'vehicle-1',
+                    'name' => 'Truck 1',
+                    'gps'  => [[
+                        'latitude'  => 37.7749,
+                        'longitude' => -122.4194,
+                        'time'      => '2026-08-10T14:30:00Z',
+                    ]],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
             ]),
-            '*' => $this->http->response(['data' => []], 200),
         ]);
 
         $resource = new VehicleStatsResource($this->samsara);
-        $stats = $resource->history()->get();
+        $page = $resource->history()
+            ->between('2026-08-10T14:00:00Z', '2026-08-10T15:00:00Z')
+            ->types('gps')
+            ->paginate();
 
+        $stats = $page->items();
         $this->assertInstanceOf(EntityCollection::class, $stats);
         $this->assertCount(1, $stats);
-        $this->assertSame('1', $stats->first()->getId());
+        $this->assertInstanceOf(VehicleStatsSeries::class, $stats->first());
+        $this->assertSame('vehicle-1', $stats->first()->getId());
+        $this->assertSame(-122.4194, $stats->first()->getGpsReadings()->first()->longitude);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/stats/history'
+            && $request->data() === [
+                'startTime' => '2026-08-10T14:00:00Z',
+                'endTime'   => '2026-08-10T15:00:00Z',
+                'types'     => 'gps',
+            ]
+        );
+    }
+
+    #[Test]
+    public function it_terminal_executes_current_stats_with_required_types(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'          => 'vehicle-1',
+                    'name'        => 'Truck 1',
+                    'fuelPercent' => ['value' => 75, 'time' => '2026-08-10T15:00:00Z'],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new VehicleStatsResource($this->samsara))
+            ->current()
+            ->types('fuelPercents')
+            ->whereVehicle(['vehicle-1', 'vehicle-2'])
+            ->paginate();
+
+        $this->assertInstanceOf(VehicleStats::class, $page->items()->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/stats'
+            && $request->data() === [
+                'vehicleIds' => 'vehicle-1,vehicle-2',
+                'types'      => 'fuelPercents',
+            ]
+        );
+    }
+
+    #[Test]
+    public function it_terminal_executes_the_base_stats_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'   => 'vehicle-1',
+                    'name' => 'Truck 1',
+                    'gps'  => ['latitude' => 35.8, 'longitude' => -86.3, 'time' => '2026-08-10T15:00:00Z'],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $stats = (new VehicleStatsResource($this->samsara))
+            ->query()
+            ->types('gps')
+            ->get();
+
+        $this->assertInstanceOf(VehicleStats::class, $stats->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/stats'
+            && $request->data() === ['types' => 'gps']
+        );
     }
 }

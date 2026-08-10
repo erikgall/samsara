@@ -22,12 +22,12 @@ permalink: /resources/live-shares
 
 The `Samsara::liveShares()` resource manages live sharing links — time-limited URLs that let people without Samsara accounts watch a vehicle on a map. Each share has an expiration time, a list of shared assets, and a list of email recipients; revoke it by deleting the live share record.
 
+The resource owns generic `all`, `create`, `update`, and `delete`. `update($id, $data)` and `delete($id)` use the collection path `/live-shares?id={id}`. Generic `find` is unsupported and throws before HTTP.
+
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
-
-$share = Samsara::liveShares()->find('live-share-id');
 
 $shares = Samsara::liveShares()->all();
 
@@ -37,7 +37,7 @@ $active = Samsara::liveShares()
     ->get();
 ```
 
-`find()` returns `null` when the share does not exist; `all()` returns an `EntityCollection<int, LiveShare>`.
+`all()` returns an `EntityCollection<int, LiveShare>`. Use `query()` to filter the collection; there is no single-record `find()` capability.
 
 ## Creating Records
 
@@ -70,11 +70,11 @@ $share = Samsara::liveShares()->update('live-share-id', [
 Samsara::liveShares()->delete('live-share-id');
 ```
 
-`delete()` is the canonical way to revoke a live share early.
+The SDK sends the ID as the collection query parameter required by the operation.
 
 ## Filtering
 
-The `query()` method returns a fresh `Builder` rooted at `/live-shares`. Apply filters from the [query builder](../query-builder.md) reference; the live-shares endpoint accepts standard pagination and tag filters.
+The `query()` method returns a fresh `Builder` rooted at `/live-shares`. Apply filters from the [query builder](../query-builder.html) reference; the live-shares endpoint accepts standard pagination and tag filters.
 
 ```php
 $shares = Samsara::liveShares()
@@ -88,7 +88,7 @@ $shares = Samsara::liveShares()
 The `LiveShare` entity exposes two helpers:
 
 ```php
-$share = Samsara::liveShares()->find('live-share-id');
+$share = Samsara::liveShares()->all()->first();
 
 $share->isActive();   // bool
 $share->isExpired();  // bool
@@ -130,22 +130,12 @@ $share = Samsara::liveShares()->create([
 $trackingUrl = $share->url;
 ```
 
-### Sweep Expired Shares
+### Revoke Expired Shares
 
-Remove revoked shares to keep the list short and recipients out of stale data:
-
-```php
-Samsara::liveShares()
-    ->all()
-    ->each(function ($share) {
-        if ($share->isExpired()) {
-            Samsara::liveShares()->delete($share->id);
-        }
-    });
-```
+`delete($id)` uses the collection path and can revoke an expired link directly.
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — the assets typically referenced from a live share.
-- [Vehicle Locations](vehicle-locations.md) — direct location queries inside the SDK.
-- [Webhooks](webhooks.md) — notify on share creation or expiration.
+- [Vehicles](vehicles.html) — the assets typically referenced from a live share.
+- [Vehicle Locations](vehicle-locations.html) — direct location queries inside the SDK.
+- [Webhooks](webhooks.html) — notify on share creation or expiration.

@@ -2,9 +2,11 @@
 
 namespace Samsara\Resources\Industrial;
 
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Data\Asset\Asset;
 use Samsara\Resources\Resource;
+use Samsara\Data\Asset\AssetLocation;
 
 /**
  * Assets resource for the Samsara API.
@@ -28,11 +30,27 @@ class AssetsResource extends Resource
     protected string $entity = Asset::class;
 
     /**
+     * Delete an asset through the current collection query contract.
+     */
+    public function delete(string $id): bool
+    {
+        $endpoint = '/assets?id='.rawurlencode($id);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->delete($endpoint),
+            $endpoint
+        );
+
+        return $response->successful();
+    }
+
+    /**
      * Get a query builder for asset depreciation.
      */
     public function depreciation(): Builder
     {
-        return $this->createBuilderWithEndpoint('/assets/depreciation/stream');
+        return $this->createBuilderWithEndpoint('/assets/depreciation')
+            ->withoutDefaultPageSize()
+            ->usingEntity(Entity::class);
     }
 
     /**
@@ -40,7 +58,9 @@ class AssetsResource extends Resource
      */
     public function inputsStream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/assets/inputs/stream');
+        return $this->createBuilderWithEndpoint('/assets/inputs/stream')
+            ->withoutDefaultPageSize()
+            ->usingEntity(Entity::class);
     }
 
     /**
@@ -48,7 +68,8 @@ class AssetsResource extends Resource
      */
     public function locationAndSpeedStream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/assets/location-and-speed/stream');
+        return $this->createBuilderWithEndpoint('/assets/location-and-speed/stream')
+            ->usingEntity(AssetLocation::class);
     }
 
     /**
@@ -59,9 +80,11 @@ class AssetsResource extends Resource
      */
     public function locations(array $data): array
     {
-        $response = $this->client()->get('/v1/fleet/assets/locations', $data);
-
-        $this->handleError($response);
+        $endpoint = '/v1/fleet/assets/locations';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json();
     }
@@ -71,7 +94,8 @@ class AssetsResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return $this->createBuilderWithEndpoint($this->endpoint)
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -82,10 +106,37 @@ class AssetsResource extends Resource
      */
     public function reefers(array $data): array
     {
-        $response = $this->client()->get('/v1/fleet/assets/reefers', $data);
-
-        $this->handleError($response);
+        $endpoint = '/v1/fleet/assets/reefers';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json();
+    }
+
+    /**
+     * Update an asset through the current collection query contract.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function update(string $id, array $data): Asset
+    {
+        $endpoint = '/assets?id='.rawurlencode($id);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($endpoint, $data),
+            $endpoint
+        );
+
+        /** @var Asset */
+        return $this->mapToEntity($response->json('data', $response->json()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all', 'create'];
     }
 }

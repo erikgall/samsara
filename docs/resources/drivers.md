@@ -29,6 +29,8 @@ permalink: /resources/drivers
 
 Drivers are the people who operate vehicles in your Samsara fleet. Reach for this resource when you need to maintain the driver roster, manage activation, look drivers up by an external payroll ID, or generate the credentials a driver uses to log into the Samsara app.
 
+The resource owns generic `all`, `find`, `create`, and `update`. Generic `delete` is unsupported and throws `UnsupportedOperationException` before an HTTP request. The custom auth-token, QR-code, and remote-sign-out helpers use the current paths and typed return objects described below.
+
 ## Retrieving Records
 
 ```php
@@ -58,13 +60,11 @@ $driver = Samsara::drivers()->update('driver-id', [
 
 ## Deleting Records
 
-```php
-Samsara::drivers()->delete('driver-id');
-```
+`delete()` is not a supported generic capability for drivers. Calling it throws `UnsupportedOperationException` without sending a request.
 
 ## Filtering
 
-Drivers accept the standard query builder. See [the query builder reference](../query-builder.md) for the full method list.
+Drivers accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
 
 ```php
 $drivers = Samsara::drivers()
@@ -86,13 +86,21 @@ $deactivatedDrivers = Samsara::drivers()->deactivated()->get();
 
 ### By External ID
 
-`findByExternalId()` looks up a single driver by an `externalIds[key]` mapping you control.
+`findByExternalId()` looks up a single driver using the item identifier form `{key}:{value}`.
 
 ```php
 $driver = Samsara::drivers()->findByExternalId('payroll_id', '12345');
 ```
 
 ## Additional Operations
+
+| Method | Request | Return |
+|--------|---------|--------|
+| `createAuthToken(array $data)` | `POST /fleet/drivers/auth-token` | `DriverAuthToken` (`token`, `expirationTime`) |
+| `createQrCode(array $data)` | `POST /drivers/qr-codes` | `DriverQrCode` |
+| `getQrCodes(array|string $driverIds)` | `GET /drivers/qr-codes?driverIds=...` | `EntityCollection<int, DriverQrCode>` |
+| `deleteQrCode(int $driverId)` | `DELETE /drivers/qr-codes` with `driverId` in the body | `bool` |
+| `remoteSignOut(string $id)` | `POST /fleet/drivers/remote-sign-out` with `driverId` in the body | `DriverRemoteSignOutResult` |
 
 ### Activation and Deactivation
 
@@ -107,7 +115,8 @@ $driver = Samsara::drivers()->activate('driver-id');
 ### Remote Sign Out
 
 ```php
-Samsara::drivers()->remoteSignOut('driver-id');
+$result = Samsara::drivers()->remoteSignOut('driver-id');
+$result->driverName; // ?string
 ```
 
 ### QR Codes
@@ -115,26 +124,30 @@ Samsara::drivers()->remoteSignOut('driver-id');
 QR codes provide a passwordless app login path for drivers.
 
 ```php
-$qrCodes = Samsara::drivers()->getQrCodes(); // Collection<int, object>
+$qrCodes = Samsara::drivers()->getQrCodes(['123', '456']);
 
 $qrCode = Samsara::drivers()->createQrCode([
     'driverId' => 'driver-id',
 ]);
 
-Samsara::drivers()->deleteQrCode('qr-code-id');
+Samsara::drivers()->deleteQrCode(123);
 ```
 
 ### Auth Tokens
 
-`createAuthToken()` returns a session token string that the driver app can use to authenticate.
+`createAuthToken()` accepts the official payload and returns a `DriverAuthToken` rather than a bare token string.
 
 ```php
-$token = Samsara::drivers()->createAuthToken('driver-id');
+$auth = Samsara::drivers()->createAuthToken([
+    'driverId' => 'driver-id',
+]);
+
+$token = $auth->token;
 ```
 
 ## Driver Activation Status
 
-The `Samsara\Enums\DriverActivationStatus` enum lists the values for the `driverActivationStatus` field. See the [enum reference](../enums.md) for the canonical mapping.
+The `Samsara\Enums\DriverActivationStatus` enum lists the values for the `driverActivationStatus` field. See the [enum reference](../enums.html) for the canonical mapping.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -203,8 +216,8 @@ The `Driver` entity (`Samsara\Data\Driver\Driver`) exposes the following typed p
 
 ## Related Resources
 
-- [Hours of Service](hours-of-service.md) — HOS logs, clocks, and violations per driver.
-- [Assignments](assignments.md) — driver-vehicle and driver-trailer assignment history.
-- [Tags](tags.md) — group drivers for filtering.
-- [Query Builder](../query-builder.md) — filters and pagination.
-- [Testing](../testing.md) — fake `Samsara::drivers()` calls in your tests.
+- [Hours of Service](hours-of-service.html) — HOS logs, clocks, and violations per driver.
+- [Assignments](assignments.html) — driver-vehicle and driver-trailer assignment history.
+- [Tags](tags.html) — group drivers for filtering.
+- [Query Builder](../query-builder.html) — filters and pagination.
+- [Testing](../testing.html) — fake `Samsara::drivers()` calls in your tests.

@@ -8,87 +8,39 @@ use Samsara\Data\Route\RouteStop;
 use PHPUnit\Framework\Attributes\Test;
 
 /**
- * Unit tests for the RouteStop entity.
- *
- * @author Erik Galloway <erik@erikgall.com>
+ * Unit tests for the current RouteStop response entity.
  */
 class RouteStopTest extends TestCase
 {
     #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $stop = new RouteStop([
-            'id'            => 'c3d4e5f6-a7b8-9012-cdef-345678901234',
-            'name'          => 'Stop 1',
-            'hubLocationId' => 'd4e5f6a7-b8c9-0123-defa-456789012345',
-            'notes'         => 'Deliver to back door',
-        ]);
-
-        $this->assertSame('c3d4e5f6-a7b8-9012-cdef-345678901234', $stop->id);
-        $this->assertSame('Stop 1', $stop->name);
-        $this->assertSame('d4e5f6a7-b8c9-0123-defa-456789012345', $stop->hubLocationId);
-        $this->assertSame('Deliver to back door', $stop->notes);
-    }
-
-    #[Test]
     public function it_can_be_created_with_make(): void
     {
         $stop = RouteStop::make([
-            'id'   => 'c3d4e5f6-a7b8-9012-cdef-345678901234',
-            'name' => 'Stop 1',
+            'id'     => 'stop-1',
+            'name'   => 'Current Stop',
+            'state'  => 'scheduled',
+            'orders' => [],
         ]);
 
         $this->assertInstanceOf(RouteStop::class, $stop);
-        $this->assertSame('c3d4e5f6-a7b8-9012-cdef-345678901234', $stop->getId());
-    }
-
-    #[Test]
-    public function it_can_check_if_has_hub_location(): void
-    {
-        $stop = new RouteStop([
-            'hubLocationId' => 'd4e5f6a7-b8c9-0123-defa-456789012345',
-        ]);
-
-        $this->assertTrue($stop->hasHubLocation());
-    }
-
-    #[Test]
-    public function it_can_check_if_has_single_use_location(): void
-    {
-        $stop = new RouteStop([
-            'singleUseLocation' => [
-                'address' => '123 Main St',
-            ],
-        ]);
-
-        $this->assertTrue($stop->hasSingleUseLocation());
+        $this->assertSame('stop-1', $stop->getId());
     }
 
     #[Test]
     public function it_can_convert_to_array(): void
     {
         $data = [
-            'id'   => 'c3d4e5f6-a7b8-9012-cdef-345678901234',
-            'name' => 'Stop 1',
+            'id'     => 'stop-1',
+            'name'   => 'Current Stop',
+            'state'  => 'scheduled',
+            'orders' => [],
         ];
 
-        $stop = new RouteStop($data);
-
-        $this->assertSame($data, $stop->toArray());
+        $this->assertSame($data, (new RouteStop($data))->toArray());
     }
 
     #[Test]
-    public function it_can_get_display_name(): void
-    {
-        $stop = new RouteStop([
-            'name' => 'Customer Location',
-        ]);
-
-        $this->assertSame('Customer Location', $stop->getDisplayName());
-    }
-
-    #[Test]
-    public function it_can_get_order_count(): void
+    public function it_counts_orders(): void
     {
         $stop = new RouteStop([
             'orders' => [
@@ -101,90 +53,71 @@ class RouteStopTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_orders(): void
+    public function it_exposes_current_stop_detail_collections(): void
     {
         $stop = new RouteStop([
-            'orders' => [
-                ['id' => 'order-1', 'description' => 'Order 1'],
-                ['id' => 'order-2', 'description' => 'Order 2'],
-            ],
+            'appointmentWindows'       => [['startTime' => '2026-08-10T14:00:00Z']],
+            'documents'                => [['id' => 'document-1']],
+            'forms'                    => [['id' => 'form-1']],
+            'issues'                   => [['id' => 'issue-1']],
+            'externalIds'              => ['customer' => 'stop-1'],
+            'liveSharingUrl'           => 'https://cloud.samsara.com/live/stop-1',
+            'locationLiveSharingLinks' => [['id' => 'share-1']],
         ]);
 
-        $this->assertCount(2, $stop->orders);
+        $this->assertCount(1, $stop->appointmentWindows);
+        $this->assertSame('form-1', $stop->forms[0]['id']);
+        $this->assertSame('stop-1', $stop->externalIds['customer']);
     }
 
     #[Test]
-    public function it_can_have_scheduled_arrival_time(): void
+    public function it_exposes_current_stop_fields_without_hub_location_helpers(): void
     {
         $stop = new RouteStop([
-            'scheduledArrivalTime' => '2024-04-10T09:00:00Z',
+            'id'                    => 'stop-1',
+            'name'                  => 'Current Stop',
+            'state'                 => 'scheduled',
+            'orders'                => [],
+            'address'               => ['formattedAddress' => '123 Main Street'],
+            'plannedDistanceMeters' => 1200,
+            'actualDistanceMeters'  => 1250,
+            'sequenceNumber'        => 1,
         ]);
 
-        $this->assertSame('2024-04-10T09:00:00Z', $stop->scheduledArrivalTime);
-    }
-
-    #[Test]
-    public function it_can_have_scheduled_departure_time(): void
-    {
-        $stop = new RouteStop([
-            'scheduledDepartureTime' => '2024-04-10T09:30:00Z',
-        ]);
-
-        $this->assertSame('2024-04-10T09:30:00Z', $stop->scheduledDepartureTime);
-    }
-
-    #[Test]
-    public function it_can_have_single_use_location(): void
-    {
-        $stop = new RouteStop([
-            'singleUseLocation' => [
-                'address'   => '123 Main St',
-                'latitude'  => 37.7749,
-                'longitude' => -122.4194,
-            ],
-        ]);
-
-        $this->assertIsArray($stop->singleUseLocation);
-        $this->assertSame('123 Main St', $stop->singleUseLocation['address']);
+        $this->assertSame('Current Stop', $stop->getDisplayName());
+        $this->assertSame('scheduled', $stop->state);
+        $this->assertSame(1200, $stop->plannedDistanceMeters);
+        $this->assertSame(1250, $stop->actualDistanceMeters);
+        $this->assertFalse(method_exists($stop, 'hasHubLocation'));
     }
 
     #[Test]
     public function it_extends_entity(): void
     {
-        $stop = new RouteStop;
-
-        $this->assertInstanceOf(Entity::class, $stop);
+        $this->assertInstanceOf(Entity::class, new RouteStop);
     }
 
     #[Test]
-    public function it_returns_false_when_no_hub_location(): void
+    public function it_handles_current_schedule_and_single_use_location_fields(): void
     {
-        $stop = new RouteStop;
+        $stop = new RouteStop([
+            'scheduledArrivalTime'   => '2026-08-10T14:30:00Z',
+            'scheduledDepartureTime' => '2026-08-10T14:45:00Z',
+            'singleUseLocation'      => ['address' => '123 Main Street'],
+        ]);
 
-        $this->assertFalse($stop->hasHubLocation());
+        $this->assertSame('2026-08-10T14:30:00Z', $stop->scheduledArrivalTime);
+        $this->assertSame('2026-08-10T14:45:00Z', $stop->scheduledDepartureTime);
+        $this->assertTrue($stop->hasSingleUseLocation());
     }
 
     #[Test]
-    public function it_returns_false_when_no_single_use_location(): void
-    {
-        $stop = new RouteStop;
-
-        $this->assertFalse($stop->hasSingleUseLocation());
-    }
-
-    #[Test]
-    public function it_returns_unknown_for_missing_display_name(): void
+    public function it_returns_empty_defaults_when_values_are_not_set(): void
     {
         $stop = new RouteStop;
 
         $this->assertSame('Unknown', $stop->getDisplayName());
-    }
-
-    #[Test]
-    public function it_returns_zero_order_count_when_no_orders(): void
-    {
-        $stop = new RouteStop;
-
         $this->assertSame(0, $stop->getOrderCount());
+        $this->assertFalse($stop->hasSingleUseLocation());
     }
 }

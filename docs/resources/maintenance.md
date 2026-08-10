@@ -20,16 +20,16 @@ permalink: /resources/maintenance
 
 ## Introduction
 
-The `Samsara::maintenance()` resource exposes Driver Vehicle Inspection Reports (DVIRs) and the defects logged against them. DVIRs are the federally mandated pre-trip and post-trip inspections drivers perform; defects are the individual issues reported on each one. The resource is typed against `Dvir`; the defects builder is also typed as `Dvir` due to a single `$entity` declaration on the resource (see [Defects](#defects)).
+The `Samsara::maintenance()` resource exposes Driver Vehicle Inspection Reports (DVIRs) and the defects logged against them. DVIR builders return `Dvir`; the defects builder returns `Defect`.
+
+`dvirs()` targets `/dvirs/stream`, `defects()` targets `/defects/stream`, and `createDvir()` posts to `/fleet/dvirs`. All use the shared typed error boundary. No generic CRUD operation is supported by this multi-endpoint resource.
 
 ## Retrieving Records
 
-The default resource endpoint is `/dvirs/stream`, so calling `Samsara::maintenance()->all()` (or the equivalent `dvirs()->get()`) returns the DVIR stream rather than a snapshot list.
+Use `dvirs()` for the stream. Generic `all()` is rejected locally.
 
 ```php
 use Samsara\Facades\Samsara;
-
-$dvir = Samsara::maintenance()->find('dvir-id');
 
 $dvirs = Samsara::maintenance()
     ->dvirs()
@@ -56,7 +56,7 @@ Samsara::maintenance()
 
 ## Creating Records
 
-`createDvir()` posts to `/dvirs` and returns the saved `Dvir` entity. The payload mirrors the entity's `@property-read` shape — note that the upstream API uses `type` (not `inspectionType`), splits defects into `vehicleDefects` and `trailerDefects`, and accepts a single `trailer` (not `trailerIds`):
+`createDvir()` posts to `/fleet/dvirs` and returns a `Dvir`.
 
 ```php
 $dvir = Samsara::maintenance()->createDvir([
@@ -77,11 +77,11 @@ $dvir = Samsara::maintenance()->createDvir([
 
 ## Updating Records
 
-`Samsara::maintenance()->update('dvir-id', $data)` is inherited from the base resource and patches `/dvirs/stream/{id}`. Most workflows create a fresh DVIR rather than updating an old one; verify the upstream endpoint accepts a PATCH for your use case before relying on it.
+Generic `update()` is unsupported. The current `PATCH /fleet/dvirs/{id}` operation is an official-only additive operation deferred from this SDK surface.
 
 ## Deleting Records
 
-DVIRs are records of completed inspections and are not designed to be deleted. The base `delete()` method is inherited but the upstream endpoint typically rejects it.
+Generic `delete()` is unsupported and fails locally.
 
 > **Note:** Treat DVIRs as append-only. Resolve safety issues by uploading a follow-up inspection, not by deleting the old one.
 
@@ -97,7 +97,7 @@ $defects = Samsara::maintenance()
     ->get();
 ```
 
-> **Note:** This builder is typed as `Dvir` due to the resource's single `$entity` declaration. The properties below describe the actual `Defect` API response shape, but the typed `Defect` helpers (`isResolved()`, etc.) are not invoked when accessing the result. Calling `$result->isResolved()` on a defect returned by this builder resolves to `Dvir::isResolved()` — which checks `safetyStatus === 'resolved'` against the defect's data and is unlikely to behave as you expect. To use the typed defect helpers, instantiate `Defect` manually from the response array, or pull defects via `$dvir->vehicleDefects` / `$dvir->trailerDefects`.
+Each row is a typed `Defect`, so helpers such as `isResolved()` use the boolean `isResolved` payload field.
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -113,23 +113,21 @@ $defects = Samsara::maintenance()
 | `trailer` | `?array{id?: string, name?: string}` | Trailer the defect was logged against. |
 | `resolvedBy` | `?array{id?: string, name?: string}` | User who resolved the defect. |
 
-To opt into typed helpers, wrap the array yourself:
+Typed helpers are available directly:
 
 ```php
-use Samsara\Data\Maintenance\Defect;
-
-foreach (Samsara::maintenance()->defects()->get() as $row) {
-    $defect = Defect::make($row->toArray());
-
+foreach (Samsara::maintenance()->defects()->get() as $defect) {
     if ($defect->isResolved()) {
         // ...
     }
 }
 ```
 
+Pass a `safetyStatus` array through `query()->where('safetyStatus', [...])` to emit repeated query keys, as required by the endpoint.
+
 ## Filtering
 
-Refer to the [query builder](../query-builder.md) for the full operator reference. Both the DVIR and defects builders accept the standard filters:
+Refer to the [query builder](../query-builder.html) for the full operator reference. Both the DVIR and defects builders accept the standard filters:
 
 ```php
 $dvirs = Samsara::maintenance()
@@ -141,7 +139,7 @@ $dvirs = Samsara::maintenance()
     ->get();
 ```
 
-The companion `MaintenanceStatus` enum (`CANCELLED`, `COMPLETED`, `IN_PROGRESS`, `OPEN`) maps the work-order status strings — see [Enums](../enums.md#maintenancestatus) for the full case-to-value mapping.
+The package's `MaintenanceStatus` enum has four lowercase values. Current upstream work orders define eleven title-cased statuses, so the enum is not the current upstream wire contract. See [Enums](../enums.html#maintenancestatus).
 
 ## Helper Methods
 
@@ -186,9 +184,9 @@ The `Dvir` entity exposes the following `@property-read` keys:
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — resolve `$dvir->vehicle['id']`.
-- [Trailers](trailers.md) — resolve `$dvir->trailer['id']`.
-- [Drivers](drivers.md) — pair DVIRs with hours-of-service activity.
-- [Work Orders](work-orders.md) — schedule shop work for unresolved defects.
-- [Enums](../enums.md#maintenancestatus) — `MaintenanceStatus` reference.
-- [Error Handling](../error-handling.md) — exceptions raised by the underlying request.
+- [Vehicles](vehicles.html) — resolve `$dvir->vehicle['id']`.
+- [Trailers](trailers.html) — resolve `$dvir->trailer['id']`.
+- [Drivers](drivers.html) — pair DVIRs with hours-of-service activity.
+- [Work Orders](work-orders.html) — schedule shop work for unresolved defects.
+- [Enums](../enums.html#maintenancestatus) — `MaintenanceStatus` reference.
+- [Error Handling](../error-handling.html) — exceptions raised by the underlying request.

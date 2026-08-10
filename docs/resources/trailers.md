@@ -20,7 +20,7 @@ permalink: /resources/trailers
 
 ## Introduction
 
-A trailer is a non-motorized asset tracked by a Samsara trailer gateway. Trailers carry their own tags, external ids, and license plate, and they appear on driver assignments and route stops independently of the towing vehicle. Use this resource to read and manage the trailer roster — telematics for the trailer gateway lives under [Vehicle Locations](vehicle-locations.md) and the dedicated trailer-stats endpoints.
+A trailer is a non-motorized asset tracked by a Samsara trailer gateway. Trailers carry their own tags, external ids, and license plate, and they appear on driver assignments and route stops independently of the towing vehicle. Use this resource to read and manage the trailer roster — telematics for the trailer gateway lives under [Vehicle Locations](vehicle-locations.html) and the dedicated trailer-stats endpoints.
 
 ## Retrieving Records
 
@@ -57,7 +57,7 @@ Samsara::trailers()->delete('trailer-id');
 
 ## Filtering
 
-See [Query Builder](../query-builder.md) for the full filter list. The Trailers resource supports tag, parent-tag, and limit filters out of the box.
+See [Query Builder](../query-builder.html) for the full filter list. The Trailers resource supports tag, parent-tag, and limit filters out of the box.
 
 ```php
 $trailers = Samsara::trailers()
@@ -105,6 +105,6 @@ $trailer = Samsara::trailers()->findByExternalId('asset_id', 'TRL-12345');
 
 ## Related Resources
 
-- [Drivers](drivers.md) — drivers who tow trailers.
-- [Routes](routes.md) — routes that reference trailers as stops.
-- [Assignments](assignments.md) — trailer assignments to drivers and vehicles.
+- [Drivers](drivers.html) — drivers who tow trailers.
+- [Routes](routes.html) — routes that reference trailers as stops.
+- [Assignments](assignments.html) — trailer assignments to drivers and vehicles.

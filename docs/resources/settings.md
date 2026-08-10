@@ -15,7 +15,9 @@ permalink: /resources/settings
 
 ## Introduction
 
-The `Samsara::settings()` resource exposes the organization-wide settings that govern compliance, the driver app experience, and safety monitoring. All five methods on `SettingsResource` return raw decoded JSON (`array<string, mixed>`); there is no typed entity, no query builder, and no traditional CRUD — only paired GET/PATCH calls per settings group.
+The five explicit methods on `SettingsResource` return raw decoded JSON (`array<string, mixed>`); there is no typed entity, query builder, or supported generic CRUD operation.
+
+The helpers use `/fleet/settings/compliance`, `/fleet/settings/driver-app`, and `/fleet/settings/safety`.
 
 ## Reading Settings
 
@@ -59,7 +61,7 @@ $updated = Samsara::settings()->updateDriverApp([
 
 ## Related Resources
 
-- [Hours of Service](hours-of-service.md) — driven by the compliance ruleset.
-- [Safety Events](safety-events.md) — events governed by safety configuration.
-- [Drivers](drivers.md) — driver-app behaviour applies to every driver.
-- [Error Handling](../error-handling.md) — exceptions raised by the underlying request.
+- [Hours of Service](hours-of-service.html) — driven by the compliance ruleset.
+- [Safety Events](safety-events.html) — events governed by safety configuration.
+- [Drivers](drivers.html) — driver-app behaviour applies to every driver.
+- [Error Handling](../error-handling.html) — exceptions raised by the underlying request.

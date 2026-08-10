@@ -17,7 +17,9 @@ permalink: /resources/gateways
 
 ## Introduction
 
-Gateways are the physical Samsara devices installed in vehicles, trailers, and equipment that report telemetry back to the API. Reach for this resource when you need to enumerate the gateways your fleet owns or look one up by ID. Gateways are typically associated with another asset — when you load a `Vehicle` or `Equipment` entity, the gateway data is already exposed there.
+Gateways are the physical Samsara devices installed in vehicles, trailers, and equipment that report telemetry back to the API. Reach for this resource to enumerate, create, or delete current gateway records. Gateway data is also exposed on `Vehicle` and `Equipment` entities.
+
+> **Package/upstream boundary:** Current upstream supports list and create at `/gateways`, plus delete by ID. It does not define find-by-ID or update-by-ID. The package exposes all five base resource methods, so use only `all()`, `create()`, and `delete()` against the current API.
 
 ## Retrieving Records
 
@@ -31,23 +33,23 @@ foreach ($gateways as $gateway) {
 }
 ```
 
-Look up a single gateway by ID:
-
-```php
-$gateway = Samsara::gateways()->find('gateway-id');
-```
-
 ## Creating Records
 
-> **Note:** Gateway provisioning happens through Samsara's hardware fulfillment process, not the API. This resource does not support `create()`.
+```php
+$gateway = Samsara::gateways()->create([
+    // Current upstream gateway-creation fields
+]);
+```
 
 ## Updating Records
 
-> **Note:** This resource does not support `update()`.
+`update()` and `find()` are unsupported and fail locally. The supported generic operations are `all`, `create`, and `delete`.
 
 ## Deleting Records
 
-> **Note:** This resource does not support `delete()`.
+```php
+Samsara::gateways()->delete('gateway-id');
+```
 
 ## Properties
 
@@ -62,7 +64,7 @@ The `Gateway` entity (`Samsara\Data\Vehicle\Gateway`) exposes the following type
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — vehicles that carry an installed gateway.
-- [Equipment](equipment.md) — equipment with an `installedGateway` property.
-- [Query Builder](../query-builder.md) — for filtering, pagination, and lazy iteration.
-- [Error Handling](../error-handling.md) — exceptions raised by HTTP failures.
+- [Vehicles](vehicles.html) — vehicles that carry an installed gateway.
+- [Equipment](equipment.html) — equipment with an `installedGateway` property.
+- [Query Builder](../query-builder.html) — for filtering, pagination, and lazy iteration.
+- [Error Handling](../error-handling.html) — exceptions raised by HTTP failures.

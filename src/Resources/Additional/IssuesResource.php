@@ -20,10 +20,27 @@ class IssuesResource extends Resource
     protected string $endpoint = '/issues';
 
     /**
+     * Get a query builder for issues by ID.
+     */
+    public function query(): Builder
+    {
+        return new Builder($this);
+    }
+
+    /**
      * Get a query builder for issues stream.
      */
     public function stream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/issues/stream');
+        return $this->createBuilderWithEndpoint('/issues/stream')
+            ->withoutDefaultPageSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['create'];
     }
 }

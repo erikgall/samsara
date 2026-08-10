@@ -417,6 +417,25 @@ class DriverTest extends TestCase
     }
 
     #[Test]
+    public function it_exposes_current_profile_and_feature_fields(): void
+    {
+        $driver = new Driver([
+            'email'                             => 'driver@example.com',
+            'dateOfBirth'                       => '1990-01-01',
+            'attributes'                        => [['id' => 'attribute-1', 'name' => 'License Class']],
+            'eldAdverseWeatherExemptionEnabled' => true,
+            'hasVehicleUnpinningEnabled'        => true,
+            'waitingTimeDutyStatusEnabled'      => false,
+            'peerGroupTag'                      => ['id' => 'tag-1', 'name' => 'Peers'],
+        ]);
+
+        $this->assertSame('driver@example.com', $driver->email);
+        $this->assertCount(1, $driver->attributes);
+        $this->assertTrue($driver->eldAdverseWeatherExemptionEnabled);
+        $this->assertSame('tag-1', $driver->peerGroupTag['id']);
+    }
+
+    #[Test]
     public function it_extends_entity(): void
     {
         $driver = new Driver;

@@ -16,9 +16,9 @@ permalink: /resources/tachograph
 
 ## Introduction
 
-Tachograph endpoints expose the EU regulatory data captured by tachograph-equipped vehicles — driver activity (driving, rest, work, available), and the periodic driver- and vehicle-card files used to satisfy member-state audits. The resource is read-only and **only available for EU organizations**. North American fleets see empty responses.
+Tachograph endpoints expose the EU regulatory data captured by tachograph-equipped vehicles — driver activity (driving, rest, work, available), and the periodic driver- and vehicle-card files used to satisfy member-state audits.
 
-> **Note:** This resource does not expose `find()`, `all()`, or any of the create/update/delete verbs. Each method below returns a query builder you must drive with `between()` and the standard filters.
+The three explicit helpers are the supported public surface. They use `/fleet/drivers/tachograph-activity/history`, `/fleet/drivers/tachograph-files/history`, and `/fleet/vehicles/tachograph-files/history`. Generic CRUD is capability-gated and unsupported. Each builder suppresses the implicit page size because its cursor operation has no official `limit`.
 
 ## Driver Activity History
 
@@ -57,7 +57,7 @@ $vehicleFiles = Samsara::tachograph()
 
 ## Filtering
 
-Each builder accepts the filters described in [Query Builder](../query-builder.md). The most common combinations are by driver, vehicle, and tag.
+Each builder accepts the filters described in [Query Builder](../query-builder.html). The most common combinations are by driver, vehicle, and tag.
 
 ```php
 // Filter activity by driver
@@ -84,6 +84,6 @@ $activities = Samsara::tachograph()
 
 ## Related Resources
 
-- [Drivers](drivers.md) — driver records referenced by tachograph activity.
-- [Hours of Service](hours-of-service.md) — North American HOS equivalent.
-- [Vehicles](vehicles.md) — vehicles whose tachograph units produce the files.
+- [Drivers](drivers.html) — driver records referenced by tachograph activity.
+- [Hours of Service](hours-of-service.html) — North American HOS equivalent.
+- [Vehicles](vehicles.html) — vehicles whose tachograph units produce the files.

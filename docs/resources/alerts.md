@@ -24,6 +24,8 @@ permalink: /resources/alerts
 
 Alerts cover two related concepts in the Samsara API: **alert configurations** define the rules that fire (a speed threshold, a geofence breach, a fuel-level drop), and **alert incidents** are the events those rules generate. The `Samsara::alerts()` resource exposes both. Reach for it when you need to manage what your fleet alerts on, or when you need to stream the incidents those alerts have produced.
 
+Configurations use `/alerts/configurations`; incidents use `/alerts/incidents/stream`. Configuration updates patch the collection payload with `id`; deletion sends one `id` query parameter per call. The resource owns generic `all` and `create`; other generic verbs are rejected locally in favor of the explicit methods below.
+
 ## Retrieving Records
 
 ### Alert Configurations
@@ -35,14 +37,14 @@ use Samsara\Facades\Samsara;
 
 $configurations = Samsara::alerts()->configurations()->get();
 
-$config = Samsara::alerts()->configurations()->find('config-id');
+$config = $configurations->findById('config-id');
 ```
 
 You may also use `query()` directly — it is the same builder.
 
 ### Alert Incidents
 
-`incidents()` returns a query builder over the incident stream. The records come back as generic `Samsara\Data\Entity` instances.
+`incidents()` returns a no-implicit-limit builder of `AlertIncident` objects. An array passed as `configurationIds` is encoded with repeated keys.
 
 ```php
 $incidents = Samsara::alerts()->incidents()->get();
@@ -57,10 +59,11 @@ $recent = Samsara::alerts()
 
 ```php
 $config = Samsara::alerts()->createConfiguration([
-    'name'      => 'Speeding Alert',
-    'alertType' => 'speed',
-    'threshold' => 75,
-    'tagIds'    => ['tag-123'],
+    'name' => 'Speeding Alert',
+    'isEnabled' => true,
+    'scope' => ['all' => true],
+    'triggers' => [/* current trigger payload */],
+    'actions' => [/* current action payload */],
 ]);
 ```
 
@@ -77,15 +80,17 @@ $config = Samsara::alerts()->updateConfiguration('config-id', [
 
 ## Deleting Records
 
-`deleteConfigurations()` accepts an array of IDs and removes them in a single call.
+`deleteConfigurations()` accepts one string ID. Call it once for each configuration you want to remove.
 
 ```php
-Samsara::alerts()->deleteConfigurations(['config-id-1', 'config-id-2']);
+foreach (['config-id-1', 'config-id-2'] as $id) {
+    Samsara::alerts()->deleteConfigurations($id);
+}
 ```
 
 ## Filtering
 
-Both sub-builders accept the standard query builder methods. See [the query builder reference](../query-builder.md) for the full method list.
+Both sub-builders accept the standard query builder methods. See [the query builder reference](../query-builder.html) for the full method list.
 
 ```php
 $configurations = Samsara::alerts()
@@ -103,7 +108,7 @@ $incidents = Samsara::alerts()
 
 ## Alert Types
 
-The `Samsara\Enums\AlertType` enum lists the values the SDK ships for the `alertType` field. Cross-link to the [enum reference](../enums.md) for the full mapping.
+The `Samsara\Enums\AlertType` enum lists the values the SDK ships for its `alertType` field. Samsara's current alert-configuration schema instead uses `actions`, `isEnabled`, `scope`, and `triggers`; treat this enum as package surface, not a complete current-upstream trigger contract.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -129,7 +134,7 @@ The `Samsara\Enums\AlertType` enum lists the values the SDK ships for the `alert
 The `AlertConfiguration` entity exposes type-check helpers that read the `alertType` field directly:
 
 ```php
-$config = Samsara::alerts()->configurations()->find('config-id');
+$config = Samsara::alerts()->configurations()->where('ids', ['config-id'])->first();
 
 $config->isEnabled();        // bool
 $config->isSpeedType();      // bool — checks for 'speed'
@@ -138,12 +143,12 @@ $config->isIdleType();       // bool — checks for 'idle'
 $config->isFuelLevelType();  // bool — checks for 'fuelLevel'
 ```
 
-The `AlertIncident` entity exposes status helpers:
+The legacy helper strings and `AlertType` enum values are not the current trigger contract. Prefer `triggers`, `actions`, and `scope` for current configurations.
+
+`incidents()->get()` instantiates `AlertIncident` automatically. The current resolved flag is boolean:
 
 ```php
-$incident->isTriggered();  // bool
 $incident->isResolved();   // bool
-$incident->isDismissed();  // bool
 ```
 
 ## Properties
@@ -156,27 +161,27 @@ The `AlertConfiguration` entity (`Samsara\Data\Alert\AlertConfiguration`) expose
 | `name` | `?string` | Alert name. |
 | `alertType` | `?string` | Alert type — see [Alert Types](#alert-types). |
 | `description` | `?string` | Alert description. |
-| `enabled` | `?bool` | Whether the alert is enabled. |
-| `notificationSettings` | `?array` | `{email?, sms?}` — channel toggles. |
-| `tagIds` | `?array<int, string>` | Tag IDs the alert is scoped to. |
+| `isEnabled` | `?bool` | Whether the alert is enabled. |
+| `actions` | `?array` | Current notification actions. |
+| `scope` | `?array` | Alert scope. |
+| `triggers` | `?array` | Current trigger definitions. |
 
-The `AlertIncident` entity (`Samsara\Data\Alert\AlertIncident`) is returned by the incidents stream:
+The incident builder returns `Samsara\Data\Alert\AlertIncident`:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `id` | `?string` | Alert incident ID. |
-| `alertConfigurationId` | `?string` | Configuration that triggered the incident. |
-| `status` | `?string` | `triggered`, `resolved`, or `dismissed`. |
-| `triggeredAtTime` | `?string` | Trigger time (RFC 3339). |
+| `configurationId` | `?string` | Configuration that triggered the incident. |
+| `isResolved` | `?bool` | Current resolution flag. |
+| `happenedAtTime` | `?string` | Incident time (RFC 3339). |
 | `resolvedAtTime` | `?string` | Resolution time (RFC 3339). |
-| `driver` | `?array` | Associated driver — `{id, name?}`. |
-| `vehicle` | `?array` | Associated vehicle — `{id, name?}`. |
-| `location` | `?array` | Incident location — `{latitude?, longitude?}`. |
+| `updatedAtTime` | `?string` | Last update time. |
+| `incidentUrl` | `?string` | Cloud dashboard URL. |
+| `conditions` | `?array` | Conditions captured for the incident. |
 
 ## Related Resources
 
-- [Vehicles](vehicles.md) — vehicle records referenced from incidents.
-- [Drivers](drivers.md) — driver records referenced from incidents.
-- [Webhooks](webhooks.md) — receive alert incidents in real time.
-- [Query Builder](../query-builder.md) — filters, pagination, and time-bounded queries.
-- [Enums](../enums.md) — `AlertType` and other typed enums.
+- [Vehicles](vehicles.html) — vehicle records referenced from incidents.
+- [Drivers](drivers.html) — driver records referenced from incidents.
+- [Webhooks](webhooks.html) — receive alert incidents in real time.
+- [Query Builder](../query-builder.html) — filters, pagination, and time-bounded queries.
+- [Enums](../enums.html) — `AlertType` and other typed enums.

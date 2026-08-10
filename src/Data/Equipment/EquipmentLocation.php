@@ -14,35 +14,17 @@ use Samsara\Data\Entity;
  * @property-read float|null $latitude GPS latitude in degrees
  * @property-read float|null $longitude GPS longitude in degrees
  * @property-read string|null $time Timestamp of the location reading
- * @property-read int|null $headingDegrees Heading in degrees (0-360)
- * @property-read float|null $speedMilesPerHour Speed in miles per hour
- * @property-read array{id?: string, formattedAddress?: string}|null $address Address information
- * @property-read array{formattedLocation?: string}|null $reverseGeo Reverse geocoded location
+ * @property-read float|null $heading Heading in degrees
+ * @property-read float|null $speed Speed in miles per hour
  */
 class EquipmentLocation extends Entity
 {
-    /**
-     * Get the formatted address if available.
-     */
-    public function getFormattedAddress(): ?string
-    {
-        return $this->address['formattedAddress'] ?? null;
-    }
-
-    /**
-     * Get the reverse geocoded location string.
-     */
-    public function getReverseGeoLocation(): ?string
-    {
-        return $this->reverseGeo['formattedLocation'] ?? null;
-    }
-
     /**
      * Get speed in kilometers per hour.
      */
     public function getSpeedKilometersPerHour(): ?float
     {
-        $mph = $this->speedMilesPerHour;
+        $mph = $this->speed;
 
         if ($mph === null) {
             return null;
@@ -56,7 +38,7 @@ class EquipmentLocation extends Entity
      */
     public function isMoving(): bool
     {
-        $speed = $this->speedMilesPerHour;
+        $speed = $this->speed;
 
         return $speed !== null && $speed > 0;
     }

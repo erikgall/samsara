@@ -39,12 +39,18 @@ class AlertsResourceTest extends TestCase
                     'id'   => 'config-123',
                     'name' => 'New Alert',
                 ],
-            ], 201),
+            ], 200),
         ]);
 
         $resource = new AlertsResource($this->samsara);
 
-        $config = $resource->createConfiguration(['name' => 'New Alert']);
+        $config = $resource->createConfiguration([
+            'actions'   => [],
+            'isEnabled' => true,
+            'name'      => 'New Alert',
+            'scope'     => ['all' => true],
+            'triggers'  => [],
+        ]);
 
         $this->assertInstanceOf(AlertConfiguration::class, $config);
         $this->assertSame('config-123', $config->id);
@@ -59,7 +65,7 @@ class AlertsResourceTest extends TestCase
 
         $resource = new AlertsResource($this->samsara);
 
-        $result = $resource->deleteConfigurations(['config-1', 'config-2']);
+        $result = $resource->deleteConfigurations('config-1');
 
         $this->assertTrue($result);
     }
@@ -88,7 +94,7 @@ class AlertsResourceTest extends TestCase
     public function it_can_update_configuration(): void
     {
         $this->http->fake([
-            '*/alerts/configurations/config-123' => $this->http->response([
+            '*/alerts/configurations' => $this->http->response([
                 'data' => [
                     'id'   => 'config-123',
                     'name' => 'Updated Alert',

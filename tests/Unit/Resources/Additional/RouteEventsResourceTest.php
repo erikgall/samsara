@@ -44,6 +44,6 @@ class RouteEventsResourceTest extends TestCase
     {
         $resource = new RouteEventsResource($this->samsara);
 
-        $this->assertSame('/route-events', $resource->getEndpoint());
+        $this->assertSame('/route-events/stream', $resource->getEndpoint());
     }
 }

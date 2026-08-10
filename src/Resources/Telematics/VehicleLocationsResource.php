@@ -4,6 +4,8 @@ namespace Samsara\Resources\Telematics;
 
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
+use Samsara\Data\Vehicle\VehicleLocationResult;
+use Samsara\Data\Vehicle\VehicleLocationSeries;
 
 /**
  * Vehicle locations resource for the Samsara API.
@@ -20,6 +22,13 @@ class VehicleLocationsResource extends Resource
     protected string $endpoint = '/fleet/vehicles/locations';
 
     /**
+     * The entity class for this resource.
+     *
+     * @var class-string<VehicleLocationResult>
+     */
+    protected string $entity = VehicleLocationResult::class;
+
+    /**
      * Get a query builder for current vehicle locations.
      */
     public function current(): Builder
@@ -32,7 +41,9 @@ class VehicleLocationsResource extends Resource
      */
     public function feed(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/locations/feed');
+        return $this->createBuilderWithEndpoint('/fleet/vehicles/locations/feed')
+            ->withoutDefaultPageSize()
+            ->usingEntity(VehicleLocationSeries::class);
     }
 
     /**
@@ -40,7 +51,9 @@ class VehicleLocationsResource extends Resource
      */
     public function history(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/locations/history');
+        return $this->createBuilderWithEndpoint('/fleet/vehicles/locations/history')
+            ->withoutDefaultPageSize()
+            ->usingEntity(VehicleLocationSeries::class);
     }
 
     /**
@@ -48,6 +61,18 @@ class VehicleLocationsResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))
+            ->withoutDefaultPageSize()
+            ->usingEntity(VehicleLocationResult::class);
+    }
+
+    /**
+     * Get the inherited generic operations supported by this resource.
+     *
+     * @return array<int, string>
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all'];
     }
 }

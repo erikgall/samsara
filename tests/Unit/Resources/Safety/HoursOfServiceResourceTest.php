@@ -8,6 +8,7 @@ use Samsara\Tests\TestCase;
 use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\HoursOfService\HosLog;
+use Samsara\Data\HoursOfService\HosLogsForDriver;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Safety\HoursOfServiceResource;
 
@@ -46,14 +47,28 @@ class HoursOfServiceResourceTest extends TestCase
             '*' => $this->http->response([
                 'data' => [
                     [
-                        'id'         => 'log-1',
-                        'driverName' => 'John Doe',
-                        'status'     => 'onDuty',
+                        'driver' => [
+                            'id'   => 'driver-1',
+                            'name' => 'John Doe',
+                        ],
+                        'hosLogs' => [
+                            [
+                                'id'     => 'log-1',
+                                'status' => 'onDuty',
+                            ],
+                        ],
                     ],
                     [
-                        'id'         => 'log-2',
-                        'driverName' => 'Jane Doe',
-                        'status'     => 'offDuty',
+                        'driver' => [
+                            'id'   => 'driver-2',
+                            'name' => 'Jane Doe',
+                        ],
+                        'hosLogs' => [
+                            [
+                                'id'     => 'log-2',
+                                'status' => 'offDuty',
+                            ],
+                        ],
                     ],
                 ],
             ]),
@@ -64,7 +79,8 @@ class HoursOfServiceResourceTest extends TestCase
 
         $this->assertInstanceOf(EntityCollection::class, $logs);
         $this->assertCount(2, $logs);
-        $this->assertInstanceOf(HosLog::class, $logs->first());
+        $this->assertInstanceOf(HosLogsForDriver::class, $logs->first());
+        $this->assertInstanceOf(HosLog::class, $logs->first()->getLogs()->first());
     }
 
     #[Test]
@@ -125,6 +141,6 @@ class HoursOfServiceResourceTest extends TestCase
     {
         $resource = new HoursOfServiceResource($this->samsara);
 
-        $this->assertSame(HosLog::class, $resource->getEntityClass());
+        $this->assertSame(HosLogsForDriver::class, $resource->getEntityClass());
     }
 }

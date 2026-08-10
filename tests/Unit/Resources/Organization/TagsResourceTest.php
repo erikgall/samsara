@@ -4,9 +4,9 @@ namespace Samsara\Tests\Unit\Resources\Organization;
 
 use Samsara\Samsara;
 use Samsara\Data\Tag\Tag;
-use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Organization\TagsResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
@@ -119,15 +119,6 @@ class TagsResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_return_query_builder(): void
-    {
-        $resource = new TagsResource($this->samsara);
-        $query = $resource->query();
-
-        $this->assertInstanceOf(Builder::class, $query);
-    }
-
-    #[Test]
     public function it_has_correct_endpoint(): void
     {
         $resource = new TagsResource($this->samsara);
@@ -141,5 +132,27 @@ class TagsResourceTest extends TestCase
         $resource = new TagsResource($this->samsara);
 
         $this->assertSame(Tag::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_terminal_executes_the_current_tag_list_query(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data'       => [['id' => 'tag-1', 'name' => 'Fleet A']],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $page = (new TagsResource($this->samsara))
+            ->query()
+            ->after('tag-cursor')
+            ->paginate(50);
+
+        $this->assertInstanceOf(Tag::class, $page->items()->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/tags'
+            && $request->data() === ['limit' => 50, 'after' => 'tag-cursor']
+        );
     }
 }

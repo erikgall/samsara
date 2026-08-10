@@ -19,11 +19,11 @@ permalink: /testing
 
 ## Introduction
 
-The SDK ships a `SamsaraFake` class that swaps out the real HTTP client so your tests never reach the network. You stage canned responses, run the code under test against the fake, then assert on the requests that were made. Reach for the fake whenever you exercise code that touches a Samsara resource — controllers, jobs, services, console commands — and prefer fixtures over hand-written response arrays for anything resembling realistic data.
+The SDK ships a `SamsaraFake` class with its own faked HTTP client. You stage canned responses, run code through the returned fake or the facade, then assert on the requests it recorded. `Samsara::fake()` replaces the facade root and both container bindings, including when the service provider has not yet resolved the singleton.
 
 ## Faking the Client
 
-Call `Samsara::fake()` in your test setup to replace the resolved client with a `SamsaraFake`. Subsequent calls to the `Samsara` facade in the same test return the fake.
+Call `Samsara::fake()` to create and install a `SamsaraFake`.
 
 ```php
 use Samsara\Facades\Samsara;
@@ -45,7 +45,7 @@ public function test_it_lists_drivers(): void
 }
 ```
 
-`Samsara::fake()` returns the `SamsaraFake` instance so you can fluently stage responses on it. Calling it again resets the fake.
+`Samsara::fake()` returns a new `SamsaraFake`, swaps the facade root, and binds that same instance as `Samsara\Samsara` and `samsara`. Direct calls through `$fake` remain equivalent.
 
 ## Faking Responses
 
@@ -111,7 +111,7 @@ $fake->fakeResponse('/fleet/routes', [
     ],
 ]);
 
-$routes = Samsara::routes()->all();
+$routes = $fake->routes()->query()->get();
 ```
 
 Pass a third argument to fake non-200 responses, which is how you exercise error paths:
@@ -120,12 +120,11 @@ Pass a third argument to fake non-200 responses, which is how you exercise error
 // 404 from a single-record lookup.
 $fake->fakeResponse('/fleet/drivers/invalid-id', [], 404);
 
-// 422 with a validation envelope.
-$fake->fakeResponse('/fleet/drivers', [
-    'message' => 'Validation failed',
-    'errors'  => ['name' => ['Name is required']],
-], 422);
+// 400 or 422 status for testing ValidationException.
+$fake->fakeResponse('/fleet/drivers', [], 400);
 ```
+
+`fakeResponse()` always wraps the supplied array in a top-level `data` key. It cannot currently stage an arbitrary top-level error envelope such as `message` plus `errors`; use the [advanced HTTP factory](#advanced-http-mocking) when the error body or headers matter.
 
 ## Assertions
 
@@ -139,7 +138,7 @@ Asserts that at least one request URL contained the given endpoint substring.
 $fake = Samsara::fake();
 $fake->fakeDrivers([['id' => 'driver-1', 'name' => 'John']]);
 
-Samsara::drivers()->all();
+$fake->drivers()->all();
 
 $fake->assertRequested('/fleet/drivers');
 ```
@@ -157,15 +156,15 @@ $fake->fakeVehicleStats([]);
 $start = Carbon::parse('2026-01-01T00:00:00Z');
 $end   = Carbon::parse('2026-01-02T00:00:00Z');
 
-Samsara::vehicleStats()
+$fake->vehicleStats()
     ->history()
     ->types(['gps'])
     ->between($start, $end)
     ->get();
 
 $fake->assertRequestedWithParams('/fleet/vehicles/stats/history', [
-    'startTime' => '2026-01-01T00:00:00+00:00',
-    'endTime'   => '2026-01-02T00:00:00+00:00',
+    'startTime' => '2026-01-01T00:00:00Z',
+    'endTime'   => '2026-01-02T00:00:00Z',
     'types'     => 'gps',
 ]);
 ```
@@ -188,7 +187,7 @@ For ad-hoc assertions, `getRecordedRequests()` returns the underlying `Illuminat
 $fake = Samsara::fake();
 $fake->fakeDrivers([['id' => 'driver-1', 'name' => 'John']]);
 
-Samsara::drivers()->all();
+$fake->drivers()->all();
 
 $requests = $fake->getRecordedRequests();
 $this->assertCount(1, $requests);
@@ -197,7 +196,7 @@ $this->assertStringContainsString('/fleet/drivers', $requests[0]->url());
 
 ## Using Fixtures
 
-The SDK ships JSON fixtures for every common resource. Each helper returns a decoded array shaped like a real Samsara API response, so you may pass them straight into the fake.
+The SDK ships JSON fixtures for common resources. Each helper returns a complete decoded response envelope with a top-level `data` key (and, where present, pagination metadata). Fake helpers expect the inner item list, so pass `Fixtures::drivers()['data']` rather than the full envelope.
 
 ```php
 use Samsara\Testing\Fixtures;
@@ -231,9 +230,10 @@ use Samsara\Testing\Fixtures;
 public function test_with_fixtures(): void
 {
     $fake = Samsara::fake();
-    $fake->fakeDrivers(Fixtures::drivers());
+    $payload = Fixtures::drivers();
+    $fake->fakeDrivers($payload['data']);
 
-    $drivers = Samsara::drivers()->all();
+    $drivers = $fake->drivers()->all();
 
     $this->assertNotEmpty($drivers);
 }
@@ -257,7 +257,7 @@ $payload = Fixtures::load('custom-drivers.json');
 
 ## Testing Error Handling
 
-Stage non-200 responses with `fakeResponse()` to exercise your exception handling.
+Stage non-200 responses with `fakeResponse()` to exercise your exception handling. Builder terminals and custom resource methods use the same typed mapper as supported generic methods.
 
 ### Authentication Errors
 
@@ -271,7 +271,7 @@ public function test_handles_auth_error(): void
 
     $this->expectException(AuthenticationException::class);
 
-    Samsara::drivers()->all();
+    $fake->drivers()->all();
 }
 ```
 
@@ -283,16 +283,11 @@ use Samsara\Exceptions\ValidationException;
 public function test_handles_validation_error(): void
 {
     $fake = Samsara::fake();
-    $fake->fakeResponse('/fleet/drivers', [
-        'message' => 'Validation failed',
-        'errors'  => ['name' => ['Name is required']],
-    ], 422);
+    $fake->fakeResponse('/fleet/drivers', [], 400);
 
-    try {
-        Samsara::drivers()->create([]);
-    } catch (ValidationException $e) {
-        $this->assertArrayHasKey('name', $e->getErrors());
-    }
+    $this->expectException(ValidationException::class);
+
+    $fake->drivers()->create([]);
 }
 ```
 
@@ -308,11 +303,11 @@ public function test_handles_rate_limit(): void
 
     $this->expectException(RateLimitException::class);
 
-    Samsara::drivers()->all();
+    $fake->drivers()->all();
 }
 ```
 
-See [Error Handling](error-handling.md) for the full exception reference.
+See [Error Handling](error-handling.html) for the full exception reference.
 
 ## Sharing the Fake Across Tests
 
@@ -352,7 +347,7 @@ class FleetServiceTest extends TestCase
             ['id' => 'driver-1', 'name' => 'John Doe'],
         ]);
 
-        $drivers = Samsara::drivers()->all();
+        $drivers = $this->samsara->drivers()->all();
 
         $this->assertSame('John Doe', $drivers->first()->name);
     }

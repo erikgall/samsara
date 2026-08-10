@@ -17,11 +17,13 @@ permalink: /resources/legacy
 
 Legacy resources expose v1 Samsara endpoints that have no v2 replacement, or that you may still need to call when a v2 migration is incomplete. Reach them through `Samsara::legacy()`, which returns a `LegacyResource` instance. Every method returns the raw decoded JSON response (`array<string, mixed>`) rather than a typed entity. When a stable v2 resource covers the same data, prefer it.
 
+The current first-party OpenAPI still lists several v1 operations, but it uses `GET` where the package sends `POST` for asset locations, asset reefers, HOS authentication logs, maintenance list, trips, and vision cameras. `/v1/fleet/dispatch/routes` and `POST /v1/fleet/assets` were not verified in the current spec; the OpenAPI notes that not every legacy endpoint is included, so absence is not proof of removal. Treat the method reference below as package behavior, not current upstream verification.
+
 ## Method Reference
 
 ### `assetLocations(array $data): array`
 
-`POST /v1/fleet/assets/locations`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.md).
+`POST /v1/fleet/assets/locations`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.html).
 
 ```php
 use Samsara\Facades\Samsara;
@@ -34,7 +36,7 @@ $payload = Samsara::legacy()->assetLocations([
 
 ### `assetReefers(array $data): array`
 
-`POST /v1/fleet/assets/reefers`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.md).
+`POST /v1/fleet/assets/reefers`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.html).
 
 ```php
 $payload = Samsara::legacy()->assetReefers([
@@ -66,7 +68,7 @@ $payload = Samsara::legacy()->driverSafetyScore('driver-id', [
 
 ### `fleetAssets(array $data): array`
 
-`POST /v1/fleet/assets`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.md).
+`POST /v1/fleet/assets`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.html).
 
 ```php
 $payload = Samsara::legacy()->fleetAssets([
@@ -97,7 +99,7 @@ $payload = Samsara::legacy()->machines([
 
 ### `maintenanceList(array $data): array`
 
-`POST /v1/fleet/maintenance/list`. Returns the raw v1 response. Prefer the v2 equivalent on [Maintenance](maintenance.md).
+`POST /v1/fleet/maintenance/list`. Returns the raw v1 response. Prefer the v2 equivalent on [Maintenance](maintenance.html).
 
 ```php
 $payload = Samsara::legacy()->maintenanceList([
@@ -119,7 +121,7 @@ $payload = Samsara::legacy()->messages([
 
 ### `trips(array $data): array`
 
-`POST /v1/fleet/trips`. Returns the raw v1 response. Prefer the v2 equivalent on [Trips](trips.md).
+`POST /v1/fleet/trips`. Returns the raw v1 response. Prefer the v2 equivalent on [Trips](trips.html).
 
 ```php
 $payload = Samsara::legacy()->trips([
@@ -131,7 +133,7 @@ $payload = Samsara::legacy()->trips([
 
 ### `vehicleHarshEvent(string $vehicleId, array $params): array`
 
-`GET /v1/fleet/vehicles/{vehicleId}/safety/harsh_event`. Returns the raw v1 response. Prefer the v2 equivalent on [Safety Events](safety-events.md).
+`GET /v1/fleet/vehicles/{vehicleId}/safety/harsh_event`. Returns the raw v1 response. Prefer the v2 equivalent on [Safety Events](safety-events.html).
 
 ```php
 $payload = Samsara::legacy()->vehicleHarshEvent('vehicle-id', [
@@ -152,7 +154,7 @@ $payload = Samsara::legacy()->vehicleSafetyScore('vehicle-id', [
 
 ### `visionCameras(array $data): array`
 
-`POST /v1/industrial/vision/cameras`. Returns the raw v1 response. Prefer the v2 equivalent on [Camera Media](camera-media.md).
+`POST /v1/industrial/vision/cameras`. Returns the raw v1 response. Prefer the v2 equivalent on [Camera Media](camera-media.html).
 
 ```php
 $payload = Samsara::legacy()->visionCameras([
@@ -162,9 +164,9 @@ $payload = Samsara::legacy()->visionCameras([
 
 ## Related Resources
 
-- [Resources Index](index.md) — full list of stable resources.
-- [Assets](assets.md) — v2 equivalent for asset locations, reefers, and fleet assets.
-- [Maintenance](maintenance.md) — v2 equivalent for maintenance lists.
-- [Trips](trips.md) — v2 equivalent for trip data.
-- [Safety Events](safety-events.md) — v2 equivalent for harsh-event reads.
-- [Camera Media](camera-media.md) — v2 equivalent for vision-camera reads.
+- [Resources Index](index.html) — full list of stable resources.
+- [Assets](assets.html) — v2 equivalent for asset locations, reefers, and fleet assets.
+- [Maintenance](maintenance.html) — v2 equivalent for maintenance lists.
+- [Trips](trips.html) — v2 equivalent for trip data.
+- [Safety Events](safety-events.html) — v2 equivalent for harsh-event reads.
+- [Camera Media](camera-media.html) — v2 equivalent for vision-camera reads.

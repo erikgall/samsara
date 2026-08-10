@@ -16,9 +16,11 @@ permalink: /resources/assignments
 
 ## Introduction
 
-Assignments record which driver was paired with which vehicle or trailer over time. The SDK exposes four facade accessors: `driverVehicleAssignments()`, `driverTrailerAssignments()`, `trailerAssignments()`, and `carrierProposedAssignments()`. Reach for these resources when you need to reconstruct an audit trail of who drove what, or who pulled which trailer, over a given window. None of the four resources declare a typed entity — each returns generic `Samsara\Data\Entity` (`Fluent`) instances.
+Assignments record which driver was paired with which vehicle or trailer over time. The SDK exposes four facade accessors: `driverVehicleAssignments()`, `driverTrailerAssignments()`, `trailerAssignments()`, and `carrierProposedAssignments()`. Reach for these resources when you need to reconstruct an audit trail of who drove what, or who pulled which trailer, over a given window. The driver-vehicle, driver-trailer, and carrier-proposed builders return generic `Samsara\Data\Entity` (`Fluent`) rows; the legacy `trailerAssignments()->forTrailer()` helper returns a typed `Trailer` wrapper.
 
-For carrier-proposed driver-vehicle assignments, see the [Carrier Proposed Assignments](carrier-proposed-assignments.md) page.
+Driver-vehicle and driver-trailer resources support generic `create` plus their read builders; all other generic verbs are rejected. The legacy trailer-assignment resource supports only `forTrailer()`.
+
+For carrier-proposed driver-vehicle assignments, see the [Carrier Proposed Assignments](carrier-proposed-assignments.html) page.
 
 ## Driver-Vehicle Assignments
 
@@ -64,13 +66,15 @@ $forDriver = Samsara::driverTrailerAssignments()
 The legacy resource exposes a single helper that returns the assignment history for a single trailer.
 
 ```php
-$assignments = Samsara::trailerAssignments()
-    ->forTrailer('trailer-123');
+$trailer = Samsara::trailerAssignments()
+    ->forTrailer(123, ['startMs' => $startMs, 'endMs' => $endMs]);
+
+$assignments = $trailer->trailerAssignments;
 ```
 
 ## Properties
 
-None of these four resources declare a typed entity. Records come back as generic `Samsara\Data\Entity` instances. The fields you can read off each row depend on the assignment kind — typical keys include:
+The current assignment builders return generic `Samsara\Data\Entity` rows. `forTrailer(int $trailerId, array $params = []): Trailer` returns one typed legacy `Trailer` wrapper containing `trailerAssignments`.
 
 | Key | Description |
 |-----|-------------|
@@ -84,8 +88,8 @@ Read each key directly from the entity (`$row->driver`) or via `$row->get('key')
 
 ## Related Resources
 
-- [Drivers](drivers.md) — the driver side of every assignment.
-- [Vehicles](vehicles.md) — the vehicle side of driver-vehicle assignments.
-- [Trailers](trailers.md) — the trailer side of driver-trailer assignments.
-- [Carrier Proposed Assignments](carrier-proposed-assignments.md) — proposed driver-vehicle assignments awaiting confirmation.
-- [Query Builder](../query-builder.md) — for filtering, pagination, and lazy iteration.
+- [Drivers](drivers.html) — the driver side of every assignment.
+- [Vehicles](vehicles.html) — the vehicle side of driver-vehicle assignments.
+- [Trailers](trailers.html) — the trailer side of driver-trailer assignments.
+- [Carrier Proposed Assignments](carrier-proposed-assignments.html) — proposed driver-vehicle assignments awaiting confirmation.
+- [Query Builder](../query-builder.html) — for filtering, pagination, and lazy iteration.

@@ -3,13 +3,12 @@
 namespace Samsara\Tests\Unit\Resources\Additional;
 
 use Samsara\Samsara;
-use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
-use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Additional\IssuesResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the IssuesResource class.
@@ -32,26 +31,6 @@ class IssuesResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_all_issues(): void
-    {
-        $this->http->fake([
-            '*/issues' => $this->http->response([
-                'data' => [
-                    ['id' => 'issue-1', 'status' => 'open'],
-                    ['id' => 'issue-2', 'status' => 'resolved'],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new IssuesResource($this->samsara);
-
-        $result = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
-    }
-
-    #[Test]
     public function it_can_get_stream_builder(): void
     {
         $resource = new IssuesResource($this->samsara);
@@ -62,29 +41,44 @@ class IssuesResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_update_issue(): void
-    {
-        $this->http->fake([
-            '*/issues/issue-123' => $this->http->response([
-                'data' => [
-                    'id'     => 'issue-123',
-                    'status' => 'resolved',
-                ],
-            ], 200),
-        ]);
-
-        $resource = new IssuesResource($this->samsara);
-
-        $result = $resource->update('issue-123', ['status' => 'resolved']);
-
-        $this->assertInstanceOf(Entity::class, $result);
-    }
-
-    #[Test]
     public function it_has_correct_endpoint(): void
     {
         $resource = new IssuesResource($this->samsara);
 
         $this->assertSame('/issues', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_rejects_the_deferred_generic_update_without_sending_a_request(): void
+    {
+        $this->http->fake();
+
+        $resource = new IssuesResource($this->samsara);
+
+        try {
+            $resource->update('issue-123', ['status' => 'resolved']);
+            $this->fail('Expected the generic update operation to be rejected.');
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('update', $exception->getContext()['operation']);
+        }
+
+        $this->http->assertNothingSent();
+    }
+
+    #[Test]
+    public function it_rejects_unfiltered_generic_all_without_sending_a_request(): void
+    {
+        $this->http->fake();
+
+        $resource = new IssuesResource($this->samsara);
+
+        try {
+            $resource->all();
+            $this->fail('Expected the generic all operation to be rejected.');
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('all', $exception->getContext()['operation']);
+        }
+
+        $this->http->assertNothingSent();
     }
 }

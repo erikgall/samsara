@@ -5,11 +5,11 @@ namespace Samsara\Tests\Unit\Resources\Safety;
 use Samsara\Samsara;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
-use Samsara\Data\EntityCollection;
 use Samsara\Data\Maintenance\Dvir;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Safety\MaintenanceResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the MaintenanceResource.
@@ -46,7 +46,7 @@ class MaintenanceResourceTest extends TestCase
             '*' => $this->http->response([
                 'data' => [
                     'id'           => 'dvir-1',
-                    'type'         => 'preTrip',
+                    'type'         => 'mechanic',
                     'safetyStatus' => 'safe',
                 ],
             ]),
@@ -54,40 +54,14 @@ class MaintenanceResourceTest extends TestCase
 
         $resource = new MaintenanceResource($this->samsara);
         $dvir = $resource->createDvir([
-            'type'      => 'preTrip',
-            'vehicleId' => 'vehicle-123',
+            'authorId'     => 'author-123',
+            'safetyStatus' => 'safe',
+            'type'         => 'mechanic',
+            'vehicleId'    => 'vehicle-123',
         ]);
 
         $this->assertInstanceOf(Dvir::class, $dvir);
-        $this->assertSame('preTrip', $dvir->type);
-    }
-
-    #[Test]
-    public function it_can_get_all_dvirs(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    [
-                        'id'           => 'dvir-1',
-                        'type'         => 'preTrip',
-                        'safetyStatus' => 'safe',
-                    ],
-                    [
-                        'id'           => 'dvir-2',
-                        'type'         => 'postTrip',
-                        'safetyStatus' => 'unsafe',
-                    ],
-                ],
-            ]),
-        ]);
-
-        $resource = new MaintenanceResource($this->samsara);
-        $dvirs = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $dvirs);
-        $this->assertCount(2, $dvirs);
-        $this->assertInstanceOf(Dvir::class, $dvirs->first());
+        $this->assertSame('mechanic', $dvir->type);
     }
 
     #[Test]
@@ -131,5 +105,23 @@ class MaintenanceResourceTest extends TestCase
         $resource = new MaintenanceResource($this->samsara);
 
         $this->assertSame(Dvir::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_rejects_the_unsupported_generic_all_operation_before_http(): void
+    {
+        $this->http->fake();
+
+        $resource = new MaintenanceResource($this->samsara);
+
+        try {
+            $resource->all();
+            $this->fail('Expected the generic all operation to be rejected.');
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('all', $exception->getContext()['operation']);
+            $this->assertSame(MaintenanceResource::class, $exception->getContext()['resource']);
+        }
+
+        $this->http->assertNothingSent();
     }
 }

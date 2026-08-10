@@ -28,9 +28,7 @@ The `Samsara::sensors()` resource calls Samsara's legacy v1 sensor endpoints —
 ```php
 use Samsara\Facades\Samsara;
 
-$sensors = Samsara::sensors()->list([
-    'groupId' => 'group-id',
-]);
+$sensors = Samsara::sensors()->list();
 
 foreach ($sensors as $sensor) {
     logger()->info('Sensor', $sensor->toArray());
@@ -91,7 +89,7 @@ $history = Samsara::sensors()->history([
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `list(array $params)` | `EntityCollection<int, Entity>` | List sensors in a group. |
+| `list()` | `EntityCollection<int, Entity>` | List sensors. |
 | `temperature(array $params)` | `array` | Latest temperature readings. |
 | `humidity(array $params)` | `array` | Latest humidity readings. |
 | `door(array $params)` | `array` | Door open/closed status. |
@@ -132,6 +130,6 @@ foreach ($doorStatus['sensors'] as $sensor) {
 
 ## Related Resources
 
-- [Industrial](industrial.md) — v2 industrial assets, data inputs, and data points.
-- [Assets](assets.md) — non-vehicle trackers managed via v2.
-- [Error Handling](../error-handling.md) — exceptions raised by the underlying request.
+- [Industrial](industrial.html) — v2 industrial assets, data inputs, and data points.
+- [Assets](assets.html) — non-vehicle trackers managed via v2.
+- [Error Handling](../error-handling.html) — exceptions raised by the underlying request.

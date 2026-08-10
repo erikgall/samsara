@@ -20,9 +20,10 @@ return [
     |--------------------------------------------------------------------------
     |
     | The region for your Samsara API. Use 'us' for the US region
-    | (api.samsara.com) or 'eu' for the EU region (api.eu.samsara.com).
+    | (api.samsara.com), 'eu' for the EU region (api.eu.samsara.com),
+    | or 'ca' for the Canada region (api.ca.samsara.com).
     |
-    | Supported: "us", "eu"
+    | Supported: "us", "eu", "ca"
     |
     */
 

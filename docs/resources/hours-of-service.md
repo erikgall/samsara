@@ -30,7 +30,7 @@ permalink: /resources/hours-of-service
 
 Hours of Service (HOS) data is the regulatory record of when your drivers were driving, on duty, or resting. The `Samsara::hoursOfService()` resource exposes four sub-builders — `logs()`, `clocks()`, `violations()`, and `dailyLogs()` — each returning a query builder over a different HOS endpoint. Reach for HOS data when you need to surface real-time clocks in a dashboard, audit a driver's history for compliance, or react to a violation.
 
-> **Note:** This resource is typed as `HosLog`. The `clocks()`, `violations()`, and `dailyLogs()` sub-builders return entities mapped to `HosLog` rather than to their own `HosClock`, `HosViolation`, and `HosDailyLog` classes. The properties documented in [Entities](#entities) describe the API response shape — read fields with `$row->get('drive')`, `$row->get('cycle')`, etc., or instantiate the typed entity yourself when you need its helpers.
+Each endpoint selects its own response type. `logs()` returns `HosLogsForDriver`, `clocks()` returns `HosClocksForDriver`, `violations()` returns `HosViolationGroup`, and `dailyLogs()` returns `HosDailyLog`. The wrapper helpers documented under [Entities](#entities) expose nested `HosLog`, `HosClock`, and `HosViolation` objects.
 
 ## Retrieving Records
 
@@ -81,19 +81,19 @@ $dailyLogs = Samsara::hoursOfService()
 
 ## Creating Records
 
-> **Note:** HOS records are written by the Samsara driver app and ELD hardware. This resource does not support `create()`.
+Only generic `all()` is supported. `create()` fails locally before HTTP.
 
 ## Updating Records
 
-> **Note:** This resource does not support `update()`.
+Generic `update()` fails locally before HTTP.
 
 ## Deleting Records
 
-> **Note:** This resource does not support `delete()`.
+Generic `delete()` fails locally before HTTP.
 
 ## Filtering
 
-Every sub-builder accepts the standard query builder methods. See [the query builder reference](../query-builder.md) for the full method list.
+Every sub-builder accepts the standard query builder methods. See [the query builder reference](../query-builder.html) for the full method list.
 
 ```php
 $logs = Samsara::hoursOfService()
@@ -106,7 +106,7 @@ $logs = Samsara::hoursOfService()
 
 ## Duty Status
 
-The `Samsara\Enums\DutyStatus` enum maps to the `hosStatusType` field on `HosLog`. See the [enum reference](../enums.md) for the canonical mapping.
+`HosLog::getDutyStatus()` maps matching `hosStatusType` values to `Samsara\Enums\DutyStatus`. One package mismatch remains: current HOS rows use `sleeperBed`, which `isSleeperBerth()` recognizes, while the enum value is `sleeperBerth`; `getDutyStatus()` therefore returns `null` for `sleeperBed`. See the [enum reference](../enums.html).
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -119,7 +119,7 @@ The `Samsara\Enums\DutyStatus` enum maps to the `hosStatusType` field on `HosLog
 
 ## HOS Log Types
 
-The `Samsara\Enums\HosLogType` enum lists the categorical types Samsara assigns to HOS log entries. See the [enum reference](../enums.md) for the canonical mapping.
+The `Samsara\Enums\HosLogType` enum lists the categorical types Samsara assigns to HOS log entries. See the [enum reference](../enums.html) for the canonical mapping.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -137,10 +137,11 @@ The `Samsara\Enums\HosLogType` enum lists the categorical types Samsara assigns 
 
 ### HosLog Entity
 
-`HosLog` represents a single duty-status log entry.
+`HosLog` represents one duty-status entry nested in a `HosLogsForDriver` response.
 
 ```php
-$log = Samsara::hoursOfService()->logs()->first();
+$logsForDriver = Samsara::hoursOfService()->logs()->first();
+$log = $logsForDriver->getLogs()->first();
 
 $log->getDutyStatus();          // ?DutyStatus
 $log->isDriving();              // bool
@@ -163,14 +164,12 @@ $log->isYardMove();             // bool
 
 ### HosClock Entity
 
-> **Note:** This builder is typed as `HosLog` due to a single `$entity` declaration on the resource. The properties below describe the API response shape; the typed `HosClock` helpers are not invoked by `clocks()->get()` automatically. Read the values with `$row->get('drive')['driveRemainingDurationMs']`, or instantiate `HosClock` yourself with the response array if you need the helpers.
+`clocks()->get()` returns `HosClocksForDriver` wrappers. Call `$row->getClocks()` for a typed `HosClock`.
 
 `HosClock` represents the live remaining-time clock for a driver. All durations come back in **milliseconds**, not seconds.
 
 ```php
-use Samsara\Data\HoursOfService\HosClock;
-
-$clock = new HosClock($row->toArray());
+$clock = $row->getClocks();
 
 $clock->getDriveRemainingHours();  // ?float
 $clock->getShiftRemainingHours();  // ?float
@@ -188,12 +187,10 @@ $clock->getTimeUntilBreakHours();  // ?float
 
 ### HosViolation Entity
 
-> **Note:** This builder is typed as `HosLog`. The properties below describe the API response shape; the typed `HosViolation` helpers are not invoked by `violations()->get()` automatically. Read the violation type with `$row->get('type')` or instantiate `HosViolation` yourself when you need the helpers.
+`violations()->get()` returns `HosViolationGroup` wrappers. Call `$group->getViolations()` for typed `HosViolation` objects.
 
 ```php
-use Samsara\Data\HoursOfService\HosViolation;
-
-$violation = new HosViolation($row->toArray());
+$violation = $group->getViolations()->first();
 
 $violation->getDurationHours();              // ?float
 $violation->getDurationMinutes();            // ?float
@@ -215,7 +212,7 @@ $violation->isUnsubmittedLogsViolation();    // bool
 
 ### HosDailyLog Entity
 
-> **Note:** This builder is typed as `HosLog`. The properties below describe the API response shape returned by `dailyLogs()->get()`.
+`dailyLogs()->get()` returns `HosDailyLog` directly. `logs()` and `query()` return `HosLogsForDriver` wrappers; call `getLogs()` for typed `HosLog` entries.
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -229,8 +226,8 @@ $violation->isUnsubmittedLogsViolation();    // bool
 
 ## Related Resources
 
-- [Drivers](drivers.md) — the driver side of every HOS record.
-- [Vehicles](vehicles.md) — vehicle records referenced from logs.
-- [Safety Events](safety-events.md) — pair safety events with HOS context.
-- [Query Builder](../query-builder.md) — filters and pagination.
-- [Enums](../enums.md) — `DutyStatus` and `HosLogType`.
+- [Drivers](drivers.html) — the driver side of every HOS record.
+- [Vehicles](vehicles.html) — vehicle records referenced from logs.
+- [Safety Events](safety-events.html) — pair safety events with HOS context.
+- [Query Builder](../query-builder.html) — filters and pagination.
+- [Enums](../enums.html) — `DutyStatus` and `HosLogType`.

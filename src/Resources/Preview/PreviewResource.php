@@ -33,40 +33,51 @@ class PreviewResource extends Resource
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
-    public function createDriverAuthToken(string $driverId, array $data = []): array
+    public function createDriverAuthToken(array $data): array
     {
-        $response = $this->client()->post("/fleet/drivers/{$driverId}/auth-token", $data);
+        $endpoint = '/preview/fleet/drivers/create-auth-token';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
-        $this->handleError($response);
-
+        /** @var array<string, mixed> */
         return $response->json('data', $response->json());
     }
 
     /**
      * Lock a vehicle.
-     *
-     * @return array<string, mixed>
      */
-    public function lockVehicle(string $vehicleId): array
+    public function lockVehicle(string $vehicleId): bool
     {
-        $response = $this->client()->post("/fleet/vehicles/{$vehicleId}/lock");
+        $endpoint = '/preview/fleet/vehicles/'.rawurlencode($vehicleId).'/lock';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->put($endpoint),
+            $endpoint
+        );
 
-        $this->handleError($response);
-
-        return $response->json('data', $response->json());
+        return $response->successful();
     }
 
     /**
      * Unlock a vehicle.
-     *
-     * @return array<string, mixed>
      */
-    public function unlockVehicle(string $vehicleId): array
+    public function unlockVehicle(string $vehicleId): bool
     {
-        $response = $this->client()->post("/fleet/vehicles/{$vehicleId}/unlock");
+        $endpoint = '/preview/fleet/vehicles/'.rawurlencode($vehicleId).'/lock';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->delete($endpoint),
+            $endpoint
+        );
 
-        $this->handleError($response);
+        return $response->successful();
+    }
 
-        return $response->json('data', $response->json());
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

@@ -5,7 +5,10 @@ namespace Samsara\Resources\Fleet;
 use Samsara\Query\Builder;
 use Samsara\Data\Driver\Driver;
 use Samsara\Resources\Resource;
-use Illuminate\Support\Collection;
+use Samsara\Data\EntityCollection;
+use Samsara\Data\Driver\DriverQrCode;
+use Samsara\Data\Driver\DriverAuthToken;
+use Samsara\Data\Driver\DriverRemoteSignOutResult;
 
 /**
  * Drivers resource for the Samsara API.
@@ -49,14 +52,18 @@ class DriversResource extends Resource
      * Create an authentication token for a driver.
      *
      * Generates a session token that can be used for driver authentication.
+     *
+     * @param  array<string, mixed>  $data
      */
-    public function createAuthToken(string $id): string
+    public function createAuthToken(array $data): DriverAuthToken
     {
-        $response = $this->client()->post("{$this->endpoint}/{$id}/auth-tokens");
+        $endpoint = '/fleet/drivers/auth-token';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
-        $this->handleError($response);
-
-        return $response->json('token', '');
+        return DriverAuthToken::make($response->json('data', []));
     }
 
     /**
@@ -64,13 +71,15 @@ class DriversResource extends Resource
      *
      * @param  array<string, mixed>  $data
      */
-    public function createQrCode(array $data): object
+    public function createQrCode(array $data): DriverQrCode
     {
-        $response = $this->client()->post("{$this->endpoint}/qr-codes", $data);
+        $endpoint = '/drivers/qr-codes';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
-        $this->handleError($response);
-
-        return (object) $response->json('data', $response->json());
+        return DriverQrCode::make($response->json('data', []));
     }
 
     /**
@@ -93,11 +102,13 @@ class DriversResource extends Resource
     /**
      * Delete a QR code.
      */
-    public function deleteQrCode(string $id): bool
+    public function deleteQrCode(int $driverId): bool
     {
-        $response = $this->client()->delete("{$this->endpoint}/qr-codes/{$id}");
-
-        $this->handleError($response);
+        $endpoint = '/drivers/qr-codes';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->delete($endpoint, ['driverId' => $driverId]),
+            $endpoint
+        );
 
         return $response->successful();
     }
@@ -110,32 +121,33 @@ class DriversResource extends Resource
      */
     public function findByExternalId(string $key, string $value): ?Driver
     {
-        $result = $this->query()
-            ->where("externalIds[{$key}]", $value)
-            ->first();
-
-        if ($result === null) {
-            return null;
-        }
-
         /** @var Driver */
-        return $result;
+        return $this->find("{$key}:{$value}");
     }
 
     /**
      * Get all QR codes for driver app login.
      *
-     * @return Collection<int, object>
+     * @param  array<int, int|string>|string  $driverIds
+     * @return EntityCollection<int, DriverQrCode>
      */
-    public function getQrCodes(): Collection
+    public function getQrCodes(array|string $driverIds): EntityCollection
     {
-        $response = $this->client()->get("{$this->endpoint}/qr-codes");
+        $endpoint = '/drivers/qr-codes';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, [
+                'driverIds' => is_array($driverIds) ? implode(',', $driverIds) : $driverIds,
+            ]),
+            $endpoint
+        );
 
-        $this->handleError($response);
-
+        /** @var array<int, array<string, mixed>> $data */
         $data = $response->json('data', []);
 
-        return new Collection(array_map(fn (array $item) => (object) $item, $data));
+        return new EntityCollection(array_map(
+            fn (array $item): DriverQrCode => DriverQrCode::make($item),
+            $data
+        ));
     }
 
     /**
@@ -149,10 +161,24 @@ class DriversResource extends Resource
     /**
      * Remotely sign out a driver from the driver app.
      */
-    public function remoteSignOut(string $id): void
+    public function remoteSignOut(string $id): DriverRemoteSignOutResult
     {
-        $response = $this->client()->post("{$this->endpoint}/{$id}/remote-sign-out");
+        $endpoint = '/fleet/drivers/remote-sign-out';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, ['driverId' => $id]),
+            $endpoint
+        );
 
-        $this->handleError($response);
+        return DriverRemoteSignOutResult::make($response->json());
+    }
+
+    /**
+     * Get the inherited generic operations supported by this resource.
+     *
+     * @return array<int, string>
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['all', 'find', 'create', 'update'];
     }
 }

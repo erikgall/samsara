@@ -8,8 +8,10 @@ use Samsara\Tests\TestCase;
 use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Maintenance\WorkOrder;
+use Samsara\Data\Maintenance\ServiceTask;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Additional\WorkOrdersResource;
+use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the WorkOrdersResource class.
@@ -39,12 +41,12 @@ class WorkOrdersResourceTest extends TestCase
                 'data' => [
                     'id' => 'wo-123',
                 ],
-            ], 201),
+            ], 200),
         ]);
 
         $resource = new WorkOrdersResource($this->samsara);
 
-        $result = $resource->create(['vehicleId' => 'vehicle-1']);
+        $result = $resource->create(['assetId' => 'asset-1']);
 
         $this->assertInstanceOf(WorkOrder::class, $result);
     }
@@ -52,34 +54,21 @@ class WorkOrdersResourceTest extends TestCase
     #[Test]
     public function it_can_delete_work_order(): void
     {
-        $this->http->fake([
-            '*/maintenance/work-orders/wo-123' => $this->http->response([], 204),
-        ]);
-
         $resource = new WorkOrdersResource($this->samsara);
 
-        $result = $resource->delete('wo-123');
+        $this->expectException(UnsupportedOperationException::class);
 
-        $this->assertTrue($result);
+        $resource->delete('wo-123');
     }
 
     #[Test]
     public function it_can_find_work_order(): void
     {
-        $this->http->fake([
-            '*/maintenance/work-orders/wo-123' => $this->http->response([
-                'data' => [
-                    'id'     => 'wo-123',
-                    'status' => 'open',
-                ],
-            ], 200),
-        ]);
-
         $resource = new WorkOrdersResource($this->samsara);
 
-        $result = $resource->find('wo-123');
+        $this->expectException(UnsupportedOperationException::class);
 
-        $this->assertInstanceOf(WorkOrder::class, $result);
+        $resource->find('wo-123');
     }
 
     #[Test]
@@ -116,9 +105,9 @@ class WorkOrdersResourceTest extends TestCase
 
         $resource = new WorkOrdersResource($this->samsara);
 
-        $result = $resource->serviceTasks();
+        $result = $resource->serviceTasks()->get();
 
-        $this->assertInstanceOf(EntityCollection::class, $result);
+        $this->assertInstanceOf(ServiceTask::class, $result->first());
         $this->assertCount(2, $result);
     }
 
@@ -135,20 +124,11 @@ class WorkOrdersResourceTest extends TestCase
     #[Test]
     public function it_can_update_work_order(): void
     {
-        $this->http->fake([
-            '*/maintenance/work-orders/wo-123' => $this->http->response([
-                'data' => [
-                    'id'     => 'wo-123',
-                    'status' => 'completed',
-                ],
-            ], 200),
-        ]);
-
         $resource = new WorkOrdersResource($this->samsara);
 
-        $result = $resource->update('wo-123', ['status' => 'completed']);
+        $this->expectException(UnsupportedOperationException::class);
 
-        $this->assertInstanceOf(WorkOrder::class, $result);
+        $resource->update('wo-123', ['status' => 'completed']);
     }
 
     #[Test]
@@ -157,17 +137,23 @@ class WorkOrdersResourceTest extends TestCase
         $this->http->fake([
             '*/maintenance/invoice-scans' => $this->http->response([
                 'data' => [
-                    'id' => 'scan-123',
+                    'workOrderId' => 'wo-123',
                 ],
-            ], 201),
+            ], 200),
         ]);
 
         $resource = new WorkOrdersResource($this->samsara);
 
-        $result = $resource->uploadInvoiceScan(['file' => 'base64data']);
+        $result = $resource->uploadInvoiceScan([
+            'file' => [
+                'base64Content' => 'base64data',
+                'contentType'   => 'application/pdf',
+            ],
+            'workOrderId' => 'wo-123',
+        ]);
 
         $this->assertIsArray($result);
-        $this->assertSame('scan-123', $result['id']);
+        $this->assertSame('wo-123', $result['workOrderId']);
     }
 
     #[Test]

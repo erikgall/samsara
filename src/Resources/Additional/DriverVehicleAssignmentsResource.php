@@ -24,6 +24,14 @@ class DriverVehicleAssignmentsResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))->withoutDefaultPageSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['create'];
     }
 }

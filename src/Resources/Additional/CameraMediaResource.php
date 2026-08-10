@@ -3,7 +3,6 @@
 namespace Samsara\Resources\Additional;
 
 use Samsara\Resources\Resource;
-use Samsara\Data\EntityCollection;
 
 /**
  * CameraMedia resource for the Samsara API.
@@ -17,20 +16,23 @@ class CameraMediaResource extends Resource
     /**
      * The API endpoint for this resource.
      */
-    protected string $endpoint = '/camera-media';
+    protected string $endpoint = '/cameras/media';
 
     /**
      * Get camera media.
      *
-     * @return EntityCollection<int, \Samsara\Data\Entity>
+     * @param  array<string, mixed>  $parameters
+     * @return array<string, mixed>
      */
-    public function get(): EntityCollection
+    public function get(array $parameters): array
     {
-        $response = $this->client()->get('/camera-media');
+        $response = $this->executeSdkGet(
+            $this->endpoint,
+            $parameters,
+            ['inputs', 'mediaTypes', 'triggerReasons'],
+        );
 
-        $this->handleError($response);
-
-        return $this->mapToEntities($response->json('data', []));
+        return $response->json();
     }
 
     /**
@@ -40,9 +42,11 @@ class CameraMediaResource extends Resource
      */
     public function getRetrieval(string $id): array
     {
-        $response = $this->client()->get("/camera-media/retrieve/{$id}");
-
-        $this->handleError($response);
+        $endpoint = '/cameras/media/retrieval';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, ['retrievalId' => $id]),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
     }
@@ -55,10 +59,20 @@ class CameraMediaResource extends Resource
      */
     public function retrieve(array $data): array
     {
-        $response = $this->client()->post('/camera-media/retrieve', $data);
-
-        $this->handleError($response);
+        $endpoint = '/cameras/media/retrieval';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint, $data),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

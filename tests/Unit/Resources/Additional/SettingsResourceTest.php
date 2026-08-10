@@ -32,9 +32,9 @@ class SettingsResourceTest extends TestCase
     public function it_can_get_compliance_settings(): void
     {
         $this->http->fake([
-            '*/settings/compliance' => $this->http->response([
+            '*/fleet/settings/compliance' => $this->http->response([
                 'data' => [
-                    'hosEnabled' => true,
+                    'canadaHosEnabled' => true,
                 ],
             ], 200),
         ]);
@@ -44,16 +44,16 @@ class SettingsResourceTest extends TestCase
         $result = $resource->compliance();
 
         $this->assertIsArray($result);
-        $this->assertTrue($result['hosEnabled']);
+        $this->assertTrue($result['canadaHosEnabled']);
     }
 
     #[Test]
     public function it_can_get_driver_app_settings(): void
     {
         $this->http->fake([
-            '*/settings/driver-app' => $this->http->response([
+            '*/fleet/settings/driver-app' => $this->http->response([
                 'data' => [
-                    'gpsEnabled' => true,
+                    'orgVehicleSearch' => true,
                 ],
             ], 200),
         ]);
@@ -63,16 +63,16 @@ class SettingsResourceTest extends TestCase
         $result = $resource->driverApp();
 
         $this->assertIsArray($result);
-        $this->assertTrue($result['gpsEnabled']);
+        $this->assertTrue($result['orgVehicleSearch']);
     }
 
     #[Test]
     public function it_can_get_safety_settings(): void
     {
         $this->http->fake([
-            '*/settings/safety' => $this->http->response([
+            '*/fleet/settings/safety' => $this->http->response([
                 'data' => [
-                    'dashcamEnabled' => true,
+                    ['eventType' => 'harshBrake'],
                 ],
             ], 200),
         ]);
@@ -82,45 +82,45 @@ class SettingsResourceTest extends TestCase
         $result = $resource->safety();
 
         $this->assertIsArray($result);
-        $this->assertTrue($result['dashcamEnabled']);
+        $this->assertSame('harshBrake', $result[0]['eventType']);
     }
 
     #[Test]
     public function it_can_update_compliance_settings(): void
     {
         $this->http->fake([
-            '*/settings/compliance' => $this->http->response([
+            '*/fleet/settings/compliance' => $this->http->response([
                 'data' => [
-                    'hosEnabled' => false,
+                    'canadaHosEnabled' => false,
                 ],
             ], 200),
         ]);
 
         $resource = new SettingsResource($this->samsara);
 
-        $result = $resource->updateCompliance(['hosEnabled' => false]);
+        $result = $resource->updateCompliance(['canadaHosEnabled' => false]);
 
         $this->assertIsArray($result);
-        $this->assertFalse($result['hosEnabled']);
+        $this->assertFalse($result['canadaHosEnabled']);
     }
 
     #[Test]
     public function it_can_update_driver_app_settings(): void
     {
         $this->http->fake([
-            '*/settings/driver-app' => $this->http->response([
+            '*/fleet/settings/driver-app' => $this->http->response([
                 'data' => [
-                    'gpsEnabled' => false,
+                    'orgVehicleSearch' => false,
                 ],
             ], 200),
         ]);
 
         $resource = new SettingsResource($this->samsara);
 
-        $result = $resource->updateDriverApp(['gpsEnabled' => false]);
+        $result = $resource->updateDriverApp(['orgVehicleSearch' => false]);
 
         $this->assertIsArray($result);
-        $this->assertFalse($result['gpsEnabled']);
+        $this->assertFalse($result['orgVehicleSearch']);
     }
 
     #[Test]
@@ -128,6 +128,6 @@ class SettingsResourceTest extends TestCase
     {
         $resource = new SettingsResource($this->samsara);
 
-        $this->assertSame('/settings', $resource->getEndpoint());
+        $this->assertSame('/fleet/settings', $resource->getEndpoint());
     }
 }

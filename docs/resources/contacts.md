@@ -59,7 +59,7 @@ Samsara::contacts()->delete('contact-id');
 
 ## Filtering
 
-Contacts accept the standard query builder. See [the query builder reference](../query-builder.md) for the full method list.
+Contacts accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
 
 ```php
 $contacts = Samsara::contacts()
@@ -111,7 +111,7 @@ The `Contact` entity (`Samsara\Data\Contact\Contact`) exposes the following type
 
 ## Related Resources
 
-- [Addresses](addresses.md) — attach contacts to a geofenced location.
-- [Routes](routes.md) — routes use contacts on their stops.
-- [Query Builder](../query-builder.md) — for filtering, pagination, and lazy iteration.
-- [Testing](../testing.md) — fake `Samsara::contacts()` calls in your tests.
+- [Addresses](addresses.html) — attach contacts to a geofenced location.
+- [Routes](routes.html) — routes use contacts on their stops.
+- [Query Builder](../query-builder.html) — for filtering, pagination, and lazy iteration.
+- [Testing](../testing.html) — fake `Samsara::contacts()` calls in your tests.

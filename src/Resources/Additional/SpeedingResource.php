@@ -24,6 +24,14 @@ class SpeedingResource extends Resource
      */
     public function intervalsStream(): Builder
     {
-        return new Builder($this);
+        return (new Builder($this))->withoutDefaultPageSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return [];
     }
 }

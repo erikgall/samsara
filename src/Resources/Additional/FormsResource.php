@@ -4,7 +4,7 @@ namespace Samsara\Resources\Additional;
 
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
-use Samsara\Data\EntityCollection;
+use Samsara\Data\Form\FormTemplate;
 use Samsara\Data\Form\FormSubmission;
 
 /**
@@ -35,9 +35,10 @@ class FormsResource extends Resource
      */
     public function createSubmission(array $data): FormSubmission
     {
-        $response = $this->client()->post('/form-submissions', $data);
-
-        $this->handleError($response);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($this->endpoint, $data),
+            $this->endpoint
+        );
 
         /** @var FormSubmission */
         return $this->mapToEntity($response->json('data', $response->json()));
@@ -46,14 +47,17 @@ class FormsResource extends Resource
     /**
      * Export form submissions as PDF.
      *
-     * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
-    public function exportPdf(array $data): array
+    public function exportPdf(string $id): array
     {
-        $response = $this->client()->post('/form-submissions/pdf-exports', $data);
-
-        $this->handleError($response);
+        $endpoint = '/form-submissions/pdf-exports';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()
+                ->withQueryParameters(['id' => $id])
+                ->post($endpoint),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
     }
@@ -65,9 +69,11 @@ class FormsResource extends Resource
      */
     public function getPdfExport(string $id): array
     {
-        $response = $this->client()->get("/form-submissions/pdf-exports/{$id}");
-
-        $this->handleError($response);
+        $endpoint = '/form-submissions/pdf-exports';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint, ['pdfId' => $id]),
+            $endpoint
+        );
 
         return $response->json('data', $response->json());
     }
@@ -93,21 +99,19 @@ class FormsResource extends Resource
      */
     public function submissionsStream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/form-submissions/stream');
+        return $this->createBuilderWithEndpoint('/form-submissions/stream')
+            ->withoutDefaultPageSize()
+            ->usingEntity(FormSubmission::class);
     }
 
     /**
      * Get all form templates.
-     *
-     * @return EntityCollection<int, \Samsara\Data\Entity>
      */
-    public function templates(): EntityCollection
+    public function templates(): Builder
     {
-        $response = $this->client()->get('/form-templates');
-
-        $this->handleError($response);
-
-        return $this->mapToEntities($response->json('data', []));
+        return $this->createBuilderWithEndpoint('/form-templates')
+            ->withoutDefaultPageSize()
+            ->usingEntity(FormTemplate::class);
     }
 
     /**
@@ -117,11 +121,21 @@ class FormsResource extends Resource
      */
     public function updateSubmission(string $id, array $data): FormSubmission
     {
-        $response = $this->client()->patch("/form-submissions/{$id}", $data);
-
-        $this->handleError($response);
+        $payload = [...$data, 'id' => $id];
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($this->endpoint, $payload),
+            $this->endpoint
+        );
 
         /** @var FormSubmission */
         return $this->mapToEntity($response->json('data', $response->json()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportedGenericOperations(): array
+    {
+        return ['create'];
     }
 }
