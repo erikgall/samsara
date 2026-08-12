@@ -17,7 +17,7 @@ Use four distinct authorities:
 1. The confirmed first-party Samsara download URL governs claims about the intended published OpenAPI contract. Confirm Samsara ownership on every refresh; do not promote a third-party generated specification to authority.
 2. A dated raw snapshot, its metadata sidecar, and a matching SHA-256 record exactly what was retrieved at one time. They do not prove live-service behavior.
 3. `src/`, its tests, and `composer.json` govern what this package actually exposes and supports.
-4. `README.md`, `docs/`, `CHANGELOG.md`, `DEVELOPMENT_CHANGELOG.md`, and `BREAKING_CHANGES.md` govern consumer-facing claims and migration guidance.
+4. `UPGRADE.md` and `docs/upgrade-guide-v2.md` are the canonical consumer migration authority. `BREAKING_CHANGES.md` is the compact release record; the README, resource pages, changelogs, and other docs must agree with the canonical guide.
 
 The root `samsara.json` is a historical package baseline. Its JSON is readable, but the repository does not prove its exact source URL or retrieval timestamp. Do not treat its `info.version` as a capture date or use it as current-upstream proof.
 
@@ -211,6 +211,9 @@ Before release:
 - update navigation and the Jekyll version when the package version changes;
 - add detailed evidence and deferred work to `DEVELOPMENT_CHANGELOG.md`;
 - add every proven consumer migration to `BREAKING_CHANGES.md`, or retain an explicitly provisional none-yet state while review is incomplete;
+- update the canonical upgrade guide with explicit before/after code, searches, verification, and rollback steps;
+- regenerate and review `docs/api-sync/v2-upgrade-disposition.json` so every changed baseline file has a migration section or explicit no-action reason;
+- run `composer check:v2-upgrade-guide` and independently review semantic examples that structural tokens cannot validate;
 - summarize released consumer-facing changes in the existing Keep a Changelog `CHANGELOG.md`.
 
 Do not claim full parity from a passing structural check, unit test, static analysis run, or documentation build.
@@ -232,6 +235,7 @@ Do not claim full parity from a passing structural check, unit test, static anal
 ```bash
 php scripts/validate-samsara-snapshot.php
 php tests/Maintenance/ApiSnapshotValidatorTest.php
+composer check:v2-upgrade-guide
 composer validate --strict --no-check-publish
 vendor/bin/phpunit
 vendor/bin/phpstan analyse --no-progress

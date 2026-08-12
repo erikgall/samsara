@@ -28,41 +28,51 @@ use Samsara\Facades\Samsara;
 
 $jurisdiction = Samsara::ifta()->jurisdictionReport([
     'year' => 2026,
-    'quarter' => 1,
+    'quarter' => 'Q1',
+    'tagIds' => 'tag-1,tag-2',
 ]);
 
 $vehicle = Samsara::ifta()->vehicleReport([
     'year' => 2026,
-    'quarter' => 1,
-    'vehicleIds' => ['vehicle-id'],
+    'quarter' => 'Q1',
+    'vehicleIds' => 'vehicle-1,vehicle-2',
 ]);
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `year` | `int` | Reporting year. |
-| `quarter` | `int` | Reporting quarter (1–4). |
-| `tagIds` | `array<string>` | Filter to vehicles in the supplied tags. |
-| `vehicleIds` | `array<string>` | (Vehicle report only) limit to specific vehicles. |
+| `quarter` | `string` | Reporting quarter (`Q1`–`Q4`); mutually exclusive with `month`. |
+| `tagIds` | comma-separated `string` | Filter to vehicles in the supplied tags. |
+| `vehicleIds` | comma-separated `string` | Limit to specific vehicles or external IDs. |
+
+These raw helpers forward `$params` unchanged. Join multi-value filters before calling them; passing PHP arrays would produce bracket encoding, not the required comma-separated query value.
 
 ## CSV Exports
 
-CSV exports use a request-then-poll pattern: `detailCsv()` queues an export and returns a job descriptor; `getDetailCsv()` retrieves the job (and a download URL once Samsara has rendered it).
+CSV exports use a request-then-poll pattern: `detailCsv()` queues an export and returns a job descriptor; `getDetailCsv()` retrieves that job. Poll with `jobId` until `jobStatus` is `Completed` or `Failed`. A completed job exposes one or more files, each with its own `downloadUrl`.
 
 ```php
 $export = Samsara::ifta()->detailCsv([
     'startHour' => '2026-01-01T00:00:00Z',
-    'endHour' => '2026-04-01T00:00:00Z',
+    'endHour' => '2026-02-01T00:00:00Z',
 ]);
 
-$status = Samsara::ifta()->getDetailCsv($export['id']);
+$status = Samsara::ifta()->getDetailCsv($export['jobId']);
 
-if ($status['status'] === 'completed') {
-    Storage::put('ifta/q1.csv', file_get_contents($status['downloadUrl']));
+if ($status['jobStatus'] === 'Completed') {
+    foreach ($status['files'] ?? [] as $file) {
+        Storage::put(
+            'ifta/'.$file['name'],
+            file_get_contents($file['downloadUrl']),
+        );
+    }
 }
 ```
 
-Poll `getDetailCsv()` on a queued job (`Bus::dispatch(...)`); do not block the request thread.
+Status values are case-sensitive: `Requested`, `Processing`, `Completed`, or `Failed`. There is no current top-level `id`, `status`, or `downloadUrl`. Poll `getDetailCsv()` on a queued job (`Bus::dispatch(...)`); do not block the request thread.
+
+Each detail job may span at most one month. Split a quarterly or longer export into non-overlapping one-month-or-shorter jobs and combine their completed output files in application code.
 
 ## Method Reference
 
@@ -71,7 +81,7 @@ Poll `getDetailCsv()` on a queued job (`Bus::dispatch(...)`); do not block the r
 | `jurisdictionReport(array $params)` | `array` | Miles and gallons aggregated by jurisdiction. |
 | `vehicleReport(array $params)` | `array` | Miles and gallons aggregated by vehicle. |
 | `detailCsv(array $params)` | `array` | Queues a detail CSV export. |
-| `getDetailCsv(string $id)` | `array` | Fetches an export job by ID. |
+| `getDetailCsv(string $jobId)` | `array` | Fetches an export job by `jobId`. |
 
 ## Related Resources
 

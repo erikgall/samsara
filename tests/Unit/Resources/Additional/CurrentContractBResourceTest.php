@@ -181,9 +181,9 @@ class CurrentContractBResourceTest extends TestCase
     {
         $resource = new FuelAndEnergyResource($this->samsara);
         $purchase = [
-            'fuelQuantityLiters'   => 100.5,
+            'fuelQuantityLiters'   => '100.5',
             'transactionLocation'  => 'Nashville, TN',
-            'transactionPrice'     => 312.45,
+            'transactionPrice'     => ['amount' => '312.45', 'currency' => 'usd'],
             'transactionReference' => 'receipt-1',
             'transactionTime'      => '2026-08-01T00:00:00Z',
         ];
@@ -317,13 +317,30 @@ class CurrentContractBResourceTest extends TestCase
             'startHour' => '2026-08-01T00:00:00Z',
             'endHour'   => '2026-08-02T00:00:00Z',
         ];
-        $this->http->fake(['*' => $this->http->response(['data' => ['id' => 'job-1']], 201)]);
-        $this->assertIsArray($resource->detailCsv($detail));
+        $job = [
+            'args'            => $detail,
+            'jobId'           => 'job-1',
+            'jobStatus'       => 'Requested',
+            'requestedAtTime' => '2026-08-01T00:00:00Z',
+        ];
+        $this->http->fake(['*' => $this->http->response(['data' => $job], 201)]);
+        $this->assertSame($job, $resource->detailCsv($detail));
         $this->assertRequest('POST', '/ifta-detail/csv', $detail);
 
         $this->resetHttp();
-        $this->http->fake(['*' => $this->http->response(['data' => ['id' => 'job-1']])]);
-        $this->assertIsArray($resource->getDetailCsv('job-1'));
+        $completedJob = [
+            ...$job,
+            'jobStatus' => 'Completed',
+            'files'     => [[
+                'createdAtTime'             => '2026-08-01T01:00:00Z',
+                'downloadUrl'               => 'https://example.test/ifta.csv.gz',
+                'downloadUrlExpirationTime' => '2026-08-02T01:00:00Z',
+                'name'                      => 'ifta.csv.gz',
+                'recordCount'               => 10,
+            ]],
+        ];
+        $this->http->fake(['*' => $this->http->response(['data' => $completedJob])]);
+        $this->assertSame($completedJob, $resource->getDetailCsv('job-1'));
         $this->assertRequest('GET', '/ifta-detail/csv/job-1');
 
         $jurisdictionEnvelope = ['data' => ['jurisdictionReports' => [], 'year' => 2026]];

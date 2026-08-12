@@ -4,6 +4,31 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 
 ## Unreleased
 
+### 2026-08-12 — Canonical v2 upgrade guide and exhaustive disposition ledger
+
+#### Scope and decisions
+
+- Established `docs/upgrade-guide-v2.md` as the canonical developer and coding-agent migration authority from `v1.1.0` to v2.0.0, with `UPGRADE.md` as the repository entry point.
+- Re-audited the exact `v1.1.0..1750395c98c1724c40c82ba82b96b4866dd2106b` release baseline: all 239 changed paths received one disposition—86 upgrade action, 88 supporting evidence, 11 additive/no-action, 1 internal-only, and 53 documentation-only.
+- Extended that frozen implementation baseline with five final publication artifacts (`UPGRADE.md`, the canonical guide, its ledger, its checker, and the Composer command registration), producing a 244-path final release scope: 86 upgrade action, 90 supporting evidence, 12 additive/no-action, 1 internal-only, and 55 documentation-only.
+- Expanded beyond the compact breaking summary to cover custom `QueryBuilderInterface` and `Resource` extensions, every changed wire family, endpoint-specific DTO unwraps, dynamic payload fields, removed helpers, persisted enum data, exact query/pagination behavior, fakes, and consumer verification.
+- Added `scripts/check-v2-upgrade-guide.php` and `composer check:v2-upgrade-guide` to prove baseline equality, exact disposition counts, guide-section linkage, and required migration evidence.
+- Refreshed the contract inventory's package-source head, byte count, and manifest digest after the prior DTO-helper wave; the reconciliation checker had correctly exposed that stale evidence even though the source tree itself was clean.
+- Preserved the pre-existing untracked `docs/.bundle/` directory without modification.
+
+#### Documentation surface
+
+- Added prominent upgrade links to the repository README, docs home, Getting Started page, compact breaking record, and release changelog.
+- Added a copyable agent execution contract, ordered checklist, focused before/after examples, exact old/new endpoint table, completion record, and definition of done.
+- Recorded each baseline path in `docs/api-sync/v2-upgrade-disposition.json` with a guide link or explicit no-action rationale.
+
+#### Verification
+
+- `composer check:v2-upgrade-guide` — passed: all 244 final release paths have one disposition, all 86 upgrade-action paths link to validated guide sections, and all 158 evidence/no-action records have an explicit rationale.
+- Independent audit agent — completed the 239-file implementation-baseline classification and the 244-path final reconciliation; after iterative fixes to the guide, sibling package pages, checker, and executable fixtures, it found no remaining material contract or documentation defect.
+- Cursor Grok 4.5 high read-only Plan review — APPROVED after iterative current-tree reviews. Its final pass verified the production `driverId` versus Preview `id` auth-token distinction and reconfirmed Camera, Forms, Alerts, IFTA, and the final ledger with no remaining Critical or Important finding.
+- Final coordinator gates — passed: 1,535 PHPUnit tests / 3,041 assertions; PHPStan 156/156; Pint; strict Composer validation; snapshot digest/provenance; 109 reconciliation assertions with zero unclassified differences; 244/244 upgrade-guide coverage; Jekyll build; and 54 rendered HTML files with 2,153 internal links/fragments resolving.
+
 ### 2026-08-11 — Contract-backed DTO helper first wave
 
 #### Scope and decisions
@@ -115,7 +140,7 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 - `FormsResource::exportPdf(array)` became `exportPdf(string $submissionId)`; `templates()` now returns `Builder<FormTemplate>`.
 - `TrailerAssignmentsResource::forTrailer(string)` became `forTrailer(int, array = []): Trailer`.
 - HOS builders now return endpoint wrapper DTOs; service tasks and safety activity use specialized DTOs.
-- Alert configuration and incident booleans are `isEnabled` and `isResolved`; fuel windows use `startDate`/`endDate`; IFTA detail export uses `startHour`/`endHour`.
+- Alert configuration and incident booleans are `isEnabled` and `isResolved`; fuel/energy reports use `startDate`/`endDate` while efficiency streams use `startTime`/`endTime`; IFTA detail export uses `startHour`/`endHour`.
 
 ### 2026-08-10 — Fleet and platform contract slice
 
@@ -182,7 +207,7 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 #### Completed
 
 - Corrected `Samsara::fake()` so it replaces both the deferred container singleton and the facade's resolved instance.
-- Applied the configured `per_page` value to `paginate()` and `lazy()` when callers do not provide an explicit limit. Explicit `paginate($perPage)`, `lazy($chunkSize)`, `limit()`, and `where('limit', ...)` values retain precedence.
+- Applied the configured `per_page` value to `getWithPagination()`, `paginate()`, and `lazy()` when callers do not provide an explicit limit. Explicit `paginate($perPage)`, `lazy($chunkSize)`, `limit()`, and `where('limit', ...)` values retain precedence.
 - Added a shared request executor for inherited Resource CRUD and Builder GET paths. Both returned failures and exhausted-retry Laravel `RequestException` responses now route through the SDK exception taxonomy with the effective endpoint in context.
 - Preserved `find()` returning `null` for 404 responses across returned-response and exhausted-retry paths.
 - Mapped documented HTTP 400 and compatibility HTTP 422 validation responses to `ValidationException` while preserving the real status, body, endpoint, and field details.

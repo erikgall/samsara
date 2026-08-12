@@ -44,8 +44,11 @@ class FuelAndEnergyResourceTest extends TestCase
         $resource = new FuelAndEnergyResource($this->samsara);
 
         $result = $resource->createFuelPurchase([
-            'vehicleId' => 'vehicle-1',
-            'amount'    => 50.0,
+            'fuelQuantityLiters'   => '189.27',
+            'transactionLocation'  => '1 De Haro St, San Francisco, CA 94107',
+            'transactionPrice'     => ['amount' => '196.45', 'currency' => 'usd'],
+            'transactionReference' => 'INV-12345',
+            'transactionTime'      => '2026-01-15T14:30:00Z',
         ]);
 
         $this->assertIsArray($result);
@@ -75,7 +78,10 @@ class FuelAndEnergyResourceTest extends TestCase
 
         $resource = new FuelAndEnergyResource($this->samsara);
 
-        $result = $resource->driversFuelEnergyReport(['startTime' => '2024-01-01']);
+        $result = $resource->driversFuelEnergyReport([
+            'startDate' => '2024-01-01',
+            'endDate'   => '2024-01-31',
+        ]);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('data', $result);
@@ -104,7 +110,10 @@ class FuelAndEnergyResourceTest extends TestCase
 
         $resource = new FuelAndEnergyResource($this->samsara);
 
-        $result = $resource->vehiclesFuelEnergyReport(['startTime' => '2024-01-01']);
+        $result = $resource->vehiclesFuelEnergyReport([
+            'startDate' => '2024-01-01',
+            'endDate'   => '2024-01-31',
+        ]);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('data', $result);

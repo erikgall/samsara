@@ -34,10 +34,13 @@ The resource owns only generic `create`; use `updateSubmission()` for a collecti
 ```php
 use Samsara\Facades\Samsara;
 
-$submissions = Samsara::forms()->submissions()->get();
+$submissions = Samsara::forms()
+    ->submissions()
+    ->where('ids', 'submission-id-1,submission-id-2')
+    ->get();
 ```
 
-`submissions()` returns a query builder, so you can chain `->whereDriver()`, `->between()`, and the rest of the standard filters before calling `->get()`.
+The current endpoint requires `ids`: pass one ID or a comma-separated list of up to 100 IDs. Its only other filter is the optional comma-separated `include` value (`externalIds`). It does not support the generic driver, tag, or time-window helpers.
 
 ### Form Templates
 
@@ -64,23 +67,42 @@ $submissions = Samsara::forms()
 
 ```php
 $submission = Samsara::forms()->createSubmission([
-    'formTemplateId' => 'template-123',
-    'driverId'       => 'driver-456',
+    'formTemplate' => [
+        'id' => '9814a1fa-f0c6-408b-bf85-51dc3bc71ac7',
+    ],
+    'status' => 'notStarted',
+    'assignedTo' => [
+        'id' => 'driver-456',
+        'type' => 'driver',
+    ],
     'fields' => [
-        ['id' => 'field-1', 'value' => 'Response text'],
+        [
+            'id' => '9814a1fa-f0c6-408b-bf85-51dc3bc71ac8',
+            'type' => 'text',
+            'textValue' => ['value' => 'Response text'],
+        ],
     ],
 ]);
 ```
+
+`formTemplate` and `status` are required. The only accepted create status is `notStarted`. If supplied, `assignedTo` requires both `id` and `type` (`driver` or `user`), and every field requires `id`, `type`, and the value object that matches that type, such as `textValue` for `text`.
 
 ## Updating Records
 
 ```php
 $submission = Samsara::forms()->updateSubmission('submission-id', [
+    'status' => 'inProgress',
     'fields' => [
-        ['id' => 'field-1', 'value' => 'Updated response'],
+        [
+            'id' => '9814a1fa-f0c6-408b-bf85-51dc3bc71ac8',
+            'type' => 'text',
+            'textValue' => ['value' => 'Updated response'],
+        ],
     ],
 ]);
 ```
+
+The helper adds the submission `id` to the collection PATCH body. Do not put the ID in an item path.
 
 ## Deleting Records
 
@@ -88,38 +110,40 @@ Generic `delete()` is unsupported and throws before HTTP.
 
 ## Filtering
 
-Submissions accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
+The direct submissions endpoint accepts only required `ids` and optional `include`, both as comma-separated strings. Use `submissionsStream()` for time-bounded change-feed reads.
 
 ```php
 $submissions = Samsara::forms()
     ->submissions()
-    ->whereDriver('driver-123')
-    ->whereTag('inspection-forms')
+    ->where('ids', 'submission-id-1,submission-id-2')
+    ->where('include', 'externalIds')
     ->get();
 ```
 
-You can also call `Samsara::forms()->query()` directly for the same builder if you prefer the generic accessor.
-
 ## PDF Exports
 
-PDF generation follows the **request-then-poll** pattern (the same pattern used by [camera media](camera-media.html)). You submit an export request and receive an export ID, then poll `getPdfExport()` until the file is ready.
+PDF generation follows the **request-then-poll** pattern (the same pattern used by [camera media](camera-media.html)). Submit the form-submission ID, then poll with the returned `pdfId` until `jobStatus` is `done` or `failed`.
 
 ```php
 $export = Samsara::forms()->exportPdf('submission-id');
 
-$exportId = $export['id'];
+$pdfId = $export['pdfId'];
 
-$pdf = Samsara::forms()->getPdfExport($exportId);
+$pdf = Samsara::forms()->getPdfExport($pdfId);
+
+if ($pdf['jobStatus'] === 'done') {
+    $downloadUrl = $pdf['pdfUrl'];
+}
 ```
 
-Both methods return raw `array<string, mixed>` payloads from the API.
+Both methods return raw `array<string, mixed>` payloads from the API. `id` is the form-submission ID; it is not the polling identifier. Current response keys are `pdfId`, `jobStatus`, and, when complete, `pdfUrl`. The legacy `status` and `url` keys are not returned.
 
 ## Helper Methods
 
 The `FormSubmission` entity exposes status helpers:
 
 ```php
-$submission = Samsara::forms()->submissions()->where('ids', ['submission-id'])->first();
+$submission = Samsara::forms()->submissions()->where('ids', 'submission-id')->first();
 
 $submission->isNotStarted();       // bool
 $submission->isCompleted();        // bool

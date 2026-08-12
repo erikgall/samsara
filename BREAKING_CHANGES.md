@@ -2,6 +2,8 @@
 
 This file lists verified consumer actions for the integrated staged-v2 behavior. Engineering evidence belongs in `DEVELOPMENT_CHANGELOG.md`.
 
+For an executable, agent-oriented migration sequence with before/after code, exact searches, endpoint-path tables, verification steps, and a 244-path final release ledger (239 frozen implementation paths plus five publication artifacts), use the canonical [v1.1.0 to v2.0.0 upgrade guide](UPGRADE.md). This file is the compact release record; the upgrade guide is the migration authority.
+
 ## Unreleased — staged v2
 
 The final audit maps 195 package operations: 187 match the pinned first-party contract and 8 are explicit legacy helpers. Six matched operations retain only additive pagination-ergonomics gaps; no matched operation retains a classified wire, request-body, response-loss, or error-mapping break. Exact capability gates now reject 133 unsupported public operation calls locally, so consumers must apply the migrations below instead of relying on inherited CRUD. The 183 unique official-only operations are additive backlog and do not require a consumer migration until implemented.
@@ -33,7 +35,7 @@ These entities extend an open fluent data object, so the following are payload/s
 
 | DTO | Old fields or assumptions | Current replacement |
 |---|---|---|
-| `AlertConfiguration` | `description`, `enabled`, `notificationSettings`, `tagIds` | Use `isEnabled` plus current `actions`, `externalIds`, `operationalSettings`, `scope`, and `triggers`. |
+| `AlertConfiguration` | `description`, `enabled`, `notificationSettings`, `tagIds`, legacy `alertType` | Use `isEnabled` plus current `actions`, `externalIds`, `operationalSettings`, `scope`, and `triggers`. Current responses have no `alertType`; do not use the four legacy type helpers. |
 | `AlertIncident` | `id`, `alertConfigurationId`, `triggeredAtTime`, flat driver/vehicle/location, string status | Use `configurationId`, `happenedAtTime`, `conditions`, `incidentUrl`, `isResolved`, and resolution/update timestamps. |
 | `EquipmentLocation` | `headingDegrees`, `speedMilesPerHour`, `address`, `reverseGeo` | Use snapshot fields `heading` and `speed`; address and reverse geocode belong only to `EquipmentGpsLocation`. |
 | `FormSubmission` | `formTemplateId`, `driver`, `vehicle`, `draft` / `submitted` status | Use nested `formTemplate`, `asset`, assignment/submission objects, and the seven current status values documented on the Forms page. |
@@ -45,6 +47,10 @@ These entities extend an open fluent data object, so the following are payload/s
 | `Webhook` | `secret`, `status`, creation/update timestamps | Use `secretKey`, `version`, event types, and current header/name fields. |
 | `Asset` | `serial`, `assetType` | Use `serialNumber` and `type`. |
 | `Defect` | `defectType` | Use `defectTypeId` and `defectSafetyStatus`. |
+| `HosViolation` | `day.date`, `day.timezone` | Use nullable `day.startTime` and `day.endTime`. |
+| `DataPoint` | numeric-only `float|null` value | Treat `value` as `mixed` and validate/cast it for the selected input before arithmetic or serialization. |
+| `GpsLocation` | integer-only `headingDegrees` | Accept nullable `float` and test fractional headings. |
+| `RouteStop` | `hubLocationId` and the narrow legacy shape | Use current stop state, addresses, windows, documents/forms/issues, times/distances/orders, and `singleUseLocation`; there is no hub-location field. |
 | `Trailer` | `assetSerialNumber` | Use `trailerSerialNumber`. |
 | `Vehicle` | scalar `grossVehicleWeight` | Treat `grossVehicleWeight` as the current structured response value; list responses expose their own vehicle-weight fields. |
 
@@ -59,7 +65,7 @@ These entities extend an open fluent data object, so the following are payload/s
 
 #### Account for the configured page size
 
-- `paginate()` and `lazy()` now apply configured `per_page` when the query has no explicit limit.
+- `getWithPagination()`, `paginate()`, and `lazy()` now apply configured `per_page` when the query has no explicit limit.
 - Explicit terminal sizes, `limit()`, and `where('limit', ...)` retain precedence.
 - Update request fakes and signatures that previously expected no `limit`.
 - Endpoint helpers whose official cursor contract has no `limit` suppress only the implicit default; do not add a limit unless the endpoint and your use case allow it.
@@ -69,6 +75,7 @@ These entities extend an open fluent data object, so the following are payload/s
 - `types`, `expand`, `withDecorations`, `whereAttribute`, `whereDriver`, `whereParentTag`, `whereTag`, and `whereVehicle` encode arrays as comma-separated values.
 - Resource-declared form/`explode=true` arrays encode as repeated keys.
 - Arbitrary arrays passed to `where()` retain Laravel's standard encoding.
+- A scalar passed to `whereAttribute`, `whereDriver`, `whereParentTag`, `whereTag`, or `whereVehicle` now produces a scalar value such as `driverIds=d1`, not v1's one-element bracket array.
 - Update URL assertions, caches, signatures, and hand-built workarounds. Keep passing logical arrays to dedicated helpers.
 
 Repeated-key parameters now include:
@@ -98,7 +105,7 @@ Canadian organizations may set `SAMSARA_REGION=ca` or call `useCanadaEndpoint()`
 
 | Old call/assumption | Required replacement |
 |---|---|
-| `createAuthToken(string): string` | `createAuthToken(array): DriverAuthToken`; read `$result->token` and `$result->expirationTime`. |
+| `createAuthToken(string): string` | `createAuthToken(array): DriverAuthToken`; send required 12+ character `code` plus one of integer `driverId`, `externalId`, or `username`, then read `$result->token` and `$result->expirationTime`. Do not confuse this production body with Preview's `id` key. |
 | Untyped QR create | `createQrCode(array): DriverQrCode`. |
 | `getQrCodes()` with no IDs | `getQrCodes(array|string $driverIds): EntityCollection<DriverQrCode>`. |
 | `deleteQrCode(string $qrCodeId)` | `deleteQrCode(int $driverId): bool`; the ID is sent in the DELETE body. |
@@ -138,6 +145,7 @@ Trailer DTOs expose `trailerSerialNumber`. Vehicle DTOs expose list fields `vehi
 |---|---|
 | `deleteConfigurations(array $ids)` | Call `deleteConfigurations(string $id)` once per ID. |
 | Camera `get()` returned mapped rows | Call `get(array $parameters): array` and read the preserved `data` and `pagination` envelope. |
+| Camera retrieval used `cameraSerial` / `eventId`, response `id`, or top-level `completed` / `url` | Send required `vehicleId`, `startTime`, `endTime`, and `mediaType`; poll with `retrievalId`; inspect each `media[*].status` and read `media[*].urlInfo.url` only when `available`. |
 | `forms()->exportPdf(array)` | `exportPdf(string $submissionId): array`. |
 | `forms()->templates()` returned a collection/parent DTO | Add a terminal call; it is now `Builder<FormTemplate>`. |
 | `workOrders()->serviceTasks()` returned parent DTOs | It is now `Builder<ServiceTask>`. |
@@ -145,8 +153,16 @@ Trailer DTOs expose `trailerSerialNumber`. Vehicle DTOs expose list fields `vehi
 | HOS rows were treated as `HosLog` everywhere | Use `HosLogsForDriver`, `HosClocksForDriver`, `HosDailyLog`, and `HosViolationGroup`; unwrap with their typed helpers. |
 | Safety audit-log rows were `SafetyEvent` | Use `SafetyEventActivity::getSafetyEvent()` for the nested event. |
 | Alert fields `enabled` or string incident status | Use boolean `isEnabled` and `isResolved`. |
-| Fuel windows used `startTime`/`endTime` | Use `startDate`/`endDate`. |
-| IFTA detail export used quarter examples | Use `startHour`/`endHour`; jurisdiction/vehicle reports retain their own report parameters. |
+| `AlertIncident::isTriggered()` / `isDismissed()` | Current incidents have no legacy string status. Use `isResolved()` only for actual resolution checks; otherwise inspect conditions or application-owned state. |
+| Alert create/update used flat `type`, `threshold`, or `tagIds` | Create with current required `actions`, `isEnabled`, `name`, `scope`, and `triggers`; update with current configuration fields and collection-body `id`. |
+| Alert incidents were read without bounded configuration filters | Every `/alerts/incidents/stream` read requires `startTime` plus one to 50 repeated `configurationIds`; `endTime` and `after` are optional. |
+| Form submission create used flat `formTemplateId`, `driverId`, or generic `{id,value}` fields | Send required `formTemplate: {id,...}` and `status: notStarted`; use `assignedTo: {id,type}` and `{id,type,<type>Value}` field objects. |
+| Form submissions used a bare GET or generic driver/tag filters | Supply required comma-separated `ids` (and optional comma-separated `include`) or use the time-bounded submissions stream. |
+| Form PDF polling used `$export['id']`, `status`, or `url` | Poll `getPdfExport($export['pdfId'])`; read `jobStatus` and `pdfUrl` when `jobStatus === 'done'`. |
+| Fuel report windows used `startTime`/`endTime` | Reports use `startDate`/`endDate`; efficiency streams continue to use `startTime`/`endTime`. |
+| Fuel purchase used gallon, scalar-price, total, purchase-time, flat location, or `fuelType` fields | Convert gallons to the required `fuelQuantityLiters` string; use `transactionLocation`, total `{amount,currency}` `transactionPrice`, `transactionReference`, and `transactionTime`; map fuel classification to current `iftaFuelType` values such as `Diesel`. |
+| IFTA detail export used quarter examples | Use `startHour`/`endHour`, split every range into jobs of at most one month, and combine the output files; jurisdiction/vehicle reports retain their own report parameters. |
+| IFTA detail polling used `id`, lowercase `status`, or a flat `downloadUrl` | Poll with `jobId`, compare case-sensitive `jobStatus`, and read each completed output from `files[*].downloadUrl`. |
 
 Maintenance generic CRUD is no longer callable. `createDvir()` posts to `/fleet/dvirs`; `dvirs()` and `defects()` return builders, with `Defect` selected for defect rows. The official `PATCH /fleet/dvirs/{id}` operation is not yet implemented.
 
@@ -177,6 +193,10 @@ The package still implements legacy `/fleet/safety-events` and its audit feed. T
 Qualification, training, HOS ELD-event, and industrial-job helpers now use their current documented paths. Update exact-path HTTP fakes.
 
 #### Preview helpers
+
+- `createDriverAuthToken(string $driverId, array $data = []): array` becomes `createDriverAuthToken(array $data): array` on `/preview/fleet/drivers/create-auth-token`.
+- `lockVehicle()` changes from POST/array to PUT/bool.
+- `unlockVehicle()` changes from POST/array to DELETE/bool.
 
 - `createDriverAuthToken(array): array` is payload-only and posts to `/preview/fleet/drivers/create-auth-token`.
 - `lockVehicle(string): bool` sends PUT to `/preview/fleet/vehicles/{id}/lock`.

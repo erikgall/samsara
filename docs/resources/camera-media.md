@@ -17,7 +17,7 @@ permalink: /resources/camera-media
 
 ## Introduction
 
-Camera media exposes the dash camera footage Samsara records on safety events and on demand. Reach for this resource when you need to review video around an incident — a hard brake, a collision, or any safety event captured by a vehicle's camera. Footage is not returned synchronously: you submit a retrieval request, then poll for the status until the file is ready.
+Camera media exposes the dash camera footage Samsara records on safety events and on demand. Reach for this resource when you need to review video around an incident — a hard brake, a collision, or any safety event captured by a vehicle's camera. Footage is not returned synchronously: submit a retrieval request, then poll until each returned media item is available or reaches another terminal state.
 
 The explicit helpers implement `GET /cameras/media` and `GET|POST /cameras/media/retrieval`. No generic CRUD capability is supported.
 
@@ -39,31 +39,37 @@ $media = $response['data']['media'];
 
 ## Requesting Footage
 
-Submit a retrieval request with either a time range or a safety event ID.
+Submit a retrieval request for one vehicle, time range, and media type. Depending on the installed hardware, add `inputs` or `cameraRoles` to select camera views.
 
 ```php
 $retrieval = Samsara::cameraMedia()->retrieve([
-    'cameraSerial' => 'camera-serial-123',
+    'vehicleId'    => 'vehicle-123',
     'startTime'    => '2024-01-15T08:00:00Z',
-    'endTime'      => '2024-01-15T08:30:00Z',
+    'endTime'      => '2024-01-15T08:00:30Z',
+    'mediaType'    => 'videoHighRes',
+    'inputs'       => ['dashcamRoadFacing'],
 ]);
 
-$retrievalId = $retrieval['id'];
+$retrievalId = $retrieval['retrievalId'];
 ```
 
-`retrieve()` returns the raw response array with the new retrieval's identifier, not a typed entity.
+`vehicleId`, `startTime`, `endTime`, and `mediaType` are required. `retrieve()` returns the unwrapped response data with `retrievalId` and `quotaStatus`, not a typed entity.
 
 ### The Request-Then-Poll Pattern
 
-Camera media exports are asynchronous. The Samsara API returns a retrieval ID immediately, and you poll `getRetrieval()` until the status flips to `completed`.
+Camera media retrieval is asynchronous. Poll `getRetrieval()` with `retrievalId`; its unwrapped response contains `media`, and each media item has its own `status`. Read the signed URL only when that item is `available`.
 
 ```php
-$status = Samsara::cameraMedia()->getRetrieval($retrievalId);
+$result = Samsara::cameraMedia()->getRetrieval($retrievalId);
 
-if ($status['status'] === 'completed') {
-    $mediaUrl = $status['url'];
+foreach ($result['media'] ?? [] as $media) {
+    if ($media['status'] === 'available') {
+        $mediaUrl = $media['urlInfo']['url'];
+    }
 }
 ```
+
+Other item statuses are `pending`, `invalid`, `failed`, and `unavailable`. Signed URLs expire; poll the GET endpoint again for a fresh URL after expiration.
 
 The same pattern applies to PDF exports on [forms](forms.html) and to CSV exports on the IFTA resource.
 
@@ -71,10 +77,12 @@ The same pattern applies to PDF exports on [forms](forms.html) and to CSV export
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `cameraSerial` | `string` | Camera serial number. |
-| `startTime` | `string` | Start time (RFC 3339). Pair with `endTime`. |
-| `endTime` | `string` | End time (RFC 3339). Pair with `startTime`. |
-| `eventId` | `string` | Safety event ID. Use as an alternative to a time range. |
+| `vehicleId` | `string` | Required Samsara vehicle ID. |
+| `startTime` | `string` | Required start time (RFC 3339). |
+| `endTime` | `string` | Required end time (RFC 3339); duration must satisfy the selected media type. |
+| `mediaType` | `string` | Required: `image`, `videoHighRes`, `videoLowRes`, or `hyperlapse`. |
+| `inputs` | `array<string>` | Optional camera inputs such as `dashcamRoadFacing`; at least one of `inputs` or `cameraRoles` is needed to select an installed view. |
+| `cameraRoles` | `array<string>` | Optional camera roles for supported auxiliary-camera hardware. |
 
 ## Properties
 
@@ -82,7 +90,7 @@ This resource has no generic entity surface. `get()` returns the full raw envelo
 
 ## Related Resources
 
-- [Safety Events](safety-events.html) — pair an event ID with `retrieve()` to grab its footage.
+- [Safety Events](safety-events.html) — use an event's vehicle and time window to construct the retrieval request; do not send the event ID.
 - [Vehicles](vehicles.html) — the camera serial is exposed on the vehicle entity.
 - [Forms](forms.html) — the same request-then-poll pattern applies to PDF exports.
 - [Error Handling](../error-handling.html) — exceptions raised by HTTP failures.

@@ -5,6 +5,7 @@ namespace Samsara\Tests\Unit\Resources\Additional;
 use Samsara\Samsara;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
+use Illuminate\Http\Client\Request;
 use Samsara\Data\Form\FormTemplate;
 use Samsara\Data\Form\FormSubmission;
 use PHPUnit\Framework\Attributes\Test;
@@ -45,13 +46,17 @@ class FormsResourceTest extends TestCase
 
         $resource = new FormsResource($this->samsara);
 
-        $submission = $resource->createSubmission([
+        $payload = [
             'formTemplate' => ['id' => 'template-1'],
             'status'       => 'notStarted',
-        ]);
+        ];
+        $submission = $resource->createSubmission($payload);
 
         $this->assertInstanceOf(FormSubmission::class, $submission);
         $this->assertSame('submission-123', $submission->id);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/form-submissions'
+            && $request->data() === $payload);
     }
 
     #[Test]
@@ -72,7 +77,8 @@ class FormsResourceTest extends TestCase
         $result = $resource->exportPdf('submission-1');
 
         $this->assertIsArray($result);
-        $this->assertSame('export-123', $result['id']);
+        $this->assertSame('pdf-123', $result['pdfId']);
+        $this->assertSame('pending', $result['jobStatus']);
     }
 
     #[Test]
@@ -81,19 +87,24 @@ class FormsResourceTest extends TestCase
         $this->http->fake([
             '*/form-submissions/pdf-exports*' => $this->http->response([
                 'data' => [
-                    'id'        => 'export-123',
+                    'id'        => 'submission-1',
                     'pdfId'     => 'pdf-123',
-                    'jobStatus' => 'completed',
+                    'jobStatus' => 'done',
+                    'pdfUrl'    => 'https://example.test/form.pdf',
                 ],
             ], 200),
         ]);
 
         $resource = new FormsResource($this->samsara);
 
-        $result = $resource->getPdfExport('export-123');
+        $result = $resource->getPdfExport('pdf-123');
 
         $this->assertIsArray($result);
-        $this->assertSame('completed', $result['jobStatus']);
+        $this->assertSame('done', $result['jobStatus']);
+        $this->assertSame('https://example.test/form.pdf', $result['pdfUrl']);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/form-submissions/pdf-exports'
+            && str_contains($request->url(), 'pdfId=pdf-123'));
     }
 
     #[Test]

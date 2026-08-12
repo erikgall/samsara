@@ -127,7 +127,7 @@ QR codes provide a passwordless app login path for drivers.
 $qrCodes = Samsara::drivers()->getQrCodes(['123', '456']);
 
 $qrCode = Samsara::drivers()->createQrCode([
-    'driverId' => 'driver-id',
+    'driverId' => 494123,
 ]);
 
 Samsara::drivers()->deleteQrCode(123);
@@ -139,11 +139,14 @@ Samsara::drivers()->deleteQrCode(123);
 
 ```php
 $auth = Samsara::drivers()->createAuthToken([
-    'driverId' => 'driver-id',
+    'code' => 'driver-code-1234',
+    'driverId' => 494123,
 ]);
 
 $token = $auth->token;
 ```
+
+`code` is required and must contain at least 12 characters. Identify the driver with an integer `driverId`, an `externalId` formatted as `key:value`, or a `username`. The separate Preview auth-token endpoint uses `id`; do not copy that Preview-only key into this production endpoint.
 
 ## Driver Activation Status
 

@@ -13,6 +13,7 @@ A Laravel SDK for the Samsara Fleet Management API.
 {: .fs-6 .fw-300 }
 
 [Get Started](/samsara/getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[Upgrade to v2](/samsara/upgrade-guide-v2){: .btn .btn-purple .fs-5 .mb-4 .mb-md-0 .mr-2 }
 [View on GitHub](https://github.com/erikgall/samsara){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 - [Introduction](#introduction)
@@ -26,6 +27,9 @@ A Laravel SDK for the Samsara Fleet Management API.
 ## Introduction
 
 Samsara is a Laravel SDK for the Samsara Fleet Management API. You reach for it when you need to read or mutate fleet data — drivers, vehicles, telematics, hours of service, safety events — from a Laravel application without hand-rolling HTTP calls. The SDK exposes resources through a `Samsara` facade, returns typed entities, and provides a fluent query builder for filtering, paginating, and streaming results.
+
+{: .warning }
+> Upgrading an existing application to version 2 requires code changes. Complete the [v1.1.0 to v2.0.0 guide](upgrade-guide-v2.html) before changing the package constraint.
 
 ## Installation
 
@@ -77,6 +81,7 @@ $stats = Samsara::vehicleStats()
 
 ## Where to Next
 
+- [Upgrade to v2](upgrade-guide-v2.html) — mandatory migration steps, before/after code, searches, and verification for v1.1.0 consumers.
 - [Getting Started](getting-started.html) — install, configure, and walk through dependency injection.
 - [Configuration](configuration.html) — every config key, env var, and runtime override.
 - [Query Builder](query-builder.html) — filtering, pagination, lazy collections, and the underlying HTTP client.

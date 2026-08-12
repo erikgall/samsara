@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Upgrade documentation**: Added a canonical v1.1.0-to-v2.0.0 guide with executable migrations, exact before/after wire contracts, an agent completion record, and a machine-checked disposition for all 244 final release paths (239 implementation-baseline files plus 5 publication artifacts).
 - **Form submissions**: Added seven exact current-status predicates: `isNotStarted()`, `isCompleted()`, `isArchived()`, `isInProgress()`, `needsReview()`, `hasChangesRequested()`, and `isApproved()`.
 - **Route stops**: Added six exact state predicates plus actual/planned distance conversion helpers for kilometers and miles.
 - **Trips**: Added `isCompleted()` and `isInProgress()` for the current completion-status contract.

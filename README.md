@@ -4,6 +4,8 @@ A Laravel SDK for selected [Samsara Fleet Management API](https://developers.sam
 
 See the [documentation coverage and API-sync report](docs/api-sync/documentation-coverage.md) for the audited package surface and current upstream endpoint status as of 2026-08-10.
 
+> **Upgrading to v2:** Version 2 changes public signatures, generic capabilities, DTOs, errors, pagination, query encoding, and HTTP paths. Follow the complete [v1.1.0 to v2.0.0 upgrade guide](UPGRADE.md) before changing the Composer constraint.
+
 ## Features
 
 - **41 Resource Accessors** - Package wrappers across Fleet, Telematics, Safety, Dispatch, Industrial, and more

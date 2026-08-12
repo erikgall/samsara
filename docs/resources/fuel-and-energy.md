@@ -42,21 +42,19 @@ $vehicleReport = Samsara::fuelAndEnergy()->vehiclesFuelEnergyReport([
 
 ## Efficiency Streams
 
-The efficiency endpoints expose query builders whose date window uses `startDate` and `endDate`.
+The efficiency endpoints expose query builders whose timestamp window uses `startTime` and `endTime`.
 
 ```php
 use Carbon\Carbon;
 
 $driverEfficiency = Samsara::fuelAndEnergy()
     ->driverEfficiency()
-    ->where('startDate', Carbon::now()->subDays(30)->toDateString())
-    ->where('endDate', Carbon::now()->toDateString())
+    ->between(Carbon::now()->subDays(30), Carbon::now())
     ->get();
 
 $vehicleEfficiency = Samsara::fuelAndEnergy()
     ->vehicleEfficiency()
-    ->where('startDate', Carbon::now()->subDays(30)->toDateString())
-    ->where('endDate', Carbon::now()->toDateString())
+    ->between(Carbon::now()->subDays(30), Carbon::now())
     ->get();
 ```
 
@@ -68,36 +66,37 @@ When a fuel transaction did not flow through a connected card, you can record it
 
 ```php
 $purchase = Samsara::fuelAndEnergy()->createFuelPurchase([
-    'vehicleId'      => 'vehicle-123',
-    'driverId'       => 'driver-456',
-    'fuelType'       => 'diesel',
-    'volumeGallons'  => 50.5,
-    'pricePerGallon' => 3.89,
-    'totalAmount'    => 196.45,
-    'purchaseTime'   => '2024-01-15T14:30:00Z',
-    'location'       => 'Truck Stop A, Highway 101',
+    'vehicleId' => 'vehicle-123',
+    'driverId' => 'driver-456',
+    'iftaFuelType' => 'Diesel',
+    'fuelQuantityLiters' => '189.27',
+    'transactionLocation' => '1 De Haro St, San Francisco, CA 94107',
+    'transactionPrice' => [
+        'amount' => '196.45',
+        'currency' => 'usd',
+    ],
+    'transactionReference' => 'INV-12345',
+    'transactionTime' => '2026-01-15T14:30:00Z',
 ]);
 ```
 
-`createFuelPurchase()` returns the raw response array.
+`fuelQuantityLiters`, `transactionLocation`, `transactionPrice`, `transactionReference`, and `transactionTime` are required. Convert gallon-based source data to liters; `transactionPrice.amount` is the total transaction amount, not a per-gallon scalar. `createFuelPurchase()` returns the unwrapped response data when present.
 
 ## Filtering
 
-The efficiency builders support the standard filters from the query builder. See [the query builder reference](../query-builder.html) for the full method list. Supply `startDate` and `endDate` with `where()`.
+The efficiency builders support the standard filters from the query builder. See [the query builder reference](../query-builder.html) for the full method list. Their window is `startTime`/`endTime`; report helpers separately require `startDate`/`endDate`.
 
 ```php
 $vehicleEfficiency = Samsara::fuelAndEnergy()
     ->vehicleEfficiency()
     ->whereVehicle('vehicle-123')
-    ->where('startDate', now()->subDays(30)->toDateString())
-    ->where('endDate', now()->toDateString())
+    ->between(now()->subDays(30), now())
     ->get();
 
 $driverEfficiency = Samsara::fuelAndEnergy()
     ->driverEfficiency()
     ->whereTag('long-haul-fleet')
-    ->where('startDate', now()->subDays(30)->toDateString())
-    ->where('endDate', now()->toDateString())
+    ->between(now()->subDays(30), now())
     ->get();
 ```
 
@@ -107,9 +106,12 @@ $driverEfficiency = Samsara::fuelAndEnergy()
 |-----------|------|-------------|
 | `startDate` | `string` | Report start date. Required. |
 | `endDate` | `string` | Report end date. Required. |
-| `tagIds` | `array<int, string>` | Filter by tag IDs. |
-| `vehicleIds` | `array<int, string>` | Filter by vehicle IDs. |
-| `driverIds` | `array<int, string>` | Filter by driver IDs. |
+| `tagIds` | comma-separated `string` | Filter by tag IDs, such as `tag-1,tag-2`. |
+| `parentTagIds` | comma-separated `string` | Filter by parent tag IDs. |
+| `vehicleIds` | comma-separated `string` | Vehicle-report filter, including external IDs when documented. |
+| `driverIds` | comma-separated `string` | Driver-report filter, including external IDs when documented. |
+
+The raw report helpers forward `$params` unchanged. Join multi-ID filters before calling them; a PHP array would use bracket encoding and violate these report contracts.
 
 ## Properties
 

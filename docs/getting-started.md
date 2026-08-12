@@ -8,6 +8,9 @@ permalink: /getting-started
 
 # Getting Started
 
+{: .warning }
+> This page describes a fresh install. Existing v1.1.0 applications must complete the [v2 upgrade guide](upgrade-guide-v2.html) before changing the Composer constraint.
+
 - [Introduction](#introduction)
 - [Requirements](#requirements)
 - [Installation](#installation)

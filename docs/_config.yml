@@ -1,6 +1,6 @@
 title: Samsara SDK for Laravel
 description: Laravel SDK for the Samsara Fleet Management API
-version: "1.0.4"
+version: "2.0.0-dev"
 baseurl: "/samsara"
 url: "https://erikgall.github.io"
 
@@ -21,7 +21,7 @@ aux_links:
 aux_links_new_tab: true
 
 # Footer
-footer_content: "Copyright &copy; 2024-2025 Erik Galloway. Distributed under the MIT License."
+footer_content: "Copyright &copy; 2024-2026 Erik Galloway. Distributed under the MIT License."
 
 # Search
 search_enabled: true

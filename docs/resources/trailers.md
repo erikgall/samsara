@@ -37,7 +37,7 @@ $trailer = Samsara::trailers()->find('trailer-id');
 ```php
 $trailer = Samsara::trailers()->create([
     'name' => 'Trailer T-500',
-    'assetSerialNumber' => 'SN12345678',
+    'trailerSerialNumber' => 'SN12345678',
 ]);
 ```
 
@@ -96,11 +96,13 @@ $trailer = Samsara::trailers()->findByExternalId('asset_id', 'TRL-12345');
 |----------|------|-------------|
 | `id` | `?string` | Trailer id. |
 | `name` | `?string` | Trailer name. |
-| `assetSerialNumber` | `?string` | The trailer asset serial number. |
+| `trailerSerialNumber` | `?string` | The trailer serial number. |
 | `licensePlate` | `?string` | License plate. |
 | `notes` | `?string` | Free-form notes. |
 | `enabledForMobile` | `?bool` | Whether the trailer appears in the driver app. |
+| `installedGateway` | `?array{serial?: string, model?: string}` | Installed trailer gateway. |
 | `externalIds` | `?array<string, string>` | External id mappings keyed by namespace. |
+| `attributes` | `?array` | Trailer attributes returned by item endpoints. |
 | `tags` | `?array` | Associated tags (each item exposes `id`, optional `name`, optional `parentTagId`). |
 
 ## Related Resources

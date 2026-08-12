@@ -46,7 +46,8 @@
     "scripts": {
         "test": "vendor/bin/phpunit",
         "analyse": "vendor/bin/phpstan analyse",
-        "format": "vendor/bin/pint"
+        "format": "vendor/bin/pint",
+        "check:v2-upgrade-guide": "php scripts/check-v2-upgrade-guide.php"
     },
     "config": {
         "sort-packages": true

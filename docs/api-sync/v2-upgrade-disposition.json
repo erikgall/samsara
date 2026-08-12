@@ -1,0 +1,2243 @@
+{
+    "schema_version": 1,
+    "baseline": {
+        "tag": "v1.1.0",
+        "audited_head": "1750395c98c1724c40c82ba82b96b4866dd2106b",
+        "comparison": "v1.1.0..1750395c98c1724c40c82ba82b96b4866dd2106b",
+        "changed_files": 239
+    },
+    "release_scope": {
+        "comparison": "v1.1.0..final-dev",
+        "changed_files": 244,
+        "publication_artifacts_added_after_audited_head": [
+            "composer.json",
+            "UPGRADE.md",
+            "docs/api-sync/v2-upgrade-disposition.json",
+            "docs/upgrade-guide-v2.md",
+            "scripts/check-v2-upgrade-guide.php"
+        ]
+    },
+    "summary": {
+        "additive_no_action": 12,
+        "documentation_only": 55,
+        "internal_only": 1,
+        "supporting_evidence": 90,
+        "upgrade_action": 86
+    },
+    "records": [
+        {
+            "path": "BREAKING_CHANGES.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "CHANGELOG.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "DEVELOPMENT_CHANGELOG.md",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "README.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "UPGRADE.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "composer.json",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Adds the maintainer-only check:v2-upgrade-guide Composer script; it does not change the installed SDK runtime or require consumer migration."
+        },
+        {
+            "path": "config/samsara.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "contracts/samsara/README.md",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "contracts/samsara/samsara-api-2026-08-10.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "contracts/samsara/samsara-api-2026-08-10.json.metadata.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "docs/.gitignore",
+            "disposition": "internal_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Repository ignore hygiene only; no shipped package or consumer behavior."
+        },
+        {
+            "path": "docs/_config.yml",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/api-maintenance.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/api-sync/contract-drift.md",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "docs/api-sync/contract-inventory.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "docs/api-sync/documentation-coverage.md",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "docs/api-sync/dto-helper-catalog.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/api-sync/v2-upgrade-disposition.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "docs/configuration.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/enums.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/error-handling.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/getting-started.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/index.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/query-builder.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/addresses.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/alerts.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/assets.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/assignments.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/beta.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/camera-media.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/carrier-proposed-assignments.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/contacts.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/drivers.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/equipment.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/forms.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/fuel-and-energy.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/gateways.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/hours-of-service.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/hubs.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/idling.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/ifta.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/index.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/industrial.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/issues.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/legacy.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/live-shares.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/maintenance.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/preview.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/route-events.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/routes.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/safety-events.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/sensors.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/settings.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/speeding.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/tachograph.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/tags.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/trailers.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/trips.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/users.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/vehicle-locations.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/vehicle-stats.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/vehicles.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/webhooks.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/resources/work-orders.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/testing.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "docs/upgrade-guide-v2.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": "scripts/check-samsara-contract-reconciliation.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "scripts/check-v2-upgrade-guide.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "scripts/validate-samsara-snapshot.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Contracts/QueryBuilderInterface.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-03"
+            ],
+            "consumer_action": "Add repeatQueryParameters(string ...$parameters): static to every third-party implementation and verify interface conformance.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Alert/AlertConfiguration.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-11"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Alert/AlertIncident.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-11"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Asset/Asset.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-17"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Asset/AssetLocation.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Driver/Driver.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Driver/DriverAuthToken.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-10"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Driver/DriverQrCode.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-10"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Driver/DriverRemoteSignOutResult.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-10"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Equipment/EquipmentGpsLocation.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Equipment/EquipmentLocation.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Equipment/EquipmentLocationResult.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Equipment/EquipmentLocationSeries.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Equipment/EquipmentStatValue.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Equipment/EquipmentStats.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Equipment/EquipmentStatsSeries.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Form/FormSubmission.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-13"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Form/FormTemplate.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-13"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/HoursOfService/HosClocksForDriver.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-09",
+                "mig-15"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/HoursOfService/HosLogsForDriver.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-09",
+                "mig-15"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/HoursOfService/HosViolation.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-09",
+                "mig-15"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/HoursOfService/HosViolationGroup.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-09",
+                "mig-15"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Industrial/DataInput.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-17"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Industrial/DataPoint.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-17"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/LiveShare/LiveShare.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-08",
+                "mig-14",
+                "mig-16"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Maintenance/Defect.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-15"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Maintenance/Dvir.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Route/Route.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Route/RouteAuditLog.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Route/RouteStop.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Safety/SafetyEvent.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Safety/SafetyEventActivity.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-15"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Tag/Tag.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Trailer/Trailer.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-08",
+                "mig-14",
+                "mig-15"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Trip/Trip.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/User/User.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Vehicle/Gateway.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Vehicle/GpsLocation.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Vehicle/Vehicle.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Vehicle/VehicleLocation.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Vehicle/VehicleLocationResult.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Vehicle/VehicleLocationSeries.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Vehicle/VehicleStatValue.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Vehicle/VehicleStats.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Vehicle/VehicleStatsSeries.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Webhook/Webhook.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Enums/DutyStatus.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-09"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Exceptions/ValidationException.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-04"
+            ],
+            "consumer_action": "Catch the SDK exception hierarchy and treat both HTTP 400 and 422 as ValidationException.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Facades/Samsara.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-18"
+            ],
+            "consumer_action": "Remove redundant manual fake facade/container swaps and verify all aliases resolve the same fake.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Http/QueryString.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Http/RequestExecutor.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Query/Builder.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-04",
+                "mig-05",
+                "mig-06",
+                "mig-07"
+            ],
+            "consumer_action": "Update pagination, query encoding, exception, and endpoint-DTO expectations for builder terminals.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/AlertsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-06",
+                "mig-07",
+                "mig-11",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/CameraMediaResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-06",
+                "mig-12",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/CarrierProposedAssignmentsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-15"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/DriverTrailerAssignmentsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-15"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/DriverVehicleAssignmentsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-15"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/FormsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-07",
+                "mig-13",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/FuelAndEnergyResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/HubsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/IdlingResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/IftaResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/IssuesResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/RouteEventsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/SettingsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/SpeedingResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/TachographResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/TrailerAssignmentsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-15"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Additional/WorkOrdersResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-06",
+                "mig-07",
+                "mig-15"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Beta/BetaResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-07",
+                "mig-16",
+                "mig-17"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Dispatch/AddressesResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Dispatch/RoutesResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Fleet/DriversResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-10",
+                "mig-14",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Fleet/EquipmentResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Fleet/TrailersResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Fleet/VehiclesResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-06",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Industrial/AssetsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-07",
+                "mig-08",
+                "mig-14",
+                "mig-16",
+                "mig-17"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Industrial/IndustrialResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-07",
+                "mig-16",
+                "mig-17"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Industrial/SensorsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-17"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Integrations/GatewaysResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Integrations/LiveSharingLinksResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-08",
+                "mig-14",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Integrations/WebhooksResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-08"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Legacy/LegacyResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-04"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Organization/ContactsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Organization/TagsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-08"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Organization/UsersResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-08"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Preview/PreviewResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-16",
+                "mig-17"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Resource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-03",
+                "mig-04"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Safety/HoursOfServiceResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-07",
+                "mig-09",
+                "mig-15"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Safety/MaintenanceResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-06",
+                "mig-07",
+                "mig-08",
+                "mig-15",
+                "mig-16"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Safety/SafetyEventsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-07",
+                "mig-15"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Telematics/TripsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-07",
+                "mig-08",
+                "mig-14"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Telematics/VehicleLocationsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-07"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Telematics/VehicleStatsResource.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-02",
+                "mig-05",
+                "mig-06",
+                "mig-07",
+                "mig-14"
+            ],
+            "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Samsara.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/SamsaraServiceProvider.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "tests/Maintenance/ApiSnapshotValidatorTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Alert/AlertConfigurationTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Alert/AlertIncidentTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Asset/AssetLocationTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Asset/AssetTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Driver/DriverTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Equipment/EquipmentGpsLocationTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Equipment/EquipmentLocationTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Equipment/EquipmentStatsTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Form/FormSubmissionTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Form/FormTemplateTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/HoursOfService/HosLogTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Industrial/DataInputTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/LiveShare/LiveShareTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Maintenance/DefectTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Maintenance/DvirTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Route/RouteStopTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Route/RouteTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Safety/SafetyEventTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Tag/TagTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Trailer/TrailerTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Trip/TripTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/User/UserTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Vehicle/GatewayTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Vehicle/GpsLocationTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Vehicle/VehicleTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Webhook/WebhookTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Enums/DutyStatusTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Exceptions/HttpExceptionsTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Facades/SamsaraFacadeTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Http/QueryStringTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Query/BuilderTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/AlertsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/CameraMediaResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/CurrentContractAResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/CurrentContractBResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/DriverTrailerAssignmentsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/DriverVehicleAssignmentsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/FormsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/FuelAndEnergyResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/GenericCapabilitiesTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/HubsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/IftaResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/IssuesResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/RouteEventsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/SettingsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/TachographResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/TrailerAssignmentsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Additional/WorkOrdersResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Beta/BetaResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Dispatch/AddressesResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Dispatch/RoutesResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Fleet/DriversResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Fleet/EquipmentResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Fleet/TrailersResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Fleet/VehiclesResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Industrial/AssetsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Industrial/IndustrialResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Industrial/SensorsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Integrations/GatewaysResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Integrations/LiveSharingLinksResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Integrations/WebhooksResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Legacy/LegacyResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Organization/ContactsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Organization/TagsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Organization/UsersResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/OwnedDomainCapabilitiesTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/OwnedGenericOperationContractTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Preview/PreviewResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/ResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Safety/CurrentContractResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Safety/HoursOfServiceResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Safety/MaintenanceResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Safety/SafetyEventsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Telematics/TripsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Telematics/VehicleLocationsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Resources/Telematics/VehicleStatsResourceTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/SamsaraServiceProviderTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/SamsaraTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        }
+    ]
+}

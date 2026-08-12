@@ -4,6 +4,7 @@ namespace Samsara\Tests\Unit\Resources\Additional;
 
 use Samsara\Samsara;
 use Samsara\Tests\TestCase;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Additional\IftaResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
@@ -34,9 +35,20 @@ class IftaResourceTest extends TestCase
         $this->http->fake([
             '*ifta-detail/csv/export-123' => $this->http->response([
                 'data' => [
-                    'id'     => 'export-123',
-                    'status' => 'completed',
-                    'url'    => 'https://example.com/csv',
+                    'args' => [
+                        'startHour' => '2024-01-01T00:00:00Z',
+                        'endHour'   => '2024-02-01T00:00:00Z',
+                    ],
+                    'jobId'           => 'export-123',
+                    'jobStatus'       => 'Completed',
+                    'requestedAtTime' => '2024-01-01T00:00:00Z',
+                    'files'           => [[
+                        'createdAtTime'             => '2024-01-01T01:00:00Z',
+                        'downloadUrl'               => 'https://example.com/csv',
+                        'downloadUrlExpirationTime' => '2024-01-02T01:00:00Z',
+                        'name'                      => 'ifta.csv.gz',
+                        'recordCount'               => 10,
+                    ]],
                 ],
             ], 200),
         ]);
@@ -46,7 +58,10 @@ class IftaResourceTest extends TestCase
         $result = $resource->getDetailCsv('export-123');
 
         $this->assertIsArray($result);
-        $this->assertSame('completed', $result['status']);
+        $this->assertSame('Completed', $result['jobStatus']);
+        $this->assertSame('https://example.com/csv', $result['files'][0]['downloadUrl']);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/ifta-detail/csv/export-123');
     }
 
     #[Test]
@@ -62,10 +77,13 @@ class IftaResourceTest extends TestCase
 
         $resource = new IftaResource($this->samsara);
 
-        $result = $resource->jurisdictionReport(['year' => 2024, 'quarter' => 1]);
+        $result = $resource->jurisdictionReport(['year' => 2024, 'quarter' => 'Q1']);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('data', $result);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/reports/ifta/jurisdiction'
+            && $request->data() === ['year' => 2024, 'quarter' => 'Q1']);
     }
 
     #[Test]
@@ -81,10 +99,13 @@ class IftaResourceTest extends TestCase
 
         $resource = new IftaResource($this->samsara);
 
-        $result = $resource->vehicleReport(['year' => 2024, 'quarter' => 1]);
+        $result = $resource->vehicleReport(['year' => 2024, 'quarter' => 'Q1']);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('data', $result);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/reports/ifta/vehicle'
+            && $request->data() === ['year' => 2024, 'quarter' => 'Q1']);
     }
 
     #[Test]
@@ -93,21 +114,31 @@ class IftaResourceTest extends TestCase
         $this->http->fake([
             '*ifta-detail/csv' => $this->http->response([
                 'data' => [
-                    'id'     => 'export-123',
-                    'status' => 'pending',
+                    'args' => [
+                        'startHour' => '2024-01-01T00:00:00Z',
+                        'endHour'   => '2024-02-01T00:00:00Z',
+                    ],
+                    'jobId'           => 'export-123',
+                    'jobStatus'       => 'Requested',
+                    'requestedAtTime' => '2024-01-01T00:00:00Z',
                 ],
             ], 201),
         ]);
 
         $resource = new IftaResource($this->samsara);
 
-        $result = $resource->detailCsv([
+        $payload = [
             'startHour' => '2024-01-01T00:00:00Z',
-            'endHour'   => '2024-04-01T00:00:00Z',
-        ]);
+            'endHour'   => '2024-02-01T00:00:00Z',
+        ];
+        $result = $resource->detailCsv($payload);
 
         $this->assertIsArray($result);
-        $this->assertSame('export-123', $result['id']);
+        $this->assertSame('export-123', $result['jobId']);
+        $this->assertSame('Requested', $result['jobStatus']);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/ifta-detail/csv'
+            && $request->data() === $payload);
     }
 
     #[Test]

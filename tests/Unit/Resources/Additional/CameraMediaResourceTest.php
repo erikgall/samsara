@@ -4,6 +4,7 @@ namespace Samsara\Tests\Unit\Resources\Additional;
 
 use Samsara\Samsara;
 use Samsara\Tests\TestCase;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Additional\CameraMediaResource;
@@ -59,7 +60,18 @@ class CameraMediaResourceTest extends TestCase
         $this->http->fake([
             '*/cameras/media/retrieval*' => $this->http->response([
                 'data' => [
-                    'media' => [['id' => 'media-1']],
+                    'media' => [[
+                        'vehicleId' => 'vehicle-1',
+                        'startTime' => '2024-01-01T00:00:00Z',
+                        'endTime'   => '2024-01-01T01:00:00Z',
+                        'input'     => 'dashcamRoadFacing',
+                        'mediaType' => 'videoHighRes',
+                        'status'    => 'available',
+                        'urlInfo'   => [
+                            'url'           => 'https://example.test/media.mp4',
+                            'urlExpiryTime' => '2024-01-01T09:00:00Z',
+                        ],
+                    ]],
                 ],
             ], 200),
         ]);
@@ -69,7 +81,11 @@ class CameraMediaResourceTest extends TestCase
         $result = $resource->getRetrieval('retrieval-123');
 
         $this->assertIsArray($result);
-        $this->assertSame('media-1', $result['media'][0]['id']);
+        $this->assertSame('available', $result['media'][0]['status']);
+        $this->assertSame('https://example.test/media.mp4', $result['media'][0]['urlInfo']['url']);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/cameras/media/retrieval'
+            && str_contains($request->url(), 'retrievalId=retrieval-123'));
     }
 
     #[Test]
@@ -86,15 +102,19 @@ class CameraMediaResourceTest extends TestCase
 
         $resource = new CameraMediaResource($this->samsara);
 
-        $result = $resource->retrieve([
+        $payload = [
             'vehicleId' => 'vehicle-1',
             'startTime' => '2024-01-01T00:00:00Z',
             'endTime'   => '2024-01-01T01:00:00Z',
             'mediaType' => 'videoHighRes',
-        ]);
+        ];
+        $result = $resource->retrieve($payload);
 
         $this->assertIsArray($result);
         $this->assertSame('retrieval-123', $result['retrievalId']);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/cameras/media/retrieval'
+            && $request->data() === $payload);
     }
 
     #[Test]

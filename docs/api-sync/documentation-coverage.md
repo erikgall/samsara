@@ -116,7 +116,7 @@ Fleet/platform has 15 implemented cursor operations without official `limit`; th
 | HOS endpoint rows shared `HosLog` | `HosLogsForDriver`, `HosClocksForDriver`, `HosDailyLog`, and `HosViolationGroup` wrappers expose nested typed data. |
 | Safety activity rows used `SafetyEvent` | `auditLogs(): Builder<SafetyEventActivity>`; call `getSafetyEvent()` for the nested event. |
 | Alerts used `enabled` and string status | Configuration field is boolean `isEnabled`; incident field is boolean `isResolved`. |
-| Fuel windows used timestamp names | Report/efficiency parameters use `startDate` and `endDate`. |
+| Fuel report windows used timestamp names | Report parameters use `startDate` and `endDate`; efficiency builders continue to use `startTime` and `endTime`. |
 | IFTA detail used year/quarter in export examples | CSV detail accepts `startHour` and `endHour`. |
 
 Repeated-key arrays are declared for alert configuration `ids`, incident `configurationIds`, Camera Media `inputs`/`mediaTypes`/`triggerReasons`, DVIR `safetyStatus`, service-task `ids`, work-order `ids`, and work-order-stream `workOrderStatuses`/`assetIds`/`assignedUserIds`.
