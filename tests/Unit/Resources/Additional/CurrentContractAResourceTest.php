@@ -210,6 +210,7 @@ class CurrentContractAResourceTest extends TestCase
                 ->where('configurationIds', ['config-1']),
             $forms->submissionsStream()->where('startTime', '2026-08-01T00:00:00Z'),
             $forms->templates(),
+            $forms->submissions()->where('ids', 'submission-1'),
             $workOrders->query(),
             $workOrders->serviceTasks(),
             $workOrders->stream()->where('startTime', '2026-08-01T00:00:00Z'),

@@ -364,6 +364,20 @@ class DriversResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_encodes_external_id_parts_as_one_path_segment(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['data' => ['id' => '123']]),
+        ]);
+
+        $resource = new DriversResource($this->samsara);
+        $resource->findByExternalId('fleet code', 'north/east');
+
+        $this->http->assertSent(fn (Request $request): bool => parse_url($request->url(), PHP_URL_PATH)
+            === '/fleet/drivers/fleet%20code:north%2Feast');
+    }
+
+    #[Test]
     public function it_has_correct_endpoint(): void
     {
         $resource = new DriversResource($this->samsara);

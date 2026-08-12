@@ -87,10 +87,13 @@ class BetaResource extends Resource
      */
     public function deleteIndustrialJob(string $id): array
     {
-        $endpoint = '/beta/industrial/jobs?id='.rawurlencode($id);
+        $endpoint = '/beta/industrial/jobs';
+        $errorEndpoint = $endpoint.'?id='.rawurlencode($id);
         $response = $this->executeSdkRequest(
-            fn () => $this->client()->delete($endpoint),
-            $endpoint
+            fn () => $this->client()
+                ->withQueryParameters(['id' => $id])
+                ->delete($endpoint),
+            $errorEndpoint
         );
 
         return $response->json();
@@ -128,7 +131,8 @@ class BetaResource extends Resource
     public function industrialJobs(): Builder
     {
         return $this->createBuilderWithEndpoint('/beta/industrial/jobs')
-            ->withoutDefaultPageSize();
+            ->withoutDefaultPageSize()
+            ->repeatQueryParameters('industrialAssetIds', 'fleetDeviceIds');
     }
 
     /**
@@ -136,7 +140,8 @@ class BetaResource extends Resource
      */
     public function qualificationsRecords(): Builder
     {
-        return $this->createBuilderWithEndpoint('/qualification-records');
+        return $this->createBuilderWithEndpoint('/qualification-records')
+            ->withoutDefaultPageSize();
     }
 
     /**
@@ -272,10 +277,13 @@ class BetaResource extends Resource
      */
     public function updateIndustrialJob(string $id, array $data): array
     {
-        $endpoint = '/beta/industrial/jobs?id='.rawurlencode($id);
+        $endpoint = '/beta/industrial/jobs';
+        $errorEndpoint = $endpoint.'?id='.rawurlencode($id);
         $response = $this->executeSdkRequest(
-            fn () => $this->client()->patch($endpoint, $data),
-            $endpoint
+            fn () => $this->client()
+                ->withQueryParameters(['id' => $id])
+                ->patch($endpoint, $data),
+            $errorEndpoint
         );
 
         /** @var array<string, mixed> */

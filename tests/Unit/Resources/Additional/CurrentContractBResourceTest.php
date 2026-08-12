@@ -59,6 +59,7 @@ class CurrentContractBResourceTest extends TestCase
             $tachograph->vehicleFilesHistory()->between('2026-08-01T00:00:00Z', '2026-08-02T00:00:00Z'),
             $fuel->driverEfficiency()->between('2026-08-01T00:00:00Z', '2026-08-02T00:00:00Z'),
             $fuel->vehicleEfficiency()->between('2026-08-01T00:00:00Z', '2026-08-02T00:00:00Z'),
+            (new IssuesResource($this->samsara))->query()->where('ids', 'issue-1'),
             (new IssuesResource($this->samsara))->stream()->where('startTime', '2026-08-01T00:00:00Z'),
             (new SpeedingResource($this->samsara))->intervalsStream()
                 ->where('assetIds', 'asset-1')
@@ -228,7 +229,11 @@ class CurrentContractBResourceTest extends TestCase
             'endTime'    => '2026-08-01T01:00:00Z',
         ]);
 
-        $dates = ['startDate' => '2026-08-01', 'endDate' => '2026-08-02'];
+        $dates = [
+            'startDate' => '2026-08-01',
+            'endDate'   => '2026-08-02',
+            'driverIds' => ['driver-1', 'driver-2'],
+        ];
         $driverReportEnvelope = [
             'data'       => ['driverReports' => [['driverId' => 'driver-1']]],
             'pagination' => ['hasNextPage' => false],
@@ -236,7 +241,11 @@ class CurrentContractBResourceTest extends TestCase
         $this->resetHttp();
         $this->http->fake(['*' => $this->http->response($driverReportEnvelope)]);
         $this->assertSame($driverReportEnvelope, $resource->driversFuelEnergyReport($dates));
-        $this->assertRequest('GET', '/fleet/reports/drivers/fuel-energy', $dates);
+        $this->assertRequest('GET', '/fleet/reports/drivers/fuel-energy', [
+            'startDate' => '2026-08-01',
+            'endDate'   => '2026-08-02',
+            'driverIds' => 'driver-1,driver-2',
+        ]);
 
         $vehicleReportEnvelope = [
             'data'       => ['vehicleReports' => [['vehicleId' => 'vehicle-1']]],
@@ -244,8 +253,9 @@ class CurrentContractBResourceTest extends TestCase
         ];
         $this->resetHttp();
         $this->http->fake(['*' => $this->http->response($vehicleReportEnvelope)]);
-        $this->assertSame($vehicleReportEnvelope, $resource->vehiclesFuelEnergyReport($dates));
-        $this->assertRequest('GET', '/fleet/reports/vehicles/fuel-energy', $dates);
+        $vehicleDates = ['startDate' => '2026-08-01', 'endDate' => '2026-08-02'];
+        $this->assertSame($vehicleReportEnvelope, $resource->vehiclesFuelEnergyReport($vehicleDates));
+        $this->assertRequest('GET', '/fleet/reports/vehicles/fuel-energy', $vehicleDates);
     }
 
     #[Test]

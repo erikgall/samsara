@@ -122,7 +122,7 @@ class DriversResource extends Resource
     public function findByExternalId(string $key, string $value): ?Driver
     {
         /** @var Driver */
-        return $this->find("{$key}:{$value}");
+        return $this->find(rawurlencode($key).':'.rawurlencode($value));
     }
 
     /**

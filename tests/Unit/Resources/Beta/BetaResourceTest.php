@@ -10,6 +10,7 @@ use Samsara\Data\Safety\SafetyScore;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Trailer\TrailerStats;
 use Samsara\Resources\Beta\BetaResource;
+use Samsara\Exceptions\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Exceptions\UnsupportedOperationException;
@@ -86,16 +87,16 @@ class BetaResourceTest extends TestCase
     public function it_deletes_an_industrial_job_using_the_required_query_id(): void
     {
         $this->http->fake([
-            '*' => $this->http->response(['id' => 'job-123', 'uuid' => 'job-uuid']),
+            '*' => $this->http->response(['id' => 'job/123 &', 'uuid' => 'job-uuid']),
         ]);
         $resource = new BetaResource($this->samsara);
 
-        $result = $resource->deleteIndustrialJob('job-123');
+        $result = $resource->deleteIndustrialJob('job/123 &');
 
-        $this->assertSame('job-123', $result['id']);
+        $this->assertSame('job/123 &', $result['id']);
         $this->http->assertSent(fn ($request): bool => $request->method() === 'DELETE'
             && parse_url($request->url(), PHP_URL_PATH) === '/beta/industrial/jobs'
-            && $this->queryFor($request->url()) === ['id' => 'job-123']);
+            && $this->queryFor($request->url()) === ['id' => 'job/123 &']);
     }
 
     /**
@@ -155,6 +156,42 @@ class BetaResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_omits_an_unsupported_default_limit_for_qualification_records(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['data' => []]),
+        ]);
+        $resource = new BetaResource($this->samsara);
+
+        $resource->qualificationsRecords()
+            ->where('ids', 'record-1')
+            ->getWithPagination();
+
+        $this->http->assertSent(fn ($request): bool => $this->queryFor($request->url()) === [
+            'ids' => 'record-1',
+        ]);
+    }
+
+    #[Test]
+    public function it_preserves_the_industrial_job_id_in_error_context(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['message' => 'Invalid job ID'], 400),
+        ]);
+        $resource = new BetaResource($this->samsara);
+
+        try {
+            $resource->deleteIndustrialJob('job/123 &');
+            $this->fail('Expected the industrial job request to fail.');
+        } catch (ValidationException $exception) {
+            $this->assertSame(
+                '/beta/industrial/jobs?id=job%2F123%20%26',
+                $exception->getContext()['endpoint'],
+            );
+        }
+    }
+
+    #[Test]
     public function it_rejects_phantom_generic_operations_on_the_beta_root(): void
     {
         $this->http->fake();
@@ -166,6 +203,37 @@ class BetaResourceTest extends TestCase
         } catch (UnsupportedOperationException) {
             $this->http->assertNothingSent();
         }
+    }
+
+    #[Test]
+    public function it_repeats_exploded_industrial_job_filters(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['data' => []]),
+        ]);
+        $resource = new BetaResource($this->samsara);
+
+        $resource->industrialJobs()
+            ->where('industrialAssetIds', ['asset-1', 'asset-2'])
+            ->where('fleetDeviceIds', ['device-1', 'device-2'])
+            ->get();
+
+        $this->http->assertSent(function ($request): bool {
+            $query = (string) parse_url($request->url(), PHP_URL_QUERY);
+            $pairs = array_map(
+                fn (string $pair): array => array_map('rawurldecode', explode('=', $pair, 2)),
+                explode('&', $query),
+            );
+
+            sort($pairs);
+
+            return $pairs === [
+                ['fleetDeviceIds', 'device-1'],
+                ['fleetDeviceIds', 'device-2'],
+                ['industrialAssetIds', 'asset-1'],
+                ['industrialAssetIds', 'asset-2'],
+            ];
+        });
     }
 
     #[Test]

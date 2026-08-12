@@ -42,7 +42,7 @@ class IftaResource extends Resource
      */
     public function getDetailCsv(string $id): array
     {
-        $endpoint = "/ifta-detail/csv/{$id}";
+        $endpoint = '/ifta-detail/csv/'.rawurlencode($id);
         $response = $this->executeSdkRequest(
             fn () => $this->client()->get($endpoint),
             $endpoint
@@ -60,10 +60,7 @@ class IftaResource extends Resource
     public function jurisdictionReport(array $params): array
     {
         $endpoint = '/fleet/reports/ifta/jurisdiction';
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->get($endpoint, $params),
-            $endpoint
-        );
+        $response = $this->executeSdkGet($endpoint, $params);
 
         return $response->json();
     }
@@ -77,10 +74,7 @@ class IftaResource extends Resource
     public function vehicleReport(array $params): array
     {
         $endpoint = '/fleet/reports/ifta/vehicle';
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->get($endpoint, $params),
-            $endpoint
-        );
+        $response = $this->executeSdkGet($endpoint, $params);
 
         return $response->json();
     }

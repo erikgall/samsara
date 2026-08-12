@@ -142,6 +142,21 @@ class IftaResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_encodes_the_detail_job_id_as_one_path_segment(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['data' => ['jobId' => 'folder/export-123']]),
+        ]);
+
+        $resource = new IftaResource($this->samsara);
+        $result = $resource->getDetailCsv('folder/export-123');
+
+        $this->assertSame('folder/export-123', $result['jobId']);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/ifta-detail/csv/folder%2Fexport-123');
+    }
+
+    #[Test]
     public function it_has_correct_endpoint(): void
     {
         $resource = new IftaResource($this->samsara);

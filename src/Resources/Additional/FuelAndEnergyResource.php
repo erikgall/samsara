@@ -53,11 +53,12 @@ class FuelAndEnergyResource extends Resource
      */
     public function driversFuelEnergyReport(array $params): array
     {
+        if (is_array($params['driverIds'] ?? null) && $params['driverIds'] !== []) {
+            $params['driverIds'] = implode(',', $params['driverIds']);
+        }
+
         $endpoint = '/fleet/reports/drivers/fuel-energy';
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->get($endpoint, $params),
-            $endpoint
-        );
+        $response = $this->executeSdkGet($endpoint, $params);
 
         return $response->json();
     }
@@ -80,10 +81,7 @@ class FuelAndEnergyResource extends Resource
     public function vehiclesFuelEnergyReport(array $params): array
     {
         $endpoint = '/fleet/reports/vehicles/fuel-energy';
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->get($endpoint, $params),
-            $endpoint
-        );
+        $response = $this->executeSdkGet($endpoint, $params);
 
         return $response->json();
     }
