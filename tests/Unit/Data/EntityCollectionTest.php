@@ -48,8 +48,9 @@ class EntityCollectionTest extends TestCase
         $entity2 = Entity::make(['id' => 'def-456']);
         $entity3 = Entity::make(['name' => 'No ID']);
         $entity4 = Entity::make(['id' => 0]);
+        $entity5 = Entity::make(['id' => '']);
 
-        $collection = new EntityCollection([$entity1, $entity2, $entity3, $entity4]);
+        $collection = new EntityCollection([$entity1, $entity2, $entity3, $entity4, $entity5]);
 
         $ids = $collection->ids();
 

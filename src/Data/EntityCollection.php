@@ -42,7 +42,7 @@ class EntityCollection extends Collection
         foreach ($this->items as $entity) {
             $id = $entity->getId();
 
-            if ($id !== null) {
+            if ($id !== null && $id !== '') {
                 $ids[] = $id;
             }
         }
