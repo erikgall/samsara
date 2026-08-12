@@ -41,6 +41,35 @@ use Samsara\Data\Entity;
 class RouteStop extends Entity
 {
     /**
+     * Meters per mile conversion constant.
+     */
+    protected const METERS_PER_MILE = 1609.344;
+
+    /**
+     * Get the actual distance from the prior stop in kilometers.
+     */
+    public function getActualDistanceKilometers(): ?float
+    {
+        if ($this->actualDistanceMeters === null) {
+            return null;
+        }
+
+        return $this->actualDistanceMeters / 1000;
+    }
+
+    /**
+     * Get the actual distance from the prior stop in miles.
+     */
+    public function getActualDistanceMiles(): ?float
+    {
+        if ($this->actualDistanceMeters === null) {
+            return null;
+        }
+
+        return $this->actualDistanceMeters / self::METERS_PER_MILE;
+    }
+
+    /**
      * Get the display name for the stop.
      */
     public function getDisplayName(): string
@@ -59,10 +88,82 @@ class RouteStop extends Entity
     }
 
     /**
+     * Get the planned distance from the prior stop in kilometers.
+     */
+    public function getPlannedDistanceKilometers(): ?float
+    {
+        if ($this->plannedDistanceMeters === null) {
+            return null;
+        }
+
+        return $this->plannedDistanceMeters / 1000;
+    }
+
+    /**
+     * Get the planned distance from the prior stop in miles.
+     */
+    public function getPlannedDistanceMiles(): ?float
+    {
+        if ($this->plannedDistanceMeters === null) {
+            return null;
+        }
+
+        return $this->plannedDistanceMeters / self::METERS_PER_MILE;
+    }
+
+    /**
      * Check if this stop has a single-use location.
      */
     public function hasSingleUseLocation(): bool
     {
         return ! empty($this->singleUseLocation);
+    }
+
+    /**
+     * Check if the stop has arrived.
+     */
+    public function isArrived(): bool
+    {
+        return $this->state === 'arrived';
+    }
+
+    /**
+     * Check if the stop has departed.
+     */
+    public function isDeparted(): bool
+    {
+        return $this->state === 'departed';
+    }
+
+    /**
+     * Check if the stop is en route.
+     */
+    public function isEnRoute(): bool
+    {
+        return $this->state === 'en route';
+    }
+
+    /**
+     * Check if the stop is scheduled.
+     */
+    public function isScheduled(): bool
+    {
+        return $this->state === 'scheduled';
+    }
+
+    /**
+     * Check if the stop is skipped.
+     */
+    public function isSkipped(): bool
+    {
+        return $this->state === 'skipped';
+    }
+
+    /**
+     * Check if the stop is unassigned.
+     */
+    public function isUnassigned(): bool
+    {
+        return $this->state === 'unassigned';
     }
 }

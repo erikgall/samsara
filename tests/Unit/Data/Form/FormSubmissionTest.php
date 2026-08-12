@@ -15,6 +15,35 @@ use PHPUnit\Framework\Attributes\Test;
 class FormSubmissionTest extends TestCase
 {
     #[Test]
+    public function documented_status_checks_require_an_exact_known_value(): void
+    {
+        $methods = [
+            'isNotStarted',
+            'isCompleted',
+            'isArchived',
+            'isInProgress',
+            'needsReview',
+            'hasChangesRequested',
+            'isApproved',
+        ];
+        $attributes = [
+            [],
+            ['status' => null],
+            ['status' => ''],
+            ['status' => 'unknown'],
+            ['status' => 'submitted'],
+        ];
+
+        foreach ($attributes as $values) {
+            $submission = new FormSubmission($values);
+
+            foreach ($methods as $method) {
+                $this->assertFalse($submission->{$method}());
+            }
+        }
+    }
+
+    #[Test]
     public function it_can_be_created_with_attributes(): void
     {
         $submission = new FormSubmission([
@@ -39,6 +68,28 @@ class FormSubmissionTest extends TestCase
 
         $this->assertInstanceOf(FormSubmission::class, $submission);
         $this->assertSame('12345', $submission->getId());
+    }
+
+    #[Test]
+    public function it_can_check_each_documented_status(): void
+    {
+        $statusMethods = [
+            'notStarted'       => 'isNotStarted',
+            'completed'        => 'isCompleted',
+            'archived'         => 'isArchived',
+            'inProgress'       => 'isInProgress',
+            'needsReview'      => 'needsReview',
+            'changesRequested' => 'hasChangesRequested',
+            'approved'         => 'isApproved',
+        ];
+
+        foreach ($statusMethods as $status => $expectedMethod) {
+            $submission = new FormSubmission(['status' => $status]);
+
+            foreach ($statusMethods as $method) {
+                $this->assertSame($method === $expectedMethod, $submission->{$method}());
+            }
+        }
     }
 
     #[Test]

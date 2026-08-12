@@ -13,6 +13,58 @@ use PHPUnit\Framework\Attributes\Test;
 class RouteStopTest extends TestCase
 {
     #[Test]
+    public function distance_conversions_preserve_zero_and_missing_values(): void
+    {
+        $zero = new RouteStop([
+            'actualDistanceMeters'  => 0,
+            'plannedDistanceMeters' => 0,
+        ]);
+
+        $this->assertSame(0.0, $zero->getActualDistanceKilometers());
+        $this->assertSame(0.0, $zero->getActualDistanceMiles());
+        $this->assertSame(0.0, $zero->getPlannedDistanceKilometers());
+        $this->assertSame(0.0, $zero->getPlannedDistanceMiles());
+
+        foreach ([new RouteStop, new RouteStop([
+            'actualDistanceMeters'  => null,
+            'plannedDistanceMeters' => null,
+        ])] as $missing) {
+            $this->assertNull($missing->getActualDistanceKilometers());
+            $this->assertNull($missing->getActualDistanceMiles());
+            $this->assertNull($missing->getPlannedDistanceKilometers());
+            $this->assertNull($missing->getPlannedDistanceMiles());
+        }
+    }
+
+    #[Test]
+    public function documented_state_checks_require_an_exact_known_value(): void
+    {
+        $methods = [
+            'isUnassigned',
+            'isScheduled',
+            'isEnRoute',
+            'isSkipped',
+            'isArrived',
+            'isDeparted',
+        ];
+        $attributes = [
+            [],
+            ['state' => null],
+            ['state' => ''],
+            ['state' => 'unknown'],
+            ['state' => 'enRoute'],
+        ];
+
+        foreach ($attributes as $values) {
+            $stop = new RouteStop($values);
+
+            foreach ($methods as $method) {
+                $this->assertFalse($stop->{$method}());
+            }
+        }
+    }
+
+    #[Test]
     public function it_can_be_created_with_make(): void
     {
         $stop = RouteStop::make([
@@ -27,6 +79,27 @@ class RouteStopTest extends TestCase
     }
 
     #[Test]
+    public function it_can_check_each_documented_state(): void
+    {
+        $stateMethods = [
+            'unassigned' => 'isUnassigned',
+            'scheduled'  => 'isScheduled',
+            'en route'   => 'isEnRoute',
+            'skipped'    => 'isSkipped',
+            'arrived'    => 'isArrived',
+            'departed'   => 'isDeparted',
+        ];
+
+        foreach ($stateMethods as $state => $expectedMethod) {
+            $stop = new RouteStop(['state' => $state]);
+
+            foreach ($stateMethods as $method) {
+                $this->assertSame($method === $expectedMethod, $stop->{$method}());
+            }
+        }
+    }
+
+    #[Test]
     public function it_can_convert_to_array(): void
     {
         $data = [
@@ -37,6 +110,20 @@ class RouteStopTest extends TestCase
         ];
 
         $this->assertSame($data, (new RouteStop($data))->toArray());
+    }
+
+    #[Test]
+    public function it_converts_actual_and_planned_distances(): void
+    {
+        $stop = new RouteStop([
+            'actualDistanceMeters'  => 1609344,
+            'plannedDistanceMeters' => 3218688,
+        ]);
+
+        $this->assertSame(1609.344, $stop->getActualDistanceKilometers());
+        $this->assertSame(1000.0, $stop->getActualDistanceMiles());
+        $this->assertSame(3218.688, $stop->getPlannedDistanceKilometers());
+        $this->assertSame(2000.0, $stop->getPlannedDistanceMiles());
     }
 
     #[Test]
