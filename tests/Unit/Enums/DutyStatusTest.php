@@ -48,7 +48,9 @@ class DutyStatusTest extends TestCase
     #[Test]
     public function it_has_sleeper_berth_case(): void
     {
-        $this->assertSame('sleeperBerth', DutyStatus::SLEEPER_BERTH->value);
+        $this->assertSame('sleeperBed', DutyStatus::SLEEPER_BERTH->value);
+        $this->assertSame(DutyStatus::SLEEPER_BERTH, DutyStatus::from('sleeperBed'));
+        $this->assertNull(DutyStatus::tryFrom('sleeperBerth'));
     }
 
     #[Test]

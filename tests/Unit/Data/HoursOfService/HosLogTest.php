@@ -127,13 +127,13 @@ class HosLogTest extends TestCase
     public function it_can_get_duty_status_enum(): void
     {
         $log = new HosLog([
-            'hosStatusType' => 'driving',
+            'hosStatusType' => 'sleeperBed',
         ]);
 
         $status = $log->getDutyStatus();
 
         $this->assertInstanceOf(DutyStatus::class, $status);
-        $this->assertSame(DutyStatus::DRIVING, $status);
+        $this->assertSame(DutyStatus::SLEEPER_BERTH, $status);
     }
 
     #[Test]

@@ -68,13 +68,13 @@ class UserTest extends TestCase
     {
         $user = new User([
             'roles' => [
-                ['id' => 'role-1', 'name' => 'Fleet Manager'],
-                ['id' => 'role-2', 'name' => 'Safety Admin'],
+                ['role' => ['id' => 'role-1', 'name' => 'Fleet Manager']],
+                ['role' => ['id' => 'role-2', 'name' => 'Safety Admin']],
             ],
         ]);
 
         $this->assertCount(2, $user->roles);
-        $this->assertSame('Fleet Manager', $user->roles[0]['name']);
+        $this->assertSame('Fleet Manager', $user->roles[0]['role']['name']);
     }
 
     #[Test]
@@ -86,6 +86,26 @@ class UserTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_role_ids_from_current_role_assignments(): void
+    {
+        $user = new User([
+            'roles' => [
+                ['role' => ['id' => 'role-1']],
+                ['role' => ['id' => 'role-2']],
+                ['role' => ['id' => 'role-1']],
+                ['role' => ['id' => '']],
+                ['role' => ['id' => 123]],
+                ['role' => []],
+                ['role' => null],
+                [],
+                'malformed-assignment',
+            ],
+        ]);
+
+        $this->assertSame(['role-1', 'role-2', 'role-1', ''], $user->getRoleIds());
+    }
+
+    #[Test]
     public function it_returns_email_for_display_name_when_name_not_set(): void
     {
         $user = new User([
@@ -93,6 +113,20 @@ class UserTest extends TestCase
         ]);
 
         $this->assertSame('john@example.com', $user->getDisplayName());
+    }
+
+    #[Test]
+    public function it_returns_no_role_ids_for_missing_or_malformed_roles(): void
+    {
+        $users = [
+            new User,
+            new User(['roles' => null]),
+            new User(['roles' => 'role-1']),
+        ];
+
+        foreach ($users as $user) {
+            $this->assertSame([], $user->getRoleIds());
+        }
     }
 
     #[Test]

@@ -13,6 +13,39 @@ use Samsara\Data\Vehicle\GpsLocation;
  * @property-read float|null $headingDegrees Heading in degrees
  * @property-read float|null $speedMilesPerHour Speed in miles per hour
  * @property-read array{id?: string, name?: string}|null $address Matching Samsara address
- * @property-read array<string, mixed>|null $reverseGeo Reverse geocoded data
+ * @property-read array{formattedLocation?: string}|null $reverseGeo Reverse geocoded data
  */
-class EquipmentGpsLocation extends GpsLocation {}
+class EquipmentGpsLocation extends GpsLocation
+{
+    /**
+     * Get the matching Samsara address name.
+     */
+    public function getAddressName(): ?string
+    {
+        $address = $this->get('address');
+
+        if (! is_array($address)) {
+            return null;
+        }
+
+        $name = $address['name'] ?? null;
+
+        return is_string($name) ? $name : null;
+    }
+
+    /**
+     * Get the reverse geocoded formatted location.
+     */
+    public function getReverseGeoLocation(): ?string
+    {
+        $reverseGeo = $this->get('reverseGeo');
+
+        if (! is_array($reverseGeo)) {
+            return null;
+        }
+
+        $formattedLocation = $reverseGeo['formattedLocation'] ?? null;
+
+        return is_string($formattedLocation) ? $formattedLocation : null;
+    }
+}
