@@ -2,7 +2,7 @@
 
 This file lists verified consumer actions for the integrated staged-v2 behavior. Engineering evidence belongs in `DEVELOPMENT_CHANGELOG.md`.
 
-For an executable, agent-oriented migration sequence with before/after code, exact searches, endpoint-path tables, verification steps, and a 244-path final release ledger (239 frozen implementation paths plus five publication artifacts), use the canonical [v1.1.0 to v2.0.0 upgrade guide](UPGRADE.md). This file is the compact release record; the upgrade guide is the migration authority.
+For an executable, agent-oriented migration sequence with before/after code, exact searches, endpoint-path tables, verification steps, and a 257-path final release ledger (239 frozen implementation paths plus 18 publication artifacts), use the canonical [v1.1.0 to v2.0.0 upgrade guide](UPGRADE.md). This file is the compact release record; the upgrade guide is the migration authority.
 
 ## Unreleased — staged v2
 

@@ -29,6 +29,18 @@ composer require erikgall/samsara
 
 The package will auto-register its service provider and facade.
 
+### Laravel Boost Agent Guidance
+
+This package ships a concise Laravel Boost guideline plus on-demand skills for current v2 integration work and v1.1-to-v2 upgrades. Laravel Boost discovers them from the installed package; no files need to be copied manually.
+
+For a new Boost setup, run `php artisan boost:install`, enable AI guidelines and Agent Skills, and select `erikgall/samsara` when Boost lists third-party packages. For an existing Boost setup, discover the package after installing or updating it:
+
+```bash
+php artisan boost:update --discover
+```
+
+Select `erikgall/samsara`, then keep the generated resources current with `php artisan boost:update`. The published source lives in `resources/boost/guidelines/` and `resources/boost/skills/` for package maintainers; consuming applications should use Boost's generated agent-specific files.
+
 ### Publish Configuration
 
 ```bash

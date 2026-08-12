@@ -115,6 +115,7 @@ scripts/check-samsara-contract-reconciliation.php
 scripts/check-v2-upgrade-guide.php
 scripts/validate-samsara-snapshot.php
 tests/Maintenance/ApiSnapshotValidatorTest.php
+tests/Unit/BoostDocumentationTest.php
 tests/Unit/Data/Alert/AlertConfigurationTest.php
 tests/Unit/Data/Alert/AlertIncidentTest.php
 tests/Unit/Data/Asset/AssetLocationTest.php
@@ -407,14 +408,6 @@ $baselineOutput = [];
 $baselineStatus = 0;
 $ignoredAncestorOutput = [];
 $ancestorStatus = 0;
-$currentHeadOutput = [];
-$currentHeadStatus = 0;
-exec('git rev-parse HEAD', $currentHeadOutput, $currentHeadStatus);
-if ($currentHeadStatus !== 0 || count($currentHeadOutput) !== 1) {
-    fwrite(STDERR, "FAIL: unable to resolve current HEAD.\n");
-    exit(1);
-}
-$currentHead = trim($currentHeadOutput[0]);
 exec(sprintf('git merge-base --is-ancestor %s HEAD', escapeshellarg(AUDITED_HEAD)), $ignoredAncestorOutput, $ancestorStatus);
 if ($ancestorStatus !== 0) {
     fwrite(STDERR, "FAIL: audited head is not an ancestor of the current HEAD.\n");
@@ -424,9 +417,12 @@ if ($ancestorStatus !== 0) {
 $allowedPostAuditPaths = listedPaths(<<<'PATHS'
 BREAKING_CHANGES.md
 CHANGELOG.md
+CLAUDE.md
 DEVELOPMENT_CHANGELOG.md
 README.md
 UPGRADE.md
+.ai/skills/samsara-sdk-development/SKILL.md
+.ai/skills/samsara-sdk-maintenance/SKILL.md
 composer.json
 docs/_config.yml
 docs/api-maintenance.md
@@ -443,6 +439,15 @@ docs/resources/fuel-and-energy.md
 docs/resources/ifta.md
 docs/resources/trailers.md
 docs/upgrade-guide-v2.md
+resources/boost/guidelines/core.blade.php
+resources/boost/guidelines/query-builder.blade.php
+resources/boost/guidelines/resources.blade.php
+resources/boost/guidelines/testing.blade.php
+resources/boost/skills/samsara-sdk-development/SKILL.md
+resources/boost/skills/samsara-sdk-development/references/integration.md
+resources/boost/skills/samsara-sdk-development/references/querying-and-responses.md
+resources/boost/skills/samsara-sdk-development/references/testing-and-webhooks.md
+resources/boost/skills/upgrade-samsara-sdk-v2/SKILL.md
 scripts/check-v2-upgrade-guide.php
 tests/Unit/Resources/Additional/CurrentContractBResourceTest.php
 tests/Unit/Resources/Additional/CameraMediaResourceTest.php
@@ -475,20 +480,34 @@ $publicationArtifacts = [
     'docs/api-sync/v2-upgrade-disposition.json',
     'docs/upgrade-guide-v2.md',
     'scripts/check-v2-upgrade-guide.php',
+    '.ai/skills/samsara-sdk-development/SKILL.md',
+    '.ai/skills/samsara-sdk-maintenance/SKILL.md',
+    'CLAUDE.md',
+    'resources/boost/guidelines/core.blade.php',
+    'resources/boost/guidelines/query-builder.blade.php',
+    'resources/boost/guidelines/resources.blade.php',
+    'resources/boost/guidelines/testing.blade.php',
+    'resources/boost/skills/samsara-sdk-development/SKILL.md',
+    'resources/boost/skills/samsara-sdk-development/references/integration.md',
+    'resources/boost/skills/samsara-sdk-development/references/querying-and-responses.md',
+    'resources/boost/skills/samsara-sdk-development/references/testing-and-webhooks.md',
+    'resources/boost/skills/upgrade-samsara-sdk-v2/SKILL.md',
+    'tests/Unit/BoostDocumentationTest.php',
 ];
 $releaseScope = array_values(array_unique(array_merge($baseline, $publicationArtifacts)));
 sort($releaseScope);
 
-if ($currentHead !== AUDITED_HEAD) {
-    $finalScopeOutput = [];
-    $finalScopeStatus = 0;
-    exec(sprintf('git diff --name-only %s..HEAD', escapeshellarg(BASELINE_TAG)), $finalScopeOutput, $finalScopeStatus);
-    $finalHeadScope = array_values(array_filter(array_map('trim', $finalScopeOutput)));
-    sort($finalHeadScope);
-    if ($finalScopeStatus !== 0 || $finalHeadScope !== $releaseScope) {
-        fwrite(STDERR, 'FAIL: final committed tag-to-HEAD scope differs from the 244-path release ledger.'."\n");
-        exit(1);
-    }
+$finalScopeOutput = [];
+$finalScopeStatus = 0;
+exec(sprintf('git diff --name-only %s', escapeshellarg(BASELINE_TAG)), $finalScopeOutput, $finalScopeStatus);
+$finalWorkspaceScope = array_values(array_unique(array_merge(
+    array_filter(array_map('trim', $finalScopeOutput)),
+    array_filter($publicationArtifacts, fn (string $path): bool => is_file(__DIR__.'/../'.$path)),
+)));
+sort($finalWorkspaceScope);
+if ($finalScopeStatus !== 0 || $finalWorkspaceScope !== $releaseScope) {
+    fwrite(STDERR, 'FAIL: final tag-to-worktree scope differs from the 257-path release ledger.'."\n");
+    exit(1);
 }
 
 $known = array_merge($upgradeActions, $supportingEvidence, $additiveNoAction, ['docs/.gitignore']);
@@ -547,13 +566,13 @@ $ledger = [
 
 $expectedCounts = [
     'additive_no_action'  => 12,
-    'documentation_only'  => 55,
+    'documentation_only'  => 67,
     'internal_only'       => 1,
-    'supporting_evidence' => 90,
+    'supporting_evidence' => 91,
     'upgrade_action'      => 86,
 ];
 
-if ($counts !== $expectedCounts || count($baseline) !== 239 || count($releaseScope) !== 244) {
+if ($counts !== $expectedCounts || count($baseline) !== 239 || count($releaseScope) !== 257) {
     fwrite(STDERR, 'FAIL: audited disposition counts drifted: '.json_encode($counts)."\n");
     exit(1);
 }
@@ -687,4 +706,4 @@ foreach ($forbiddenGuideTokens as $token) {
     }
 }
 
-fwrite(STDOUT, 'PASS: 244/244 final release paths have one disposition (239 implementation-baseline paths plus 5 publication artifacts); 86 upgrade actions link to canonical guide sections; 158 no-action/evidence records have explicit rationale.'."\n");
+fwrite(STDOUT, 'PASS: 257/257 final release paths have one disposition (239 implementation-baseline paths plus 18 publication artifacts); 86 upgrade actions link to canonical guide sections; 171 no-action/evidence records have explicit rationale.'."\n");

@@ -18,15 +18,15 @@ Version 2 is a breaking contract-alignment release. This guide is the canonical 
 The release audit compares tag `v1.1.0` with audited `dev` head `1750395c98c1724c40c82ba82b96b4866dd2106b`:
 
 - 239 implementation-baseline files were reviewed exactly once at that audited head.
-- 5 publication artifacts—the root entry point, canonical guide, final disposition ledger, checker, and Composer command registration—extend the final tag-to-`dev` scope to 244 paths.
+- 18 publication artifacts—the root entry point, canonical guide, final disposition ledger, checker, Composer registration, and Laravel Boost agent-documentation overhaul—extend the final tag-to-`dev` scope to 257 paths.
 - 86 files require a consumer upgrade action.
-- 90 files supply tests, contract evidence, or tooling for those actions.
+- 91 files supply tests, contract evidence, or tooling for those actions.
 - 12 files are additive and require no migration by themselves.
 - 1 file is internal-only.
-- 55 files are documentation-only.
+- 67 files are documentation-only.
 - The pinned OpenAPI and runtime ledgers cover 372 official declarations, 195 package operations, 41 concrete resource gates, 240 public request variants, and 170 source files with zero runtime-capture failures.
 
-The machine-readable [v2 disposition ledger](api-sync/v2-upgrade-disposition.json) records all 244 final release paths and their migration section or no-action reason, while retaining the frozen 239-file implementation comparison as a separate proof boundary. `composer check:v2-upgrade-guide` fails if either scope, the counts, section references, or required evidence are incomplete.
+The machine-readable [v2 disposition ledger](api-sync/v2-upgrade-disposition.json) records all 257 final release paths and their migration section or no-action reason, while retaining the frozen 239-file implementation comparison as a separate proof boundary. `composer check:v2-upgrade-guide` fails if either scope, the counts, section references, or required evidence are incomplete.
 
 ## Agent execution contract
 

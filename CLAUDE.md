@@ -27,12 +27,14 @@ Laravel SDK for the Samsara Fleet Management API.
 
 ## SDK Development
 
-Use the `samsara-sdk-development` skill for detailed patterns on:
+Use the `samsara-sdk-maintenance` skill for package-internal work on:
 - Creating resources, entities, and enums
 - Query builder methods
 - Exception handling
 - Testing with HttpFactory
 - Code style reference
+
+Consumer-facing Laravel Boost guidance lives in `resources/boost/guidelines/` and `resources/boost/skills/`. Keep the guideline concise and put detailed, task-specific procedures in skills or their references.
 
 ## Testing
 

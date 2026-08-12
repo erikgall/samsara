@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Upgrade documentation**: Added a canonical v1.1.0-to-v2.0.0 guide with executable migrations, exact before/after wire contracts, an agent completion record, and a machine-checked disposition for all 244 final release paths (239 implementation-baseline files plus 5 publication artifacts).
+- **Upgrade documentation**: Added a canonical v1.1.0-to-v2.0.0 guide with executable migrations, exact before/after wire contracts, an agent completion record, and a machine-checked disposition for all 257 final release paths (239 implementation-baseline files plus 18 publication artifacts).
+- **Laravel Boost guidance**: Added package-discovered Agent Skills for current v2 application development and v1.1-to-v2 migration work, with focused references for integration, querying, responses, testing, and webhooks.
 - **Form submissions**: Added seven exact current-status predicates: `isNotStarted()`, `isCompleted()`, `isArchived()`, `isInProgress()`, `needsReview()`, `hasChangesRequested()`, and `isApproved()`.
 - **Route stops**: Added six exact state predicates plus actual/planned distance conversion helpers for kilometers and miles.
 - **Trips**: Added `isCompleted()` and `isInProgress()` for the current completion-status contract.
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Laravel Boost guidelines**: Replaced the large, v1-era always-loaded guideline set with one concise v2 guideline that routes detailed work into on-demand skills; added a current package-maintenance skill and publication-contract tests.
 - **Tags**: `hasParent()` now recognizes either `parentTagId` or a documented nested `parentTag` payload.
 - **Hours of Service**: `DutyStatus::SLEEPER_BERTH` now uses the upstream `sleeperBed` backing value, allowing `HosLog::getDutyStatus()` to hydrate current sleeper-berth rows. This changes the enum's serialized value; see `BREAKING_CHANGES.md`.
 

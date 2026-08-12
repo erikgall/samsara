@@ -4,6 +4,23 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 
 ## Unreleased
 
+### 2026-08-12 — Laravel Boost agent-documentation overhaul
+
+#### Scope and decisions
+
+- Replaced the stale, always-loaded v1-era Boost guideline set with one 110-word v2 guideline that routes normal SDK work and v1.1-to-v2 migrations to separate Agent Skills.
+- Added a current-v2 consumer skill with progressively disclosed integration, query/response, testing, and webhook references, plus a dedicated upgrade skill that requires the canonical migration guide instead of duplicating it.
+- Renamed the repository-local development skill to `samsara-sdk-maintenance` so package-maintainer instructions no longer collide with the published consumer skill.
+- Confirmed from Laravel 13 documentation and Laravel Boost 2.5.3 source that third-party packages publish guidelines from `resources/boost/guidelines/` and skills from `resources/boost/skills/`; no Composer metadata or runtime Boost dependency is required.
+- Expanded the final v2 release ledger from 244 to 257 paths while preserving the frozen 239-path implementation audit. The 18 post-audit publication artifacts now include all changed Boost sources and their contract test.
+
+#### Verification
+
+- Laravel Boost 2.5.3 in a temporary Laravel 13.25 consumer discovered `erikgall/samsara/core`, generated `AGENTS.md`, installed both skills and all three references, and completed `boost:update` successfully.
+- The official Agent Skills validator passed the two published skills, the local maintenance skill, and both generated consumer copies.
+- `BoostDocumentationTest` passed 3 tests / 65 assertions; it enforces the one-guideline boundary, exact published skill set, frontmatter limits, reference integrity, and local/published skill separation.
+- Full PHPUnit, PHPStan, Pint, strict Composer validation, and the updated v2 disposition checker passed.
+
 ### 2026-08-12 — Canonical v2 upgrade guide and exhaustive disposition ledger
 
 #### Scope and decisions

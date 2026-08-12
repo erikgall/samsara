@@ -11,6 +11,6 @@ Use the canonical [v1.1.0 to v2.0.0 upgrade guide](docs/upgrade-guide-v2.md). It
 - exact searches for removed calls, fields, values, and paths;
 - HTTP-fake, cache, proxy, serializer, and persistence checks;
 - an agent completion record and release checklist; and
-- a [machine-checkable 244-file disposition ledger](docs/api-sync/v2-upgrade-disposition.json) covering the 239-file implementation baseline plus all five final publication artifacts, including the Composer checker registration.
+- a [machine-checkable 257-file disposition ledger](docs/api-sync/v2-upgrade-disposition.json) covering the frozen 239-file implementation baseline plus all 18 final publication artifacts, including the Laravel Boost guideline and skill overhaul.
 
 `BREAKING_CHANGES.md` is the compact release record. The upgrade guide is the migration authority.
