@@ -92,6 +92,19 @@ class InvalidSignatureExceptionTest extends TestCase
     }
 
     #[Test]
+    public function it_has_invalid_timestamp_factory_method(): void
+    {
+        $exception = InvalidSignatureException::invalidTimestamp('not-a-timestamp');
+
+        $this->assertSame(401, $exception->getCode());
+        $this->assertStringContainsString('invalid X-Samsara-Timestamp', $exception->getMessage());
+        $this->assertSame(
+            ['timestamp' => 'not-a-timestamp'],
+            $exception->getContext()
+        );
+    }
+
+    #[Test]
     public function it_has_missing_signature_factory_method(): void
     {
         $exception = InvalidSignatureException::missingSignature();

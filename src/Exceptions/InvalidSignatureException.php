@@ -48,6 +48,19 @@ class InvalidSignatureException extends SamsaraException
     }
 
     /**
+     * Create an exception for a malformed timestamp header.
+     */
+    public static function invalidTimestamp(string $timestamp): static
+    {
+        return static::make(
+            'Webhook signature verification failed: invalid X-Samsara-Timestamp header.',
+            401,
+            null,
+            ['timestamp' => $timestamp]
+        );
+    }
+
+    /**
      * Create an exception for a missing signature header.
      */
     public static function missingSignature(): static

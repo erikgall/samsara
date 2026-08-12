@@ -174,12 +174,17 @@ class Samsara
      */
     public function client(): PendingRequest
     {
-        return $this->http->baseUrl($this->baseUrl)
-            ->withToken($this->token ?? '')
+        $request = $this->http->baseUrl($this->baseUrl)
             ->acceptJson()
             ->asJson()
             ->timeout($this->getConfig('timeout', 30))
             ->retry($this->getConfig('retry', 3), 100);
+
+        if ($this->token !== null) {
+            $request->withToken($this->token);
+        }
+
+        return $request;
     }
 
     /**
@@ -495,6 +500,16 @@ class Samsara
     {
         /** @var TripsResource */
         return $this->resource(TripsResource::class);
+    }
+
+    /**
+     * Use a custom API base URL.
+     */
+    public function useBaseUrl(string $baseUrl): static
+    {
+        $this->baseUrl = rtrim($baseUrl, '/');
+
+        return $this;
     }
 
     /**

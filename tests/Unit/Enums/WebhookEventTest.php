@@ -52,8 +52,7 @@ class WebhookEventTest extends TestCase
     {
         $cases = WebhookEvent::cases();
 
-        // 27 valid event types
-        $this->assertCount(27, $cases);
+        $this->assertCount(35, $cases);
     }
 
     #[Test]
@@ -84,5 +83,29 @@ class WebhookEventTest extends TestCase
     public function it_has_vehicle_created_case(): void
     {
         $this->assertSame('VehicleCreated', WebhookEvent::VEHICLE_CREATED->value);
+    }
+
+    #[Test]
+    public function it_includes_current_subscription_events(): void
+    {
+        $this->assertSame([
+            'AlertIncident',
+            'AlertObjectEvent',
+            'MissingDvirPastDue',
+            'ShipmentTrackingEvent',
+            'SuddenFuelLevelDrop',
+            'SuddenFuelLevelRise',
+            'VisualSearchMatch',
+            'WorkOrderCreatedOrChanged',
+        ], [
+            WebhookEvent::ALERT_INCIDENT->value,
+            WebhookEvent::ALERT_OBJECT_EVENT->value,
+            WebhookEvent::MISSING_DVIR_PAST_DUE->value,
+            WebhookEvent::SHIPMENT_TRACKING_EVENT->value,
+            WebhookEvent::SUDDEN_FUEL_LEVEL_DROP->value,
+            WebhookEvent::SUDDEN_FUEL_LEVEL_RISE->value,
+            WebhookEvent::VISUAL_SEARCH_MATCH->value,
+            WebhookEvent::WORK_ORDER_CREATED_OR_CHANGED->value,
+        ]);
     }
 }

@@ -52,4 +52,80 @@ class VehicleStatTypeTest extends TestCase
     {
         $this->assertSame('obdOdometerMeters', VehicleStatType::OBD_ODOMETER_METERS->value);
     }
+
+    #[Test]
+    public function it_supports_every_current_vehicle_stat_query_value(): void
+    {
+        $currentValues = [
+            'ambientAirTemperatureMilliC',
+            'auxInput1',
+            'auxInput2',
+            'auxInput3',
+            'auxInput4',
+            'auxInput5',
+            'auxInput6',
+            'auxInput7',
+            'auxInput8',
+            'auxInput9',
+            'auxInput10',
+            'auxInput11',
+            'auxInput12',
+            'auxInput13',
+            'barometricPressurePa',
+            'batteryMilliVolts',
+            'defLevelMilliPercent',
+            'ecuSpeedMph',
+            'engineCoolantTemperatureMilliC',
+            'engineImmobilizer',
+            'engineLoadPercent',
+            'engineOilPressureKPa',
+            'engineRpm',
+            'engineStates',
+            'faultCodes',
+            'fuelPercents',
+            'fuelConsumedMilliliters',
+            'gps',
+            'gpsDistanceMeters',
+            'gpsOdometerMeters',
+            'idlingDurationMilliseconds',
+            'intakeManifoldTemperatureMilliC',
+            'nfcCardScans',
+            'obdEngineSeconds',
+            'obdOdometerMeters',
+            'syntheticEngineSeconds',
+            'evStateOfChargeMilliPercent',
+            'evChargingStatus',
+            'evChargingEnergyMicroWh',
+            'evChargingVoltageMilliVolt',
+            'evChargingCurrentMilliAmp',
+            'evConsumedEnergyMicroWh',
+            'evRegeneratedEnergyMicroWh',
+            'evBatteryVoltageMilliVolt',
+            'evBatteryCurrentMilliAmp',
+            'evBatteryStateOfHealthMilliPercent',
+            'evAverageBatteryTemperatureMilliCelsius',
+            'evDistanceDrivenMeters',
+            'spreaderLiquidRate',
+            'spreaderGranularRate',
+            'spreaderPrewetRate',
+            'spreaderAirTemp',
+            'spreaderRoadTemp',
+            'spreaderOnState',
+            'spreaderActive',
+            'spreaderBlastState',
+            'spreaderGranularName',
+            'spreaderPrewetName',
+            'spreaderLiquidName',
+            'spreaderPlowStatus',
+            'seatbeltDriver',
+            'tellTales',
+            'ecuDoorStatus',
+        ];
+        $enumValues = array_map(
+            fn (VehicleStatType $type) => $type->value,
+            VehicleStatType::cases()
+        );
+
+        $this->assertSame([], array_values(array_diff($currentValues, $enumValues)));
+    }
 }

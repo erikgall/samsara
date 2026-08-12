@@ -18,6 +18,8 @@ enum WebhookEvent: string
     case ADDRESS_CREATED = 'AddressCreated';
     case ADDRESS_DELETED = 'AddressDeleted';
     case ADDRESS_UPDATED = 'AddressUpdated';
+    case ALERT_INCIDENT = 'AlertIncident';
+    case ALERT_OBJECT_EVENT = 'AlertObjectEvent';
     case DOCUMENT_SUBMITTED = 'DocumentSubmitted';
     case DRIVER_CREATED = 'DriverCreated';
     case DRIVER_UPDATED = 'DriverUpdated';
@@ -30,6 +32,7 @@ enum WebhookEvent: string
     case GEOFENCE_ENTRY = 'GeofenceEntry';
     case GEOFENCE_EXIT = 'GeofenceExit';
     case ISSUE_CREATED = 'IssueCreated';
+    case MISSING_DVIR_PAST_DUE = 'MissingDvirPastDue';
     case PREDICTIVE_MAINTENANCE_ALERT = 'PredictiveMaintenanceAlert';
     case ROUTE_STOP_ARRIVAL = 'RouteStopArrival';
     case ROUTE_STOP_DEPARTURE = 'RouteStopDeparture';
@@ -38,10 +41,15 @@ enum WebhookEvent: string
     case ROUTE_STOP_RESEQUENCE = 'RouteStopResequence';
     case SEVERE_SPEEDING_ENDED = 'SevereSpeedingEnded';
     case SEVERE_SPEEDING_STARTED = 'SevereSpeedingStarted';
+    case SHIPMENT_TRACKING_EVENT = 'ShipmentTrackingEvent';
     case SPEEDING_EVENT_ENDED = 'SpeedingEventEnded';
     case SPEEDING_EVENT_STARTED = 'SpeedingEventStarted';
+    case SUDDEN_FUEL_LEVEL_DROP = 'SuddenFuelLevelDrop';
+    case SUDDEN_FUEL_LEVEL_RISE = 'SuddenFuelLevelRise';
     case VEHICLE_CREATED = 'VehicleCreated';
     case VEHICLE_UPDATED = 'VehicleUpdated';
+    case VISUAL_SEARCH_MATCH = 'VisualSearchMatch';
+    case WORK_ORDER_CREATED_OR_CHANGED = 'WorkOrderCreatedOrChanged';
 
     /**
      * Get all webhook event values as an array.

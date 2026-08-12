@@ -70,6 +70,8 @@ class InteractsWithTimeTest extends TestCase
         $result = $class->testToUtcString($carbon);
 
         $this->assertSame('2024-01-15T14:30:00Z', $result);
+        $this->assertSame('America/Los_Angeles', $carbon->getTimezone()->getName());
+        $this->assertSame('2024-01-15 06:30:00', $carbon->format('Y-m-d H:i:s'));
     }
 
     #[Test]

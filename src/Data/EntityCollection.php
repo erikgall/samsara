@@ -37,9 +37,16 @@ class EntityCollection extends Collection
      */
     public function ids(): array
     {
-        /** @var array<int, string> */
-        return $this->map(function (Entity $entity) {
-            return $entity->getId();
-        })->filter()->values()->all();
+        $ids = [];
+
+        foreach ($this->items as $entity) {
+            $id = $entity->getId();
+
+            if ($id !== null) {
+                $ids[] = $id;
+            }
+        }
+
+        return $ids;
     }
 }

@@ -77,6 +77,39 @@ class BuilderTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('pageSizeDisabledMultiPageTerminals')]
+    public function it_can_customize_the_cursor_request_parameter(string $terminal): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->fakeSequence()
+            ->push([
+                'data'       => [],
+                'pagination' => ['endCursor' => 'cursor-1', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data'       => [],
+                'pagination' => ['endCursor' => null, 'hasNextPage' => false],
+            ]);
+
+        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara->setHttpFactory($http);
+        $builder = (new Builder(new TestQueryResource($samsara)))
+            ->withoutDefaultPageSize()
+            ->withCursorParameter('startingAfter');
+
+        match ($terminal) {
+            'paginator' => $builder->paginate()->nextPage(),
+            'lazy'      => $builder->lazy()->all(),
+        };
+
+        $requests = $http->recorded();
+
+        $this->assertCount(2, $requests);
+        $this->assertArrayNotHasKey('after', $requests[1][0]->data());
+        $this->assertSame('cursor-1', $requests[1][0]->data()['startingAfter']);
+    }
+
+    #[Test]
     #[DataProvider('pageSizeDisabledTerminals')]
     public function it_can_disable_the_implicit_default_page_size(string $terminal): void
     {
@@ -235,6 +268,52 @@ class BuilderTest extends TestCase
 
         $this->assertSame($builder, $result);
         $this->assertSame(['vehicleIds' => 'vehicle-123'], $builder->buildQuery());
+    }
+
+    #[Test]
+    #[DataProvider('mappingTerminals')]
+    public function it_can_read_a_custom_response_collection_key(string $terminal): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->fake(['*' => $http->response([
+            'assets'     => [['id' => 'asset-1']],
+            'pagination' => ['endCursor' => null, 'hasNextPage' => false],
+        ])]);
+
+        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara->setHttpFactory($http);
+        $builder = (new Builder(new TestQueryResource($samsara)))
+            ->withResponseCollectionKey('assets');
+
+        $items = match ($terminal) {
+            'get'      => $builder->get()->all(),
+            'paginate' => $builder->paginate()->items()->all(),
+            'lazy'     => $builder->lazy()->all(),
+        };
+
+        $this->assertCount(1, $items);
+        $this->assertSame('asset-1', $items[0]->getId());
+    }
+
+    #[Test]
+    public function it_can_read_a_nested_response_collection_key(): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->fake(['*' => $http->response([
+            'data' => [
+                'media' => [['id' => 'media-1']],
+            ],
+        ])]);
+
+        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara->setHttpFactory($http);
+
+        $items = (new Builder(new TestQueryResource($samsara)))
+            ->withResponseCollectionKey('data.media')
+            ->get();
+
+        $this->assertCount(1, $items);
+        $this->assertSame('media-1', $items->first()->getId());
     }
 
     #[Test]
@@ -749,6 +828,47 @@ class BuilderTest extends TestCase
 
         $http->assertSentCount(1);
         $http->assertSent(fn ($request) => $request->data() === ['limit' => $expectedLimit]);
+    }
+
+    #[Test]
+    public function it_restarts_lazy_pagination_without_mutating_the_original_builder(): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->fakeSequence()
+            ->push([
+                'data'       => [['id' => 'page-1']],
+                'pagination' => ['endCursor' => 'cursor-1', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data'       => [['id' => 'page-2']],
+                'pagination' => ['endCursor' => null, 'hasNextPage' => false],
+            ])
+            ->push([
+                'data'       => [['id' => 'page-1']],
+                'pagination' => ['endCursor' => 'cursor-1', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data'       => [['id' => 'page-2']],
+                'pagination' => ['endCursor' => null, 'hasNextPage' => false],
+            ]);
+
+        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara->setHttpFactory($http);
+        $builder = (new Builder(new TestQueryResource($samsara)))
+            ->withoutDefaultPageSize();
+        $lazy = $builder->lazy();
+
+        $firstIteration = array_map(fn (Entity $item) => $item->getId(), $lazy->all());
+        $secondIteration = array_map(fn (Entity $item) => $item->getId(), $lazy->all());
+        $requests = $http->recorded();
+
+        $this->assertSame(['page-1', 'page-2'], $firstIteration);
+        $this->assertSame($firstIteration, $secondIteration);
+        $this->assertArrayNotHasKey('after', $builder->buildQuery());
+        $this->assertArrayNotHasKey('after', $requests[0][0]->data());
+        $this->assertSame('cursor-1', $requests[1][0]->data()['after']);
+        $this->assertArrayNotHasKey('after', $requests[2][0]->data());
+        $this->assertSame('cursor-1', $requests[3][0]->data()['after']);
     }
 
     #[Test]

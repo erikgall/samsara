@@ -140,6 +140,38 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_can_use_a_custom_base_url(): void
+    {
+        $http = new HttpFactory;
+        $http->fake(['*' => $http->response(['data' => []])]);
+        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara->setHttpFactory($http);
+
+        $result = $samsara->useBaseUrl('https://samsara-proxy.example.test/');
+        $samsara->drivers()->query()->get();
+
+        $this->assertSame($samsara, $result);
+        $this->assertSame('https://samsara-proxy.example.test', $samsara->getBaseUrl());
+        $http->assertSent(fn ($request) => str_starts_with(
+            $request->url(),
+            'https://samsara-proxy.example.test/fleet/drivers'
+        ));
+    }
+
+    #[Test]
+    public function it_omits_the_authorization_header_when_token_is_not_set(): void
+    {
+        $http = new HttpFactory;
+        $http->fake(['*' => $http->response(['data' => []])]);
+        $samsara = new Samsara(null, ['retry' => 0]);
+        $samsara->setHttpFactory($http);
+
+        $samsara->drivers()->query()->get();
+
+        $http->assertSent(fn ($request) => ! $request->hasHeader('Authorization'));
+    }
+
+    #[Test]
     public function it_returns_addresses_resource(): void
     {
         $samsara = new Samsara('test-token');

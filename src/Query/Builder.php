@@ -32,6 +32,11 @@ class Builder implements QueryBuilderInterface
     protected ?string $cursor = null;
 
     /**
+     * The query parameter used to request the next cursor page.
+     */
+    protected string $cursorParameter = 'after';
+
+    /**
      * The decorations to include.
      *
      * @var array<string>
@@ -78,6 +83,11 @@ class Builder implements QueryBuilderInterface
      * The resource instance.
      */
     protected Resource $resource;
+
+    /**
+     * The response key containing the result collection.
+     */
+    protected string $responseCollectionKey = 'data';
 
     /**
      * The endpoint-specific response mapper.
@@ -137,7 +147,7 @@ class Builder implements QueryBuilderInterface
         }
 
         if ($this->cursor !== null) {
-            $query['after'] = $this->cursor;
+            $query[$this->cursorParameter] = $this->cursor;
         }
 
         if (! empty($this->types)) {
@@ -206,7 +216,7 @@ class Builder implements QueryBuilderInterface
     {
         $response = $this->executeRequest();
 
-        $data = $response->json('data', []);
+        $data = $response->json($this->responseCollectionKey, []);
 
         return $this->mapToEntities($data);
     }
@@ -228,7 +238,7 @@ class Builder implements QueryBuilderInterface
 
         $response = $this->executeRequest();
 
-        $data = $response->json('data', []);
+        $data = $response->json($this->responseCollectionKey, []);
         $pagination = $response->json('pagination', []);
 
         $items = $this->mapToEntities($data);
@@ -244,15 +254,15 @@ class Builder implements QueryBuilderInterface
      */
     public function lazy(?int $chunkSize = null): LazyCollection
     {
-        $builder = $this;
+        $template = clone $this;
         if ($chunkSize !== null) {
-            $builder = clone $this;
-            $builder->limit($chunkSize);
+            $template->limit($chunkSize);
         }
 
-        $builder->applyDefaultPerPage();
+        $template->applyDefaultPerPage();
 
-        return LazyCollection::make(function () use ($builder) {
+        return LazyCollection::make(function () use ($template) {
+            $builder = clone $template;
             $cursor = null;
 
             do {
@@ -262,7 +272,7 @@ class Builder implements QueryBuilderInterface
 
                 $response = $builder->executeRequest();
 
-                $data = $response->json('data', []);
+                $data = $response->json($builder->responseCollectionKey, []);
                 $pagination = $response->json('pagination', []);
 
                 foreach ($data as $item) {
@@ -447,6 +457,16 @@ class Builder implements QueryBuilderInterface
     }
 
     /**
+     * Set the query parameter used to request the next cursor page.
+     */
+    public function withCursorParameter(string $parameter): static
+    {
+        $this->cursorParameter = $parameter;
+
+        return $this;
+    }
+
+    /**
      * Set the decorations to include.
      *
      * @param  array<string>|string  $decorations
@@ -464,6 +484,16 @@ class Builder implements QueryBuilderInterface
     public function withoutDefaultPageSize(): static
     {
         $this->defaultPageSizeEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Set the response key containing the result collection.
+     */
+    public function withResponseCollectionKey(string $key): static
+    {
+        $this->responseCollectionKey = $key;
 
         return $this;
     }

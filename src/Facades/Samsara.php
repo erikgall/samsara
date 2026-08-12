@@ -15,6 +15,8 @@ use Illuminate\Http\Client\PendingRequest;
  * @method static SamsaraClient withToken(string $token)
  * @method static bool hasToken()
  * @method static string getBaseUrl()
+ * @method static SamsaraClient useBaseUrl(string $baseUrl)
+ * @method static SamsaraClient useCanadaEndpoint()
  * @method static SamsaraClient useEuEndpoint()
  * @method static SamsaraClient useUsEndpoint()
  * @method static PendingRequest client()

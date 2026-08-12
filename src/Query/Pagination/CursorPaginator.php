@@ -84,7 +84,8 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
      */
     public function hasMorePages(): bool
     {
-        return $this->cursor->hasNextPage();
+        return $this->cursor->hasNextPage()
+            && $this->cursor->getEndCursor() !== null;
     }
 
     /**

@@ -92,7 +92,7 @@ trait InteractsWithTime
      */
     protected function toUtcString(DateTimeInterface $time): string
     {
-        $carbon = $time instanceof Carbon ? $time : Carbon::instance($time);
+        $carbon = $time instanceof Carbon ? $time->copy() : Carbon::instance($time);
 
         return $carbon->utc()->format('Y-m-d\TH:i:s\Z');
     }

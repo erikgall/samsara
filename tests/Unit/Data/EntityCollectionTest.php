@@ -47,12 +47,13 @@ class EntityCollectionTest extends TestCase
         $entity1 = Entity::make(['id' => 'abc-123']);
         $entity2 = Entity::make(['id' => 'def-456']);
         $entity3 = Entity::make(['name' => 'No ID']);
+        $entity4 = Entity::make(['id' => 0]);
 
-        $collection = new EntityCollection([$entity1, $entity2, $entity3]);
+        $collection = new EntityCollection([$entity1, $entity2, $entity3, $entity4]);
 
         $ids = $collection->ids();
 
-        $this->assertSame(['abc-123', 'def-456'], $ids);
+        $this->assertSame(['abc-123', 'def-456', '0'], $ids);
     }
 
     #[Test]

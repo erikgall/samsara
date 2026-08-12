@@ -304,6 +304,28 @@ class WebhookSignatureVerifierTest extends TestCase
     }
 
     #[Test]
+    public function verify_from_request_throws_for_invalid_timestamp_format(): void
+    {
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+
+        try {
+            $verifier->verifyFromRequest(
+                self::TEST_BODY,
+                'v1=signature',
+                'not-a-timestamp'
+            );
+            $this->fail('Expected an invalid timestamp exception.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertStringContainsString('invalid X-Samsara-Timestamp', $exception->getMessage());
+            $this->assertSame(
+                ['timestamp' => 'not-a-timestamp'],
+                $exception->getContext()
+            );
+        }
+    }
+
+    #[Test]
     public function verify_from_request_throws_for_missing_signature(): void
     {
         $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);

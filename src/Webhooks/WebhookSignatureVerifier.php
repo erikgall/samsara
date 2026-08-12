@@ -116,8 +116,13 @@ class WebhookSignatureVerifier
             throw InvalidSignatureException::missingTimestamp();
         }
 
+        $timestampValue = filter_var($timestamp, FILTER_VALIDATE_INT);
+        if ($timestampValue === false) {
+            throw InvalidSignatureException::invalidTimestamp($timestamp);
+        }
+
         // Check if timestamp is within tolerance
-        $timestampAge = abs(time() - (int) $timestamp);
+        $timestampAge = abs(time() - $timestampValue);
 
         if ($timestampAge > $tolerance) {
             throw InvalidSignatureException::expiredTimestamp($tolerance, $timestampAge);
