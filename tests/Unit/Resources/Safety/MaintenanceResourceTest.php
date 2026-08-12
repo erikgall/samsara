@@ -52,7 +52,7 @@ class MaintenanceResourceTest extends TestCase
             ]),
         ]);
 
-        $resource = new MaintenanceResource($this->samsara);
+        $resource = new HydrationAwareMaintenanceResource($this->samsara);
         $dvir = $resource->createDvir([
             'authorId'     => 'author-123',
             'safetyStatus' => 'safe',
@@ -62,6 +62,7 @@ class MaintenanceResourceTest extends TestCase
 
         $this->assertInstanceOf(Dvir::class, $dvir);
         $this->assertSame('mechanic', $dvir->type);
+        $this->assertTrue($resource->mappedCreateResponse);
     }
 
     #[Test]
@@ -123,5 +124,17 @@ class MaintenanceResourceTest extends TestCase
         }
 
         $this->http->assertNothingSent();
+    }
+}
+
+class HydrationAwareMaintenanceResource extends MaintenanceResource
+{
+    public bool $mappedCreateResponse = false;
+
+    protected function mapToEntity(array $data): object
+    {
+        $this->mappedCreateResponse = true;
+
+        return parent::mapToEntity($data);
     }
 }

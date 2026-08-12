@@ -162,12 +162,13 @@ class LiveSharingLinksResourceTest extends TestCase
             ], 200),
         ]);
 
-        $resource = new LiveSharingLinksResource($this->samsara);
+        $resource = new HydrationAwareLiveSharingLinksResource($this->samsara);
 
         $liveShare = $resource->update('share-123', ['name' => 'Updated Share']);
 
         $this->assertInstanceOf(LiveShare::class, $liveShare);
         $this->assertSame('Updated Share', $liveShare->name);
+        $this->assertTrue($resource->mappedUpdateResponse);
         $this->http->assertSent(fn (Request $request): bool => $request->method() === 'PATCH'
             && parse_url($request->url(), PHP_URL_PATH) === '/live-shares'
             && parse_url($request->url(), PHP_URL_QUERY) === 'id=share-123'
@@ -223,5 +224,17 @@ class LiveSharingLinksResourceTest extends TestCase
                 'limit' => 50,
             ]
         );
+    }
+}
+
+class HydrationAwareLiveSharingLinksResource extends LiveSharingLinksResource
+{
+    public bool $mappedUpdateResponse = false;
+
+    protected function mapToEntity(array $data): object
+    {
+        $this->mappedUpdateResponse = true;
+
+        return parent::mapToEntity($data);
     }
 }

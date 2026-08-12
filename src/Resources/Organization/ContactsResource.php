@@ -32,7 +32,7 @@ class ContactsResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return $this->createBuilderWithEndpoint($this->endpoint);
     }
 
     /**

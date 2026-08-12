@@ -78,7 +78,7 @@ class AssetsResource extends Resource
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
-    public function locations(array $data): array
+    public function locations(array $data = []): array
     {
         $endpoint = '/v1/fleet/assets/locations';
         $response = $this->executeSdkRequest(

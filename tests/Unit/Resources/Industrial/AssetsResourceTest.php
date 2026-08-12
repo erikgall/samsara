@@ -131,6 +131,23 @@ class AssetsResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_can_get_legacy_locations_without_optional_query_parameters(): void
+    {
+        $this->http->fake([
+            '*v1/fleet/assets/locations' => $this->http->response([
+                'assets'     => [],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $result = (new AssetsResource($this->samsara))->locations();
+
+        $this->assertSame([], $result['assets']);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'GET'
+            && $request->url() === 'https://api.samsara.com/v1/fleet/assets/locations');
+    }
+
+    #[Test]
     public function it_can_get_legacy_reefers(): void
     {
         $this->http->fake([
@@ -146,13 +163,13 @@ class AssetsResourceTest extends TestCase
 
         $resource = new AssetsResource($this->samsara);
 
-        $result = $resource->reefers(['groupId' => 123]);
+        $result = $resource->reefers(['startMs' => 1000, 'endMs' => 2000]);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('reeferStats', $result);
         $this->http->assertSent(fn ($request): bool => $request->method() === 'GET'
             && parse_url($request->url(), PHP_URL_PATH) === '/v1/fleet/assets/reefers'
-            && $this->queryFor($request->url()) === ['groupId' => '123']);
+            && $this->queryFor($request->url()) === ['startMs' => '1000', 'endMs' => '2000']);
     }
 
     #[Test]

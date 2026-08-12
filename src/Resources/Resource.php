@@ -237,7 +237,10 @@ abstract class Resource implements ResourceInterface
     }
 
     /**
-     * Create a builder with a custom endpoint.
+     * Create a query builder for an endpoint.
+     *
+     * Subclasses may override this factory to customize builder creation while
+     * retaining each resource method's endpoint-specific configuration.
      */
     protected function createBuilderWithEndpoint(string $endpoint): Builder
     {

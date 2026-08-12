@@ -4,6 +4,7 @@ namespace Samsara\Tests\Unit\Resources;
 
 use Samsara\Samsara;
 use Samsara\Data\Entity;
+use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Resources\Resource;
 use Samsara\Data\EntityCollection;
@@ -241,6 +242,21 @@ class ResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_routes_default_and_custom_endpoint_builders_through_the_resource_factory(): void
+    {
+        $resource = new TestBuilderFactoryResource(new Samsara('test-token'));
+
+        $query = $resource->query();
+        $customQuery = $resource->customQuery();
+
+        $this->assertInstanceOf(TestBuilder::class, $query);
+        $this->assertSame('/test-endpoint', $query->getEndpoint());
+        $this->assertInstanceOf(TestBuilder::class, $customQuery);
+        $this->assertSame('/test-endpoint/custom', $customQuery->getEndpoint());
+        $this->assertSame(['/test-endpoint', '/test-endpoint/custom'], $resource->createdEndpoints);
+    }
+
+    #[Test]
     #[DataProvider('genericOperations')]
     public function it_stops_unsupported_generic_operations_before_sending_http(
         string $operation,
@@ -389,6 +405,33 @@ class TestExecutorResource extends Resource
         );
     }
 }
+
+class TestBuilderFactoryResource extends Resource
+{
+    /** @var array<int, string> */
+    public array $createdEndpoints = [];
+
+    protected string $endpoint = '/test-endpoint';
+
+    public function customQuery(): Builder
+    {
+        return $this->createBuilderWithEndpoint("{$this->endpoint}/custom");
+    }
+
+    public function query(): Builder
+    {
+        return $this->createBuilderWithEndpoint($this->endpoint);
+    }
+
+    protected function createBuilderWithEndpoint(string $endpoint): Builder
+    {
+        $this->createdEndpoints[] = $endpoint;
+
+        return new TestBuilder($this, $endpoint);
+    }
+}
+
+class TestBuilder extends Builder {}
 
 class UnsupportedGenericResource extends Resource
 {

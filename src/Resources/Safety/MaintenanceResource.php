@@ -41,7 +41,8 @@ class MaintenanceResource extends Resource
             $endpoint
         );
 
-        return Dvir::make($response->json('data', []));
+        /** @var Dvir */
+        return $this->mapToEntity($response->json('data', []));
     }
 
     /**
@@ -66,7 +67,8 @@ class MaintenanceResource extends Resource
      */
     public function query(): Builder
     {
-        return (new Builder($this))->repeatQueryParameters('safetyStatus');
+        return $this->createBuilderWithEndpoint($this->endpoint)
+            ->repeatQueryParameters('safetyStatus');
     }
 
     /**

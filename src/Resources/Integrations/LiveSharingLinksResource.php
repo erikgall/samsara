@@ -46,7 +46,7 @@ class LiveSharingLinksResource extends Resource
      */
     public function query(): Builder
     {
-        return new Builder($this);
+        return $this->createBuilderWithEndpoint($this->endpoint);
     }
 
     /**
@@ -62,7 +62,8 @@ class LiveSharingLinksResource extends Resource
             $endpoint
         );
 
-        return LiveShare::make($response->json('data', []));
+        /** @var LiveShare */
+        return $this->mapToEntity($response->json('data', []));
     }
 
     /**
