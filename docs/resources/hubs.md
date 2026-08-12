@@ -48,7 +48,7 @@ foreach ($hubs as $hub) {
 
 ## Filtering
 
-Hubs accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
+The list operation accepts `hubIds`, `startTime`, `endTime`, `after`, and `limit`. See [the query builder reference](../query-builder.html) for the fluent method mapping.
 
 ```php
 $hubs = Samsara::hubs()
@@ -65,6 +65,9 @@ This resource does not declare a typed entity, so responses come back as a gener
 |----------|------|-------------|
 | `id` | `string` | Hub ID. |
 | `name` | `string` | Hub name. |
+| `timeZone` | `string` | Hub time zone. |
+| `createdAt` | `string` | RFC 3339 creation time. |
+| `updatedAt` | `string` | RFC 3339 last-update time. |
 
 Read each key directly from the entity (`$hub->id`, `$hub->name`) or via `$hub->get('key')`.
 

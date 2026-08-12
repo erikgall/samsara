@@ -61,14 +61,9 @@ Samsara::users()->delete('user-id');
 
 ## Filtering
 
-See [Query Builder](../query-builder.html) for the full filter list.
+The current list-users operation declares only `limit` and `after`. It does not accept tag filters.
 
 ```php
-$users = Samsara::users()
-    ->query()
-    ->whereTag('management-team')
-    ->get();
-
 $users = Samsara::users()
     ->query()
     ->limit(25)

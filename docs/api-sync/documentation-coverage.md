@@ -19,7 +19,7 @@ The retrieved OpenAPI is 3.0.1 with `info.version` `2025-10-23`, 260 paths, 372 
 
 - `SAMSARA_REGION` accepts `us`, `eu`, and `ca`; runtime switches are `useUsEndpoint()`, `useEuEndpoint()`, and `useCanadaEndpoint()`.
 - `paginate()` and `lazy()` apply configured `per_page` when no explicit limit exists. Explicit terminal arguments, `limit()`, and `where('limit', ...)` win.
-- Resource helpers call `withoutDefaultPageSize()` for cursor operations that have `after` but no official `limit`. Caller-supplied limits still win and the opt-out persists across cursor traversal.
+- Resource helpers call `withoutDefaultPageSize()` for cursor operations that have `after` but no official `limit`. The builder preserves caller-supplied limits, but callers must omit them on operations whose contract does not declare `limit`; the opt-out persists across cursor traversal.
 - Dedicated list helpers use CSV values. OpenAPI form/`explode=true` arrays explicitly declared by a resource use repeated query keys. Arbitrary arrays passed to `where()` retain Laravel's standard encoding.
 - `get()` returns one HTTP response page; `paginate()` returns one page plus cursor metadata; `lazy()` walks the cursor sequence. A short or empty page does not end traversal when `hasNextPage` is true.
 - `usingEntity()` and `mapUsing()` retain endpoint-specific mapping across `get`, `paginate`, `nextPage`, and `lazy`.
@@ -102,7 +102,7 @@ The retrieved OpenAPI is 3.0.1 with `info.version` `2025-10-23`, 260 paths, 372 
 | Live-share `find()` | No single-item operation; query the collection. Update/delete use `/live-shares?id=`. |
 | One DTO shape for snapshots and series | Equipment locations: `EquipmentLocationResult` vs `EquipmentLocationSeries`; equipment stats: `EquipmentStats` vs `EquipmentStatsSeries`; vehicle locations: `VehicleLocationResult` vs `VehicleLocationSeries`; vehicle stats: `VehicleStats` vs `VehicleStatsSeries`. |
 
-Fleet/platform has 15 implemented cursor operations without official `limit`; those builders suppress only the implicit page size. `GET /fleet/vehicles` attributes is the sole owned Fleet/platform `explode=true` repeated-key array. Trailer DTOs expose `trailerSerialNumber`. Vehicle DTOs retain list fields `vehicleWeight`, `vehicleWeightInKilograms`, and `vehicleWeightInPounds` plus item field `grossVehicleWeight`.
+Fleet/platform has 15 implemented cursor operations without official `limit`; those builders suppress the implicit page size and callers must not add an explicit one. `GET /fleet/vehicles` attributes is the sole owned Fleet/platform `explode=true` repeated-key array. Trailer DTOs expose `trailerSerialNumber`. Vehicle DTOs retain list fields `vehicleWeight`, `vehicleWeightInKilograms`, and `vehicleWeightInPounds` plus item field `grossVehicleWeight`.
 
 ### Safety and operations
 

@@ -72,7 +72,7 @@ return [
 ];
 ```
 
-`per_page` is the implicit `limit` for `paginate()` and `lazy()` when the caller does not supply one. An explicit `paginate($perPage)`, `lazy($chunkSize)`, `limit()`, or `where('limit', ...)` value wins. Endpoint helpers whose official contract has cursors but no `limit` disable this default automatically.
+`per_page` is the implicit `limit` for `paginate()` and `lazy()` when the caller does not supply one. An explicit `paginate($perPage)`, `lazy($chunkSize)`, `limit()`, or `where('limit', ...)` value wins. Endpoint helpers whose official contract has cursors but no `limit` disable this default automatically; do not add an explicit limit to those endpoints.
 
 ## Quick Start
 
@@ -168,6 +168,7 @@ $stats = Samsara::vehicleStats()
 // Vehicle Stats (historical)
 $stats = Samsara::vehicleStats()
     ->history()
+    ->types(['gps'])
     ->between($startTime, $endTime)
     ->get();
 
@@ -178,7 +179,7 @@ $locations = Samsara::vehicleLocations()->current()->get();
 $trips = Samsara::trips()
     ->query()
     ->startTime($startTime)
-    ->where('ids', 'trip-1,trip-2')
+    ->where('ids', 'vehicle-1,vehicle-2')
     ->get();
 ```
 
@@ -191,11 +192,11 @@ $clocks = Samsara::hoursOfService()->clocks()->get();
 $violations = Samsara::hoursOfService()->violations()->get();
 
 // Safety Events
-$events = Samsara::safetyEvents()->query()->get();
+$events = Samsara::safetyEvents()->query()->between($startTime, $endTime)->get();
 
 // Maintenance (DVIRs)
-$dvirs = Samsara::maintenance()->dvirs()->get();
-$defects = Samsara::maintenance()->defects()->get();
+$dvirs = Samsara::maintenance()->dvirs()->startTime($startTime)->get();
+$defects = Samsara::maintenance()->defects()->startTime($startTime)->get();
 ```
 
 ### Dispatch Resources
@@ -260,12 +261,12 @@ $shares = Samsara::liveShares()->all();
 Samsara::alerts()->configurations()->get();
 
 // Forms
-Samsara::forms()->submissions()->get();
+Samsara::forms()->submissions()->where('ids', 'submission-id')->get();
 Samsara::forms()->templates()->get();
 
 // Current streaming endpoints
-Samsara::idling()->events()->get();
-Samsara::issues()->stream()->get();
+Samsara::idling()->events()->between($startTime, $endTime)->get();
+Samsara::issues()->stream()->startTime($startTime)->get();
 
 // And many more...
 ```
@@ -274,7 +275,7 @@ The package also exposes alert incidents, Fuel and Energy, IFTA, Camera Media, S
 
 ## Query Builder
 
-The query builder provides a fluent interface for filtering and paginating data:
+The query builder provides a fluent interface for filtering and paginating data. It does not validate filters against the selected endpoint, so use only parameters declared on that resource page:
 
 ```php
 $drivers = Samsara::drivers()
@@ -304,14 +305,14 @@ $drivers = Samsara::drivers()
 
 // Stats Types
 ->types(['gps', 'engineStates', 'fuelPercents'])
-->withDecorations(['reverseGeo'])
+->withDecorations(['gps'])
 
 // Pagination
 ->limit(100)
 ->after($cursor)
 
-// Expand Related Data
-->expand(['driver', 'vehicle'])
+// Expand Related Data (only on endpoints that declare expand)
+->expand('vehicle')
 
 // Custom Filters
 ->where('status', 'active')
@@ -331,7 +332,7 @@ $first = $query->first();
 // Paginate one page with cursor metadata
 $paginator = $query->paginate(100);
 
-// Lazy stream (memory efficient)
+// Lazy stream (memory efficient; chunk size only where limit is supported)
 $lazy = $query->lazy(100);
 ```
 
@@ -345,7 +346,13 @@ foreach ($paginator as $driver) {
 }
 
 while ($paginator->hasMorePages()) {
-    $paginator = $paginator->nextPage();
+    $next = $paginator->nextPage();
+
+    if ($next === null) {
+        break;
+    }
+
+    $paginator = $next;
 
     foreach ($paginator as $driver) {
         // Process next page

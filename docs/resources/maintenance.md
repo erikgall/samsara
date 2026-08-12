@@ -36,9 +36,9 @@ $dvirs = Samsara::maintenance()
     ->between(now()->subDays(7), now())
     ->get();
 
-$updated = Samsara::maintenance()
+$recent = Samsara::maintenance()
     ->dvirs()
-    ->updatedAfter(now()->subHour())
+    ->startTime(now()->subHour())
     ->get();
 ```
 
@@ -60,20 +60,16 @@ Samsara::maintenance()
 
 ```php
 $dvir = Samsara::maintenance()->createDvir([
-    'vehicle' => ['id' => 'vehicle-id'],
-    'type' => 'preTrip',
+    'authorId' => 'mechanic-user-id',
+    'vehicleId' => 'vehicle-id',
+    'type' => 'mechanic',
     'safetyStatus' => 'safe',
-    'startTime' => now()->toIso8601String(),
-    'endTime' => now()->addMinutes(10)->toIso8601String(),
     'odometerMeters' => 184_523,
-    'vehicleDefects' => [
-        [
-            'defectType' => 'Brakes',
-            'comment' => 'Brake pad worn',
-        ],
-    ],
+    'mechanicNotes' => 'Replaced the passenger-side headlight.',
 ]);
 ```
+
+The current create operation requires `authorId`, `safetyStatus`, and `type`; only `mechanic` is accepted for `type`. Supply either `vehicleId` or `trailerId`.
 
 ## Updating Records
 
@@ -93,7 +89,7 @@ Defects are exposed through the `defects()` builder, which targets `/defects/str
 $defects = Samsara::maintenance()
     ->defects()
     ->between(now()->subDays(30), now())
-    ->whereVehicle('vehicle-id')
+    ->where('isResolved', false)
     ->get();
 ```
 
@@ -119,7 +115,7 @@ Each row is a typed `Defect`. `isResolved()` uses the boolean response field; `i
 Typed helpers are available directly:
 
 ```php
-foreach (Samsara::maintenance()->defects()->get() as $defect) {
+foreach (Samsara::maintenance()->defects()->startTime(now()->subDay())->get() as $defect) {
     if ($defect->isUnsafe() && ! $defect->isResolved()) {
         // ...
     }
@@ -130,14 +126,12 @@ Pass a `safetyStatus` array through `query()->where('safetyStatus', [...])` to e
 
 ## Filtering
 
-Refer to the [query builder](../query-builder.html) for the full operator reference. Both the DVIR and defects builders accept the standard filters:
+Refer to the [query builder](../query-builder.html) for the fluent operator reference, but use only parameters declared by the selected stream. DVIRs accept time and `safetyStatus` filters; defects accept time and `isResolved` filters.
 
 ```php
 $dvirs = Samsara::maintenance()
     ->dvirs()
-    ->whereDriver('driver-id')
-    ->whereVehicle('vehicle-id')
-    ->whereTag('fleet-west')
+    ->where('safetyStatus', ['unsafe'])
     ->between(now()->subDays(7), now())
     ->get();
 ```
@@ -149,7 +143,7 @@ The package's `MaintenanceStatus` enum has four lowercase values. Current upstre
 The `Dvir` entity exposes the following helpers:
 
 ```php
-$dvir = Samsara::maintenance()->dvirs()->first();
+$dvir = Samsara::maintenance()->dvirs()->startTime(now()->subDay())->first();
 
 $dvir->isPreTrip();             // bool — type === 'preTrip'
 $dvir->isPostTrip();            // bool — type === 'postTrip'

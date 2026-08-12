@@ -51,14 +51,14 @@ The full set of operators lives on the [query builder](../query-builder.html) pa
 ```php
 $events = Samsara::idling()
     ->events()
-    ->whereVehicle('vehicle-id')
+    ->where('assetIds', 'vehicle-id')
     ->whereTag('delivery-fleet')
     ->between(now()->subDays(7), now())
     ->limit(100)
     ->get();
 ```
 
-A `between()` window is required by the upstream endpoint; calls without one return an empty collection.
+A `between()` window is required by the upstream endpoint. Omitting it leaves validation to the API and may raise the SDK's mapped validation exception.
 
 ## Properties
 
@@ -66,17 +66,25 @@ A `between()` window is required by the upstream endpoint; calls without one ret
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `vehicle` | `array{id?: string, name?: string}` | Vehicle that idled. |
+| `asset` | `array` | Asset that idled. |
 | `startTime` | `string` | RFC 3339 start of the idle interval. |
-| `endTime` | `string` | RFC 3339 end of the idle interval. |
-| `durationMs` | `int` | Idle duration in milliseconds. |
-| `location` | `array{latitude?: float, longitude?: float}` | Idle location. |
+| `durationMilliseconds` | `int` | Idle duration in milliseconds. |
+| `eventUuid` | `string` | Event UUID. |
+| `fuelConsumedMilliliters` | `int` | Liquid fuel consumed during the event. |
+| `fuelCost` | `array` | Liquid-fuel cost details. |
+| `gaseousFuelConsumedGrams` | `int` | Gaseous fuel consumed during the event. |
+| `gaseousFuelCost` | `array` | Gaseous-fuel cost details. |
+| `ptoState` | `string` | Power-take-off state. |
+| `address` | `?string` | Reverse-geocoded address, when available. |
+| `airTemperatureMillicelsius` | `?int` | Ambient air temperature, when available. |
+| `latitude` / `longitude` | `?float` | Event coordinates, when available. |
+| `operator` | `?array` | Operator details, when available. |
 
-Read keys with array access (`$event['durationMs']`) or magic-property access (`$event->durationMs`). Helper methods are not available because no typed entity is bound.
+Read keys with array access (`$event['durationMilliseconds']`) or magic-property access (`$event->durationMilliseconds`). Helper methods are not available because no typed entity is bound.
 
 ## Related Resources
 
-- [Vehicles](vehicles.html) — resolve the vehicle from `$event->vehicle['id']`.
+- [Vehicles](vehicles.html) — resolve the vehicle from `$event->asset['id']`.
 - [Vehicle Stats](vehicle-stats.html) — pair idle intervals with `engineStates` history.
 - [Speeding](speeding.html) — companion stream for behaviour reporting.
 - [Error Handling](../error-handling.html) — exceptions raised by the underlying request.

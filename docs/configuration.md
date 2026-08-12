@@ -104,7 +104,7 @@ SAMSARA_RETRY=5
 
 ### Per Page
 
-This value supplies the implicit `limit` for `paginate()` and `lazy()` when the caller did not set a limit. Explicit `paginate($perPage)`, `lazy($chunkSize)`, `limit()`, and `where('limit', ...)` values take precedence. Builders for official cursor endpoints that do not accept `limit` opt out automatically with `withoutDefaultPageSize()`.
+This value supplies the implicit `limit` for `paginate()` and `lazy()` when the caller did not set a limit. Explicit `paginate($perPage)`, `lazy($chunkSize)`, `limit()`, and `where('limit', ...)` values take precedence. Builders for official cursor endpoints that do not accept `limit` opt out automatically with `withoutDefaultPageSize()`; do not add an explicit limit to those endpoints.
 
 ```php
 // config/samsara.php

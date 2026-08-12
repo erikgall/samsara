@@ -24,13 +24,14 @@ Speeding intervals are streamed through the `intervalsStream()` builder. All gen
 ```php
 use Samsara\Facades\Samsara;
 
-$intervals = Samsara::speeding()
+$trips = Samsara::speeding()
     ->intervalsStream()
+    ->where('assetIds', 'vehicle-id')
     ->between(now()->subDays(7), now())
     ->get();
 
-foreach ($intervals as $interval) {
-    SpeedingReport::record($interval->toArray());
+foreach ($trips as $trip) {
+    SpeedingReport::record($trip->toArray());
 }
 ```
 
@@ -39,9 +40,10 @@ For long windows, prefer the `lazy()` cursor:
 ```php
 Samsara::speeding()
     ->intervalsStream()
+    ->where('assetIds', 'vehicle-id')
     ->between(now()->subMonth(), now())
-    ->lazy(500)
-    ->each(fn ($interval) => SpeedingReport::record($interval->toArray()));
+    ->lazy()
+    ->each(fn ($trip) => SpeedingReport::record($trip->toArray()));
 ```
 
 ## Filtering
@@ -49,36 +51,36 @@ Samsara::speeding()
 Refer to the [query builder](../query-builder.html) for the full operator reference. The speeding builder commonly accepts:
 
 ```php
-$intervals = Samsara::speeding()
+$trips = Samsara::speeding()
     ->intervalsStream()
-    ->whereVehicle('vehicle-id')
-    ->whereDriver('driver-id')
-    ->whereTag('delivery-fleet')
+    ->where('assetIds', 'vehicle-id')
+    ->where('includeDriverId', true)
     ->between(now()->subDays(7), now())
     ->get();
 ```
 
-A `between()` window is required by the upstream endpoint.
+The upstream endpoint requires `assetIds` and `startTime`; `endTime` is optional. `between()` supplies both timestamps.
 
 ## Properties
 
-`SpeedingResource` does not declare a typed `$entity`, so each result is a generic `Samsara\Data\Entity` (a `Fluent` instance). The keys returned by the API are typically:
+`SpeedingResource` does not declare a typed `$entity`, so each result is a generic `Samsara\Data\Entity` (a `Fluent` instance). Each result represents one trip and contains nested `intervals`:
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `vehicle` | `array{id?: string, name?: string}` | Vehicle that was speeding. |
-| `driver` | `array{id?: string, name?: string}` | Driver assigned to the vehicle. |
-| `startMs` | `int` | Interval start in milliseconds since the Unix epoch. |
-| `endMs` | `int` | Interval end in milliseconds since the Unix epoch. |
-| `maxSpeedMph` | `float` | Peak speed during the interval. |
-| `durationMs` | `int` | Interval duration in milliseconds. |
-| `severity` | `string` | Severity bucket (`light`, `moderate`, `heavy`, `severe`). |
+| `asset` | `array` | Asset associated with the trip. |
+| `driverId` | `?string` | Driver ID when `includeDriverId` is requested and a driver is known. |
+| `tripStartTime` | `string` | RFC 3339 trip start time. |
+| `createdAtTime` | `string` | RFC 3339 creation time. |
+| `updatedAtTime` | `string` | RFC 3339 last-update time. |
+| `intervals` | `array` | Nested speeding intervals for the trip. |
 
-Read keys with array access (`$interval['maxSpeedMph']`) or magic-property access (`$interval->maxSpeedMph`). No helper methods are available because no typed entity is bound.
+Each nested interval may include `startTime`, `endTime`, `isDismissed`, `location`, `maxSpeedKilometersPerHour`, `postedSpeedLimitKilometersPerHour`, and `severityLevel`.
+
+Read parent keys with array access (`$trip['intervals']`) or magic-property access (`$trip->intervals`). No helper methods are available because no typed entity is bound.
 
 ## Related Resources
 
 - [Safety Events](safety-events.html) — coaching events that complement the speeding stream.
-- [Vehicles](vehicles.html) — resolve `$interval->vehicle['id']`.
-- [Drivers](drivers.html) — resolve `$interval->driver['id']`.
+- [Vehicles](vehicles.html) — resolve the trip's `asset` reference.
+- [Drivers](drivers.html) — resolve the optional `driverId`.
 - [Error Handling](../error-handling.html) — exceptions raised by the underlying request.

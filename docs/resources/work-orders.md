@@ -31,18 +31,22 @@ use Samsara\Facades\Samsara;
 
 $workOrders = Samsara::workOrders()->all();
 
-$workOrder = Samsara::workOrders()->query()->where('ids', ['work-order-id'])->first();
+$workOrder = Samsara::workOrders()
+    ->query()
+    ->where('ids', ['work-order-id'])
+    ->get()
+    ->first();
 ```
 
 ## Creating Records
 
 ```php
 $workOrder = Samsara::workOrders()->create([
-    'vehicleId' => 'vehicle-id',
+    'assetId' => 'vehicle-id',
     'description' => 'Oil change and tire rotation',
-    'serviceTasks' => [
-        ['id' => 'task-oil-change'],
-        ['id' => 'task-tire-rotation'],
+    'serviceTaskInstances' => [
+        ['serviceTaskId' => 'task-oil-change', 'status' => 'Open'],
+        ['serviceTaskId' => 'task-tire-rotation', 'status' => 'Open'],
     ],
 ]);
 ```
@@ -57,12 +61,12 @@ The SDK does not yet expose the collection-style delete operation. Generic `dele
 
 ## Filtering
 
-Use `query()` to apply filters to the standard endpoint. See [Query Builder](../query-builder.html) for the full filter list.
+Use `query()` with the standard endpoint's declared `ids`, `after`, and `includeExternalIds` parameters. See [Query Builder](../query-builder.html) for the fluent method mapping.
 
 ```php
 $workOrders = Samsara::workOrders()
     ->query()
-    ->whereTag('fleet-maintenance')
+    ->where('ids', ['work-order-1', 'work-order-2'])
     ->get();
 ```
 
@@ -82,7 +86,7 @@ $workOrders = Samsara::workOrders()
 Samsara::workOrders()
     ->stream()
     ->between(Carbon::now()->subYear(), Carbon::now())
-    ->lazy(500)
+    ->lazy()
     ->each(function ($workOrder) {
         // Process each work order
     });
@@ -102,7 +106,7 @@ foreach ($serviceTasks as $task) {
 
 The terminal `get()` call returns `EntityCollection<int, ServiceTask>`.
 
-The package's `MaintenanceStatus` enum contains four lowercase values, while the current upstream Work Orders schema defines eleven title-cased statuses. Treat status handling as a pending package-contract reconciliation.
+The package's `MaintenanceStatus` enum is legacy vocabulary and is not the current Work Orders wire contract. Work-order status fields use the exact title-cased values documented by the current API, including `Unknown`, `Open`, `In Progress`, `On Hold`, and `Completed`; do not send the lowercase enum values for these fields.
 
 ## Invoice Scans
 

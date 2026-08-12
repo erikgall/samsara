@@ -4,6 +4,31 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 
 ## Unreleased
 
+### 2026-08-12 — Documentation quality and developer-experience lane
+
+#### Scope and decisions
+
+- Verified detached `HEAD`, `dev`, and their merge base at `3b475a16340eb23e341f51dba7135fa38b62364f` before editing; audited the exact 64-file documentation assignment once with zero omissions or duplicates.
+- Changed 41 owned files, including this ledger, and kept 23 after review. No source, tests, config, tooling, contract snapshot, dependency file, or lockfile was modified. `docs/.bundle/` was not created or touched.
+- Corrected current request bodies for Live Shares, DVIR creation, Work Orders, Settings, and gateway creation; replaced stale response tables for Assets, HOS violations, Idling, Issues, Route Events, Speeding, carrier-proposed assignments, hubs, vehicles, and gateways.
+- Reconciled required endpoint filters and no-limit behavior across Trips, Forms, Assignments, Maintenance, Safety Events, Vehicle Stats, Equipment, Assets, Beta helpers, and other resource examples. The shared Builder documentation now states explicitly that fluent methods do not validate endpoint contracts.
+- Added maintainer integration gates to the upgrade entry point, canonical guide, and compact breaking record. Later parallel-lane commits must receive a consumer-action or explicit no-action disposition before the existing 257-path proof claim can be carried forward.
+
+#### Cross-lane follow-ups
+
+- Tooling owner: add the already-recorded `tests/Unit/BoostDocumentationTest.php` publication artifact to `$allowedPostAuditPaths` in `scripts/check-v2-upgrade-guide.php`; the clean starting commit otherwise fails the checker before ledger validation.
+- Query-builder owner: decide whether `first()` and chunked `lazy($size)` should reject or avoid `limit` on `withoutDefaultPageSize()` operations. Documentation now uses `get()->first()` and `lazy()` for those endpoints.
+- Beta-resource owner: declare repeated-key encoding for required qualification-record `ids` in `BetaResource::qualificationsRecords()`. The guide currently shows the explicit `repeatQueryParameters('ids')` workaround.
+- Release integrator: classify every incoming quality-lane path for signatures, capabilities, wire contracts, DTO/null semantics, errors, pagination, serialized enum values, tests, and migration documentation; then update the v2 guide/ledger counts and rerun all release gates.
+
+#### Verification
+
+- Local links/fragments — passed: 807 checks across all 58 assigned Markdown files.
+- Markdown fences, both documentation JSON artifacts, exact snapshot digest/provenance, strict Composer validation, and `git diff --check` — passed.
+- `BoostDocumentationTest` — passed: 3 tests / 65 assertions using the canonical checkout's installed PHPUnit dependencies against this worktree's test and documentation files.
+- `composer check:v2-upgrade-guide` — expected baseline failure: `tests/Unit/BoostDocumentationTest.php` is missing only from the checker's post-audit allowlist; the path is already present in the publication-artifact list and ledger.
+- Full PHPUnit and Jekyll build — not run in this worktree because `vendor/bin/phpunit` and the `jekyll` executable are absent. Dependencies were not installed or copied; the focused documentation test ran without modifying dependency state, and the release integrator must rerun the full suite and site build in the dependency-equipped integration checkout.
+
 ### 2026-08-12 — Laravel Boost agent-documentation overhaul
 
 #### Scope and decisions

@@ -67,7 +67,7 @@ $stats = Samsara::vehicleStats()
 
 History rows are also `VehicleStatsSeries`. Use `getGpsReadings()`, `getEngineStateReadings()`, and `getFuelPercentReadings()` for typed reading collections. `current()`, `query()`, and the typed shortcuts return snapshot `VehicleStats` objects with scalar-value helpers such as `getGps()` and `getFuelPercent()`.
 
-The current, feed, and history cursor operations do not declare `limit`; their builders therefore omit the configured implicit page size while retaining any limit the caller sets explicitly.
+The current, feed, and history operations do not declare `limit`; their builders therefore omit the configured implicit page size. Do not set an explicit limit on these endpoints.
 
 ## Typed Shortcuts
 
@@ -88,17 +88,19 @@ $gps = Samsara::vehicleStats()
     ->get();
 
 $engine = Samsara::vehicleStats()
-    ->engineStates()
+    ->history()
+    ->types(['engineStates'])
     ->between(now()->subDay(), now())
     ->get();
 
 $odometer = Samsara::vehicleStats()
     ->odometer()
     ->whereVehicle('vehicle-id')
+    ->get()
     ->first();
 ```
 
-> **Note:** The typed shortcuts hand back a `Builder`. They do not target a different endpoint — by default they hit the same endpoint as `current()`. Chain `between()` if you need historical samples through a typed shortcut.
+> **Note:** The typed shortcuts hand back a `Builder` for the current-stats endpoint. For historical samples, call `history()->types(...)`; adding a time range to a typed shortcut does not switch endpoints.
 
 ## Selecting Stat Types
 
@@ -145,7 +147,7 @@ The most commonly requested stat types:
 
 ## Filtering
 
-See [Query Builder](../query-builder.html) for the full filter list. The most common filters on stats are by vehicle, by tag, and with response decorations. Each chains onto a builder returned by `current()` / `history()` / `feed()` (or one of the typed shortcuts).
+Vehicle stats accept vehicle, tag, parent-tag, type, and operation-specific time/decorations filters. See [Query Builder](../query-builder.html) for the fluent method mapping. Each valid filter chains onto a builder returned by `current()` / `history()` / `feed()` (or one of the typed shortcuts).
 
 ```php
 // By vehicle
@@ -168,11 +170,12 @@ $stats = Samsara::vehicleStats()
     ->whereTag('tag-id')
     ->get();
 
-// With decorations (address, reverse geocoding)
+// Decorate engine-state samples with GPS and fuel readings
 $stats = Samsara::vehicleStats()
-    ->current()
-    ->types(['gps'])
-    ->withDecorations(['address', 'reverseGeo'])
+    ->history()
+    ->types(['engineStates'])
+    ->withDecorations(['gps', 'fuelPercents'])
+    ->between(now()->subDay(), now())
     ->get();
 ```
 
@@ -218,6 +221,7 @@ Samsara::vehicleStats()
 $stat = Samsara::vehicleStats()
     ->current()
     ->types(['gps'])
+    ->get()
     ->first();
 
 $gps = $stat->getGps();           // ?GpsLocation
@@ -247,7 +251,7 @@ $gps = $stat->getGps();
 $gps->latitude;          // float
 $gps->longitude;         // float
 $gps->time;              // string (RFC 3339)
-$gps->headingDegrees;    // ?int
+$gps->headingDegrees;    // ?float
 $gps->speedMilesPerHour; // ?float
 ```
 

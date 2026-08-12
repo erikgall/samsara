@@ -106,7 +106,6 @@ $locations = Samsara::vehicleLocations()
 $locations = Samsara::vehicleLocations()
     ->current()
     ->whereTag('delivery-trucks')
-    ->limit(50)
     ->get();
 ```
 

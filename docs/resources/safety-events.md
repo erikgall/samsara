@@ -37,7 +37,7 @@ For long windows, prefer the `lazy()` cursor:
 Samsara::safetyEvents()
     ->query()
     ->between(now()->subYear(), now())
-    ->lazy(500)
+    ->lazy()
     ->each(fn ($event) => SafetyEventReport::record($event->toArray()));
 ```
 
@@ -50,7 +50,7 @@ No generic CRUD operation is supported; `all`, `find`, `create`, `update`, and `
 ```php
 $logs = Samsara::safetyEvents()
     ->auditLogs()
-    ->between(now()->subDays(7), now())
+    ->startTime(now()->subDays(7))
     ->get();
 ```
 
@@ -93,10 +93,8 @@ Refer to the [query builder](../query-builder.html) for the full operator refere
 $events = Samsara::safetyEvents()
     ->query()
     ->whereVehicle('vehicle-id')
-    ->whereDriver('driver-id')
     ->whereTag('fleet-west')
     ->between(now()->subDays(30), now())
-    ->limit(100)
     ->get();
 ```
 
@@ -107,7 +105,12 @@ A `between()` window is required by the upstream endpoint.
 The `SafetyEvent` entity exposes video and coaching helpers:
 
 ```php
-$event = Samsara::safetyEvents()->query()->where('ids', 'event-id')->first();
+$event = Samsara::safetyEvents()
+    ->query()
+    ->whereVehicle('vehicle-id')
+    ->between(now()->subDays(7), now())
+    ->get()
+    ->first();
 
 $event->hasVideo();      // bool — true if any of the three video URLs are present
 $event->needsCoaching(); // bool — coachingState === 'needsCoaching'

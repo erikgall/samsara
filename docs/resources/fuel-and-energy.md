@@ -84,7 +84,7 @@ $purchase = Samsara::fuelAndEnergy()->createFuelPurchase([
 
 ## Filtering
 
-The efficiency builders support the standard filters from the query builder. See [the query builder reference](../query-builder.html) for the full method list. Their window is `startTime`/`endTime`; report helpers separately require `startDate`/`endDate`.
+The efficiency builders accept their matching driver/vehicle IDs, tags, parent tags, data formats, cursors, and the required `startTime`/`endTime` window. Report helpers separately require `startDate`/`endDate`. See [the query builder reference](../query-builder.html) for the fluent method mapping.
 
 ```php
 $vehicleEfficiency = Samsara::fuelAndEnergy()

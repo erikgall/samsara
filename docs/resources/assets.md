@@ -66,19 +66,18 @@ The request is `DELETE /assets?id=asset-id`.
 
 ## Filtering
 
-Assets accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
+The list operation accepts asset type/ID, tag, attribute, external-ID, update-time, include, and cursor filters. See [the query builder reference](../query-builder.html) for the fluent method mapping.
 
 ```php
 $assets = Samsara::assets()
     ->query()
     ->whereTag('warehouse-equipment')
-    ->limit(50)
     ->get();
 ```
 
 ## Specialized Streams
 
-Three sub-builders expose stream endpoints for asset telemetry. Each returns a `Builder` you can compose with the standard filters.
+Three sub-builders expose stream endpoints for asset telemetry. Each returns a `Builder`, but each endpoint has its own filter requirements.
 
 ```php
 use Carbon\Carbon;
@@ -89,6 +88,9 @@ $depreciation = Samsara::assets()
 
 $inputs = Samsara::assets()
     ->inputsStream()
+    ->where('ids', 'asset-id')
+    ->where('type', 'auxInput1')
+    ->startTime(Carbon::now()->subHours(24))
     ->get();
 
 $locations = Samsara::assets()
@@ -153,10 +155,17 @@ The `Asset` entity (`Samsara\Data\Asset\Asset`) exposes the following typed prop
 | `name` | `?string` | Asset name. |
 | `serialNumber` | `?string` | Serial number. |
 | `type` | `?string` | Asset type — see [`AssetType`](#asset-types). |
-| `purchasePrice` | `?float` | Purchase price. |
-| `gateway` | `?array` | Installed gateway info — `{id, serial}`. |
-| `location` | `?array` | Current location — `{latitude, longitude}`. |
+| `attributes` | `?array` | Custom attributes returned for the asset. |
+| `externalIds` | `?array<string, string>` | External identifier map. |
+| `licensePlate` | `?string` | License plate. |
+| `make` | `?string` | Manufacturer. |
+| `model` | `?string` | Model. |
+| `notes` | `?string` | Asset notes. |
+| `readingsIngestionEnabled` | `?bool` | Whether readings ingestion is enabled. |
+| `regulationMode` | `?string` | Regulation mode. |
 | `tags` | `?array` | Associated tags. Each entry is `{id, name?}`. |
+| `vin` | `?string` | Vehicle identification number, when present. |
+| `year` | `?int` | Model year. |
 | `createdAtTime` | `?string` | Creation timestamp (RFC 3339). |
 | `updatedAtTime` | `?string` | Last update timestamp (RFC 3339). |
 

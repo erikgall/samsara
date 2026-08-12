@@ -20,7 +20,7 @@ permalink: /resources/live-shares
 
 ## Introduction
 
-The `Samsara::liveShares()` resource manages live sharing links — time-limited URLs that let people without Samsara accounts watch a vehicle on a map. Each share has an expiration time, a list of shared assets, and a list of email recipients; revoke it by deleting the live share record.
+The `Samsara::liveShares()` resource manages live sharing links — URLs that let people without Samsara accounts watch selected assets on a map. Each share selects one link type and its corresponding configuration object. A share may expire at `expiresAtTime`; revoke it by deleting the live share record.
 
 The resource owns generic `all`, `create`, `update`, and `delete`. `update($id, $data)` and `delete($id)` use the collection path `/live-shares?id={id}`. Generic `find` is unsupported and throws before HTTP.
 
@@ -44,13 +44,11 @@ $active = Samsara::liveShares()
 ```php
 $share = Samsara::liveShares()->create([
     'name' => 'Customer Fleet View',
-    'assets' => [
-        ['id' => 'vehicle-id', 'type' => 'vehicle'],
+    'type' => 'assetsLocation',
+    'assetsLocationLinkConfig' => [
+        'assetId' => 'vehicle-id',
     ],
-    'recipients' => [
-        ['email' => 'customer@example.com'],
-    ],
-    'expiresAt' => now()->addDay()->toIso8601String(),
+    'expiresAtTime' => now()->addDay()->toIso8601String(),
 ]);
 ```
 
@@ -74,12 +72,13 @@ The SDK sends the ID as the collection query parameter required by the operation
 
 ## Filtering
 
-The `query()` method returns a fresh `Builder` rooted at `/live-shares`. Apply filters from the [query builder](../query-builder.html) reference; the live-shares endpoint accepts standard pagination and tag filters.
+The `query()` method returns a fresh `Builder` rooted at `/live-shares`. The endpoint declares `ids`, `type`, `limit`, and `after`; do not add tag filters that the operation does not declare.
 
 ```php
 $shares = Samsara::liveShares()
     ->query()
-    ->whereTag('customer-tracking')
+    ->where('type', 'assetsLocation')
+    ->limit(25)
     ->get();
 ```
 
@@ -119,16 +118,14 @@ Hand a customer a tracking link that auto-expires once delivery is complete:
 ```php
 $share = Samsara::liveShares()->create([
     'name' => "Delivery Tracking — Order #12345",
-    'assets' => [
-        ['id' => $vehicle->id, 'type' => 'vehicle'],
+    'type' => 'assetsLocation',
+    'assetsLocationLinkConfig' => [
+        'assetId' => $vehicle->id,
     ],
-    'recipients' => [
-        ['email' => $customer->email],
-    ],
-    'expiresAt' => now()->addHours(4)->toIso8601String(),
+    'expiresAtTime' => now()->addHours(4)->toIso8601String(),
 ]);
 
-$trackingUrl = $share->url;
+$trackingUrl = $share->liveSharingUrl;
 ```
 
 ### Revoke Expired Shares
@@ -139,4 +136,3 @@ $trackingUrl = $share->url;
 
 - [Vehicles](vehicles.html) — the assets typically referenced from a live share.
 - [Vehicle Locations](vehicle-locations.html) — direct location queries inside the SDK.
-- [Webhooks](webhooks.html) — notify on share creation or expiration.

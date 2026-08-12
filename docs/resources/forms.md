@@ -52,7 +52,7 @@ $templates = Samsara::forms()->templates()->get();
 
 ### Form Submissions Stream
 
-For change-feed style polling, use the stream builder. `between()` is required.
+For change-feed style polling, use the stream builder. `startTime` is required and `endTime` is optional; `between()` supplies both.
 
 ```php
 use Carbon\Carbon;
@@ -143,7 +143,11 @@ Both methods return raw `array<string, mixed>` payloads from the API. `id` is th
 The `FormSubmission` entity exposes status helpers:
 
 ```php
-$submission = Samsara::forms()->submissions()->where('ids', 'submission-id')->first();
+$submission = Samsara::forms()
+    ->submissions()
+    ->where('ids', 'submission-id')
+    ->get()
+    ->first();
 
 $submission->isNotStarted();       // bool
 $submission->isCompleted();        // bool

@@ -29,35 +29,33 @@ For carrier-proposed driver-vehicle assignments, see the [Carrier Proposed Assig
 ```php
 use Samsara\Facades\Samsara;
 
-$assignments = Samsara::driverVehicleAssignments()
-    ->query()
-    ->get();
-
 $forDriver = Samsara::driverVehicleAssignments()
     ->query()
+    ->where('filterBy', 'drivers')
     ->whereDriver('driver-123')
     ->get();
 
 $forVehicle = Samsara::driverVehicleAssignments()
     ->query()
+    ->where('filterBy', 'vehicles')
     ->whereVehicle('vehicle-456')
     ->get();
 ```
+
+`filterBy` is required and must match the ID filter you supply.
 
 ## Driver-Trailer Assignments
 
 The driver-trailer endpoint mirrors the driver-vehicle one.
 
 ```php
-$assignments = Samsara::driverTrailerAssignments()
-    ->query()
-    ->get();
-
 $forDriver = Samsara::driverTrailerAssignments()
     ->query()
     ->whereDriver('driver-123')
     ->get();
 ```
+
+The driver-trailer operation requires at least one `driverIds` value, which `whereDriver()` supplies.
 
 ## Trailer Assignments (Legacy)
 

@@ -56,9 +56,11 @@ The resource returns a generic `Entity` (a `Fluent` instance) keyed by the field
 $proposal = $proposals->first();
 
 $proposal['id'];
-$proposal['driverId'];
-$proposal['vehicleId'];
+$proposal['driver']['id'] ?? null;
+$proposal['vehicle']['id'] ?? null;
 ```
+
+Current responses require `id` and `activeTime`. They may also include `acceptedTime`, `rejectedTime`, `firstSeenTime`, `shippingDocs`, nested `driver` and `vehicle` objects, and a `trailers` array.
 
 ## Related Resources
 

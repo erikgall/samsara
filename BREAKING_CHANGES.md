@@ -8,6 +8,10 @@ For an executable, agent-oriented migration sequence with before/after code, exa
 
 The final audit maps 195 package operations: 187 match the pinned first-party contract and 8 are explicit legacy helpers. Six matched operations retain only additive pagination-ergonomics gaps; no matched operation retains a classified wire, request-body, response-loss, or error-mapping break. Exact capability gates now reject 133 unsupported public operation calls locally, so consumers must apply the migrations below instead of relying on inherited CRUD. The 183 unique official-only operations are additive backlog and do not require a consumer migration until implemented.
 
+### Release integration gate
+
+These are the verified migrations through the documentation lane's starting `dev` commit, `3b475a16340eb23e341f51dba7135fa38b62364f`, subject to the frozen proof boundary described in `UPGRADE.md`. Parallel quality-lane commits are not release claims until the integrator classifies their consumer impact, updates the guide and ledger or records explicit no-action rationale, and reruns the release checks.
+
 ### Required DTO and enum migrations
 
 #### Update the sleeper-berth enum value
@@ -70,6 +74,18 @@ These entities extend an open fluent data object, so the following are payload/s
 - Update request fakes and signatures that previously expected no `limit`.
 - Endpoint helpers whose official cursor contract has no `limit` suppress only the implicit default; do not add a limit unless the endpoint and your use case allow it.
 
+#### Audit pass-through request bodies and required filters
+
+These are current-contract audits for pass-through arrays, not new PHP signature changes. The calls continue to compile with stale keys, but the API does not accept the old shapes:
+
+| Operation | Stale assumption | Current contract |
+|---|---|---|
+| Live Share create | flat `assets`, `recipients`, `expiresAt` | required `name`, `type`, the matching nested link-config object, and optional `expiresAtTime` |
+| DVIR create | nested `vehicle`, `preTrip`, client timestamps/defect rows | required `authorId`, `safetyStatus`, `type: mechanic`, and either `vehicleId` or `trailerId` |
+| Work Order create | `vehicleId`, `serviceTasks[*].id` | `assetId`, `serviceTaskInstances[*].serviceTaskId`, and a current title-cased task status |
+
+Revalidate read filters too: Trips requires `startTime` and comma-separated asset `ids`; Idling requires both timestamps; Issues and Work Order streams require `startTime`; Speeding requires `assetIds` and `startTime`; assignment feeds require `filterBy` or `driverIds` as documented; HOS daily logs use date keys. The shared Builder does not validate endpoint parameters. On no-limit operations, `first()` and `lazy($chunkSize)` add an undocumented `limit`; use `get()->first()` or `lazy()`.
+
 #### Update exact query encoding
 
 - `types`, `expand`, `withDecorations`, `whereAttribute`, `whereDriver`, `whereParentTag`, `whereTag`, and `whereVehicle` encode arrays as comma-separated values.
@@ -119,7 +135,7 @@ Driver auth uses `POST /fleet/drivers/auth-token`; QR operations use `/drivers/q
 - Driver, trailer, and vehicle external lookup now encodes the item identifier as `{key}:{value}`. Update exact URL fakes.
 - Equipment external lookup is unsupported; retain the Samsara equipment ID and call `find()`.
 - Replace `routes()->all()` with `routes()->query()->between($start, $end)->get()`.
-- Replace Trip `all()` or an unbounded bare query with `trips()->query()->startTime($start)->where('ids', 'id1,id2')->get()` as needed.
+- Replace Trip `all()` or an unbounded bare query with `trips()->query()->startTime($start)->where('ids', 'vehicle-1,vehicle-2')->get()`; `ids` contains asset IDs and is required.
 - Replace `vehicleStats()->all()` with `current()->types(...)`, `feed()`, or `history()`.
 - Live-share `find()` is unsupported. Query the collection; update/delete now send `/live-shares?id={id}`.
 

@@ -37,13 +37,13 @@ Compliance and driver-app settings are mutable; safety settings are read-only.
 
 ```php
 $updated = Samsara::settings()->updateCompliance([
-    'hosRuleset' => 'usa_70_8',
-    'restBreakRequired' => true,
+    'driverAutoDutyEnabled' => true,
+    'forceReviewUnassignedHosEnabled' => true,
 ]);
 
 $updated = Samsara::settings()->updateDriverApp([
-    'allowManualDutyStatus' => true,
-    'requireSignatureOnDelivery' => true,
+    'orgVehicleSearch' => true,
+    'trailerSelection' => true,
 ]);
 ```
 

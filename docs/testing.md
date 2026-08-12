@@ -107,11 +107,14 @@ $fake->fakeResponse('/fleet/routes', [
     [
         'id'                 => 'route-1',
         'name'               => 'Morning Route',
-        'scheduledStartTime' => '2026-01-15T08:00:00Z',
+        'scheduledRouteStartTime' => '2026-01-15T08:00:00Z',
     ],
 ]);
 
-$routes = $fake->routes()->query()->get();
+$routes = $fake->routes()
+    ->query()
+    ->between('2026-01-15T00:00:00Z', '2026-01-16T00:00:00Z')
+    ->get();
 ```
 
 Pass a third argument to fake non-200 responses, which is how you exercise error paths:

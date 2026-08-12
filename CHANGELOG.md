@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **API contract alignment**: Reconciled capability gates, wrapped paths and methods, query encoding, pagination defaults, typed errors, and endpoint-specific DTO mapping against the pinned 2026-08-10 Samsara contract. See `BREAKING_CHANGES.md` and `UPGRADE.md` before adopting v2.
+- **Documentation accuracy**: Corrected endpoint-specific required filters, no-limit pagination examples, current create payloads, and response-field tables across stable and beta resource guides.
 - **Laravel Boost guidelines**: Replaced the large, v1-era always-loaded guideline set with one concise v2 guideline that routes detailed work into on-demand skills; added a current package-maintenance skill and publication-contract tests.
 - **Tags**: `hasParent()` now recognizes either `parentTagId` or a documented nested `parentTag` payload.
 - **Hours of Service**: `DutyStatus::SLEEPER_BERTH` now uses the upstream `sleeperBed` backing value, allowing `HosLog::getDutyStatus()` to hydrate current sleeper-berth rows. This changes the enum's serialized value; see `BREAKING_CHANGES.md`.
@@ -29,6 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 - **Form submissions**: `isDraft()` and `isSubmitted()` remain callable but are deprecated because the current response status enum contains neither `draft` nor `submitted`.
+
+### Removed
+
+- **Unsupported generic operations**: Capability-gated inherited CRUD methods that have no represented upstream operation now fail locally with `UnsupportedOperationException`; use the exact matrix and migrations in the v2 guide.
+- **DTO helpers**: Removed 17 helpers whose source fields are absent, renamed, semantically different, or owned by another endpoint. The upgrade guide lists every replacement or explicit no-equivalent decision.
 
 ## [1.1.0] - 2026-05-07
 

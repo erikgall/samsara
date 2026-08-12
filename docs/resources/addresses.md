@@ -100,7 +100,7 @@ Samsara::addresses()->delete('address-id');
 
 ## Filtering
 
-Addresses accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
+The list operation accepts pagination, tag and parent-tag IDs, and `createdAfterTime`. See [the query builder reference](../query-builder.html) for the fluent method mapping.
 
 ```php
 $addresses = Samsara::addresses()

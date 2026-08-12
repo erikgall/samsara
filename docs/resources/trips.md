@@ -30,7 +30,7 @@ use Carbon\Carbon;
 $trips = Samsara::trips()
     ->query()
     ->startTime(Carbon::now()->subDays(7))
-    ->where('ids', 'trip-1,trip-2')
+    ->where('ids', 'vehicle-1,vehicle-2')
     ->get();
 ```
 
@@ -42,16 +42,19 @@ The resource ships two typed shortcuts that pre-filter on `completionStatus`.
 $completed = Samsara::trips()
     ->completed()
     ->startTime(now()->subDays(7))
+    ->where('ids', 'vehicle-id')
     ->get();
 
 $inProgress = Samsara::trips()
     ->inProgress()
+    ->startTime(now()->subDay())
+    ->where('ids', 'vehicle-id')
     ->get();
 ```
 
 ## Time-Based Queries
 
-The official stream requires `startTime`; pass comma-separated trip IDs through `where('ids', 'id1,id2')` when filtering by ID. The operation does not accept `limit`, so the builder suppresses the implicit configured page size.
+The official stream requires both `startTime` and comma-separated asset IDs in `ids`. The operation does not accept `limit`, so the builder suppresses the implicit configured page size.
 
 ```php
 use Carbon\Carbon;
@@ -59,12 +62,13 @@ use Carbon\Carbon;
 $today = Samsara::trips()
     ->query()
     ->startTime(Carbon::today())
+    ->where('ids', 'vehicle-id')
     ->get();
 
 $range = Samsara::trips()
     ->query()
     ->startTime('2026-01-01T00:00:00Z')
-    ->where('ids', 'trip-1,trip-2')
+    ->where('ids', 'vehicle-1,vehicle-2')
     ->get();
 ```
 
@@ -76,6 +80,7 @@ For multi-month windows, use `lazy()` to iterate without loading every page into
 Samsara::trips()
     ->query()
     ->startTime(now()->subYear())
+    ->where('ids', 'vehicle-id')
     ->lazy()
     ->each(function ($trip) {
         DB::table('trip_archive')->insert([
@@ -112,6 +117,8 @@ $trips = Samsara::trips()
 $trip = Samsara::trips()
     ->query()
     ->startTime(now()->subDay())
+    ->where('ids', 'vehicle-id')
+    ->get()
     ->first();
 
 $trip->isCompleted();           // bool

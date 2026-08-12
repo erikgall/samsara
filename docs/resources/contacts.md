@@ -59,7 +59,7 @@ Samsara::contacts()->delete('contact-id');
 
 ## Filtering
 
-Contacts accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
+The list operation declares only `limit` and `after`. See [the query builder reference](../query-builder.html) for pagination behavior.
 
 ```php
 $contacts = Samsara::contacts()

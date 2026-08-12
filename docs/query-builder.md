@@ -26,6 +26,8 @@ permalink: /query-builder
 
 The query builder is the fluent interface you reach for whenever you need to filter, paginate, or stream records from a Samsara resource. You start a builder by calling `query()` on a resource, or by calling a builder-returning helper such as `current()` or `history()` on resources that expose multiple endpoints. Resources like [Vehicle Stats](resources/vehicle-stats.html) also expose typed shortcuts (`current()`, `history()`, `feed()`, `gps()`, `engineStates()`, etc.) that return a pre-configured builder — prefer those when you know which endpoint or stat type you want.
 
+The builder maps method names to query parameters; it does not validate those parameters against each endpoint. Use only the filters documented for the selected resource operation. A fluent method being available does not mean every endpoint accepts it.
+
 ## Building Queries
 
 Most resources expose `query()` as the entry point. The builder is mutable, so you may assemble it conditionally and execute it once you have applied every filter you need.
@@ -131,6 +133,7 @@ $stats = Samsara::vehicleStats()
     ->history()
     ->types(['engineStates'])
     ->withDecorations(['gps', 'fuelPercents'])
+    ->between($start, $end)
     ->get();
 ```
 
@@ -139,9 +142,11 @@ $stats = Samsara::vehicleStats()
 `expand()` requests inline expansion of related entities so you avoid follow-up calls.
 
 ```php
-$assignments = Samsara::driverVehicleAssignments()
-    ->query()
-    ->expand(['driver', 'vehicle'])
+$dailyLogs = Samsara::hoursOfService()
+    ->dailyLogs()
+    ->where('startDate', '2026-08-01')
+    ->where('endDate', '2026-08-07')
+    ->expand('vehicle')
     ->get();
 ```
 
@@ -169,7 +174,7 @@ $page = Samsara::vehicles()
 
 `paginate()` makes one request and returns a `Samsara\Query\Pagination\CursorPaginator`. The paginator is iterable, countable, and exposes the cursor metadata returned by the API. When no explicit limit exists, `paginate()` and `lazy()` apply the configured `per_page`. Explicit method arguments, `limit()`, and `where('limit', ...)` take precedence.
 
-Some official cursor endpoints accept `after` but no `limit`. Their resource helpers call `withoutDefaultPageSize()`, so pagination sends no implicit limit while still honoring a limit the caller explicitly supplies. Fleet/platform currently has 15 such helpers. The opt-out persists when `nextPage()` and `lazy()` clone the builder.
+Some official cursor endpoints accept `after` but no `limit`. Their resource helpers call `withoutDefaultPageSize()`, so pagination sends no implicit limit. The builder still preserves an explicit caller-supplied limit, but that does not make the parameter contract-valid: omit it when the selected endpoint does not declare `limit`. Fleet/platform currently has 15 such helpers. The opt-out persists when `nextPage()` and `lazy()` clone the builder.
 
 ```php
 $paginator = Samsara::vehicles()
@@ -230,14 +235,16 @@ if ($driver === null) {
 }
 ```
 
-`lazy()` is the right choice for unbounded data sets such as historical telemetry. Pass a chunk size to control how many records are fetched per page.
+Because `first()` injects `limit=1`, use it only on endpoints that declare `limit`. On no-limit endpoints, fetch one response page and select locally with `get()->first()`.
+
+`lazy()` is the right choice for unbounded data sets such as historical telemetry. Pass a chunk size only when the selected endpoint declares `limit`; otherwise call `lazy()` with no argument.
 
 ```php
 Samsara::vehicleStats()
     ->history()
     ->types(['gps'])
     ->between($start, $end)
-    ->lazy(100)
+    ->lazy()
     ->each(function ($stat) {
         // Process each stat without loading every page into memory.
     });

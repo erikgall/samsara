@@ -64,7 +64,7 @@ $driver = Samsara::drivers()->update('driver-id', [
 
 ## Filtering
 
-Drivers accept the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
+The list operation accepts activation status, pagination, tag, attribute, update-time, and create-time filters. See [the query builder reference](../query-builder.html) for the fluent method mapping.
 
 ```php
 $drivers = Samsara::drivers()

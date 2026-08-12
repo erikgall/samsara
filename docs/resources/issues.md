@@ -40,7 +40,7 @@ For long windows, prefer the `lazy()` cursor:
 Samsara::issues()
     ->stream()
     ->between(now()->subYear(), now())
-    ->lazy(500)
+    ->lazy()
     ->each(fn ($issue) => Issue::record($issue->toArray()));
 ```
 
@@ -51,14 +51,13 @@ The full operator list lives on the [query builder](../query-builder.html) page.
 ```php
 $issues = Samsara::issues()
     ->stream()
-    ->whereVehicle('vehicle-id')
-    ->whereTag('maintenance-required')
+    ->where('assetIds', 'vehicle-id')
+    ->where('status', 'open')
     ->between(now()->subDays(30), now())
-    ->limit(100)
     ->get();
 ```
 
-A `between()` window is required by the upstream endpoint.
+`startTime` is required by the upstream endpoint; `endTime` is optional. `between()` supplies both.
 
 ## Properties
 
@@ -67,10 +66,20 @@ A `between()` window is required by the upstream endpoint.
 | Key | Type | Description |
 |-----|------|-------------|
 | `id` | `string` | Issue ID. |
-| `vehicle` | `array{id?: string, name?: string}` | Vehicle that produced the issue. |
-| `firstOccurredAtTime` | `string` | RFC 3339 timestamp of the first occurrence. |
-| `lastOccurredAtTime` | `string` | RFC 3339 timestamp of the most recent occurrence. |
-| `description` | `string` | Issue description. |
+| `asset` | `?array` | Asset associated with the issue, when present. |
+| `assignedTo` | `?array` | Assigned user details, when present. |
+| `createdAtTime` | `string` | RFC 3339 creation time. |
+| `description` | `?string` | Issue description. |
+| `dueDate` | `?string` | Due date, when present. |
+| `externalIds` | `?array<string, string>` | External identifier map. |
+| `issueSource` | `array` | Issue-origin details. |
+| `mediaList` | `?array` | Attached media. |
+| `priority` | `?string` | Issue priority. |
+| `status` | `string` | Issue status. |
+| `submittedAtTime` | `string` | RFC 3339 submission time. |
+| `submittedBy` | `array` | Submitting user details. |
+| `title` | `string` | Issue title. |
+| `updatedAtTime` | `string` | RFC 3339 last-update time. |
 
 Read keys with array access (`$issue['description']`) or magic-property access (`$issue->description`). No helper methods are available, since no typed entity is bound.
 

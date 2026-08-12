@@ -63,12 +63,11 @@ Samsara::tags()->delete('tag-id');
 
 ## Filtering
 
-The query builder reference lives in [Query Builder](../query-builder.html). The Tags resource supports `limit()`, `after()`, and the standard pagination methods. `cursor()` is a method on the returned `CursorPaginator`, not on the builder.
+The current list-tags operation declares no query filters or pagination parameters. Use `all()` or an unmodified `query()->get()`, then filter the returned collection in memory when needed. Fluent builder methods do not make unsupported parameters valid for this endpoint.
 
 ```php
 $tags = Samsara::tags()
     ->query()
-    ->limit(50)
     ->get();
 ```
 

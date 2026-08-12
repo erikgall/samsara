@@ -19,7 +19,7 @@ permalink: /resources/gateways
 
 Gateways are the physical Samsara devices installed in vehicles, trailers, and equipment that report telemetry back to the API. Reach for this resource to enumerate, create, or delete current gateway records. Gateway data is also exposed on `Vehicle` and `Equipment` entities.
 
-> **Package/upstream boundary:** Current upstream supports list and create at `/gateways`, plus delete by ID. It does not define find-by-ID or update-by-ID. The package exposes all five base resource methods, so use only `all()`, `create()`, and `delete()` against the current API.
+> **Package/upstream boundary:** Current upstream supports list and create at `/gateways`, plus delete by ID. It does not define find-by-ID or update-by-ID. The resource capability gate supports only `all()`, `create()`, and `delete()`; unsupported generic calls fail locally before HTTP.
 
 ## Retrieving Records
 
@@ -37,7 +37,7 @@ foreach ($gateways as $gateway) {
 
 ```php
 $gateway = Samsara::gateways()->create([
-    // Current upstream gateway-creation fields
+    'serial' => 'GFRV-43N-VGX',
 ]);
 ```
 
@@ -59,8 +59,10 @@ The `Gateway` entity (`Samsara\Data\Vehicle\Gateway`) exposes the following type
 |----------|------|-------------|
 | `serial` | `?string` | Gateway serial number. |
 | `model` | `?string` | Gateway model identifier. |
-
-> **Note:** The Samsara API may return additional fields on the response payload. Access them through the underlying `Fluent` accessors (`$gateway->get('field')`) until the entity is expanded.
+| `accessoryDevices` | `?array` | Accessory devices connected to the gateway. |
+| `asset` | `?array<string, mixed>` | Attached asset. |
+| `connectionStatus` | `?array<string, mixed>` | Connection-status details. |
+| `dataUsageLast30Days` | `?array<string, mixed>` | Recent data-usage details. |
 
 ## Related Resources
 

@@ -50,7 +50,7 @@ $item = Samsara::equipment()->find('equipment-id');
 
 ## Filtering
 
-Equipment accepts the standard query builder. See [the query builder reference](../query-builder.html) for the full method list.
+The list operation accepts pagination plus tag and parent-tag IDs. See [the query builder reference](../query-builder.html) for the fluent method mapping.
 
 ```php
 $equipment = Samsara::equipment()
@@ -90,17 +90,18 @@ $history = Samsara::equipment()
 Stats follow the same three-builder shape as locations.
 
 ```php
-$stats = Samsara::equipment()->stats()->get();
+$stats = Samsara::equipment()->stats()->types(['gps'])->get();
 
-$feed = Samsara::equipment()->statsFeed()->get();
+$feed = Samsara::equipment()->statsFeed()->types(['gps'])->get();
 
 $history = Samsara::equipment()
     ->statsHistory()
+    ->types(['gps'])
     ->between(now()->subDays(7), now())
     ->get();
 ```
 
-`stats()` returns `EquipmentStats` snapshots. `statsFeed()` and `statsHistory()` return `EquipmentStatsSeries`, whose helpers expose collections of typed readings. These cursor builders also suppress only the implicit configured page size.
+`types` is required on all three stats operations. `stats()` returns `EquipmentStats` snapshots. `statsFeed()` and `statsHistory()` return `EquipmentStatsSeries`, whose helpers expose collections of typed readings. These cursor builders suppress the implicit configured page size because the operations do not declare `limit`; do not add one explicitly.
 
 ## Helper Methods
 
@@ -117,7 +118,7 @@ $item->getTagIds();                   // array<int, string>
 Equipment stats use a distinct `EquipmentGpsLocation` DTO. It inherits coordinate and speed conversion helpers from `GpsLocation` and adds nested address conveniences:
 
 ```php
-$gps = Samsara::equipment()->stats()->first()?->getGps();
+$gps = Samsara::equipment()->stats()->types(['gps'])->get()->first()?->getGps();
 
 $gps?->getCoordinates();             // array{latitude: ?float, longitude: ?float}
 $gps?->getSpeedKilometersPerHour();  // ?float

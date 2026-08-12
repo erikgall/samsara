@@ -75,7 +75,8 @@ $forDriver = Samsara::hoursOfService()
 $dailyLogs = Samsara::hoursOfService()
     ->dailyLogs()
     ->whereDriver('driver-id')
-    ->between('2024-01-01', '2024-01-07')
+    ->where('startDate', '2024-01-01')
+    ->where('endDate', '2024-01-07')
     ->get();
 ```
 
@@ -93,7 +94,7 @@ Generic `delete()` fails locally before HTTP.
 
 ## Filtering
 
-Every sub-builder accepts the standard query builder methods. See [the query builder reference](../query-builder.html) for the full method list.
+Each sub-builder accepts only the parameters declared by its endpoint. Logs and violations use `startTime` / `endTime`; daily logs use `startDate` / `endDate`. Clocks do not accept a time window. See [the query builder reference](../query-builder.html) for the fluent method mapping, then confirm the selected endpoint's filters here.
 
 ```php
 $logs = Samsara::hoursOfService()
@@ -140,7 +141,7 @@ The `Samsara\Enums\HosLogType` enum lists the categorical types Samsara assigns 
 `HosLog` represents one duty-status entry nested in a `HosLogsForDriver` response.
 
 ```php
-$logsForDriver = Samsara::hoursOfService()->logs()->first();
+$logsForDriver = Samsara::hoursOfService()->logs()->get()->first();
 $log = $logsForDriver->getLogs()->first();
 
 $log->getDutyStatus();          // ?DutyStatus
@@ -208,7 +209,7 @@ $violation->isUnsubmittedLogsViolation();    // bool
 | `durationMs` | `?int` | Duration of the violation in milliseconds. |
 | `violationStartTime` | `?string` | Violation start time (RFC 3339). |
 | `driver` | `?array` | Driver information — `{id?, name?}`. |
-| `day` | `?array` | Day information — `{date?, timezone?}`. |
+| `day` | `?array` | Violation window — `{startTime?, endTime?}`. |
 
 ### HosDailyLog Entity
 

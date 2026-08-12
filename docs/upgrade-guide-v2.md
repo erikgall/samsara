@@ -28,6 +28,15 @@ The release audit compares tag `v1.1.0` with audited `dev` head `1750395c98c1724
 
 The machine-readable [v2 disposition ledger](api-sync/v2-upgrade-disposition.json) records all 257 final release paths and their migration section or no-action reason, while retaining the frozen 239-file implementation comparison as a separate proof boundary. `composer check:v2-upgrade-guide` fails if either scope, the counts, section references, or required evidence are incomplete.
 
+## Maintainer integration gate
+
+{: .warning }
+> This guide does not classify parallel quality-lane commits made after the documentation lane's starting `dev` commit, `3b475a16340eb23e341f51dba7135fa38b62364f`. Before release, inventory every incoming path and update this guide, the compact breaking record, changelog, and disposition ledger—or record an explicit no-action rationale—before carrying the 257-path proof claim forward.
+
+The starting commit also has one known checker allowlist defect: `tests/Unit/BoostDocumentationTest.php` is already recorded as a publication artifact and supporting evidence, but `scripts/check-v2-upgrade-guide.php` omits it from `$allowedPostAuditPaths`. The tooling owner must add that existing path to the allowlist and rerun `composer check:v2-upgrade-guide`; until then, the command fails even on the clean starting commit. This is a proof-tool defect, not evidence that the path is absent from the ledger.
+
+For each incoming lane, the integrator must check public signatures and capability gates, request method/path/query/body encoding, error and pagination behavior, endpoint-specific DTOs, null/empty semantics, serialized enum values, tests, and consumer documentation. Add a new `MIG-*` action for every new consumer migration; do not hide it in a changelog-only note.
+
 ## Agent execution contract
 
 An upgrading agent must:
@@ -90,6 +99,7 @@ $trips = Samsara::trips()->all();
 $trips = Samsara::trips()
     ->query()
     ->startTime($start)
+    ->where('ids', 'vehicle-1,vehicle-2')
     ->get();
 ```
 
@@ -174,7 +184,7 @@ Builder terminals, supported generic operations, and explicit resource helpers n
 use Illuminate\Http\Client\RequestException;
 
 try {
-    $rows = Samsara::trips()->query()->startTime($start)->get();
+    $rows = Samsara::trips()->query()->startTime($start)->where('ids', 'vehicle-1')->get();
 } catch (RequestException $exception) {
     // ...
 }
@@ -187,7 +197,7 @@ use Samsara\Exceptions\UnsupportedOperationException;
 use Samsara\Exceptions\ValidationException;
 
 try {
-    $rows = Samsara::trips()->query()->startTime($start)->get();
+    $rows = Samsara::trips()->query()->startTime($start)->where('ids', 'vehicle-1')->get();
 } catch (ValidationException $exception) {
     // Both HTTP 400 and 422. Read getCode() only if that distinction matters.
 } catch (AuthenticationException|RateLimitException $exception) {
@@ -601,9 +611,10 @@ Equipment external lookup is not supported; retain the Samsara equipment ID and 
 Other mandatory changes:
 
 - Replace `routes()->all()` with `routes()->query()->between($start, $end)->get()`.
-- Replace Trip `all()` and unbounded reads with a `startTime()` and other documented filters.
+- Replace Trip `all()` and unbounded reads with required `startTime()` and comma-separated asset `ids` filters.
 - Replace `vehicleStats()->all()` with `current()->types(...)`, `feed()`, or `history()`.
 - Live-share `find()` is unsupported; update/delete now use `/live-shares?id={id}`.
+- Live-share creation uses required `name` and `type` plus the configuration object matching that type (`assetsLocationLinkConfig`, `assetsNearLocationLinkConfig`, or `assetsOnRouteLinkConfig`). Replace flat `assets`, `recipients`, and `expiresAt` with the current nested configuration and `expiresAtTime` where applicable.
 - Asset `find()` is unsupported; asset update/delete use `/assets?id={id}`.
 - Trailer fields use `trailerSerialNumber`; vehicle list fields use `vehicleWeight`, `vehicleWeightInKilograms`, and `vehicleWeightInPounds`.
 
@@ -629,11 +640,14 @@ Verify exact encoded URLs and local `UnsupportedOperationException` behavior for
 | HOS rows were a single DTO shape | use operation-specific wrappers and their getters from `MIG-07`; `HosClocksForDriver::getClocks()` returns one `HosClock` object, not a collection |
 | Safety audit rows were `SafetyEvent` | use `SafetyEventActivity::getSafetyEvent()` |
 | Maintenance inherited CRUD | generic CRUD is rejected; use explicit builders/helpers |
-| DVIR path `/dvirs` | `POST /fleet/dvirs`; `dvirs()` and `defects()` are builders |
+| DVIR path/body used legacy inspection fields | `POST /fleet/dvirs`; create requires `authorId`, `safetyStatus`, `type: mechanic`, and either `vehicleId` or `trailerId`; `dvirs()` and `defects()` are builders |
 | Work Orders inherited all CRUD | only generic `all` and `create`; use builders for reads |
+| Work Order create used `vehicleId` / `serviceTasks` | use `assetId` and `serviceTaskInstances`, whose rows carry `serviceTaskId` and a current title-cased `status` |
 | Service tasks returned parent DTOs | `serviceTasks(): Builder<ServiceTask>` |
 
 Work Order/service-task IDs and filters use the repeated keys listed in `MIG-06`. Official `PATCH /fleet/dvirs/{id}` is not implemented. The package retains legacy `/fleet/safety-events`; modern `/safety-events` operations are additive backlog. Do not change production paths until explicit package methods exist.
+
+Also revalidate endpoint-specific read requirements rather than assuming every fluent filter is accepted: Trips requires `startTime` plus comma-separated asset `ids`; idling requires `startTime` and `endTime`; Issues and Work Order streams require `startTime`; Speeding requires `assetIds` and `startTime`; driver-vehicle assignments require `filterBy`; driver-trailer assignments require `driverIds`; and HOS daily logs use `startDate` / `endDate`, not timestamp parameter names. On operations without `limit`, avoid `first()` and chunked `lazy($size)` because those helpers inject a limit; use `get()->first()` or `lazy()` instead.
 
 Test every used operation's method, path, query/body, row class, and nested unwrap.
 

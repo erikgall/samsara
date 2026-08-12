@@ -28,7 +28,7 @@ The default builder targets `/industrial/assets` and returns typed `IndustrialAs
 ```php
 use Samsara\Facades\Samsara;
 
-$asset = Samsara::industrial()->query()->where('ids', 'asset-id')->first();
+$asset = Samsara::industrial()->query()->where('assetIds', 'asset-id')->first();
 
 $assets = Samsara::industrial()->all();
 
@@ -105,7 +105,7 @@ The three data-point builders omit the configured implicit page size because the
 
 ## Filtering
 
-Refer to the [query builder](../query-builder.html) for the full operator reference. The asset builder accepts the standard filters:
+The asset builder accepts pagination plus parent-tag, tag, and asset IDs. See [the query builder](../query-builder.html) for the fluent method mapping.
 
 ```php
 $assets = Samsara::industrial()
@@ -134,4 +134,4 @@ $assets = Samsara::industrial()
 - [Assets](assets.html) — non-powered tracker assets (vs. industrial machines).
 - [Sensors](sensors.html) — legacy v1 sensor endpoints for older industrial gateways.
 - [Tags](tags.html) — group industrial assets for filtering.
-- [Query Builder](../query-builder.html) — operators available on every builder.
+- [Query Builder](../query-builder.html) — shared method mapping and endpoint-specific filter caveats.

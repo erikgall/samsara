@@ -28,7 +28,7 @@ use Samsara\Facades\Samsara;
 
 $events = Samsara::routeEvents()
     ->query()
-    ->between(now()->subDays(7), now())
+    ->startTime(now()->subDays(7))
     ->get();
 
 foreach ($events as $event) {
@@ -41,7 +41,7 @@ For long windows, prefer the `lazy()` cursor:
 ```php
 Samsara::routeEvents()
     ->query()
-    ->between(now()->subMonth(), now())
+    ->startTime(now()->subMonth())
     ->lazy(500)
     ->each(fn ($event) => RouteEvent::record($event->toArray()));
 ```
@@ -53,13 +53,13 @@ Refer to the [query builder](../query-builder.html) for the full operator refere
 ```php
 $events = Samsara::routeEvents()
     ->query()
-    ->whereTag('delivery-routes')
-    ->between(now()->subDays(7), now())
+    ->where('includeExternalIds', true)
+    ->startTime(now()->subDays(7))
     ->limit(100)
     ->get();
 ```
 
-A `between()` window is required by the upstream endpoint.
+The operation accepts `startTime` but does not declare `endTime` or tag filters.
 
 ## Properties
 
@@ -68,12 +68,12 @@ A `between()` window is required by the upstream endpoint.
 | Key | Type | Description |
 |-----|------|-------------|
 | `id` | `string` | Event ID. |
-| `eventType` | `string` | Event type (`routeStarted`, `stopArrived`, `stopDeparted`, etc.). |
-| `time` | `string` | RFC 3339 event timestamp. |
+| `eventType` | `string` | One of `stopArrived`, `stopCompleted`, `stopEnRoute`, `stopSkipped`, `stopTaskCompleted`, `stopTaskSkipped`, `stopEtaUpdated`, or `unspecified`. |
+| `eventTime` | `string` | RFC 3339 event time. |
+| `happenedAtTime` | `string` | RFC 3339 time when the event happened. |
 | `route` | `array{id?: string, name?: string}` | Route the event belongs to. |
-| `stop` | `array{id?: string, name?: string}` | Stop the event refers to (when applicable). |
-| `vehicle` | `array{id?: string, name?: string}` | Vehicle reporting the event. |
-| `driver` | `array{id?: string, name?: string}` | Driver reporting the event. |
+| `stop` | `?array{id?: string, name?: string}` | Stop the event refers to (when applicable). |
+| `eventDetails` | `?array` | Event-specific details, when present. |
 
 Read keys with array access (`$event['eventType']`) or magic-property access (`$event->eventType`). No helper methods are available, since no typed entity is bound.
 

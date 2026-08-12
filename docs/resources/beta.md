@@ -95,7 +95,7 @@ $deleted = Samsara::beta()->deleteIndustrialJob('job-id');
 Returns a query builder for `/detections/stream`, the live detections feed.
 
 ```php
-$detections = Samsara::beta()->detectionsStream()->lazy();
+$detections = Samsara::beta()->detectionsStream()->startTime($start)->lazy();
 ```
 
 ### Devices
@@ -133,15 +133,24 @@ $events = Samsara::beta()
 Returns a query builder for `/qualification-records`.
 
 ```php
-$records = Samsara::beta()->qualificationsRecords()->get();
+$records = Samsara::beta()
+    ->qualificationsRecords()
+    ->repeatQueryParameters('ids')
+    ->where('ids', ['qualification-id'])
+    ->get();
 ```
+
+`ids` is required and uses repeated query keys. The explicit `repeatQueryParameters()` call is required until the resource helper declares that encoding itself.
 
 #### `qualificationsTypes(): Builder`
 
 Returns a no-implicit-limit builder for `GET /qualification-types`.
 
 ```php
-$types = Samsara::beta()->qualificationsTypes()->get();
+$types = Samsara::beta()
+    ->qualificationsTypes()
+    ->where('entityType', 'worker')
+    ->get();
 ```
 
 ### Readings
@@ -161,6 +170,8 @@ Returns a query builder for `/readings/history`.
 ```php
 $history = Samsara::beta()
     ->readingsHistory()
+    ->where('readingId', 'reading-id')
+    ->where('entityType', 'asset')
     ->between($start, $end)
     ->get();
 ```
@@ -170,7 +181,11 @@ $history = Samsara::beta()
 Returns a query builder for `/readings/latest`.
 
 ```php
-$latest = Samsara::beta()->readingsLatest()->get();
+$latest = Samsara::beta()
+    ->readingsLatest()
+    ->where('readingIds', 'reading-id')
+    ->where('entityType', 'asset')
+    ->get();
 ```
 
 #### `createReading(array $data): bool`
@@ -241,7 +256,7 @@ $scores = Samsara::beta()
 Returns a query builder for `/fleet/trailers/stats`, the latest snapshot per trailer.
 
 ```php
-$stats = Samsara::beta()->trailerStatsCurrent()->get();
+$stats = Samsara::beta()->trailerStatsCurrent()->types(['gps'])->get();
 ```
 
 #### `trailerStatsFeed(): Builder`
@@ -249,7 +264,7 @@ $stats = Samsara::beta()->trailerStatsCurrent()->get();
 Returns a query builder for `/fleet/trailers/stats/feed`, the streaming feed.
 
 ```php
-$feed = Samsara::beta()->trailerStatsFeed()->lazy();
+$feed = Samsara::beta()->trailerStatsFeed()->types(['gps'])->lazy();
 ```
 
 #### `trailerStatsHistory(): Builder`
@@ -259,6 +274,7 @@ Returns a query builder for `/fleet/trailers/stats/history`.
 ```php
 $history = Samsara::beta()
     ->trailerStatsHistory()
+    ->types(['gps'])
     ->between($start, $end)
     ->get();
 ```
@@ -270,7 +286,10 @@ $history = Samsara::beta()
 Returns a no-implicit-limit query builder for `/training-assignments/stream`.
 
 ```php
-$assignments = Samsara::beta()->trainingAssignments()->get();
+$assignments = Samsara::beta()
+    ->trainingAssignments()
+    ->startTime($start)
+    ->get();
 ```
 
 #### `trainingCourses(): Builder`
@@ -288,7 +307,11 @@ $courses = Samsara::beta()->trainingCourses()->get();
 Returns a query builder for `/fleet/vehicles/immobilizer/stream`, the lock/unlock state feed. Preview control operations remain contract-stage and unsuitable for business-critical use.
 
 ```php
-$stream = Samsara::beta()->vehicleImmobilizerStream()->lazy();
+$stream = Samsara::beta()
+    ->vehicleImmobilizerStream()
+    ->whereVehicle('vehicle-id')
+    ->startTime($start)
+    ->lazy();
 ```
 
 ## Related Resources

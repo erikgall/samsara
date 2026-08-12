@@ -29,7 +29,7 @@ permalink: /resources/webhooks
 
 ## Introduction
 
-Webhooks deliver Samsara events to your application as POST requests, signed with HMAC-SHA256. Use this resource to manage the webhook configuration roster (URL, event subscriptions, status). Use [`WebhookSignatureVerifier`](#using-the-verifier-class) and the bundled middleware to verify incoming requests in your handler.
+Webhooks deliver Samsara events to your application as POST requests, signed with HMAC-SHA256. Use this resource to manage the webhook configuration roster (URL and event subscriptions). Use [`WebhookSignatureVerifier`](#using-the-verifier-class) and the bundled middleware to verify incoming requests in your handler.
 
 ## Retrieving Records
 
@@ -67,7 +67,7 @@ Samsara::webhooks()->delete('webhook-id');
 
 ## Filtering
 
-The resource exposes `query()` for filter chaining. See [Query Builder](../query-builder.html) for the full filter list.
+The list operation accepts `ids`, `limit`, and `after`. See [Query Builder](../query-builder.html) for pagination behavior.
 
 ```php
 $webhooks = Samsara::webhooks()

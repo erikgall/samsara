@@ -30,7 +30,7 @@ The SDK ships 12 string-backed `BackedEnum` classes. The tables below are exact 
 
 `Samsara\Enums\AlertType`
 
-Categorizes the alert configurations returned by the [Alerts](resources/alerts.html) resource. Use it when you want to compare or filter the `alertType` field on an `AlertConfiguration` against a known case rather than a raw string.
+Legacy package vocabulary for older alert categories. Do not use it to build or filter current [Alerts](resources/alerts.html) requests or responses.
 
 > **Upstream status:** Current alert-configuration requests use triggers, actions, scope, and related fields rather than a single `alertType` enum. The package entity helpers also test `speed` and `fuelLevel`, while this enum declares `speeding` and `fuel`.
 

@@ -87,7 +87,7 @@ Samsara::vehicles()->update('vehicle-id', [
 
 ## Filtering
 
-See [Query Builder](../query-builder.html) for the full filter list.
+The list operation accepts pagination, tag, attribute, update-time, and create-time filters. See [Query Builder](../query-builder.html) for the fluent method mapping.
 
 ```php
 $vehicles = Samsara::vehicles()
@@ -121,6 +121,7 @@ The SDK converts the pair to the item identifier `fleet_id:TRUCK001`. Vehicle qu
 | `getDisplayName()` | `string` | Vehicle name with a fallback when null. |
 | `getExternalId(string $key)` | `?string` | Look up an external id by namespace key. |
 | `getTagIds()` | `array<int, string>` | Flat list of tag ids associated with the vehicle. |
+| `getGateway()` | `?Gateway` | Hydrate the nested gateway payload, or return `null` when absent. |
 | `hasStaticAssignedDriver()` | `bool` | True when a driver is statically assigned. |
 | `getStaticAssignedDriver()` | `?StaticAssignedDriver` | The statically assigned driver, when present. |
 
@@ -138,7 +139,12 @@ The SDK converts the pair to the item identifier `fleet_id:TRUCK001`. Vehicle qu
 | `serial` | `?string` | Gateway serial number. |
 | `notes` | `?string` | Free-form notes. |
 | `vehicleType` | `?string` | Vehicle type. |
+| `vehicleWeight` | `?int` | Vehicle weight when the unit is unspecified. |
+| `vehicleWeightInKilograms` | `?int` | Vehicle weight in kilograms. |
+| `vehicleWeightInPounds` | `?int` | Vehicle weight in pounds. |
+| `grossVehicleWeight` | `?array{unit?: string, weight?: int}` | Item-response gross vehicle weight. |
 | `externalIds` | `?array<string, string>` | External id mappings keyed by namespace. |
+| `gateway` | `?array` | Installed gateway payload. Use `getGateway()` for a typed wrapper. |
 | `tags` | `?array` | Associated tags. |
 | `staticAssignedDriver` | `?array` | Statically assigned driver, when set. |
 
