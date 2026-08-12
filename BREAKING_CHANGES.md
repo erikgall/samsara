@@ -6,6 +6,48 @@ This file lists verified consumer actions for the integrated staged-v2 behavior.
 
 The final audit maps 195 package operations: 187 match the pinned first-party contract and 8 are explicit legacy helpers. Six matched operations retain only additive pagination-ergonomics gaps; no matched operation retains a classified wire, request-body, response-loss, or error-mapping break. Exact capability gates now reject 133 unsupported public operation calls locally, so consumers must apply the migrations below instead of relying on inherited CRUD. The 183 unique official-only operations are additive backlog and do not require a consumer migration until implemented.
 
+### Required DTO and enum migrations
+
+#### Update the sleeper-berth enum value
+
+`DutyStatus::SLEEPER_BERTH->value` changes from `sleeperBerth` to the upstream `sleeperBed` value. Code that compares enum cases remains stable. Update persisted strings, serialized fixtures, validation lists, and direct string comparisons to `sleeperBed`. `HosLog::getDutyStatus()` now returns `DutyStatus::SLEEPER_BERTH` for current sleeper-berth rows.
+
+#### Replace removed DTO helpers
+
+The staged-v2 contract reconciliation removed **17 public helpers** whose source fields are absent, renamed, semantically different, or owned by another endpoint. They are not restored by the additive helper wave.
+
+| DTO | Removed helpers | Migration |
+|---|---|---|
+| `EquipmentLocation` | `getFormattedAddress()`, `getReverseGeoLocation()` | Location snapshots have no address fields. For equipment stats GPS, use `EquipmentStats::getGps()` and then `EquipmentGpsLocation::getAddressName()` or `getReverseGeoLocation()`. No formatted-address equivalent exists because the stats address shape is `{id,name}`. |
+| `Route` | `getDistanceKilometers()`, `getDistanceMiles()`, `getDurationHours()`, `getDurationMinutes()`, `isEdited()`, `isPinned()` | The current `/fleet/routes` row lacks those fields. Use the new actual/planned distance helpers on each `RouteStop`; there is no current duration, edited, or pinned replacement. |
+| `RouteStop` | `hasHubLocation()` | The current stop payload has no `hubLocationId`; use `hasSingleUseLocation()` only when that documented object is relevant. |
+| `Trip` | `getDistanceKilometers()`, `getDistanceMiles()`, `getDrivingTimeHours()`, `getDrivingTimeMinutes()` | The current `/trips/stream` row has no distance or driving-duration field. Use `isCompleted()` / `isInProgress()` only for documented state checks; derive telemetry elsewhere if the application needs distance. |
+| `User` | `isAdmin()`, `isDriver()` | `authType` now means `default` or `saml`, not authorization. Use `getRoleIds()` and inspect role assignments; use the Drivers resource for driver records. |
+| `Webhook` | `isActive()`, `isPaused()` | Current webhook responses have no status field. Remove these checks or derive lifecycle state in application-owned data. |
+
+`EquipmentStats::getGps()` now returns `?EquipmentGpsLocation` instead of `?EquipmentLocation`. Update concrete type declarations and imports. The split is required because stats GPS uses `headingDegrees`, `speedMilesPerHour`, `address`, and `reverseGeo`, while equipment location snapshots use `heading` and `speed` and contain no address data.
+
+#### Update dynamic DTO field access
+
+These entities extend an open fluent data object, so the following are payload/schema migrations rather than declared PHP-property removals. Update array projections, serializers, fixtures, and direct dynamic-field reads.
+
+| DTO | Old fields or assumptions | Current replacement |
+|---|---|---|
+| `AlertConfiguration` | `description`, `enabled`, `notificationSettings`, `tagIds` | Use `isEnabled` plus current `actions`, `externalIds`, `operationalSettings`, `scope`, and `triggers`. |
+| `AlertIncident` | `id`, `alertConfigurationId`, `triggeredAtTime`, flat driver/vehicle/location, string status | Use `configurationId`, `happenedAtTime`, `conditions`, `incidentUrl`, `isResolved`, and resolution/update timestamps. |
+| `EquipmentLocation` | `headingDegrees`, `speedMilesPerHour`, `address`, `reverseGeo` | Use snapshot fields `heading` and `speed`; address and reverse geocode belong only to `EquipmentGpsLocation`. |
+| `FormSubmission` | `formTemplateId`, `driver`, `vehicle`, `draft` / `submitted` status | Use nested `formTemplate`, `asset`, assignment/submission objects, and the seven current status values documented on the Forms page. |
+| `FormTemplate` | `name`, numeric `revision`, `fieldDefinitions` | Use `title`, `revisionId`, and `fields`, plus current sections and approval metadata. |
+| `LiveShare` | flat `url`, `status`, `expiresAt`, `createdAtTime`, `assets`, `recipients` | Use `liveSharingUrl`, `expiresAtTime`, and the current nested configuration objects. |
+| `Route` | type/hub/plan/dispatch IDs, cost, route distance/duration, edited/pinned flags, legacy timestamps/quantities | Use current route identity, notes, timezone, scheduled/actual route timestamps, driver/vehicle, external IDs, tags, stops, links, and settings. |
+| `Trip` | `startTime`, `endTime`, `distanceMeters`, `drivingTimeMs`, `driver`, `vehicle` | Use `tripStartTime`, `tripEndTime`, `completionStatus`, timestamps, `asset`, and start/end locations. |
+| `User` | flat role IDs, `tagIds`, user timestamps, role meaning inferred from `authType` | Use nested `roles[*].role`, optional role tag/expiry, and `authType` only for `default` / `saml` authentication. |
+| `Webhook` | `secret`, `status`, creation/update timestamps | Use `secretKey`, `version`, event types, and current header/name fields. |
+| `Asset` | `serial`, `assetType` | Use `serialNumber` and `type`. |
+| `Defect` | `defectType` | Use `defectTypeId` and `defectSafetyStatus`. |
+| `Trailer` | `assetSerialNumber` | Use `trailerSerialNumber`. |
+| `Vehicle` | scalar `grossVehicleWeight` | Treat `grossVehicleWeight` as the current structured response value; list responses expose their own vehicle-weight fields. |
+
 ### Required core migrations
 
 #### Catch SDK exceptions for every wrapped request

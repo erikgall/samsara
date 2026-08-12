@@ -4,6 +4,46 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 
 ## Unreleased
 
+### 2026-08-11 — Contract-backed DTO helper first wave
+
+#### Scope and decisions
+
+- Promoted the exact-once DTO audit into `docs/api-sync/dto-helper-catalog.md`: 73/73 concrete DTOs, 96 valid proposed signatures across 46 DTOs, and 27 explicit no-helper decisions.
+- Used Cursor Grok 4.5 high for prioritization, then independently revalidated every selected field, enum, unit, null behavior, and endpoint hydration path against `contracts/samsara/samsara-api-2026-08-10.json` and `docs/api-sync/contract-inventory.json`.
+- Implemented the focused first wave only: 28 additive helpers across 9 DTOs. The other 68 valid proposals remain deferred; rejected Route, Trip, User, Webhook, and equipment-location helpers were not restored.
+- Preserved the callable deprecated `FormSubmission::isDraft()` and `isSubmitted()` methods instead of creating an additional compatibility break.
+
+#### Implementation
+
+- Added seven exact current-status predicates to `FormSubmission`; six state predicates and four distance conversions to `RouteStop`; and two completion predicates to `Trip`.
+- Added nested-role extraction to `User`, defect presence/classification helpers to `Dvir` and `Defect`, and `SafetyEvent::needsCoaching()`.
+- Added address-name and reverse-geocode accessors to `EquipmentGpsLocation`, plus exact external-ID and typed-parent helpers to `Tag`.
+- Corrected `Tag::hasParent()` to recognize either `parentTagId` or a non-empty nested `parentTag`.
+- Changed `DutyStatus::SLEEPER_BERTH` from the stale `sleeperBerth` backing value to the current `sleeperBed` wire value and proved `HosLog::getDutyStatus()` hydration.
+
+#### Parallel RED/GREEN evidence
+
+- Operational task `019ff43f-d9df-70d2-82fd-a9ac40949fd7`: RED produced 8 focused failures from absent APIs; GREEN passed 34 tests / 232 assertions. Reviewed and integrated as `a4fab9e52244`.
+- Safety/maintenance task `019ff43f-d9e1-72e0-bafd-63d1a0d531c9`: three RED stages produced 2, 3, and 2 failures; GREEN passed 49 tests / 95 assertions. Reviewed and integrated as `84a25ccf79e0`.
+- Identity/GPS/HOS task `019ff43f-d9e3-7250-8a07-f619fd58eb8b`: RED produced 14 failures covering missing helpers, parent detection, enum value, and HOS mapping; GREEN passed 47 tests / 102 assertions. Reviewed and integrated as `e9b5b0fdba8a`.
+- Each task used an isolated worktree based on `05d3f47a948a`, changed only its owned source/test files, passed Pint and `git diff --check`, committed independently, and did not push.
+
+#### Documentation and migration records
+
+- Updated selected resource pages and corrected stale Forms, Routes, Trips, Users, Webhooks, and Live Shares claims exposed by the helper audit.
+- Expanded `BREAKING_CHANGES.md` with the exact 17 removed helpers, the `EquipmentStats::getGps()` DTO split, dynamic payload/schema migrations, and the `DutyStatus` serialized-value migration.
+- Updated the standalone visual migration guide with the 28-helper map and a compact `sleeperBerth` → `sleeperBed` migration card.
+
+#### Final verification
+
+- Combined focused helper suite — passed, 130 tests and 429 assertions.
+- `composer test` — passed, 1,535 tests and 3,028 assertions on PHP 8.4.23.
+- `composer analyse` — passed, PHPStan 156/156 with no errors. The first sandboxed attempt could not open PHPStan's loopback worker socket; the permission-correct rerun passed unchanged.
+- `vendor/bin/pint --test`, strict Composer validation, exact snapshot validation, and `git diff --check` — passed.
+- Jekyll 4.4.1 build — passed; 52 rendered HTML files contained 2,050 checked internal links/fragments with zero failures. The configured remote theme emitted only non-fatal Sass deprecation warnings.
+- Visual migration guide browser check — passed with the 28-helper grid, sleeper-berth value shift, responsive cards, and zero console errors.
+- Cursor Grok 4.5 high independently reviewed the complete integrated code, tests, contract evidence, package docs, changelogs, catalog, and visual guide in read-only Plan mode. It approved with no Critical or Important finding, identified two optional documentation-clarity issues, and approved both fixes plus the final wording correction on re-review with no remaining material finding.
+
 ### 2026-08-10 — Final contract reconciliation and release gate
 
 #### Status

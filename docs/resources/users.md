@@ -38,9 +38,9 @@ $user = Samsara::users()->find('user-id');
 $user = Samsara::users()->create([
     'name' => 'John Smith',
     'email' => 'john.smith@company.com',
-    'authType' => 'admin',
+    'authType' => 'default',
     'roles' => [
-        ['id' => 'role-id'],
+        ['roleId' => 'role-id'],
     ],
 ]);
 ```
@@ -77,22 +77,14 @@ $users = Samsara::users()
 
 ## Auth Types
 
-Common values you will see on `authType`:
-
-- `admin` — full administrative access.
-- `driver` — driver-level access (rare on dashboard users).
-- `standard` — standard user access.
-- `limited` — read-only or restricted access.
-
-> **Note:** This list is illustrative. The SDK does not ship an `AuthType` enum; consult the Samsara API documentation for the authoritative auth-type catalog used by your organization.
+The current `authType` values are `default` and `saml`. They describe authentication, not authorization or whether a person is a driver. Inspect role assignments for authorization decisions.
 
 ## Helper Methods
 
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `getDisplayName()` | `string` | The user's `name`, falling back to their email when name is null. |
-| `isAdmin()` | `bool` | True when `authType === 'admin'`. |
-| `isDriver()` | `bool` | True when `authType === 'driver'`. |
+| `getRoleIds()` | `array<int, string>` | Nested `roles[*].role.id` values in response order; malformed assignments are skipped. |
 
 ## Properties
 
@@ -102,10 +94,7 @@ Common values you will see on `authType`:
 | `name` | `?string` | User's display name. |
 | `email` | `?string` | User's email address. |
 | `authType` | `?string` | Authentication type — see above. |
-| `roles` | `?array` | Roles assigned to the user (each item exposes `id` and optional `name`). |
-| `tagIds` | `?array<int, string>` | Tag ids associated with the user. |
-| `createdAtTime` | `?string` | RFC 3339 creation timestamp. |
-| `updatedAtTime` | `?string` | RFC 3339 last-update timestamp. |
+| `roles` | `?array<int, array{expireAt?: string, role?: array{id?: string, name?: string}, tag?: array<string, mixed>}>` | Organizational or tag-scoped role assignments. |
 
 ## Related Resources
 

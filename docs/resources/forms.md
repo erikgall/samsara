@@ -121,9 +121,16 @@ The `FormSubmission` entity exposes status helpers:
 ```php
 $submission = Samsara::forms()->submissions()->where('ids', ['submission-id'])->first();
 
-$submission->isDraft();     // bool
-$submission->isSubmitted(); // bool
+$submission->isNotStarted();       // bool
+$submission->isCompleted();        // bool
+$submission->isArchived();         // bool
+$submission->isInProgress();       // bool
+$submission->needsReview();        // bool
+$submission->hasChangesRequested(); // bool
+$submission->isApproved();         // bool
 ```
+
+Each method matches one documented wire value exactly. Missing, null, empty, and unknown statuses return `false`. The older `isDraft()` and `isSubmitted()` methods remain callable for compatibility but are deprecated because `draft` and `submitted` are not current response statuses.
 
 ## Properties
 
@@ -132,11 +139,24 @@ The `FormSubmission` entity (`Samsara\Data\Form\FormSubmission`) exposes the fol
 | Property | Type | Description |
 |----------|------|-------------|
 | `id` | `?string` | Form submission ID. |
-| `formTemplateId` | `?string` | Form template ID. |
-| `status` | `?string` | Submission status — `draft` or `submitted`. |
-| `driver` | `?array` | Associated driver — `{id, name?}`. |
-| `vehicle` | `?array` | Associated vehicle — `{id, name?}`. |
-| `fields` | `?array` | Submitted fields. Each entry is `{name?, value?}`. |
+| `formTemplate` | `?array<string, mixed>` | Form template reference. |
+| `status` | `?string` | `notStarted`, `completed`, `archived`, `inProgress`, `needsReview`, `changesRequested`, or `approved`. |
+| `title` | `?string` | Submission title. |
+| `approvalDetails` | `?array<string, mixed>` | Approval workflow details. |
+| `asset` | `?array<string, mixed>` | Associated asset. |
+| `assignedTo` | `?array<string, mixed>` | Assigned user or driver. |
+| `assignedAtTime` | `?string` | Assignment timestamp (RFC 3339). |
+| `dueAtTime` | `?string` | Due timestamp (RFC 3339). |
+| `durationMs` | `?int` | Submission duration in milliseconds. |
+| `externalIds` | `?array<string, string>` | External ID mappings. |
+| `fields` | `?array<int, array<string, mixed>>` | Submitted form fields. |
+| `geofence` | `?array<string, mixed>` | Submission geofence. |
+| `isRequired` | `?bool` | Whether completion is required. |
+| `location` | `?array<string, mixed>` | Submission location. |
+| `routeId` | `?string` | Related route ID. |
+| `routeStopId` | `?string` | Related route-stop ID. |
+| `score` | `?float` | Submission score when present. |
+| `submittedBy` | `?array<string, mixed>` | User or driver who submitted the form. |
 | `createdAtTime` | `?string` | Creation timestamp (RFC 3339). |
 | `updatedAtTime` | `?string` | Last update timestamp (RFC 3339). |
 | `submittedAtTime` | `?string` | Submission timestamp (RFC 3339). |
@@ -146,10 +166,15 @@ The `FormSubmission` entity (`Samsara\Data\Form\FormSubmission`) exposes the fol
 | Property | Type | Description |
 |----------|------|-------------|
 | `id` | `?string` | Template ID. |
-| `name` | `?string` | Template name. |
+| `title` | `?string` | Template title. |
 | `description` | `?string` | Template description. |
-| `revision` | `?int` | Template revision number. |
-| `fieldDefinitions` | `?array` | Field definitions. Each entry is `{name?, type?}`. |
+| `revisionId` | `?string` | Template revision ID. |
+| `formCategory` | `?string` | Template category. |
+| `fields` | `?array<int, array<string, mixed>>` | Field definitions. |
+| `sections` | `?array<int, array<string, mixed>>` | Template sections. |
+| `approvalConfig` | `?array<string, mixed>` | Approval configuration. |
+| `createdBy` | `?array<string, mixed>` | Template creator. |
+| `updatedBy` | `?array<string, mixed>` | Last updater. |
 | `createdAtTime` | `?string` | Creation timestamp (RFC 3339). |
 | `updatedAtTime` | `?string` | Last update timestamp (RFC 3339). |
 

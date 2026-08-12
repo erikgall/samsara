@@ -114,6 +114,19 @@ $item->getExternalId('asset_id');     // ?string
 $item->getTagIds();                   // array<int, string>
 ```
 
+Equipment stats use a distinct `EquipmentGpsLocation` DTO. It inherits coordinate and speed conversion helpers from `GpsLocation` and adds nested address conveniences:
+
+```php
+$gps = Samsara::equipment()->stats()->first()?->getGps();
+
+$gps?->getCoordinates();             // array{latitude: ?float, longitude: ?float}
+$gps?->getSpeedKilometersPerHour();  // ?float
+$gps?->getAddressName();             // ?string — address.name
+$gps?->getReverseGeoLocation();      // ?string — reverseGeo.formattedLocation
+```
+
+These address helpers intentionally belong to stats GPS data. `EquipmentLocation` snapshots do not contain address or reverse-geocode fields.
+
 ## Properties
 
 The `Equipment` entity (`Samsara\Data\Equipment\Equipment`) exposes the following typed properties.
@@ -127,6 +140,8 @@ The `Equipment` entity (`Samsara\Data\Equipment\Equipment`) exposes the followin
 | `externalIds` | `?array<string, string>` | External ID mappings. |
 | `tags` | `?array` | Associated tags. Each entry is `{id, name?, parentTagId?}`. |
 | `installedGateway` | `?array` | Installed gateway info — `{serial?, model?}`. |
+
+`EquipmentGpsLocation` exposes `latitude`, `longitude`, `time`, `headingDegrees`, `speedMilesPerHour`, `address{id?, name?}`, and `reverseGeo{formattedLocation?}`.
 
 ## Related Resources
 

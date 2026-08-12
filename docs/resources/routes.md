@@ -21,7 +21,7 @@ permalink: /resources/routes
 
 ## Introduction
 
-The `Samsara::routes()` resource manages dispatched routes — ordered sets of stops scheduled against a hub or plan. Each route exposes its scheduled window, distance, duration, and an array of stop entries; the typed `Route` entity also surfaces helpers for unit conversion and pinned/edited flags. The lifecycle events emitted as drivers run a route live on the [Route Events](route-events.html) resource.
+The `Samsara::routes()` resource manages dispatched routes and their ordered stops. Route-level data includes scheduled and actual windows, assigned driver and vehicle references, settings, and stop entries. Stop payloads carry their own state plus actual and planned distance from the preceding stop. Lifecycle events emitted as drivers run a route live on the [Route Events](route-events.html) resource.
 
 ## Retrieving Records
 
@@ -120,16 +120,12 @@ The `Route` entity exposes the following helpers:
 $route = Samsara::routes()->find('route-id');
 
 $route->getDisplayName();         // string — falls back to 'Unknown'
-$route->getDistanceMiles();       // ?float — distanceMeters / 1609.344
-$route->getDistanceKilometers();  // ?float — distanceMeters / 1000
-$route->getDurationHours();       // ?float — durationSeconds / 3600
-$route->getDurationMinutes();     // ?float — durationSeconds / 60
 $route->getStops();               // array<int, RouteStop> — typed wrappers
 $route->getStopCount();           // int
 $route->getSettings();            // ?RouteSettings
-$route->isEdited();               // bool
-$route->isPinned();               // bool
 ```
+
+Route-level distance, duration, edited, and pinned helpers are intentionally absent because the current `/fleet/routes` response does not provide those fields.
 
 ## Properties
 
@@ -139,25 +135,21 @@ The `Route` entity exposes the following `@property-read` keys:
 |----------|------|-------------|
 | `id` | `?string` | Route ID (UUID). |
 | `name` | `?string` | Route name. |
-| `type` | `?string` | Route type (e.g., `dynamic`). |
-| `hubId` | `?string` | Hub ID this route belongs to. |
-| `planId` | `?string` | Plan ID this route belongs to. |
-| `dispatchRouteId` | `?string` | Dispatch route identifier. |
-| `cost` | `?float` | Route cost. |
-| `distanceMeters` | `?int` | Total distance in meters. |
-| `durationSeconds` | `?int` | Total duration in seconds. |
-| `orgLocationTimezone` | `?string` | Organization location timezone. |
+| `notes` | `?string` | Route notes. |
+| `orgLocalTimezone` | `?string` | Organization-local timezone. |
+| `actualRouteStartTime` | `?string` | Actual start time (RFC 3339). |
+| `actualRouteEndTime` | `?string` | Actual end time (RFC 3339). |
 | `scheduledRouteStartTime` | `?string` | Scheduled start time (RFC 3339). |
 | `scheduledRouteEndTime` | `?string` | Scheduled end time (RFC 3339). |
-| `createdAt` | `?string` | Creation timestamp. |
-| `updatedAt` | `?string` | Last update timestamp. |
-| `isEdited` | `?bool` | Whether the route has been edited. |
-| `isPinned` | `?bool` | Whether the route is pinned. |
+| `driver` | `?array{id?: string, name?: string}` | Assigned driver. |
+| `vehicle` | `?array{id?: string, name?: string}` | Assigned vehicle. |
+| `externalIds` | `?array<string, string>` | External ID mappings. |
+| `tagIds` | `?array<int, string>` | Tag IDs. |
+| `recurringRouteLiveSharingLinks` | `?array<int, array<string, mixed>>` | Live-sharing links. |
 | `stops` | `?array<int, array>` | Route stops (see [Route Stops](#route-stops)). |
-| `quantities` | `?array<int, array{name?: string, value?: float\|int}>` | Per-route quantity totals. |
 | `settings` | `?array{routeCompletionCondition?: string, routeStartingCondition?: string, sequencingMethod?: string}` | Route settings. |
 
-> **Note:** The entity does not expose flat `driverId`, `vehicleId`, `actualStartTime`, `actualEndTime`, `status`, or `notes` keys. Driver and vehicle data live on the per-stop payload returned by the upstream API; lifecycle state lives on the [Route Events](route-events.html) stream.
+> **Note:** The entity uses nested `driver` and `vehicle` references plus `actualRouteStartTime` and `actualRouteEndTime`; it does not expose the legacy flat IDs, generic `actualStartTime` / `actualEndTime`, or a top-level lifecycle `status`. Lifecycle state lives on the [Route Events](route-events.html) stream.
 
 ### Route Stops
 
@@ -167,19 +159,26 @@ The `Route` entity exposes the following `@property-read` keys:
 |----------|------|-------------|
 | `id` | `?string` | Stop ID (UUID). |
 | `name` | `?string` | Stop name. |
-| `hubLocationId` | `?string` | Hub location identifier. |
+| `state` | `?string` | `unassigned`, `scheduled`, `en route`, `skipped`, `arrived`, or `departed`. |
 | `notes` | `?string` | Additional notes for the stop. |
+| `address` | `?array<string, mixed>` | Stop address. |
+| `actualDistanceMeters` | `?int` | Actual distance from the prior stop. |
+| `plannedDistanceMeters` | `?int` | Planned distance from the prior stop. |
+| `actualArrivalTime` | `?string` | Actual arrival time (RFC 3339). |
+| `actualDepartureTime` | `?string` | Actual departure time (RFC 3339). |
 | `scheduledArrivalTime` | `?string` | Scheduled arrival (RFC 3339). |
 | `scheduledDepartureTime` | `?string` | Scheduled departure (RFC 3339). |
+| `sequenceNumber` | `?int` | Stop sequence number. |
 | `orders` | `?array<int, array{id?: string, description?: string}>` | Order tasks at this stop. |
 | `singleUseLocation` | `?array{address?: string, latitude?: float, longitude?: float}` | Ad-hoc location. |
 
-`RouteStop` adds the helpers `getDisplayName()`, `getOrderCount()`, `hasHubLocation()`, and `hasSingleUseLocation()`.
+`RouteStop` exposes `getDisplayName()`, `getOrderCount()`, and `hasSingleUseLocation()`, plus exact state helpers: `isUnassigned()`, `isScheduled()`, `isEnRoute()`, `isSkipped()`, `isArrived()`, and `isDeparted()`.
+
+Use `getActualDistanceKilometers()`, `getActualDistanceMiles()`, `getPlannedDistanceKilometers()`, and `getPlannedDistanceMiles()` for unit conversion. Missing distance returns `null`; zero meters returns `0.0`. `hasHubLocation()` remains absent because this payload has no `hubLocationId`.
 
 ## Related Resources
 
 - [Route Events](route-events.html) — lifecycle events emitted as drivers run a route.
-- [Addresses](addresses.html) — referenced via `hubLocationId` on each stop.
-- [Hubs](hubs.html) — the hub that owns a route.
+- [Addresses](addresses.html) — reusable organization locations that can inform route planning.
 - [Trips](trips.html) — the vehicle-centric record of the same drive.
 - [Enums](../enums.html#routestate) — `RouteState` reference.

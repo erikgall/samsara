@@ -94,7 +94,7 @@ $share->isActive();   // bool
 $share->isExpired();  // bool
 ```
 
-Both check `$share->status` against the literal strings `'active'` and `'expired'`.
+`isExpired()` compares `expiresAtTime` with the current time. A missing expiration is treated as not expired; `isActive()` is the inverse.
 
 ## Properties
 
@@ -102,12 +102,13 @@ Both check `$share->status` against the literal strings `'active'` and `'expired
 |----------|------|-------------|
 | `id` | `?string` | Live share ID. |
 | `name` | `?string` | Live share name. |
-| `url` | `?string` | Shareable URL handed to recipients. |
-| `status` | `?string` | `active` or `expired`. |
-| `expiresAt` | `?string` | RFC 3339 expiration timestamp. |
-| `createdAtTime` | `?string` | RFC 3339 creation timestamp. |
-| `assets` | `?array<int, array{id?: string, type?: string}>` | Assets exposed by the share. |
-| `recipients` | `?array<int, array{email?: string}>` | Email recipients. |
+| `liveSharingUrl` | `?string` | Shareable URL handed to recipients. |
+| `type` | `?string` | Link type. |
+| `description` | `?string` | Link description. |
+| `expiresAtTime` | `?string` | RFC 3339 expiration timestamp. |
+| `assetsLocationLinkConfig` | `?array<string, mixed>` | Assets-location configuration. |
+| `assetsNearLocationLinkConfig` | `?array<string, mixed>` | Assets-near-location configuration. |
+| `assetsOnRouteLinkConfig` | `?array<string, mixed>` | Assets-on-route configuration. |
 
 ## Common Use Cases
 

@@ -97,18 +97,21 @@ $defects = Samsara::maintenance()
     ->get();
 ```
 
-Each row is a typed `Defect`, so helpers such as `isResolved()` use the boolean `isResolved` payload field.
+Each row is a typed `Defect`. `isResolved()` uses the boolean response field; `isSafe()` and `isUnsafe()` match the documented `defectSafetyStatus` values exactly.
 
 | Property | Type | Description |
 |----------|------|-------------|
 | `id` | `?string` | Defect ID. |
-| `defectType` | `?string` | Type of defect (free-form upstream). |
+| `defectTypeId` | `?string` | Defect type ID. |
+| `defectSafetyStatus` | `?string` | `safe` or `unsafe`. |
 | `comment` | `?string` | Driver comment. |
 | `isResolved` | `?bool` | Whether the defect has been resolved. |
 | `createdAtTime` | `?string` | RFC 3339 creation timestamp. |
+| `updatedAtTime` | `?string` | RFC 3339 update timestamp. |
 | `resolvedAtTime` | `?string` | RFC 3339 resolution timestamp. |
 | `mechanicNotes` | `?string` | Mechanic notes. |
-| `mechanicNotesUpdatedAtTime` | `?string` | RFC 3339 timestamp of the last mechanic-note edit. |
+| `defectPhotos` | `?array<int, array<string, mixed>>` | Photos attached to the defect. |
+| `dvirId` | `?string` | Associated DVIR ID. |
 | `vehicle` | `?array{id?: string, name?: string}` | Vehicle the defect was logged against. |
 | `trailer` | `?array{id?: string, name?: string}` | Trailer the defect was logged against. |
 | `resolvedBy` | `?array{id?: string, name?: string}` | User who resolved the defect. |
@@ -117,7 +120,7 @@ Typed helpers are available directly:
 
 ```php
 foreach (Samsara::maintenance()->defects()->get() as $defect) {
-    if ($defect->isResolved()) {
+    if ($defect->isUnsafe() && ! $defect->isResolved()) {
         // ...
     }
 }
@@ -154,7 +157,10 @@ $dvir->isMechanicInspection();  // bool — type === 'mechanic'
 $dvir->isSafe();                // bool — safetyStatus === 'safe'
 $dvir->isUnsafe();              // bool — safetyStatus === 'unsafe'
 $dvir->isResolved();            // bool — safetyStatus === 'resolved'
+$dvir->hasDefects();            // bool — any documented defect collection is non-empty
 ```
+
+`hasDefects()` handles both DVIR response variants: stream rows expose `defectIds`, while create responses can expose `vehicleDefects` and `trailerDefects`.
 
 ## Properties
 
@@ -165,6 +171,8 @@ The `Dvir` entity exposes the following `@property-read` keys:
 | `id` | `?string` | DVIR ID. |
 | `type` | `?string` | Inspection type (`preTrip`, `postTrip`, `mechanic`, `unspecified`). |
 | `safetyStatus` | `?string` | Safety status (`safe`, `unsafe`, `resolved`). |
+| `defectIds` | `?array<int, string>` | Stream defect IDs. |
+| `formattedAddress` | `?string` | Stream location address. |
 | `startTime` | `?string` | RFC 3339 start time. |
 | `endTime` | `?string` | RFC 3339 end time. |
 | `odometerMeters` | `?int` | Odometer reading in meters at inspection time. |

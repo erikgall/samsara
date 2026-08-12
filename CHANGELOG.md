@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Form submissions**: Added seven exact current-status predicates: `isNotStarted()`, `isCompleted()`, `isArchived()`, `isInProgress()`, `needsReview()`, `hasChangesRequested()`, and `isApproved()`.
+- **Route stops**: Added six exact state predicates plus actual/planned distance conversion helpers for kilometers and miles.
+- **Trips**: Added `isCompleted()` and `isInProgress()` for the current completion-status contract.
+- **Users**: Added `getRoleIds()` for nested role assignments.
+- **Maintenance and safety**: Added `Dvir::hasDefects()`, `Defect::isSafe()`, `Defect::isUnsafe()`, and `SafetyEvent::needsCoaching()`.
+- **Equipment stats GPS**: Added `EquipmentGpsLocation::getAddressName()` and `getReverseGeoLocation()`.
+- **Tags**: Added `getExternalId()` and typed `getParent()` helpers.
+- **Documentation**: Added a contract-evidenced catalog covering all 73 concrete DTOs, 96 valid proposals, and 27 explicit no-helper decisions.
+
+### Changed
+
+- **Tags**: `hasParent()` now recognizes either `parentTagId` or a documented nested `parentTag` payload.
+- **Hours of Service**: `DutyStatus::SLEEPER_BERTH` now uses the upstream `sleeperBed` backing value, allowing `HosLog::getDutyStatus()` to hydrate current sleeper-berth rows. This changes the enum's serialized value; see `BREAKING_CHANGES.md`.
+
+### Deprecated
+
+- **Form submissions**: `isDraft()` and `isSubmitted()` remain callable but are deprecated because the current response status enum contains neither `draft` nor `submitted`.
+
 ## [1.1.0] - 2026-05-07
 
 ### Added

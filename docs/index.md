@@ -84,6 +84,7 @@ $stats = Samsara::vehicleStats()
 - [Testing](testing.html) — `SamsaraFake` and HTTP-level fakes.
 - [Resources](resources/index.html) — every resource the SDK exposes.
 - [Documentation Coverage](api-sync/documentation-coverage.html) — package-versus-upstream coverage and pending synchronization gaps.
+- [DTO Helper Catalog](api-sync/dto-helper-catalog.html) — contract evidence, accepted conveniences, deferrals, and explicit no-helper decisions for all 73 DTOs.
 
 ## Requirements
 

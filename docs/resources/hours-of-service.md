@@ -106,12 +106,12 @@ $logs = Samsara::hoursOfService()
 
 ## Duty Status
 
-`HosLog::getDutyStatus()` maps matching `hosStatusType` values to `Samsara\Enums\DutyStatus`. One package mismatch remains: current HOS rows use `sleeperBed`, which `isSleeperBerth()` recognizes, while the enum value is `sleeperBerth`; `getDutyStatus()` therefore returns `null` for `sleeperBed`. See the [enum reference](../enums.html).
+`HosLog::getDutyStatus()` maps the documented `hosStatusType` values to `Samsara\Enums\DutyStatus`, including the upstream `sleeperBed` value. See the [enum reference](../enums.html).
 
 | Case | Value | Description |
 |------|-------|-------------|
 | `OFF_DUTY` | `offDuty` | Driver is off duty. |
-| `SLEEPER_BERTH` | `sleeperBerth` | Driver is in the sleeper berth. |
+| `SLEEPER_BERTH` | `sleeperBed` | Driver is in the sleeper berth. |
 | `DRIVING` | `driving` | Driver is driving. |
 | `ON_DUTY` | `onDuty` | Driver is on duty (not driving). |
 | `YARD_MOVE` | `yardMove` | Driver is performing a yard move. |

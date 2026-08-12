@@ -19,7 +19,7 @@ permalink: /resources/trips
 
 ## Introduction
 
-A Samsara trip is the engine-on to engine-off interval recorded by a vehicle gateway — distinct from a planned dispatch route. Trips carry the driver and vehicle that produced them, the start/end timestamps and locations, and the distance and driving time. The resource is read-only; trips are created and closed by the gateway, not by the API.
+A Samsara trip is an asset movement interval collected by the Trips stream, distinct from a planned dispatch route. Current rows carry the associated asset, completion state, start/end timestamps, locations, and record timestamps. The resource is read-only; trips are created and closed by Samsara, not by this API.
 
 ## Retrieving Records
 
@@ -79,35 +79,25 @@ Samsara::trips()
     ->lazy()
     ->each(function ($trip) {
         DB::table('trip_archive')->insert([
-            'samsara_trip_start' => $trip->startTime,
-            'driver_id' => $trip->driver['id'] ?? null,
-            'vehicle_id' => $trip->vehicle['id'] ?? null,
-            'distance_meters' => $trip->distanceMeters,
+            'samsara_trip_start' => $trip->tripStartTime,
+            'samsara_trip_end' => $trip->tripEndTime,
+            'asset_id' => $trip->asset['id'] ?? null,
+            'completion_status' => $trip->completionStatus,
         ]);
     });
 ```
 
 ## Filtering
 
-See [Query Builder](../query-builder.html) for the complete filter list. The most common Trip filters are by driver, vehicle, and tag.
+See [Query Builder](../query-builder.html) for the generic builder surface. The current Trips stream requires `startTime` and comma-separated asset `ids`; it also accepts `endTime`, `queryBy`, `completionStatus`, and `includeAsset`.
 
 ```php
 $trips = Samsara::trips()
     ->query()
-    ->whereDriver('driver-id')
-    ->startTime(now()->subWeek())
-    ->get();
-
-$trips = Samsara::trips()
-    ->query()
-    ->whereVehicle(['vehicle-1', 'vehicle-2'])
     ->startTime(now()->subDays(7))
-    ->get();
-
-$trips = Samsara::trips()
-    ->query()
-    ->whereTag('delivery-fleet')
-    ->startTime(now()->subDays(7))
+    ->where('ids', 'vehicle-1,vehicle-2')
+    ->where('includeAsset', true)
+    ->where('queryBy', 'tripStartTime')
     ->get();
 ```
 
@@ -115,10 +105,8 @@ $trips = Samsara::trips()
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `getDistanceMiles()` | `?float` | Distance converted from `distanceMeters` to miles. |
-| `getDistanceKilometers()` | `?float` | Distance converted from `distanceMeters` to kilometers. |
-| `getDrivingTimeHours()` | `?float` | Driving time converted from `drivingTimeMs` to hours. |
-| `getDrivingTimeMinutes()` | `?float` | Driving time converted from `drivingTimeMs` to minutes. |
+| `isCompleted()` | `bool` | True only when `completionStatus === 'completed'`. |
+| `isInProgress()` | `bool` | True only when `completionStatus === 'inProgress'`. |
 
 ```php
 $trip = Samsara::trips()
@@ -126,30 +114,28 @@ $trip = Samsara::trips()
     ->startTime(now()->subDay())
     ->first();
 
-$trip->getDistanceMiles();      // ?float
-$trip->getDrivingTimeHours();   // ?float
-$trip->driver['id'] ?? null;    // ?string
-$trip->vehicle['id'] ?? null;   // ?string
+$trip->isCompleted();           // bool
+$trip->isInProgress();          // bool
+$trip->asset['id'] ?? null;     // ?string
 ```
 
 ## Properties
 
-The Trip entity exposes nested `driver` and `vehicle` arrays, not flat `driverId` / `vehicleId` keys.
+The current Trip response exposes one nested `asset`; it does not expose the legacy distance, driving-duration, driver, or vehicle fields.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `startTime` | `?string` | RFC 3339 trip start time. |
-| `endTime` | `?string` | RFC 3339 trip end time. |
-| `distanceMeters` | `?int` | Trip distance in meters. |
-| `drivingTimeMs` | `?int` | Driving time in milliseconds. |
-| `driver` | `?array{id?: string, name?: string}` | Associated driver. |
-| `vehicle` | `?array{id?: string, name?: string}` | Associated vehicle. |
-| `asset` | `?array{id?: string, name?: string}` | Associated asset (when the trip was made by a non-vehicle asset). |
+| `tripStartTime` | `?string` | RFC 3339 trip start time. |
+| `tripEndTime` | `?string` | RFC 3339 trip end time. |
+| `createdAtTime` | `?string` | Record creation time (RFC 3339). |
+| `updatedAtTime` | `?string` | Record update time (RFC 3339). |
+| `completionStatus` | `?string` | `inProgress` or `completed`. |
+| `asset` | `?array{id?: string, name?: string}` | Associated asset. |
 | `startLocation` | `?array{latitude?: float, longitude?: float}` | Trip start location. |
 | `endLocation` | `?array{latitude?: float, longitude?: float}` | Trip end location. |
 
 ## Related Resources
 
 - [Vehicles](vehicles.html) — vehicles whose gateways produce trips.
-- [Drivers](drivers.html) — drivers attributed to each trip.
+- [Assets](assets.html) — asset records referenced by Trip rows.
 - [Vehicle Stats](vehicle-stats.html) — engine-state and GPS samples that compose a trip.

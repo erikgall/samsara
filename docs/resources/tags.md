@@ -92,7 +92,7 @@ $east = Samsara::tags()->create([
 ]);
 
 if ($west->hasParent()) {
-    echo "Parent: {$west->parentTagId}";
+    echo "Parent: ".($west->getParent()?->name ?? $west->parentTagId);
 }
 ```
 
@@ -122,7 +122,9 @@ $events = Samsara::safetyEvents()
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `hasParent()` | `bool` | True when the tag has a non-null `parentTagId`. |
+| `hasParent()` | `bool` | True when either `parentTagId` or a nested `parentTag` is present. |
+| `getParent()` | `?Tag` | Wraps a non-empty nested `parentTag` payload as a typed `Tag`. |
+| `getExternalId(string $key)` | `?string` | Returns the exact mapped string, including an empty string, or `null`. |
 
 ## Properties
 
@@ -131,7 +133,8 @@ $events = Samsara::safetyEvents()
 | `id` | `string` | Tag id. |
 | `name` | `string` | Tag name. |
 | `parentTagId` | `?string` | Id of the parent tag, when the tag is a child. |
-| `externalIds` | `?array` | External system id mappings keyed by namespace. |
+| `parentTag` | `?array{id?: string, name?: string}` | Expanded parent tag when included. |
+| `externalIds` | `?array<string, string>` | External system ID mappings keyed by namespace. |
 
 ## Related Resources
 

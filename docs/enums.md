@@ -106,9 +106,7 @@ The activation state of a record returned by the [Drivers](resources/drivers.htm
 
 `Samsara\Enums\DutyStatus`
 
-The duty status reported on hours-of-service logs. See the [Hours of Service](resources/hours-of-service.html) resource.
-
-> **Known mismatch:** Current upstream and the package's `HosLog` mapper use `sleeperBed`; the enum value is `sleeperBerth`. `HosLog::getDutyStatus()` therefore returns `null` for a source-tested `sleeperBed` payload.
+The duty status reported on hours-of-service logs. See the [Hours of Service](resources/hours-of-service.html) resource. `SLEEPER_BERTH` uses the upstream `sleeperBed` wire value.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -116,7 +114,7 @@ The duty status reported on hours-of-service logs. See the [Hours of Service](re
 | `OFF_DUTY` | `offDuty` | The driver is off duty. |
 | `ON_DUTY` | `onDuty` | The driver is on duty (not driving). |
 | `PERSONAL_CONVEYANCE` | `personalConveyance` | The driver is using the vehicle for personal conveyance. |
-| `SLEEPER_BERTH` | `sleeperBerth` | The driver is in the sleeper berth. |
+| `SLEEPER_BERTH` | `sleeperBed` | The driver is in the sleeper berth. |
 | `YARD_MOVE` | `yardMove` | The driver is performing a yard move. |
 
 ## EngineState

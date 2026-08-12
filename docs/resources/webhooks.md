@@ -274,16 +274,10 @@ Route::post('/webhooks/samsara', [SamsaraWebhookController::class, 'handle'])
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `isActive()` | `bool` | True when `status === 'active'`. |
-| `isPaused()` | `bool` | True when `status === 'paused'`. |
 | `hasEventType(string $eventType)` | `bool` | True when the webhook subscribes to the given event. |
 
 ```php
 $webhook = Samsara::webhooks()->find('webhook-id');
-
-if ($webhook->isPaused()) {
-    Samsara::webhooks()->update($webhook->id, ['status' => 'active']);
-}
 
 if ($webhook->hasEventType('VehicleCreated')) {
     // Already subscribed
@@ -297,12 +291,12 @@ if ($webhook->hasEventType('VehicleCreated')) {
 | `id` | `?string` | Webhook id. |
 | `name` | `?string` | Webhook name. |
 | `url` | `?string` | The destination URL Samsara posts events to. |
-| `secret` | `?string` | Base64-encoded HMAC secret (returned on create only). |
-| `status` | `?string` | `"active"` or `"paused"`. |
+| `secretKey` | `?string` | Webhook secret returned by the current response shape. |
+| `version` | `?string` | Webhook API version. |
 | `eventTypes` | `?array<int, string>` | Subscribed event type wire values. |
-| `customHeaders` | `?array` | Additional headers Samsara appends to each delivery. Each item exposes `name` and `value`. |
-| `createdAtTime` | `?string` | RFC 3339 creation timestamp. |
-| `updatedAtTime` | `?string` | RFC 3339 last-update timestamp. |
+| `customHeaders` | `?array` | Additional headers Samsara appends to each delivery. Each item exposes `key` and `value`. |
+
+The current response contains no lifecycle status. Removed `isActive()` and `isPaused()` calls have no direct replacement.
 
 ## Related Resources
 

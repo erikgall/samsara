@@ -104,15 +104,18 @@ A `between()` window is required by the upstream endpoint.
 
 ## Helper Methods
 
-The `SafetyEvent` entity exposes one helper:
+The `SafetyEvent` entity exposes video and coaching helpers:
 
 ```php
 $event = Samsara::safetyEvents()->query()->where('ids', 'event-id')->first();
 
-$event->hasVideo();  // bool — true if any of the three video URLs are present
+$event->hasVideo();      // bool — true if any of the three video URLs are present
+$event->needsCoaching(); // bool — coachingState === 'needsCoaching'
 ```
 
 `hasVideo()` returns `true` when any of `downloadForwardVideoUrl`, `downloadInwardVideoUrl`, or `downloadTrackedInwardVideoUrl` are populated.
+
+`needsCoaching()` returns `false` for missing or unknown state values, including the smaller event shape nested in legacy audit-log rows.
 
 ## Properties
 
