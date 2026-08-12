@@ -56,6 +56,28 @@ class DefectTest extends TestCase
     }
 
     #[Test]
+    public function it_can_check_if_safe(): void
+    {
+        $defect = new Defect([
+            'defectSafetyStatus' => 'safe',
+        ]);
+
+        $this->assertTrue($defect->isSafe());
+        $this->assertFalse($defect->isUnsafe());
+    }
+
+    #[Test]
+    public function it_can_check_if_unsafe(): void
+    {
+        $defect = new Defect([
+            'defectSafetyStatus' => 'unsafe',
+        ]);
+
+        $this->assertTrue($defect->isUnsafe());
+        $this->assertFalse($defect->isSafe());
+    }
+
+    #[Test]
     public function it_can_convert_to_array(): void
     {
         $data = [
@@ -127,6 +149,24 @@ class DefectTest extends TestCase
         $defect = new Defect;
 
         $this->assertInstanceOf(Entity::class, $defect);
+    }
+
+    #[Test]
+    public function it_returns_false_for_unrecognized_or_missing_safety_statuses(): void
+    {
+        foreach ([null, '', 'unknown'] as $status) {
+            $defect = new Defect([
+                'defectSafetyStatus' => $status,
+            ]);
+
+            $this->assertFalse($defect->isSafe());
+            $this->assertFalse($defect->isUnsafe());
+        }
+
+        $defect = new Defect;
+
+        $this->assertFalse($defect->isSafe());
+        $this->assertFalse($defect->isUnsafe());
     }
 
     #[Test]

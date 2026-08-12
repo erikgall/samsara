@@ -13,6 +13,7 @@ use Samsara\Data\Entity;
  *
  * @property-read string|null $id Defect ID
  * @property-read string|null $defectTypeId Defect type ID
+ * @property-read string|null $defectSafetyStatus Driver-designated safety classification (safe, unsafe)
  * @property-read string|null $comment Comment on the defect
  * @property-read bool|null $isResolved Whether the defect is resolved
  * @property-read string|null $createdAtTime Creation time (RFC 3339)
@@ -31,5 +32,21 @@ class Defect extends Entity
     public function isResolved(): bool
     {
         return $this->isResolved ?? false;
+    }
+
+    /**
+     * Check if the defect is designated safe.
+     */
+    public function isSafe(): bool
+    {
+        return $this->defectSafetyStatus === 'safe';
+    }
+
+    /**
+     * Check if the defect is designated unsafe.
+     */
+    public function isUnsafe(): bool
+    {
+        return $this->defectSafetyStatus === 'unsafe';
     }
 }

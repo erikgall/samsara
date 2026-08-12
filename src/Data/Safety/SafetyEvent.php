@@ -34,4 +34,12 @@ class SafetyEvent extends Entity
             || ! empty($this->downloadInwardVideoUrl)
             || ! empty($this->downloadTrackedInwardVideoUrl);
     }
+
+    /**
+     * Check if the event needs coaching.
+     */
+    public function needsCoaching(): bool
+    {
+        return $this->coachingState === 'needsCoaching';
+    }
 }

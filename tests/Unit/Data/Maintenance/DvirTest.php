@@ -227,4 +227,31 @@ class DvirTest extends TestCase
 
         $this->assertInstanceOf(Entity::class, $dvir);
     }
+
+    #[Test]
+    public function it_returns_false_without_a_non_empty_array_of_defects(): void
+    {
+        $attributes = [
+            [],
+            ['defectIds' => null, 'vehicleDefects' => null, 'trailerDefects' => null],
+            ['defectIds' => [], 'vehicleDefects' => [], 'trailerDefects' => []],
+            ['defectIds' => 'defect-1', 'vehicleDefects' => true, 'trailerDefects' => 1],
+        ];
+
+        foreach ($attributes as $attributeSet) {
+            $this->assertFalse((new Dvir($attributeSet))->hasDefects());
+        }
+    }
+
+    #[Test]
+    public function it_returns_true_when_any_documented_defect_collection_is_non_empty(): void
+    {
+        foreach (['defectIds', 'vehicleDefects', 'trailerDefects'] as $field) {
+            $dvir = new Dvir([
+                $field => ['defect-1'],
+            ]);
+
+            $this->assertTrue($dvir->hasDefects(), $field);
+        }
+    }
 }

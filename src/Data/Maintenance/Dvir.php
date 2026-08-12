@@ -38,6 +38,22 @@ use Samsara\Data\Entity;
 class Dvir extends Entity
 {
     /**
+     * Check if the DVIR has any defects.
+     */
+    public function hasDefects(): bool
+    {
+        foreach (['defectIds', 'vehicleDefects', 'trailerDefects'] as $field) {
+            $defects = $this->get($field);
+
+            if (is_array($defects) && $defects !== []) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Check if this is a mechanic inspection.
      */
     public function isMechanicInspection(): bool

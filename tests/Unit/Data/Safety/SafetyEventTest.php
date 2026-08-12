@@ -38,6 +38,16 @@ class SafetyEventTest extends TestCase
     }
 
     #[Test]
+    public function it_can_check_if_coaching_is_needed(): void
+    {
+        $event = new SafetyEvent([
+            'coachingState' => 'needsCoaching',
+        ]);
+
+        $this->assertTrue($event->needsCoaching());
+    }
+
+    #[Test]
     public function it_can_check_if_has_video(): void
     {
         $event = new SafetyEvent([
@@ -153,6 +163,21 @@ class SafetyEventTest extends TestCase
         $event = new SafetyEvent;
 
         $this->assertInstanceOf(Entity::class, $event);
+    }
+
+    #[Test]
+    public function it_returns_false_for_unrecognized_or_missing_coaching_states(): void
+    {
+        foreach ([null, '', 'needsReview', 'unknown'] as $state) {
+            $event = new SafetyEvent([
+                'coachingState' => $state,
+            ]);
+
+            $this->assertFalse($event->needsCoaching());
+        }
+
+        $this->assertFalse((new SafetyEvent)->needsCoaching());
+        $this->assertFalse((new SafetyEvent(['eventState' => 'needsCoaching']))->needsCoaching());
     }
 
     #[Test]
