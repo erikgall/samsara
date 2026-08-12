@@ -18,7 +18,7 @@ use Samsara\Enums\DutyStatus;
  * @property-read string|null $remark Remark associated with the log entry
  * @property-read array{id?: string, name?: string}|null $vehicle Vehicle information
  * @property-read array<int, array{id?: string, name?: string}>|null $codrivers Codriver information
- * @property-read array{latitude?: float, longitude?: float, location?: string}|null $logRecordedLocation Location where log was recorded
+ * @property-read array{latitude?: float, longitude?: float}|null $logRecordedLocation Location where log was recorded
  */
 class HosLog extends Entity
 {

@@ -128,16 +128,30 @@ class FormSubmissionTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_driver(): void
+    public function it_can_have_an_asset(): void
     {
         $submission = new FormSubmission([
-            'driver' => [
-                'id'   => 'driver-1',
-                'name' => 'John Smith',
+            'asset' => [
+                'id'   => 'asset-1',
+                'name' => 'Truck 42',
             ],
         ]);
 
-        $this->assertSame('driver-1', $submission->driver['id']);
+        $this->assertSame('asset-1', $submission->asset['id']);
+    }
+
+    #[Test]
+    public function it_can_have_an_assignee(): void
+    {
+        $submission = new FormSubmission([
+            'assignedTo' => [
+                'id'   => 'driver-1',
+                'name' => 'John Smith',
+                'type' => 'driver',
+            ],
+        ]);
+
+        $this->assertSame('driver-1', $submission->assignedTo['id']);
     }
 
     #[Test]
@@ -165,19 +179,6 @@ class FormSubmissionTest extends TestCase
         $this->assertSame('2024-04-10T07:06:25Z', $submission->createdAtTime);
         $this->assertSame('2024-04-11T10:00:00Z', $submission->updatedAtTime);
         $this->assertSame('2024-04-10T08:00:00Z', $submission->submittedAtTime);
-    }
-
-    #[Test]
-    public function it_can_have_vehicle(): void
-    {
-        $submission = new FormSubmission([
-            'vehicle' => [
-                'id'   => 'vehicle-1',
-                'name' => 'Truck 42',
-            ],
-        ]);
-
-        $this->assertSame('vehicle-1', $submission->vehicle['id']);
     }
 
     #[Test]

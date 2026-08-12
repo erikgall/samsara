@@ -6,6 +6,7 @@ use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\HoursOfService\HosViolation;
+use Samsara\Data\HoursOfService\HosViolationGroup;
 
 /**
  * Unit tests for the HosViolation entity.
@@ -128,12 +129,12 @@ class HosViolationTest extends TestCase
     {
         $violation = new HosViolation([
             'day' => [
-                'date'     => '2024-04-10',
-                'timezone' => 'America/Los_Angeles',
+                'startTime' => '2024-04-10T00:00:00Z',
+                'endTime'   => '2024-04-10T23:59:59Z',
             ],
         ]);
 
-        $this->assertSame('2024-04-10', $violation->day['date']);
+        $this->assertSame('2024-04-10T00:00:00Z', $violation->day['startTime']);
     }
 
     #[Test]
@@ -165,5 +166,17 @@ class HosViolationTest extends TestCase
 
         $this->assertNull($violation->getDurationHours());
         $this->assertNull($violation->getDurationMinutes());
+    }
+
+    #[Test]
+    public function violation_groups_return_a_typed_or_empty_collection(): void
+    {
+        $group = new HosViolationGroup([
+            'violations' => [['type' => 'shiftHours', 'durationMs' => 60000]],
+        ]);
+
+        $this->assertInstanceOf(HosViolation::class, $group->getViolations()->first());
+        $this->assertTrue((new HosViolationGroup(['violations' => null]))->getViolations()->isEmpty());
+        $this->assertTrue((new HosViolationGroup(['violations' => 'invalid']))->getViolations()->isEmpty());
     }
 }

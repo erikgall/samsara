@@ -19,15 +19,10 @@ class AttributeValueTest extends TestCase
     {
         $attributeValue = new AttributeValue([
             'id'          => '12345',
-            'attributeId' => 'attr-1',
-            'value'       => 'Operations',
             'stringValue' => 'Operations',
-            'numberValue' => null,
         ]);
 
         $this->assertSame('12345', $attributeValue->id);
-        $this->assertSame('attr-1', $attributeValue->attributeId);
-        $this->assertSame('Operations', $attributeValue->value);
         $this->assertSame('Operations', $attributeValue->stringValue);
     }
 
@@ -46,8 +41,8 @@ class AttributeValueTest extends TestCase
     public function it_can_convert_to_array(): void
     {
         $data = [
-            'id'    => '12345',
-            'value' => 'Operations',
+            'id'          => '12345',
+            'stringValue' => 'Operations',
         ];
 
         $attributeValue = new AttributeValue($data);
@@ -66,16 +61,6 @@ class AttributeValueTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_value_from_number(): void
-    {
-        $attributeValue = new AttributeValue([
-            'numberValue' => 42,
-        ]);
-
-        $this->assertSame(42, $attributeValue->getValue());
-    }
-
-    #[Test]
     public function it_extends_entity(): void
     {
         $attributeValue = new AttributeValue;
@@ -84,7 +69,15 @@ class AttributeValueTest extends TestCase
     }
 
     #[Test]
-    public function it_prefers_string_value_over_number_value(): void
+    public function it_returns_null_when_no_value_set(): void
+    {
+        $attributeValue = new AttributeValue;
+
+        $this->assertNull($attributeValue->getValue());
+    }
+
+    #[Test]
+    public function legacy_numeric_values_do_not_override_the_contract_string_value(): void
     {
         $attributeValue = new AttributeValue([
             'stringValue' => 'Text',
@@ -95,10 +88,12 @@ class AttributeValueTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_null_when_no_value_set(): void
+    public function legacy_numeric_values_remain_backwards_compatible(): void
     {
-        $attributeValue = new AttributeValue;
+        $attributeValue = new AttributeValue([
+            'numberValue' => 42,
+        ]);
 
-        $this->assertNull($attributeValue->getValue());
+        $this->assertSame(42, $attributeValue->getValue());
     }
 }

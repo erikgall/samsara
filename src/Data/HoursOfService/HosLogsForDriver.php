@@ -20,9 +20,15 @@ class HosLogsForDriver extends Entity
      */
     public function getLogs(): EntityCollection
     {
+        $logs = $this->get('hosLogs', []);
+
+        if (! is_array($logs)) {
+            return new EntityCollection;
+        }
+
         return new EntityCollection(array_map(
             fn (array $log): HosLog => HosLog::make($log),
-            $this->get('hosLogs', [])
+            array_values(array_filter($logs, 'is_array'))
         ));
     }
 }

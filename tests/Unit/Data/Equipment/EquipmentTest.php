@@ -4,6 +4,7 @@ namespace Samsara\Tests\Unit\Data\Equipment;
 
 use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
+use Samsara\Data\Vehicle\Gateway;
 use Samsara\Data\Equipment\Equipment;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -86,6 +87,24 @@ class EquipmentTest extends TestCase
         ]);
 
         $this->assertSame(['3914', '4815'], $equipment->getTagIds());
+    }
+
+    #[Test]
+    public function it_can_get_the_installed_gateway_as_an_entity(): void
+    {
+        $equipment = new Equipment([
+            'installedGateway' => [
+                'serial' => 'ABCD-123-XYZ',
+                'model'  => 'AG26',
+            ],
+        ]);
+
+        $gateway = $equipment->getInstalledGateway();
+
+        $this->assertInstanceOf(Gateway::class, $gateway);
+        $this->assertSame('ABCD-123-XYZ', $gateway->serial);
+        $this->assertNull((new Equipment)->getInstalledGateway());
+        $this->assertNull((new Equipment(['installedGateway' => 'invalid']))->getInstalledGateway());
     }
 
     #[Test]

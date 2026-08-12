@@ -41,17 +41,6 @@ class AlertIncidentTest extends TestCase
     }
 
     #[Test]
-    public function it_can_check_if_dismissed(): void
-    {
-        $incident = new AlertIncident([
-            'status' => 'dismissed',
-        ]);
-
-        $this->assertTrue($incident->isDismissed());
-        $this->assertFalse($incident->isTriggered());
-    }
-
-    #[Test]
     public function it_can_check_if_resolved(): void
     {
         $incident = new AlertIncident([
@@ -59,17 +48,6 @@ class AlertIncidentTest extends TestCase
         ]);
 
         $this->assertTrue($incident->isResolved());
-    }
-
-    #[Test]
-    public function it_can_check_if_triggered(): void
-    {
-        $incident = new AlertIncident([
-            'status' => 'triggered',
-        ]);
-
-        $this->assertTrue($incident->isTriggered());
-        $this->assertFalse($incident->isResolved());
     }
 
     #[Test]
@@ -86,54 +64,49 @@ class AlertIncidentTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_driver(): void
+    public function it_can_have_an_incident_url(): void
     {
         $incident = new AlertIncident([
-            'driver' => [
-                'id'   => 'driver-1',
-                'name' => 'John Smith',
-            ],
+            'incidentUrl' => 'https://cloud.samsara.com/o/1/fleet/workflows/123',
         ]);
 
-        $this->assertSame('driver-1', $incident->driver['id']);
+        $this->assertSame('https://cloud.samsara.com/o/1/fleet/workflows/123', $incident->incidentUrl);
     }
 
     #[Test]
-    public function it_can_have_location(): void
+    public function it_can_have_conditions(): void
     {
         $incident = new AlertIncident([
-            'location' => [
-                'latitude'  => 37.7749,
-                'longitude' => -122.4194,
+            'conditions' => [
+                ['description' => 'Vehicle speed exceeded threshold'],
             ],
         ]);
 
-        $this->assertSame(37.7749, $incident->location['latitude']);
+        $this->assertCount(1, $incident->conditions);
+    }
+
+    #[Test]
+    public function it_can_have_resolution_timestamps(): void
+    {
+        $incident = new AlertIncident([
+            'resolvedAtTime' => '2024-04-10T08:00:00Z',
+            'updatedAtTime'  => '2024-04-10T08:01:00Z',
+        ]);
+
+        $this->assertSame('2024-04-10T08:00:00Z', $incident->resolvedAtTime);
+        $this->assertSame('2024-04-10T08:01:00Z', $incident->updatedAtTime);
     }
 
     #[Test]
     public function it_can_have_timestamps(): void
     {
         $incident = new AlertIncident([
-            'triggeredAtTime' => '2024-04-10T07:06:25Z',
-            'resolvedAtTime'  => '2024-04-10T08:00:00Z',
+            'happenedAtTime' => '2024-04-10T07:06:25Z',
+            'resolvedAtTime' => '2024-04-10T08:00:00Z',
         ]);
 
-        $this->assertSame('2024-04-10T07:06:25Z', $incident->triggeredAtTime);
+        $this->assertSame('2024-04-10T07:06:25Z', $incident->happenedAtTime);
         $this->assertSame('2024-04-10T08:00:00Z', $incident->resolvedAtTime);
-    }
-
-    #[Test]
-    public function it_can_have_vehicle(): void
-    {
-        $incident = new AlertIncident([
-            'vehicle' => [
-                'id'   => 'vehicle-1',
-                'name' => 'Truck 42',
-            ],
-        ]);
-
-        $this->assertSame('vehicle-1', $incident->vehicle['id']);
     }
 
     #[Test]
@@ -142,5 +115,27 @@ class AlertIncidentTest extends TestCase
         $incident = new AlertIncident;
 
         $this->assertInstanceOf(Entity::class, $incident);
+    }
+
+    #[Test]
+    public function legacy_dismissed_status_check_remains_backwards_compatible(): void
+    {
+        $incident = new AlertIncident([
+            'status' => 'dismissed',
+        ]);
+
+        $this->assertTrue($incident->isDismissed());
+        $this->assertFalse($incident->isTriggered());
+    }
+
+    #[Test]
+    public function legacy_triggered_status_check_remains_backwards_compatible(): void
+    {
+        $incident = new AlertIncident([
+            'status' => 'triggered',
+        ]);
+
+        $this->assertTrue($incident->isTriggered());
+        $this->assertFalse($incident->isResolved());
     }
 }

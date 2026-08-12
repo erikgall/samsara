@@ -26,6 +26,22 @@ use Samsara\Data\Entity;
 class AlertConfiguration extends Entity
 {
     /**
+     * Get an external ID by key.
+     */
+    public function getExternalId(string $key): ?string
+    {
+        $externalIds = $this->get('externalIds');
+
+        if (! is_array($externalIds)) {
+            return null;
+        }
+
+        $externalId = $externalIds[$key] ?? null;
+
+        return is_string($externalId) ? $externalId : null;
+    }
+
+    /**
      * Check if the alert is enabled.
      */
     public function isEnabled(): bool
@@ -35,6 +51,8 @@ class AlertConfiguration extends Entity
 
     /**
      * Check if the alert is a fuel level type.
+     *
+     * @deprecated The current API does not expose an alertType field.
      */
     public function isFuelLevelType(): bool
     {
@@ -43,6 +61,8 @@ class AlertConfiguration extends Entity
 
     /**
      * Check if the alert is a geofence type.
+     *
+     * @deprecated The current API does not expose an alertType field.
      */
     public function isGeofenceType(): bool
     {
@@ -51,6 +71,8 @@ class AlertConfiguration extends Entity
 
     /**
      * Check if the alert is an idle type.
+     *
+     * @deprecated The current API does not expose an alertType field.
      */
     public function isIdleType(): bool
     {
@@ -59,6 +81,8 @@ class AlertConfiguration extends Entity
 
     /**
      * Check if the alert is a speed type.
+     *
+     * @deprecated The current API does not expose an alertType field.
      */
     public function isSpeedType(): bool
     {

@@ -18,21 +18,16 @@ class DocumentTypeTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $documentType = new DocumentType([
-            'id'                     => '12345',
-            'uid'                    => 'uid-12345',
-            'name'                   => 'Fuel Receipt',
-            'orgId'                  => 'org-1',
-            'fieldDefinitions'       => [],
-            'conditionSets'          => [],
-            'isDriverEditable'       => true,
-            'requireDriverSignature' => false,
+            'id'                       => '12345',
+            'name'                     => 'Fuel Receipt',
+            'orgId'                    => 12345,
+            'fieldTypes'               => [],
+            'conditionalFieldSections' => [],
         ]);
 
         $this->assertSame('12345', $documentType->id);
-        $this->assertSame('uid-12345', $documentType->uid);
         $this->assertSame('Fuel Receipt', $documentType->name);
-        $this->assertTrue($documentType->isDriverEditable);
-        $this->assertFalse($documentType->requireDriverSignature);
+        $this->assertSame(12345, $documentType->orgId);
     }
 
     #[Test]
@@ -44,26 +39,6 @@ class DocumentTypeTest extends TestCase
 
         $this->assertInstanceOf(DocumentType::class, $documentType);
         $this->assertSame('12345', $documentType->getId());
-    }
-
-    #[Test]
-    public function it_can_check_if_driver_editable(): void
-    {
-        $documentType = new DocumentType([
-            'isDriverEditable' => true,
-        ]);
-
-        $this->assertTrue($documentType->isDriverEditable());
-    }
-
-    #[Test]
-    public function it_can_check_if_requires_signature(): void
-    {
-        $documentType = new DocumentType([
-            'requireDriverSignature' => true,
-        ]);
-
-        $this->assertTrue($documentType->requiresSignature());
     }
 
     #[Test]
@@ -80,16 +55,16 @@ class DocumentTypeTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_field_definitions(): void
+    public function it_can_have_field_types(): void
     {
         $documentType = new DocumentType([
-            'fieldDefinitions' => [
-                ['name' => 'Fuel Type', 'type' => 'string'],
-                ['name' => 'Gallons', 'type' => 'number'],
+            'fieldTypes' => [
+                ['fieldType' => 'multipleChoice', 'label' => 'Fuel Type', 'requiredField' => true],
+                ['fieldType' => 'number', 'label' => 'Gallons', 'requiredField' => false],
             ],
         ]);
 
-        $this->assertCount(2, $documentType->fieldDefinitions);
+        $this->assertCount(2, $documentType->fieldTypes);
     }
 
     #[Test]
@@ -98,6 +73,23 @@ class DocumentTypeTest extends TestCase
         $documentType = new DocumentType;
 
         $this->assertInstanceOf(Entity::class, $documentType);
+    }
+
+    #[Test]
+    public function it_gets_only_required_field_types(): void
+    {
+        $required = ['fieldType' => 'signature', 'label' => 'Sign', 'requiredField' => true];
+        $documentType = new DocumentType([
+            'fieldTypes' => [
+                ['fieldType' => 'number', 'label' => 'Gallons', 'requiredField' => false],
+                $required,
+                ['fieldType' => 'text', 'label' => 'Notes'],
+            ],
+        ]);
+
+        $this->assertSame([$required], $documentType->getRequiredFieldTypes());
+        $this->assertSame([], (new DocumentType)->getRequiredFieldTypes());
+        $this->assertSame([], (new DocumentType(['fieldTypes' => null]))->getRequiredFieldTypes());
     }
 
     #[Test]
@@ -114,5 +106,25 @@ class DocumentTypeTest extends TestCase
         $documentType = new DocumentType;
 
         $this->assertFalse($documentType->requiresSignature());
+    }
+
+    #[Test]
+    public function legacy_driver_editable_check_remains_backwards_compatible(): void
+    {
+        $documentType = new DocumentType([
+            'isDriverEditable' => true,
+        ]);
+
+        $this->assertTrue($documentType->isDriverEditable());
+    }
+
+    #[Test]
+    public function legacy_signature_check_remains_backwards_compatible(): void
+    {
+        $documentType = new DocumentType([
+            'requireDriverSignature' => true,
+        ]);
+
+        $this->assertTrue($documentType->requiresSignature());
     }
 }

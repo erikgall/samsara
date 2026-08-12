@@ -22,6 +22,9 @@ class AlertConfigurationTest extends TestCase
             'name'          => 'Speed Alert',
             'isEnabled'     => true,
             'createdAtTime' => '2024-04-10T07:06:25Z',
+            'actions'       => [],
+            'scope'         => [],
+            'triggers'      => [],
         ]);
 
         $this->assertSame('12345', $alert->id);
@@ -51,47 +54,6 @@ class AlertConfigurationTest extends TestCase
     }
 
     #[Test]
-    public function it_can_check_if_fuel_level_type(): void
-    {
-        $alert = new AlertConfiguration([
-            'alertType' => 'fuelLevel',
-        ]);
-
-        $this->assertTrue($alert->isFuelLevelType());
-    }
-
-    #[Test]
-    public function it_can_check_if_geofence_type(): void
-    {
-        $alert = new AlertConfiguration([
-            'alertType' => 'geofence',
-        ]);
-
-        $this->assertTrue($alert->isGeofenceType());
-    }
-
-    #[Test]
-    public function it_can_check_if_idle_type(): void
-    {
-        $alert = new AlertConfiguration([
-            'alertType' => 'idle',
-        ]);
-
-        $this->assertTrue($alert->isIdleType());
-    }
-
-    #[Test]
-    public function it_can_check_if_speed_type(): void
-    {
-        $alert = new AlertConfiguration([
-            'alertType' => 'speed',
-        ]);
-
-        $this->assertTrue($alert->isSpeedType());
-        $this->assertFalse($alert->isGeofenceType());
-    }
-
-    #[Test]
     public function it_can_convert_to_array(): void
     {
         $data = [
@@ -106,27 +68,41 @@ class AlertConfigurationTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_notification_settings(): void
+    public function it_can_get_an_external_id(): void
     {
         $alert = new AlertConfiguration([
-            'notificationSettings' => [
-                'email' => true,
-                'sms'   => false,
-            ],
+            'externalIds' => ['maintenanceId' => 'alert-123', 'empty' => ''],
         ]);
 
-        $this->assertTrue($alert->notificationSettings['email']);
-        $this->assertFalse($alert->notificationSettings['sms']);
+        $this->assertSame('alert-123', $alert->getExternalId('maintenanceId'));
+        $this->assertSame('', $alert->getExternalId('empty'));
+        $this->assertNull($alert->getExternalId('missing'));
+        $this->assertNull((new AlertConfiguration(['externalIds' => null]))->getExternalId('maintenanceId'));
     }
 
     #[Test]
-    public function it_can_have_tags(): void
+    public function it_can_have_operational_settings(): void
     {
         $alert = new AlertConfiguration([
-            'tagIds' => ['tag-1', 'tag-2'],
+            'operationalSettings' => [
+                'timeRangeType' => 'activeBetween',
+            ],
         ]);
 
-        $this->assertCount(2, $alert->tagIds);
+        $this->assertSame('activeBetween', $alert->operationalSettings['timeRangeType']);
+    }
+
+    #[Test]
+    public function it_can_have_triggers(): void
+    {
+        $alert = new AlertConfiguration([
+            'triggers' => [
+                ['triggerType' => 'deviceLocationInsideGeofence'],
+                ['triggerType' => 'deviceSpeedAbove'],
+            ],
+        ]);
+
+        $this->assertCount(2, $alert->triggers);
     }
 
     #[Test]
@@ -153,5 +129,46 @@ class AlertConfigurationTest extends TestCase
         ]);
 
         $this->assertFalse($alert->isEnabled());
+    }
+
+    #[Test]
+    public function legacy_fuel_level_type_check_remains_backwards_compatible(): void
+    {
+        $alert = new AlertConfiguration([
+            'alertType' => 'fuelLevel',
+        ]);
+
+        $this->assertTrue($alert->isFuelLevelType());
+    }
+
+    #[Test]
+    public function legacy_geofence_type_check_remains_backwards_compatible(): void
+    {
+        $alert = new AlertConfiguration([
+            'alertType' => 'geofence',
+        ]);
+
+        $this->assertTrue($alert->isGeofenceType());
+    }
+
+    #[Test]
+    public function legacy_idle_type_check_remains_backwards_compatible(): void
+    {
+        $alert = new AlertConfiguration([
+            'alertType' => 'idle',
+        ]);
+
+        $this->assertTrue($alert->isIdleType());
+    }
+
+    #[Test]
+    public function legacy_speed_type_check_remains_backwards_compatible(): void
+    {
+        $alert = new AlertConfiguration([
+            'alertType' => 'speed',
+        ]);
+
+        $this->assertTrue($alert->isSpeedType());
+        $this->assertFalse($alert->isGeofenceType());
     }
 }

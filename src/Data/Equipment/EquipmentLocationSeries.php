@@ -29,7 +29,7 @@ class EquipmentLocationSeries extends Entity
 
         return new EntityCollection(array_map(
             fn (array $location): EquipmentLocation => EquipmentLocation::make($location),
-            $locations
+            array_values(array_filter($locations, 'is_array'))
         ));
     }
 }

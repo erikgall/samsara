@@ -6,8 +6,10 @@ use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Driver\Driver;
 use Samsara\Data\Driver\EldSettings;
+use Samsara\Data\Driver\DriverQrCode;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Driver\CarrierSettings;
+use Samsara\Data\Driver\DriverAuthToken;
 use Samsara\Enums\DriverActivationStatus;
 use Samsara\Data\Driver\StaticAssignedVehicle;
 
@@ -18,6 +20,24 @@ use Samsara\Data\Driver\StaticAssignedVehicle;
  */
 class DriverTest extends TestCase
 {
+    #[Test]
+    public function driver_auth_tokens_can_report_expiration(): void
+    {
+        $this->assertTrue((new DriverAuthToken(['expirationTime' => 1]))->isExpired());
+        $this->assertFalse((new DriverAuthToken(['expirationTime' => PHP_INT_MAX]))->isExpired());
+        $this->assertFalse((new DriverAuthToken)->isExpired());
+        $this->assertFalse((new DriverAuthToken(['expirationTime' => null]))->isExpired());
+    }
+
+    #[Test]
+    public function driver_qr_codes_report_whether_a_link_exists(): void
+    {
+        $this->assertTrue((new DriverQrCode(['qrCodeLink' => 'https://cloud.samsara.com/qr_code/123']))->hasQrCode());
+        $this->assertFalse((new DriverQrCode(['driverId' => 123]))->hasQrCode());
+        $this->assertFalse((new DriverQrCode(['qrCodeLink' => '']))->hasQrCode());
+        $this->assertFalse((new DriverQrCode(['qrCodeLink' => null]))->hasQrCode());
+    }
+
     #[Test]
     public function it_can_be_created_with_attributes(): void
     {
@@ -44,6 +64,21 @@ class DriverTest extends TestCase
 
         $this->assertInstanceOf(Driver::class, $driver);
         $this->assertSame('123', $driver->getId());
+    }
+
+    #[Test]
+    public function it_can_check_for_a_tag_by_id(): void
+    {
+        $driver = new Driver([
+            'tags' => [
+                ['id' => '3914', 'name' => 'East Coast'],
+                ['name' => 'No ID'],
+            ],
+        ]);
+
+        $this->assertTrue($driver->hasTag('3914'));
+        $this->assertFalse($driver->hasTag('4815'));
+        $this->assertFalse((new Driver(['tags' => null]))->hasTag('3914'));
     }
 
     #[Test]
@@ -499,6 +534,21 @@ class DriverTest extends TestCase
         $driver = new Driver;
 
         $this->assertNull($driver->getEldSettings());
+    }
+
+    #[Test]
+    public function it_returns_null_for_malformed_nested_driver_data(): void
+    {
+        $driver = new Driver([
+            'carrierSettings'       => 'invalid',
+            'eldSettings'           => 'invalid',
+            'staticAssignedVehicle' => 'invalid',
+        ]);
+
+        $this->assertNull($driver->getCarrierSettings());
+        $this->assertNull($driver->getEldSettings());
+        $this->assertNull($driver->getStaticAssignedVehicle());
+        $this->assertFalse($driver->hasStaticAssignedVehicle());
     }
 
     #[Test]

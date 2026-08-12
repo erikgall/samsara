@@ -33,9 +33,37 @@ class Address extends Entity
      */
     public function getContactIds(): array
     {
-        $contacts = $this->contacts ?? [];
+        $contacts = $this->get('contacts', []);
 
-        return array_map(fn (array $contact): string => (string) $contact['id'], $contacts);
+        if (! is_array($contacts)) {
+            return [];
+        }
+
+        $ids = [];
+
+        foreach ($contacts as $contact) {
+            if (is_array($contact) && isset($contact['id'])) {
+                $ids[] = (string) $contact['id'];
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Get an external ID by key.
+     */
+    public function getExternalId(string $key): ?string
+    {
+        $externalIds = $this->get('externalIds');
+
+        if (! is_array($externalIds)) {
+            return null;
+        }
+
+        $externalId = $externalIds[$key] ?? null;
+
+        return is_string($externalId) ? $externalId : null;
     }
 
     /**
@@ -45,7 +73,7 @@ class Address extends Entity
     {
         $geofence = $this->get('geofence');
 
-        if (empty($geofence)) {
+        if (! is_array($geofence) || $geofence === []) {
             return null;
         }
 
@@ -59,9 +87,21 @@ class Address extends Entity
      */
     public function getTagIds(): array
     {
-        $tags = $this->tags ?? [];
+        $tags = $this->get('tags', []);
 
-        return array_map(fn (array $tag): string => (string) $tag['id'], $tags);
+        if (! is_array($tags)) {
+            return [];
+        }
+
+        $ids = [];
+
+        foreach ($tags as $tag) {
+            if (is_array($tag) && isset($tag['id'])) {
+                $ids[] = (string) $tag['id'];
+            }
+        }
+
+        return $ids;
     }
 
     /**
@@ -79,7 +119,9 @@ class Address extends Entity
      */
     public function hasGeofence(): bool
     {
-        return ! empty($this->geofence);
+        $geofence = $this->get('geofence');
+
+        return is_array($geofence) && $geofence !== [];
     }
 
     /**

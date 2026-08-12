@@ -18,17 +18,23 @@ class AssetLocationTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $location = new AssetLocation([
-            'latitude'          => 37.7749,
-            'longitude'         => -122.4194,
-            'headingDegrees'    => 90.0,
-            'speedMilesPerHour' => 0.0,
-            'time'              => '2024-04-10T07:06:25Z',
+            'asset'          => ['id' => 'asset-1'],
+            'happenedAtTime' => '2024-04-10T07:06:25Z',
+            'location'       => [
+                'latitude'       => 37.7749,
+                'longitude'      => -122.4194,
+                'headingDegrees' => 90,
+            ],
+            'speed' => [
+                'ecuSpeedMetersPerSecond' => 0,
+                'gpsSpeedMetersPerSecond' => 12.5,
+            ],
         ]);
 
-        $this->assertSame(37.7749, $location->latitude);
-        $this->assertSame(-122.4194, $location->longitude);
-        $this->assertSame(90.0, $location->headingDegrees);
-        $this->assertSame(0.0, $location->speedMilesPerHour);
+        $this->assertSame('asset-1', $location->getAssetId());
+        $this->assertSame(90, $location->getHeadingDegrees());
+        $this->assertSame(0.0, $location->getEcuSpeedMetersPerSecond());
+        $this->assertSame(12.5, $location->getGpsSpeedMetersPerSecond());
     }
 
     #[Test]
@@ -55,33 +61,6 @@ class AssetLocationTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_coordinates(): void
-    {
-        $location = new AssetLocation([
-            'latitude'  => 37.7749,
-            'longitude' => -122.4194,
-        ]);
-
-        $coords = $location->getCoordinates();
-
-        $this->assertSame(37.7749, $coords['latitude']);
-        $this->assertSame(-122.4194, $coords['longitude']);
-    }
-
-    #[Test]
-    public function it_can_have_address(): void
-    {
-        $location = new AssetLocation([
-            'address' => [
-                'name'             => 'Main Warehouse',
-                'formattedAddress' => '123 Main St, San Francisco, CA',
-            ],
-        ]);
-
-        $this->assertSame('Main Warehouse', $location->address['name']);
-    }
-
-    #[Test]
     public function it_can_have_asset(): void
     {
         $location = new AssetLocation([
@@ -92,6 +71,20 @@ class AssetLocationTest extends TestCase
         ]);
 
         $this->assertSame('asset-1', $location->asset['id']);
+    }
+
+    #[Test]
+    public function it_can_have_nested_address_data(): void
+    {
+        $location = new AssetLocation([
+            'location' => [
+                'address' => [
+                    'formattedAddress' => '123 Main St, San Francisco, CA',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('123 Main St, San Francisco, CA', $location->location['address']['formattedAddress']);
     }
 
     #[Test]
@@ -129,5 +122,34 @@ class AssetLocationTest extends TestCase
 
         $this->assertNull($coords['latitude']);
         $this->assertNull($coords['longitude']);
+    }
+
+    #[Test]
+    public function it_returns_null_for_missing_or_malformed_nested_values(): void
+    {
+        $location = new AssetLocation([
+            'asset'    => null,
+            'location' => 'invalid',
+            'speed'    => ['gpsSpeedMetersPerSecond' => 'fast'],
+        ]);
+
+        $this->assertNull($location->getAssetId());
+        $this->assertNull($location->getHeadingDegrees());
+        $this->assertNull($location->getEcuSpeedMetersPerSecond());
+        $this->assertNull($location->getGpsSpeedMetersPerSecond());
+    }
+
+    #[Test]
+    public function legacy_top_level_coordinates_remain_backwards_compatible(): void
+    {
+        $location = new AssetLocation([
+            'latitude'  => 37.7749,
+            'longitude' => -122.4194,
+        ]);
+
+        $coords = $location->getCoordinates();
+
+        $this->assertSame(37.7749, $coords['latitude']);
+        $this->assertSame(-122.4194, $coords['longitude']);
     }
 }

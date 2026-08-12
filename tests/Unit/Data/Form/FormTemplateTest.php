@@ -55,6 +55,26 @@ class FormTemplateTest extends TestCase
     }
 
     #[Test]
+    public function it_can_count_fields_and_sections(): void
+    {
+        $template = new FormTemplate([
+            'fields' => [
+                ['id' => 'field-1'],
+                ['id' => 'field-2'],
+            ],
+            'sections' => [
+                ['id' => 'section-1'],
+            ],
+        ]);
+
+        $this->assertSame(2, $template->getFieldCount());
+        $this->assertSame(1, $template->getSectionCount());
+        $this->assertSame(0, (new FormTemplate)->getFieldCount());
+        $this->assertSame(0, (new FormTemplate(['fields' => null]))->getFieldCount());
+        $this->assertSame(0, (new FormTemplate(['sections' => 'invalid']))->getSectionCount());
+    }
+
+    #[Test]
     public function it_can_have_field_definitions(): void
     {
         $template = new FormTemplate([

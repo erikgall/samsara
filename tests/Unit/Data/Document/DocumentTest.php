@@ -18,19 +18,18 @@ class DocumentTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $document = new Document([
-            'id'              => '12345',
-            'name'            => 'Fuel Receipt',
-            'state'           => 'approved',
-            'notes'           => 'Fuel purchase for vehicle 123',
-            'documentTypeId'  => 'doc-type-1',
-            'documentTypeUid' => 'uid-12345',
+            'id'           => '12345',
+            'name'         => 'Fuel Receipt',
+            'state'        => 'submitted',
+            'notes'        => 'Fuel purchase for vehicle 123',
+            'documentType' => ['id' => 'doc-type-1', 'name' => 'Fuel Receipt'],
         ]);
 
         $this->assertSame('12345', $document->id);
         $this->assertSame('Fuel Receipt', $document->name);
-        $this->assertSame('approved', $document->state);
+        $this->assertSame('submitted', $document->state);
         $this->assertSame('Fuel purchase for vehicle 123', $document->notes);
-        $this->assertSame('doc-type-1', $document->documentTypeId);
+        $this->assertSame('doc-type-1', $document->documentType['id']);
     }
 
     #[Test]
@@ -45,36 +44,29 @@ class DocumentTest extends TestCase
     }
 
     #[Test]
-    public function it_can_check_if_approved(): void
+    public function it_can_check_each_current_document_state(): void
     {
-        $document = new Document([
-            'state' => 'approved',
-        ]);
+        $states = [
+            'submitted' => 'isSubmitted',
+            'required'  => 'isRequired',
+            'archived'  => 'isArchived',
+        ];
 
-        $this->assertTrue($document->isApproved());
-        $this->assertFalse($document->isRejected());
-    }
+        foreach ($states as $state => $expectedMethod) {
+            $document = new Document(['state' => $state]);
 
-    #[Test]
-    public function it_can_check_if_pending(): void
-    {
-        $document = new Document([
-            'state' => 'pending',
-        ]);
+            foreach ($states as $method) {
+                $this->assertSame($method === $expectedMethod, $document->{$method}());
+            }
+        }
 
-        $this->assertTrue($document->isPending());
-        $this->assertFalse($document->isApproved());
-    }
+        foreach ([[], ['state' => null], ['state' => ''], ['state' => 'unknown']] as $attributes) {
+            $document = new Document($attributes);
 
-    #[Test]
-    public function it_can_check_if_rejected(): void
-    {
-        $document = new Document([
-            'state' => 'rejected',
-        ]);
-
-        $this->assertTrue($document->isRejected());
-        $this->assertFalse($document->isApproved());
+            foreach ($states as $method) {
+                $this->assertFalse($document->{$method}());
+            }
+        }
     }
 
     #[Test]
@@ -93,7 +85,7 @@ class DocumentTest extends TestCase
         $data = [
             'id'    => '12345',
             'name'  => 'Fuel Receipt',
-            'state' => 'approved',
+            'state' => 'submitted',
         ];
 
         $document = new Document($data);
@@ -133,14 +125,12 @@ class DocumentTest extends TestCase
     public function it_can_have_timestamps(): void
     {
         $document = new Document([
-            'createdAtTime'  => '2024-04-10T07:06:25Z',
-            'updatedAtTime'  => '2024-04-11T10:00:00Z',
-            'submittedAtUtc' => '2024-04-10T08:00:00Z',
+            'createdAtTime' => '2024-04-10T07:06:25Z',
+            'updatedAtTime' => '2024-04-11T10:00:00Z',
         ]);
 
         $this->assertSame('2024-04-10T07:06:25Z', $document->createdAtTime);
         $this->assertSame('2024-04-11T10:00:00Z', $document->updatedAtTime);
-        $this->assertSame('2024-04-10T08:00:00Z', $document->submittedAtUtc);
     }
 
     #[Test]
@@ -162,5 +152,38 @@ class DocumentTest extends TestCase
         $document = new Document;
 
         $this->assertInstanceOf(Entity::class, $document);
+    }
+
+    #[Test]
+    public function legacy_approved_state_check_remains_backwards_compatible(): void
+    {
+        $document = new Document([
+            'state' => 'approved',
+        ]);
+
+        $this->assertTrue($document->isApproved());
+        $this->assertFalse($document->isRejected());
+    }
+
+    #[Test]
+    public function legacy_pending_state_check_remains_backwards_compatible(): void
+    {
+        $document = new Document([
+            'state' => 'pending',
+        ]);
+
+        $this->assertTrue($document->isPending());
+        $this->assertFalse($document->isApproved());
+    }
+
+    #[Test]
+    public function legacy_rejected_state_check_remains_backwards_compatible(): void
+    {
+        $document = new Document([
+            'state' => 'rejected',
+        ]);
+
+        $this->assertTrue($document->isRejected());
+        $this->assertFalse($document->isApproved());
     }
 }

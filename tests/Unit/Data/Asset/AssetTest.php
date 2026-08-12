@@ -18,17 +18,15 @@ class AssetTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $asset = new Asset([
-            'id'            => '12345',
-            'name'          => 'Forklift A',
-            'serialNumber'  => 'SN12345',
-            'purchasePrice' => 25000.00,
-            'type'          => 'equipment',
+            'id'           => '12345',
+            'name'         => 'Forklift A',
+            'serialNumber' => 'SN12345',
+            'type'         => 'equipment',
         ]);
 
         $this->assertSame('12345', $asset->id);
         $this->assertSame('Forklift A', $asset->name);
         $this->assertSame('SN12345', $asset->serialNumber);
-        $this->assertSame(25000.00, $asset->purchasePrice);
         $this->assertSame('equipment', $asset->type);
     }
 
@@ -76,6 +74,15 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_can_check_the_remaining_documented_asset_types(): void
+    {
+        $this->assertTrue((new Asset(['type' => 'unpowered']))->isUnpowered());
+        $this->assertTrue((new Asset(['type' => 'uncategorized']))->isUncategorized());
+        $this->assertFalse((new Asset(['type' => null]))->isUnpowered());
+        $this->assertFalse((new Asset(['type' => 'equipment']))->isUncategorized());
+    }
+
+    #[Test]
     public function it_can_convert_to_array(): void
     {
         $data = [
@@ -89,29 +96,30 @@ class AssetTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_gateway(): void
+    public function it_can_get_an_external_id_and_tag_ids(): void
     {
         $asset = new Asset([
-            'gateway' => [
-                'id'     => 'gw-1',
-                'serial' => 'GW12345',
+            'externalIds' => ['maintenanceId' => 'asset-123'],
+            'tags'        => [
+                ['id' => 'tag-1', 'name' => 'Heavy Equipment'],
+                ['id' => 2],
             ],
         ]);
 
-        $this->assertSame('gw-1', $asset->gateway['id']);
+        $this->assertSame('asset-123', $asset->getExternalId('maintenanceId'));
+        $this->assertNull($asset->getExternalId('missing'));
+        $this->assertSame(['tag-1', '2'], $asset->getTagIds());
+        $this->assertSame([], (new Asset(['tags' => null]))->getTagIds());
     }
 
     #[Test]
-    public function it_can_have_location(): void
+    public function it_can_have_external_ids(): void
     {
         $asset = new Asset([
-            'location' => [
-                'latitude'  => 37.7749,
-                'longitude' => -122.4194,
-            ],
+            'externalIds' => ['maintenanceId' => 'asset-123'],
         ]);
 
-        $this->assertSame(37.7749, $asset->location['latitude']);
+        $this->assertSame('asset-123', $asset->externalIds['maintenanceId']);
     }
 
     #[Test]
@@ -136,6 +144,21 @@ class AssetTest extends TestCase
 
         $this->assertSame('2024-04-10T07:06:25Z', $asset->createdAtTime);
         $this->assertSame('2024-04-11T10:00:00Z', $asset->updatedAtTime);
+    }
+
+    #[Test]
+    public function it_can_have_vehicle_metadata(): void
+    {
+        $asset = new Asset([
+            'make'         => 'Bobcat',
+            'model'        => 'S630 T4',
+            'licensePlate' => 'XHK1234',
+            'year'         => 2015,
+        ]);
+
+        $this->assertSame('Bobcat', $asset->make);
+        $this->assertSame('S630 T4', $asset->model);
+        $this->assertSame(2015, $asset->year);
     }
 
     #[Test]

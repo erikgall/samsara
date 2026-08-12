@@ -81,7 +81,7 @@ class EquipmentStats extends Entity
     {
         $gps = $this->get('gps');
 
-        if (empty($gps)) {
+        if (! is_array($gps) || $gps === []) {
             return null;
         }
 

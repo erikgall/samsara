@@ -120,6 +120,22 @@ class AddressTest extends TestCase
     }
 
     #[Test]
+    public function it_can_get_an_external_id(): void
+    {
+        $address = new Address([
+            'externalIds' => [
+                'maintenanceId' => '250020',
+                'empty'         => '',
+            ],
+        ]);
+
+        $this->assertSame('250020', $address->getExternalId('maintenanceId'));
+        $this->assertSame('', $address->getExternalId('empty'));
+        $this->assertNull($address->getExternalId('missing'));
+        $this->assertNull((new Address(['externalIds' => null]))->getExternalId('maintenanceId'));
+    }
+
+    #[Test]
     public function it_can_get_contact_ids(): void
     {
         $address = new Address([
@@ -303,6 +319,12 @@ class AddressTest extends TestCase
         ]);
 
         $this->assertFalse($address->isYard());
+    }
+
+    #[Test]
+    public function it_returns_null_for_a_malformed_geofence(): void
+    {
+        $this->assertNull((new Address(['geofence' => 'invalid']))->getGeofence());
     }
 
     #[Test]

@@ -15,6 +15,22 @@ use Samsara\Data\HoursOfService\HosDailyLog;
 class HosDailyLogTest extends TestCase
 {
     #[Test]
+    public function drive_conversions_preserve_zero_and_missing_values(): void
+    {
+        $zero = new HosDailyLog([
+            'distanceTraveled'    => ['driveDistanceMeters' => 0],
+            'dutyStatusDurations' => ['driveDurationMs' => 0],
+        ]);
+
+        $this->assertSame(0.0, $zero->getDriveDistanceKilometers());
+        $this->assertSame(0.0, $zero->getDriveDistanceMiles());
+        $this->assertSame(0.0, $zero->getDriveTimeHours());
+        $this->assertNull((new HosDailyLog)->getDriveDistanceKilometers());
+        $this->assertNull((new HosDailyLog(['distanceTraveled' => null]))->getDriveDistanceMiles());
+        $this->assertNull((new HosDailyLog(['dutyStatusDurations' => []]))->getDriveTimeHours());
+    }
+
+    #[Test]
     public function it_can_be_created_with_attributes(): void
     {
         $dailyLog = new HosDailyLog([
@@ -55,11 +71,13 @@ class HosDailyLogTest extends TestCase
     {
         $dailyLog = new HosDailyLog([
             'distanceTraveled' => [
-                'distanceMeters' => 150000,
+                'driveDistanceMeters'              => 150000,
+                'personalConveyanceDistanceMeters' => 2500,
+                'yardMoveDistanceMeters'           => 500,
             ],
         ]);
 
-        $this->assertSame(150000, $dailyLog->distanceTraveled['distanceMeters']);
+        $this->assertSame(150000, $dailyLog->distanceTraveled['driveDistanceMeters']);
     }
 
     #[Test]
@@ -96,11 +114,12 @@ class HosDailyLogTest extends TestCase
     {
         $dailyLog = new HosDailyLog([
             'logMetaData' => [
-                'shippingId' => 'SHIP-12345',
+                'shippingDocs' => 'SHIP-12345',
+                'isCertified'  => true,
             ],
         ]);
 
-        $this->assertSame('SHIP-12345', $dailyLog->logMetaData['shippingId']);
+        $this->assertSame('SHIP-12345', $dailyLog->logMetaData['shippingDocs']);
     }
 
     #[Test]
@@ -113,6 +132,19 @@ class HosDailyLogTest extends TestCase
         ]);
 
         $this->assertSame(1800000, $dailyLog->pendingDutyStatusDurations['driveDurationMs']);
+    }
+
+    #[Test]
+    public function it_converts_drive_distance_and_time(): void
+    {
+        $dailyLog = new HosDailyLog([
+            'distanceTraveled'    => ['driveDistanceMeters' => 160934],
+            'dutyStatusDurations' => ['driveDurationMs' => 7200000],
+        ]);
+
+        $this->assertSame(160.934, $dailyLog->getDriveDistanceKilometers());
+        $this->assertEqualsWithDelta(100.0, $dailyLog->getDriveDistanceMiles(), 0.001);
+        $this->assertSame(2.0, $dailyLog->getDriveTimeHours());
     }
 
     #[Test]

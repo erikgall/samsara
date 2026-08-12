@@ -36,9 +36,49 @@ class EquipmentStatsSeries extends Entity
     /**
      * @return EntityCollection<int, EquipmentStatValue>
      */
+    public function getEngineTotalIdleTimeMinutesReadings(): EntityCollection
+    {
+        return $this->statReadings('engineTotalIdleTimeMinutes');
+    }
+
+    /**
+     * @return EntityCollection<int, EquipmentStatValue>
+     */
     public function getFuelPercentReadings(): EntityCollection
     {
         return $this->statReadings('fuelPercents');
+    }
+
+    /**
+     * @return EntityCollection<int, EquipmentStatValue>
+     */
+    public function getGatewayEngineSecondsReadings(): EntityCollection
+    {
+        return $this->statReadings('gatewayEngineSeconds');
+    }
+
+    /**
+     * @return EntityCollection<int, EquipmentStatValue>
+     */
+    public function getGatewayEngineStateReadings(): EntityCollection
+    {
+        return $this->statReadings('gatewayEngineStates');
+    }
+
+    /**
+     * @return EntityCollection<int, EquipmentStatValue>
+     */
+    public function getGatewayJ1939EngineSecondsReadings(): EntityCollection
+    {
+        return $this->statReadings('gatewayJ1939EngineSeconds');
+    }
+
+    /**
+     * @return EntityCollection<int, EquipmentStatValue>
+     */
+    public function getGpsOdometerMetersReadings(): EntityCollection
+    {
+        return $this->statReadings('gpsOdometerMeters');
     }
 
     /**
@@ -54,8 +94,24 @@ class EquipmentStatsSeries extends Entity
 
         return new EntityCollection(array_map(
             fn (array $reading): EquipmentGpsLocation => EquipmentGpsLocation::make($reading),
-            $readings
+            array_values(array_filter($readings, 'is_array'))
         ));
+    }
+
+    /**
+     * @return EntityCollection<int, EquipmentStatValue>
+     */
+    public function getObdEngineSecondsReadings(): EntityCollection
+    {
+        return $this->statReadings('obdEngineSeconds');
+    }
+
+    /**
+     * @return EntityCollection<int, EquipmentStatValue>
+     */
+    public function getObdEngineStateReadings(): EntityCollection
+    {
+        return $this->statReadings('obdEngineStates');
     }
 
     /**
@@ -71,7 +127,7 @@ class EquipmentStatsSeries extends Entity
 
         return new EntityCollection(array_map(
             fn (array $reading): EquipmentStatValue => EquipmentStatValue::make($reading),
-            $readings
+            array_values(array_filter($readings, 'is_array'))
         ));
     }
 }

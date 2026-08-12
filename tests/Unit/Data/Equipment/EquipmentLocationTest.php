@@ -6,6 +6,8 @@ use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Equipment\EquipmentLocation;
+use Samsara\Data\Equipment\EquipmentLocationResult;
+use Samsara\Data\Equipment\EquipmentLocationSeries;
 
 /**
  * Unit tests for the EquipmentLocation entity.
@@ -61,6 +63,24 @@ class EquipmentLocationTest extends TestCase
     }
 
     #[Test]
+    public function it_can_get_coordinates(): void
+    {
+        $location = new EquipmentLocation([
+            'latitude'  => 37.7749,
+            'longitude' => -122.4194,
+        ]);
+
+        $this->assertSame([
+            'latitude'  => 37.7749,
+            'longitude' => -122.4194,
+        ], $location->getCoordinates());
+        $this->assertSame([
+            'latitude'  => null,
+            'longitude' => null,
+        ], (new EquipmentLocation)->getCoordinates());
+    }
+
+    #[Test]
     public function it_extends_entity(): void
     {
         $location = new EquipmentLocation([]);
@@ -74,5 +94,24 @@ class EquipmentLocationTest extends TestCase
         $location = new EquipmentLocation([]);
 
         $this->assertNull($location->getSpeedKilometersPerHour());
+    }
+
+    #[Test]
+    public function location_results_and_series_return_typed_locations(): void
+    {
+        $result = new EquipmentLocationResult([
+            'location' => ['latitude' => 37.7749, 'longitude' => -122.4194, 'time' => '2026-08-12T12:00:00Z'],
+        ]);
+        $series = new EquipmentLocationSeries([
+            'locations' => [
+                ['latitude' => 37.7749, 'longitude' => -122.4194, 'time' => '2026-08-12T12:00:00Z'],
+            ],
+        ]);
+
+        $this->assertInstanceOf(EquipmentLocation::class, $result->getLocation());
+        $this->assertInstanceOf(EquipmentLocation::class, $series->getLocations()->first());
+        $this->assertNull((new EquipmentLocationResult(['location' => null]))->getLocation());
+        $this->assertTrue((new EquipmentLocationSeries(['locations' => null]))->getLocations()->isEmpty());
+        $this->assertTrue((new EquipmentLocationSeries(['locations' => 'invalid']))->getLocations()->isEmpty());
     }
 }

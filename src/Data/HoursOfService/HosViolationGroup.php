@@ -19,9 +19,15 @@ class HosViolationGroup extends Entity
      */
     public function getViolations(): EntityCollection
     {
+        $violations = $this->get('violations', []);
+
+        if (! is_array($violations)) {
+            return new EntityCollection;
+        }
+
         return new EntityCollection(array_map(
             fn (array $violation): HosViolation => HosViolation::make($violation),
-            $this->get('violations', [])
+            array_values(array_filter($violations, 'is_array'))
         ));
     }
 }

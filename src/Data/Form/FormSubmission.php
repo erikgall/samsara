@@ -19,6 +19,16 @@ use Samsara\Data\Entity;
  * @property-read array<string, mixed>|null $assignedTo Assigned user or driver
  * @property-read array<int, array<string, mixed>>|null $fields Form fields
  * @property-read bool|null $isRequired Whether completion is required
+ * @property-read string|null $assignedAtTime Assignment time (RFC 3339)
+ * @property-read string|null $dueAtTime Due time (RFC 3339)
+ * @property-read int|null $durationMs Completion duration in milliseconds
+ * @property-read array<string, string>|null $externalIds External ID mappings
+ * @property-read array<string, mixed>|null $geofence Associated geofence
+ * @property-read array<string, mixed>|null $location Submission location
+ * @property-read string|null $routeId Associated route ID
+ * @property-read string|null $routeStopId Associated route stop ID
+ * @property-read array<string, mixed>|null $score Submission score
+ * @property-read array<string, mixed>|null $submittedBy Submitter
  * @property-read string|null $title Submission title
  * @property-read string|null $createdAtTime Creation time (RFC 3339)
  * @property-read string|null $updatedAtTime Last update time (RFC 3339)

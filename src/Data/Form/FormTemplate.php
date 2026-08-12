@@ -24,4 +24,25 @@ use Samsara\Data\Entity;
  * @property-read string|null $createdAtTime Creation time (RFC 3339)
  * @property-read string|null $updatedAtTime Last update time (RFC 3339)
  */
-class FormTemplate extends Entity {}
+class FormTemplate extends Entity
+{
+    /**
+     * Get the number of fields in the template.
+     */
+    public function getFieldCount(): int
+    {
+        $fields = $this->get('fields');
+
+        return is_array($fields) ? count($fields) : 0;
+    }
+
+    /**
+     * Get the number of sections in the template.
+     */
+    public function getSectionCount(): int
+    {
+        $sections = $this->get('sections');
+
+        return is_array($sections) ? count($sections) : 0;
+    }
+}

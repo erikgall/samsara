@@ -29,7 +29,7 @@ class EldSettingsTest extends TestCase
     {
         $settings = new EldSettings([
             'rulesets' => [
-                ['name' => 'US Property', 'cycle' => '70_8'],
+                ['cycle' => 'USA 70 hour / 8 day', 'jurisdiction' => 'CA'],
             ],
         ]);
 
@@ -42,7 +42,7 @@ class EldSettingsTest extends TestCase
     {
         $settings = new EldSettings([
             'rulesets' => [
-                ['name' => 'US Property'],
+                ['cycle' => 'USA 70 hour / 8 day'],
             ],
         ]);
 
@@ -67,8 +67,8 @@ class EldSettingsTest extends TestCase
     public function it_can_get_rulesets(): void
     {
         $rulesets = [
-            ['name' => 'US Property', 'cycle' => '70_8'],
-            ['name' => 'California Property', 'cycle' => '80_8'],
+            ['cycle' => 'USA 70 hour / 8 day', 'jurisdiction' => 'CA'],
+            ['cycle' => 'CA 80 hour / 8 day', 'jurisdiction' => 'CA'],
         ];
 
         $settings = new EldSettings([
@@ -92,6 +92,7 @@ class EldSettingsTest extends TestCase
         $settings = new EldSettings;
 
         $this->assertSame([], $settings->getRulesets());
+        $this->assertSame([], (new EldSettings(['rulesets' => 'invalid']))->getRulesets());
     }
 
     #[Test]

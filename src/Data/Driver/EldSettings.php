@@ -11,7 +11,7 @@ use Samsara\Data\Entity;
  *
  * @author Erik Galloway <erik@erikgall.com>
  *
- * @property-read array<int, array{name?: string, cycle?: string}>|null $rulesets ELD rulesets
+ * @property-read array<int, array{break?: string, cycle?: string, jurisdiction?: string, restart?: string, shift?: string}>|null $rulesets ELD rulesets
  */
 class EldSettings extends Entity
 {
@@ -22,7 +22,9 @@ class EldSettings extends Entity
      */
     public function getRulesets(): array
     {
-        return $this->rulesets ?? [];
+        $rulesets = $this->get('rulesets');
+
+        return is_array($rulesets) ? $rulesets : [];
     }
 
     /**
@@ -30,6 +32,6 @@ class EldSettings extends Entity
      */
     public function hasRulesets(): bool
     {
-        return ! empty($this->rulesets);
+        return $this->getRulesets() !== [];
     }
 }

@@ -7,6 +7,8 @@ use Samsara\Tests\TestCase;
 use Samsara\Enums\DutyStatus;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\HoursOfService\HosLog;
+use Samsara\Data\HoursOfService\HosLogsForDriver;
+use Samsara\Data\HoursOfService\HosClocksForDriver;
 
 /**
  * Unit tests for the HosLog entity.
@@ -15,6 +17,38 @@ use Samsara\Data\HoursOfService\HosLog;
  */
 class HosLogTest extends TestCase
 {
+    #[Test]
+    public function clocks_for_a_driver_expose_current_status_and_violation_hours(): void
+    {
+        $clocks = new HosClocksForDriver([
+            'currentDutyStatus' => ['hosStatusType' => 'sleeperBed'],
+            'violations'        => [
+                'cycleViolationDurationMs'        => 3600000,
+                'shiftDrivingViolationDurationMs' => 0,
+            ],
+        ]);
+
+        $this->assertSame(DutyStatus::SLEEPER_BERTH, $clocks->getCurrentDutyStatus());
+        $this->assertSame(1.0, $clocks->getCycleViolationHours());
+        $this->assertSame(0.0, $clocks->getShiftDrivingViolationHours());
+        $this->assertNull((new HosClocksForDriver)->getCurrentDutyStatus());
+        $this->assertSame([], (new HosClocksForDriver(['clocks' => 'invalid']))->getClocks()->toArray());
+        $this->assertNull((new HosClocksForDriver(['violations' => null]))->getCycleViolationHours());
+        $this->assertNull((new HosClocksForDriver(['currentDutyStatus' => ['hosStatusType' => 'unknown']]))->getCurrentDutyStatus());
+    }
+
+    #[Test]
+    public function grouped_logs_return_a_typed_or_empty_collection(): void
+    {
+        $group = new HosLogsForDriver([
+            'hosLogs' => [['hosStatusType' => 'driving', 'logStartTime' => '2026-08-12T12:00:00Z']],
+        ]);
+
+        $this->assertInstanceOf(HosLog::class, $group->getLogs()->first());
+        $this->assertTrue((new HosLogsForDriver(['hosLogs' => null]))->getLogs()->isEmpty());
+        $this->assertTrue((new HosLogsForDriver(['hosLogs' => 'invalid']))->getLogs()->isEmpty());
+    }
+
     #[Test]
     public function it_can_be_created_with_attributes(): void
     {
@@ -156,7 +190,6 @@ class HosLogTest extends TestCase
             'logRecordedLocation' => [
                 'latitude'  => 37.7749,
                 'longitude' => -122.4194,
-                'location'  => 'San Francisco, CA',
             ],
         ]);
 
@@ -192,5 +225,12 @@ class HosLogTest extends TestCase
         $log = new HosLog;
 
         $this->assertNull($log->getDutyStatus());
+    }
+
+    #[Test]
+    public function it_returns_null_for_an_unknown_duty_status(): void
+    {
+        $this->assertNull((new HosLog(['hosStatusType' => 'unknown']))->getDutyStatus());
+        $this->assertNull((new HosLog(['hosStatusType' => '']))->getDutyStatus());
     }
 }

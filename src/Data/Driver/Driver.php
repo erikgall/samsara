@@ -74,7 +74,7 @@ class Driver extends Entity
     {
         $settings = $this->get('carrierSettings');
 
-        if (empty($settings)) {
+        if (! is_array($settings) || $settings === []) {
             return null;
         }
 
@@ -98,7 +98,7 @@ class Driver extends Entity
     {
         $settings = $this->get('eldSettings');
 
-        if (empty($settings)) {
+        if (! is_array($settings) || $settings === []) {
             return null;
         }
 
@@ -110,9 +110,15 @@ class Driver extends Entity
      */
     public function getExternalId(string $key): ?string
     {
-        $externalIds = $this->externalIds ?? [];
+        $externalIds = $this->get('externalIds');
 
-        return $externalIds[$key] ?? null;
+        if (! is_array($externalIds)) {
+            return null;
+        }
+
+        $externalId = $externalIds[$key] ?? null;
+
+        return is_string($externalId) ? $externalId : null;
     }
 
     /**
@@ -122,7 +128,7 @@ class Driver extends Entity
     {
         $vehicle = $this->get('staticAssignedVehicle');
 
-        if (empty($vehicle)) {
+        if (! is_array($vehicle) || $vehicle === []) {
             return null;
         }
 
@@ -136,9 +142,21 @@ class Driver extends Entity
      */
     public function getTagIds(): array
     {
-        $tags = $this->tags ?? [];
+        $tags = $this->get('tags', []);
 
-        return array_map(fn (array $tag): string => (string) $tag['id'], $tags);
+        if (! is_array($tags)) {
+            return [];
+        }
+
+        $ids = [];
+
+        foreach ($tags as $tag) {
+            if (is_array($tag) && isset($tag['id'])) {
+                $ids[] = (string) $tag['id'];
+            }
+        }
+
+        return $ids;
     }
 
     /**
@@ -146,7 +164,17 @@ class Driver extends Entity
      */
     public function hasStaticAssignedVehicle(): bool
     {
-        return ! empty($this->staticAssignedVehicle);
+        $vehicle = $this->get('staticAssignedVehicle');
+
+        return is_array($vehicle) && $vehicle !== [];
+    }
+
+    /**
+     * Check if the driver has a tag by ID.
+     */
+    public function hasTag(string $id): bool
+    {
+        return in_array($id, $this->getTagIds(), true);
     }
 
     /**
