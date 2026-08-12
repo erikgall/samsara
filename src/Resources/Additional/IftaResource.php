@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
 /**
@@ -77,6 +78,16 @@ class IftaResource extends Resource
         $response = $this->executeSdkGet($endpoint, $params);
 
         return $response->json();
+    }
+
+    /**
+     * Get a query builder for IFTA vehicle reports.
+     */
+    public function vehicleReportQuery(): Builder
+    {
+        return $this->createBuilderWithEndpoint('/fleet/reports/ifta/vehicle')
+            ->withoutDefaultPageSize()
+            ->withResponseCollectionKey('data.vehicleReports');
     }
 
     /**

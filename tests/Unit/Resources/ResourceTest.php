@@ -31,6 +31,27 @@ class ResourceTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('encodedPathOperations')]
+    public function it_encodes_arbitrary_ids_as_one_path_segment(string $operation, string $method): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->fake(['*' => $http->response(['data' => ['id' => 'external/id with spaces?#']])]);
+
+        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara->setHttpFactory($http);
+        $resource = new TestResource($samsara);
+
+        match ($operation) {
+            'delete' => $resource->delete('external/id with spaces?#'),
+            'find'   => $resource->find('external/id with spaces?#'),
+            'update' => $resource->update('external/id with spaces?#', ['name' => 'Updated']),
+        };
+
+        $http->assertSent(fn ($request) => $request->method() === $method
+            && $request->url() === 'https://api.samsara.com/test-endpoint/external%2Fid%20with%20spaces%3F%23');
+    }
+
+    #[Test]
     public function it_executes_direct_get_requests_with_repeated_query_keys(): void
     {
         $http = new \Illuminate\Http\Client\Factory;
@@ -52,6 +73,29 @@ class ResourceTest extends TestCase
 
         $this->assertTrue($method->isProtected());
         $this->assertTrue($method->isFinal());
+    }
+
+    #[Test]
+    public function it_keeps_direct_builder_construction_inside_the_base_resource_factory(): void
+    {
+        $resources = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(dirname(__DIR__, 3).'/src/Resources')
+        );
+
+        foreach ($resources as $resource) {
+            if (! $resource->isFile() || $resource->getExtension() !== 'php' || $resource->getFilename() === 'Resource.php') {
+                continue;
+            }
+
+            $contents = file_get_contents($resource->getPathname());
+
+            $this->assertIsString($contents);
+            $this->assertDoesNotMatchRegularExpression(
+                '/new\s+Builder\s*\(/',
+                $contents,
+                "Direct Builder construction remains in {$resource->getPathname()}."
+            );
+        }
     }
 
     #[Test]
@@ -303,6 +347,18 @@ class ResourceTest extends TestCase
             'delete' => ['delete', 'DELETE', '/test-endpoint/123'],
             'find'   => ['find', 'GET', '/test-endpoint/123'],
             'update' => ['update', 'PATCH', '/test-endpoint/123'],
+        ];
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function encodedPathOperations(): array
+    {
+        return [
+            'find'   => ['find', 'GET'],
+            'update' => ['update', 'PATCH'],
+            'delete' => ['delete', 'DELETE'],
         ];
     }
 

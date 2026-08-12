@@ -90,6 +90,17 @@ class AssetsResource extends Resource
     }
 
     /**
+     * Get a query builder for legacy asset locations.
+     */
+    public function locationsQuery(): Builder
+    {
+        return $this->createBuilderWithEndpoint('/v1/fleet/assets/locations')
+            ->withResponseCollectionKey('assets')
+            ->withCursorParameter('startingAfter')
+            ->usingEntity(Entity::class);
+    }
+
+    /**
      * Create a new query builder for this resource.
      */
     public function query(): Builder
@@ -113,6 +124,17 @@ class AssetsResource extends Resource
         );
 
         return $response->json();
+    }
+
+    /**
+     * Get a query builder for legacy reefer stats.
+     */
+    public function reefersQuery(): Builder
+    {
+        return $this->createBuilderWithEndpoint('/v1/fleet/assets/reefers')
+            ->withResponseCollectionKey('data')
+            ->withCursorParameter('startingAfter')
+            ->usingEntity(Entity::class);
     }
 
     /**

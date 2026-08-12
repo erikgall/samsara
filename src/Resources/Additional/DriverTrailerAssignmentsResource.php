@@ -24,7 +24,7 @@ class DriverTrailerAssignmentsResource extends Resource
      */
     public function query(): Builder
     {
-        return (new Builder($this))->withoutDefaultPageSize();
+        return $this->createBuilderWithEndpoint($this->endpoint)->withoutDefaultPageSize();
     }
 
     /**

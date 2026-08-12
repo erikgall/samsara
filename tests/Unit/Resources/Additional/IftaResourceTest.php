@@ -3,6 +3,7 @@
 namespace Samsara\Tests\Unit\Resources\Additional;
 
 use Samsara\Samsara;
+use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
@@ -162,5 +163,59 @@ class IftaResourceTest extends TestCase
         $resource = new IftaResource($this->samsara);
 
         $this->assertSame('/ifta-detail/csv', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_keeps_the_raw_vehicle_report_envelope_authoritative(): void
+    {
+        $envelope = [
+            'data' => [
+                'year'            => 2024,
+                'quarter'         => 'Q1',
+                'vehicleReports'  => [['vehicleId' => 'vehicle-1', 'totalMiles' => 5000]],
+                'troubleshooting' => ['message' => 'Retained only by the raw method'],
+            ],
+            'pagination' => ['endCursor' => 'vehicle-next', 'hasNextPage' => true],
+        ];
+        $this->http->fake(['*' => $this->http->response($envelope)]);
+
+        $result = (new IftaResource($this->samsara))->vehicleReport(['year' => 2024]);
+
+        $this->assertSame($envelope, $result);
+    }
+
+    #[Test]
+    public function it_paginates_nested_ifta_vehicle_reports_without_an_unsupported_limit(): void
+    {
+        $this->http->fakeSequence()
+            ->push([
+                'data' => [
+                    'year'           => 2024,
+                    'vehicleReports' => [['id' => 'ifta-report-1', 'vehicleId' => 'vehicle-1']],
+                ],
+                'pagination' => ['endCursor' => 'ifta-next', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data' => [
+                    'year'           => 2024,
+                    'vehicleReports' => [['id' => 'ifta-report-2', 'vehicleId' => 'vehicle-2']],
+                ],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]);
+
+        $page = (new IftaResource($this->samsara))
+            ->vehicleReportQuery()
+            ->where('year', 2024)
+            ->paginate();
+        $nextPage = $page->nextPage();
+
+        $this->assertInstanceOf(Entity::class, $page->items()->first());
+        $this->assertSame('ifta-report-1', $page->items()->first()->getId());
+        $this->assertSame('ifta-report-2', $nextPage?->items()->first()->getId());
+        $this->http->assertSentCount(2);
+        $this->http->assertSent(fn (Request $request): bool => $request->data() === [
+            'year'  => 2024,
+            'after' => 'ifta-next',
+        ]);
     }
 }

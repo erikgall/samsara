@@ -3,6 +3,7 @@
 namespace Samsara\Tests\Unit\Resources\Additional;
 
 use Samsara\Samsara;
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
@@ -125,5 +126,66 @@ class FuelAndEnergyResourceTest extends TestCase
         $resource = new FuelAndEnergyResource($this->samsara);
 
         $this->assertSame('/fuel-purchase', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_paginates_nested_driver_reports_without_an_unsupported_limit(): void
+    {
+        $this->http->fakeSequence()
+            ->push([
+                'data'       => ['driverReports' => [['id' => 'driver-report-1', 'driverId' => 'driver-1']]],
+                'pagination' => ['endCursor' => 'drivers-next', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data'       => ['driverReports' => [['id' => 'driver-report-2', 'driverId' => 'driver-2']]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]);
+
+        $page = (new FuelAndEnergyResource($this->samsara))
+            ->driversFuelEnergyReportQuery()
+            ->where('startDate', '2024-01-01')
+            ->where('endDate', '2024-01-31')
+            ->paginate();
+        $nextPage = $page->nextPage();
+
+        $this->assertInstanceOf(Entity::class, $page->items()->first());
+        $this->assertSame('driver-report-1', $page->items()->first()->getId());
+        $this->assertSame('driver-report-2', $nextPage?->items()->first()->getId());
+        $this->http->assertSentCount(2);
+        $this->http->assertSent(fn ($request): bool => $request->data() === [
+            'startDate' => '2024-01-01',
+            'endDate'   => '2024-01-31',
+            'after'     => 'drivers-next',
+        ]);
+    }
+
+    #[Test]
+    public function it_paginates_nested_vehicle_reports_without_an_unsupported_limit(): void
+    {
+        $this->http->fakeSequence()
+            ->push([
+                'data'       => ['vehicleReports' => [['id' => 'vehicle-report-1', 'vehicleId' => 'vehicle-1']]],
+                'pagination' => ['endCursor' => 'vehicles-next', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data'       => ['vehicleReports' => [['id' => 'vehicle-report-2', 'vehicleId' => 'vehicle-2']]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]);
+
+        $page = (new FuelAndEnergyResource($this->samsara))
+            ->vehiclesFuelEnergyReportQuery()
+            ->where('startDate', '2024-01-01')
+            ->where('endDate', '2024-01-31')
+            ->paginate();
+        $nextPage = $page->nextPage();
+
+        $this->assertSame('vehicle-report-1', $page->items()->first()->getId());
+        $this->assertSame('vehicle-report-2', $nextPage?->items()->first()->getId());
+        $this->http->assertSentCount(2);
+        $this->http->assertSent(fn ($request): bool => $request->data() === [
+            'startDate' => '2024-01-01',
+            'endDate'   => '2024-01-31',
+            'after'     => 'vehicles-next',
+        ]);
     }
 }

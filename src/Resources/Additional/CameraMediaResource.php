@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
 /**
@@ -49,6 +50,17 @@ class CameraMediaResource extends Resource
         );
 
         return $response->json('data', $response->json());
+    }
+
+    /**
+     * Get a query builder for camera media.
+     */
+    public function query(): Builder
+    {
+        return $this->createBuilderWithEndpoint($this->endpoint)
+            ->withoutDefaultPageSize()
+            ->withResponseCollectionKey('data.media')
+            ->repeatQueryParameters('inputs', 'mediaTypes', 'triggerReasons');
     }
 
     /**

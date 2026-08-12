@@ -3,6 +3,7 @@
 namespace Samsara\Tests\Unit\Resources\Additional;
 
 use Samsara\Samsara;
+use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
@@ -123,5 +124,36 @@ class CameraMediaResourceTest extends TestCase
         $resource = new CameraMediaResource($this->samsara);
 
         $this->assertSame('/cameras/media', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_paginates_the_nested_media_collection_without_an_unsupported_limit(): void
+    {
+        $this->http->fakeSequence()
+            ->push([
+                'data'       => ['media' => [['id' => 'media-1']]],
+                'pagination' => ['endCursor' => 'media-next', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data'       => ['media' => [['id' => 'media-2']]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]);
+
+        $page = (new CameraMediaResource($this->samsara))
+            ->query()
+            ->where('vehicleIds', 'vehicle-1')
+            ->paginate();
+        $nextPage = $page->nextPage();
+
+        $this->assertInstanceOf(Entity::class, $page->items()->first());
+        $this->assertSame('media-1', $page->items()->first()->getId());
+        $this->assertSame('media-2', $nextPage?->items()->first()->getId());
+        $this->http->assertSentCount(2);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/cameras/media'
+            && $request->data() === ['vehicleIds' => 'vehicle-1']);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/cameras/media'
+            && $request->data() === ['vehicleIds' => 'vehicle-1', 'after' => 'media-next']);
     }
 }

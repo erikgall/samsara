@@ -132,7 +132,7 @@ abstract class Resource implements ResourceInterface
      */
     public function delete(string $id): bool
     {
-        $endpoint = "{$this->endpoint}/{$id}";
+        $endpoint = $this->endpoint.'/'.$this->encodePathSegment($id);
         $this->ensureGenericOperationIsSupported('delete', $endpoint);
 
         $response = $this->executeSdkRequest(
@@ -155,7 +155,7 @@ abstract class Resource implements ResourceInterface
      */
     public function find(string $id): ?object
     {
-        $endpoint = "{$this->endpoint}/{$id}";
+        $endpoint = $this->endpoint.'/'.$this->encodePathSegment($id);
         $this->ensureGenericOperationIsSupported('find', $endpoint);
 
         $response = $this->executeSdkRequest(
@@ -223,7 +223,7 @@ abstract class Resource implements ResourceInterface
      */
     public function update(string $id, array $data): object
     {
-        $endpoint = "{$this->endpoint}/{$id}";
+        $endpoint = $this->endpoint.'/'.$this->encodePathSegment($id);
         $this->ensureGenericOperationIsSupported('update', $endpoint);
 
         $response = $this->executeSdkRequest(
@@ -377,6 +377,19 @@ abstract class Resource implements ResourceInterface
     protected function supportedGenericOperations(): array
     {
         return ['all', 'find', 'create', 'update', 'delete'];
+    }
+
+    /**
+     * Encode an ID as one URL path segment without double-encoding callers
+     * that already encode external ID components.
+     */
+    private function encodePathSegment(string $id): string
+    {
+        return preg_replace_callback(
+            '/%(?![0-9A-Fa-f]{2})|[^A-Za-z0-9\-._~%!$&\'()*+,;=:@]/',
+            static fn (array $match): string => rawurlencode($match[0]),
+            $id
+        ) ?? rawurlencode($id);
     }
 
     /**

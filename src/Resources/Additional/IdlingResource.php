@@ -24,7 +24,7 @@ class IdlingResource extends Resource
      */
     public function events(): Builder
     {
-        return new Builder($this);
+        return $this->createBuilderWithEndpoint($this->endpoint);
     }
 
     /**

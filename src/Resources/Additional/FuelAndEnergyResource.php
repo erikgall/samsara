@@ -64,6 +64,16 @@ class FuelAndEnergyResource extends Resource
     }
 
     /**
+     * Get a query builder for drivers fuel and energy reports.
+     */
+    public function driversFuelEnergyReportQuery(): Builder
+    {
+        return $this->createBuilderWithEndpoint('/fleet/reports/drivers/fuel-energy')
+            ->withoutDefaultPageSize()
+            ->withResponseCollectionKey('data.driverReports');
+    }
+
+    /**
      * Get a query builder for vehicle efficiency.
      */
     public function vehicleEfficiency(): Builder
@@ -84,6 +94,16 @@ class FuelAndEnergyResource extends Resource
         $response = $this->executeSdkGet($endpoint, $params);
 
         return $response->json();
+    }
+
+    /**
+     * Get a query builder for vehicles fuel and energy reports.
+     */
+    public function vehiclesFuelEnergyReportQuery(): Builder
+    {
+        return $this->createBuilderWithEndpoint('/fleet/reports/vehicles/fuel-energy')
+            ->withoutDefaultPageSize()
+            ->withResponseCollectionKey('data.vehicleReports');
     }
 
     /**

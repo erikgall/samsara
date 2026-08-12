@@ -253,6 +253,75 @@ class AssetsResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_paginates_legacy_locations_from_the_assets_collection(): void
+    {
+        $this->http->fakeSequence()
+            ->push([
+                'assets'     => [['id' => 'asset-1', 'name' => 'Asset 1']],
+                'pagination' => ['endCursor' => 'locations-next', 'hasNextPage' => true],
+            ])
+            ->push([
+                'assets'     => [['id' => 'asset-2', 'name' => 'Asset 2']],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]);
+
+        $page = (new AssetsResource($this->samsara))->locationsQuery()->paginate(1);
+        $nextPage = $page->nextPage();
+
+        $this->assertInstanceOf(Entity::class, $page->items()->first());
+        $this->assertNotInstanceOf(Asset::class, $page->items()->first());
+        $this->assertSame('asset-1', $page->items()->first()->getId());
+        $this->assertSame('asset-2', $nextPage?->items()->first()->getId());
+        $this->http->assertSentCount(2);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/v1/fleet/assets/locations'
+            && $this->queryFor($request->url()) === ['limit' => '1']);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/v1/fleet/assets/locations'
+            && $this->queryFor($request->url()) === ['limit' => '1', 'startingAfter' => 'locations-next']);
+    }
+
+    #[Test]
+    public function it_paginates_legacy_reefers_from_the_data_collection(): void
+    {
+        $this->http->fakeSequence()
+            ->push([
+                'data'       => [['id' => 'reefer-1', 'assetId' => 'asset-1']],
+                'pagination' => ['endCursor' => 'reefers-next', 'hasNextPage' => true],
+            ])
+            ->push([
+                'data'       => [['id' => 'reefer-2', 'assetId' => 'asset-2']],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]);
+
+        $page = (new AssetsResource($this->samsara))
+            ->reefersQuery()
+            ->where('startMs', 1000)
+            ->where('endMs', 2000)
+            ->paginate(1);
+        $nextPage = $page->nextPage();
+
+        $this->assertSame('reefer-1', $page->items()->first()->getId());
+        $this->assertSame('reefer-2', $nextPage?->items()->first()->getId());
+        $this->http->assertSentCount(2);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/v1/fleet/assets/reefers'
+            && $this->queryFor($request->url()) === [
+                'startMs' => '1000',
+                'endMs'   => '2000',
+                'limit'   => '1',
+            ]);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/v1/fleet/assets/reefers'
+            && $this->queryFor($request->url()) === [
+                'startMs'       => '1000',
+                'endMs'         => '2000',
+                'limit'         => '1',
+                'startingAfter' => 'reefers-next',
+            ]);
+    }
+
+    #[Test]
     public function it_rejects_the_phantom_generic_find_operation(): void
     {
         $this->http->fake();
