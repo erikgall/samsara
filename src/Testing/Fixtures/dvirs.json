@@ -1,61 +1,63 @@
 {
     "data": [
         {
+            "authorSignature": {
+                "signatoryUser": {"id": "driver-001"},
+                "signedAtTime": "2024-06-15T07:45:00Z",
+                "type": "driver"
+            },
+            "defectIds": [],
+            "dvirSubmissionBeginTime": "2024-06-15T07:30:00Z",
+            "dvirSubmissionTime": "2024-06-15T07:45:00Z",
+            "formattedAddress": "San Francisco, CA",
             "id": "dvir-001",
             "vehicle": {
-                "id": "vehicle-001",
-                "name": "Truck 001"
+                "id": "vehicle-001"
             },
             "type": "preTrip",
             "safetyStatus": "safe",
             "odometerMeters": 150000000,
-            "location": "San Francisco, CA",
-            "startTime": "2024-06-15T07:30:00Z",
-            "endTime": "2024-06-15T07:45:00Z",
-            "vehicleDefects": [],
-            "trailerDefects": [],
-            "trailer": null
+            "updatedAtTime": "2024-06-15T07:45:00Z"
         },
         {
+            "authorSignature": {
+                "signatoryUser": {"id": "driver-002"},
+                "signedAtTime": "2024-06-15T08:20:00Z",
+                "type": "driver"
+            },
+            "defectIds": ["defect-001"],
+            "dvirSubmissionBeginTime": "2024-06-15T08:00:00Z",
+            "dvirSubmissionTime": "2024-06-15T08:20:00Z",
+            "formattedAddress": "Dallas, TX",
             "id": "dvir-002",
             "vehicle": {
-                "id": "vehicle-002",
-                "name": "Truck 002"
+                "id": "vehicle-002"
             },
             "type": "preTrip",
             "safetyStatus": "unsafe",
             "odometerMeters": 200000000,
-            "location": "Dallas, TX",
-            "startTime": "2024-06-15T08:00:00Z",
-            "endTime": "2024-06-15T08:20:00Z",
-            "vehicleDefects": [
-                {
-                    "id": "defect-001",
-                    "defectType": "tire",
-                    "comment": "Left front tire shows excessive wear",
-                    "isResolved": false
-                }
-            ],
-            "trailerDefects": [],
-            "trailer": null
+            "updatedAtTime": "2024-06-15T08:20:00Z"
         },
         {
+            "authorSignature": {
+                "signatoryUser": {"id": "driver-001"},
+                "signedAtTime": "2024-06-15T18:15:00Z",
+                "type": "driver"
+            },
+            "defectIds": [],
+            "dvirSubmissionBeginTime": "2024-06-15T18:00:00Z",
+            "dvirSubmissionTime": "2024-06-15T18:15:00Z",
+            "formattedAddress": "Los Angeles, CA",
             "id": "dvir-003",
             "vehicle": {
-                "id": "vehicle-001",
-                "name": "Truck 001"
+                "id": "vehicle-001"
             },
             "type": "postTrip",
             "safetyStatus": "safe",
             "odometerMeters": 150400000,
-            "location": "Los Angeles, CA",
-            "startTime": "2024-06-15T18:00:00Z",
-            "endTime": "2024-06-15T18:15:00Z",
-            "vehicleDefects": [],
-            "trailerDefects": [],
+            "updatedAtTime": "2024-06-15T18:15:00Z",
             "trailer": {
-                "id": "trailer-001",
-                "name": "Trailer 001"
+                "id": "trailer-001"
             }
         }
     ],

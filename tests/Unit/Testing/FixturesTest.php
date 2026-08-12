@@ -76,14 +76,26 @@ class FixturesTest extends TestCase
         $this->assertArrayHasKey('data', $dvirs);
         $this->assertIsArray($dvirs['data']);
         $this->assertNotEmpty($dvirs['data']);
+        $this->assertFixtureRowsMatchContractSchema($dvirs, 'DvirStreamResponseDataResponseBody');
         $this->assertSame('preTrip', $dvirs['data'][0]['type']);
         $this->assertSame('safe', $dvirs['data'][0]['safetyStatus']);
-        $this->assertIsString($dvirs['data'][0]['location']);
+        $this->assertIsString($dvirs['data'][0]['formattedAddress']);
         $this->assertArrayDoesNotHaveKeys(
-            ['author', 'inspectionType', 'safeToOperate', 'notes', 'defects'],
+            [
+                'author',
+                'inspectionType',
+                'safeToOperate',
+                'notes',
+                'defects',
+                'location',
+                'startTime',
+                'endTime',
+                'vehicleDefects',
+                'trailerDefects',
+            ],
             $dvirs['data'][0]
         );
-        $this->assertFalse($dvirs['data'][1]['vehicleDefects'][0]['isResolved']);
+        $this->assertSame(['defect-001'], $dvirs['data'][1]['defectIds']);
     }
 
     #[Test]
@@ -244,7 +256,9 @@ class FixturesTest extends TestCase
         $this->assertArrayHasKey('data', $vehicles);
         $this->assertIsArray($vehicles['data']);
         $this->assertNotEmpty($vehicles['data']);
+        $this->assertFixtureRowsMatchContractSchema($vehicles, 'VehicleResponseObjectResponseBody');
         $this->assertArrayHasKey('id', $vehicles['data'][0]);
+        $this->assertSame('2022-01-15T12:00:00Z', $vehicles['data'][0]['createdAtTime']);
         $this->assertSame('vehicle-001', $vehicles['data'][0]['id']);
         $this->assertSame('2022', $vehicles['data'][0]['year']);
         $this->assertSame('West Coast', $vehicles['data'][0]['tags'][0]['name']);
@@ -297,6 +311,33 @@ class FixturesTest extends TestCase
     {
         foreach ($keys as $key) {
             $this->assertArrayNotHasKey($key, $array);
+        }
+    }
+
+    /**
+     * @param  array{data: list<array<string, mixed>>}  $fixture
+     */
+    private function assertFixtureRowsMatchContractSchema(array $fixture, string $schemaName): void
+    {
+        $contractPath = dirname(__DIR__, 3).'/contracts/samsara/samsara-api-2026-08-10.json';
+        $contract = json_decode(
+            (string) file_get_contents($contractPath),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+        $schema = $contract['components']['schemas'][$schemaName];
+        $allowedKeys = array_keys($schema['properties']);
+        $requiredKeys = $schema['required'] ?? [];
+
+        foreach ($fixture['data'] as $index => $row) {
+            $this->assertEmpty(
+                array_diff($requiredKeys, array_keys($row)),
+                "Fixture row {$index} is missing required {$schemaName} keys.",
+            );
+            $this->assertEmpty(
+                array_diff(array_keys($row), $allowedKeys),
+                "Fixture row {$index} contains keys outside {$schemaName}.",
+            );
         }
     }
 }
