@@ -143,7 +143,7 @@ Repeated-key arrays are declared for alert configuration `ids`, incident `config
 | `docs/index.md`, `getting-started.md`, `configuration.md` | entry path, config keys, Canada, active page-size default | Reconciled |
 | `docs/query-builder.md` | query encoding, one-page vs lazy traversal, no-limit opt-out, endpoint mappers | Reconciled |
 | `docs/error-handling.md`, `testing.md` | shared typed boundary, 400/422, capability errors, facade fake | Reconciled |
-| `docs/enums.md` | package enum surface and upstream caveats | Reconciled; additive enum expansion remains deferred |
+| `docs/enums.md` | package enum surface and upstream caveats | Reconciled; vehicle-stat and webhook additions are complete for the pinned contract |
 | `docs/api-maintenance.md` | snapshot and maintenance process | Reconciled |
 | 39 topical resource pages | all 41 facade accessors; Assignments covers three accessors | Reconciled against integrated source/tests |
 | `DEVELOPMENT_CHANGELOG.md` | engineering sequence and evidence | Reconciled |
@@ -153,8 +153,8 @@ Repeated-key arrays are declared for alert configuration `ids`, incident `config
 
 This reconciliation does not implement operations that exist only in the first-party contract. Examples include the modern `/safety-events` replacement family, `PATCH /fleet/dvirs/{id}`, collection-style form/work-order mutations not exposed by explicit methods, and additional beta/preview operations outside `BetaResource`/`PreviewResource`. The Industrial/unstable operation inventory counted 112 official-only Beta/Preview operations; they remain additive backlog, not promised SDK coverage.
 
-Enums also remain bounded by package source. Do not infer that package enums exhaust current alert triggers, vehicle stat types, work-order statuses, document types, route states, HOS types, or safety behavior labels. See [Enums](../enums.html) for the exact shipped values and known upstream differences.
+Enums remain bounded by package source. `VehicleStatType` and `WebhookEvent` now cover the pinned contract, but do not infer that every other package enum exhausts current alert triggers, work-order statuses, document types, route states, HOS types, or safety behavior labels. See [Enums](../enums.html) for exact shipped values and known upstream differences.
 
 ## Enum gaps
 
-The package currently ships 52 `VehicleStatType` values while the audited upstream contract lists 63. Missing or renamed families include auxiliary inputs, engine immobilizer, fault codes, and singular-unit EV spellings. `WebhookEvent` omits eight current values: `AlertIncident`, `AlertObjectEvent`, `MissingDvirPastDue`, `ShipmentTrackingEvent`, `SuddenFuelLevelDrop`, `SuddenFuelLevelRise`, `VisualSearchMatch`, and `WorkOrderCreatedOrChanged`. These are documented additive gaps, not implemented enum cases.
+`VehicleStatType` now exposes every value in the pinned contract and retains older plural-unit EV spellings as compatibility aliases, for 81 cases total. `WebhookEvent` now exposes all 35 pinned event values. Other enum families remain subject to the bounded-source caveat above.

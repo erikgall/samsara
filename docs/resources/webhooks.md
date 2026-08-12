@@ -78,7 +78,7 @@ $webhooks = Samsara::webhooks()
 
 ## Webhook Events
 
-The `WebhookEvent` enum lists the 27 event types currently shipped by the package. Pass the case via `->value` (the API expects the wire string). Current upstream exposes eight more values; see [Enums](../enums.html#webhookevent).
+The `WebhookEvent` enum lists all 35 event types from the pinned contract. Pass the case via `->value` (the API expects the wire string); see [Enums](../enums.html#webhookevent).
 
 ```php
 use Samsara\Enums\WebhookEvent;
@@ -94,7 +94,7 @@ $webhook = Samsara::webhooks()->create([
 ]);
 ```
 
-The 27 package events grouped by domain:
+The 35 package events grouped by domain:
 
 | Domain | Events |
 |--------|--------|
@@ -102,10 +102,12 @@ The 27 package events grouped by domain:
 | Driver | `DriverCreated`, `DriverUpdated` |
 | Vehicle | `VehicleCreated`, `VehicleUpdated` |
 | Dispatch / Route | `RouteStopArrival`, `RouteStopDeparture`, `RouteStopEarlyLateArrival`, `RouteStopEtaUpdated`, `RouteStopResequence` |
-| Safety | `SevereSpeedingStarted`, `SevereSpeedingEnded`, `SpeedingEventStarted`, `SpeedingEventEnded` |
+| Alerts / Safety | `AlertIncident`, `AlertObjectEvent`, `SevereSpeedingStarted`, `SevereSpeedingEnded`, `SpeedingEventStarted`, `SpeedingEventEnded`, `VisualSearchMatch` |
 | Geofence | `GeofenceEntry`, `GeofenceExit` |
 | Industrial / Equipment | `EngineFaultOn`, `EngineFaultOff`, `GatewayUnplugged` |
-| Maintenance | `DvirSubmitted`, `PredictiveMaintenanceAlert` |
+| Maintenance | `DvirSubmitted`, `MissingDvirPastDue`, `PredictiveMaintenanceAlert`, `WorkOrderCreatedOrChanged` |
+| Fuel | `SuddenFuelLevelDrop`, `SuddenFuelLevelRise` |
+| Shipment | `ShipmentTrackingEvent` |
 | Document / Form | `DocumentSubmitted`, `FormSubmitted`, `FormUpdated` |
 | Issues | `IssueCreated` |
 

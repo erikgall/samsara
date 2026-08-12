@@ -215,46 +215,60 @@ Identifies the kind of safety event returned by the [Safety Events](resources/sa
 
 `Samsara\Enums\VehicleStatType`
 
-The 52 telemetry-channel values currently shipped by the package.
+The 81 telemetry-channel values currently shipped by the package. This includes every value in the pinned 2026-08-10 contract plus retained legacy plural-unit EV spellings for backward compatibility.
 
 > **Warning:** `Builder::types()` is typed as `array<string>|string` only. Do not pass enum cases to it directly — pass the wire string values shown below (for example `'gps'` or `'engineStates'`). See the [Query Builder](query-builder.html) reference for the canonical chaining pattern through `vehicleStats()->current()`, `history()`, `feed()`, `gps()`, `engineStates()`, `fuelPercents()`, or `odometer()`.
 
-Current upstream exposes 63 values. The package omits auxiliary inputs, immobilizer, fault-code, and other channels, and several EV values use older plural-unit spellings such as `MilliAmps`/`MilliVolts` instead of current `MilliAmp`/`MilliVolt`. See [Documentation Coverage](api-sync/documentation-coverage.html#enum-gaps) for the exact drift set.
+New integrations should prefer the singular-unit EV values such as `evBatteryCurrentMilliAmp` and `evBatteryVoltageMilliVolt`. The older plural forms remain valid enum cases so existing consumers are not broken.
 
 | Case | Value | Description |
 |------|-------|-------------|
 | `AMBIENT_AIR_TEMPERATURE_MILLIC` | `ambientAirTemperatureMilliC` | Ambient air temperature, in milli-degrees Celsius. |
+| `AUX_INPUT_1` through `AUX_INPUT_13` | `auxInput1` through `auxInput13` | Auxiliary input channels 1–13. |
 | `BAROMETRIC_PRESSURE_PA` | `barometricPressurePa` | Barometric pressure, in pascals. |
 | `BATTERY_MILLI_VOLTS` | `batteryMilliVolts` | Battery voltage, in millivolts. |
 | `DEF_LEVEL_MILLI_PERCENT` | `defLevelMilliPercent` | Diesel exhaust fluid level, in milli-percent. |
+| `ECU_DOOR_STATUS` | `ecuDoorStatus` | ECU-reported door state. |
+| `ECU_SPEED_MPH` | `ecuSpeedMph` | ECU-reported speed, in miles per hour. |
 | `ENGINE_COOLANT_TEMPERATURE_MILLIC` | `engineCoolantTemperatureMilliC` | Engine coolant temperature, in milli-degrees Celsius. |
+| `ENGINE_IMMOBILIZER` | `engineImmobilizer` | Engine immobilizer state. |
 | `ENGINE_LOAD_PERCENT` | `engineLoadPercent` | Engine load, in percent. |
 | `ENGINE_OIL_PRESSURE_K_PA` | `engineOilPressureKPa` | Engine oil pressure, in kilopascals. |
 | `ENGINE_RPM` | `engineRpm` | Engine RPM. |
 | `ENGINE_STATES` | `engineStates` | Engine state samples. |
+| `EV_AVERAGE_BATTERY_TEMPERATURE_MILLI_CELSIUS` | `evAverageBatteryTemperatureMilliCelsius` | Average EV battery temperature, in milli-degrees Celsius. |
+| `EV_BATTERY_CURRENT_MILLI_AMP` | `evBatteryCurrentMilliAmp` | Current upstream EV battery-current spelling. |
 | `EV_BATTERY_CURRENT_MILLI_AMPS` | `evBatteryCurrentMilliAmps` | EV battery current, in milliamps. |
 | `EV_BATTERY_STATE_OF_HEALTH_MILLI_PERCENT` | `evBatteryStateOfHealthMilliPercent` | EV battery state of health, in milli-percent. |
 | `EV_BATTERY_TEMPERATURE_MILLIC` | `evBatteryTemperatureMilliC` | EV battery temperature, in milli-degrees Celsius. |
+| `EV_BATTERY_VOLTAGE_MILLI_VOLT` | `evBatteryVoltageMilliVolt` | Current upstream EV battery-voltage spelling. |
 | `EV_BATTERY_VOLTAGE_MILLI_VOLTS` | `evBatteryVoltageMilliVolts` | EV battery voltage, in millivolts. |
+| `EV_CHARGING_CURRENT_MILLI_AMP` | `evChargingCurrentMilliAmp` | Current upstream EV charging-current spelling. |
 | `EV_CHARGING_CURRENT_MILLI_AMPS` | `evChargingCurrentMilliAmps` | EV charging current, in milliamps. |
 | `EV_CHARGING_ENERGY_MICRO_WH` | `evChargingEnergyMicroWh` | EV charging energy, in micro-watt-hours. |
 | `EV_CHARGING_STATUS` | `evChargingStatus` | EV charging status. |
+| `EV_CHARGING_VOLTAGE_MILLI_VOLT` | `evChargingVoltageMilliVolt` | Current upstream EV charging-voltage spelling. |
 | `EV_CHARGING_VOLTAGE_MILLI_VOLTS` | `evChargingVoltageMilliVolts` | EV charging voltage, in millivolts. |
 | `EV_CONSUMED_ENERGY_MICRO_WH` | `evConsumedEnergyMicroWh` | EV consumed energy, in micro-watt-hours. |
 | `EV_DISTANCE_DRIVEN_METERS` | `evDistanceDrivenMeters` | EV distance driven, in meters. |
 | `EV_REGENERATED_ENERGY_MICRO_WH` | `evRegeneratedEnergyMicroWh` | EV regenerated energy, in micro-watt-hours. |
 | `EV_STATE_OF_CHARGE_MILLI_PERCENT` | `evStateOfChargeMilliPercent` | EV state of charge, in milli-percent. |
+| `FAULT_CODES` | `faultCodes` | Active vehicle fault-code data. |
+| `FUEL_CONSUMED_MILLILITERS` | `fuelConsumedMilliliters` | Fuel consumed, in milliliters. |
 | `FUEL_PERCENTS` | `fuelPercents` | Fuel level samples, in percent. |
 | `GPS` | `gps` | GPS location samples. |
 | `GPS_DISTANCE_METERS` | `gpsDistanceMeters` | GPS-derived distance, in meters. |
 | `GPS_ODOMETER_METERS` | `gpsOdometerMeters` | GPS-derived odometer reading, in meters. |
+| `IDLING_DURATION_MILLISECONDS` | `idlingDurationMilliseconds` | Idling duration, in milliseconds. |
 | `INTAKE_MANIFOLD_TEMPERATURE_MILLIC` | `intakeManifoldTemperatureMilliC` | Intake manifold temperature, in milli-degrees Celsius. |
+| `NFC_CARD_SCANS` | `nfcCardScans` | NFC card scan events. |
 | `OBD_ENGINE_SECONDS` | `obdEngineSeconds` | OBD engine-on seconds. |
 | `OBD_ODOMETER_METERS` | `obdOdometerMeters` | OBD odometer reading, in meters. |
 | `SEATBELT_DRIVER` | `seatbeltDriver` | Driver seatbelt state. |
 | `SPREADER_ACTIVE` | `spreaderActive` | Spreader active flag. |
 | `SPREADER_AIR_TEMP` | `spreaderAirTemp` | Spreader air temperature. |
 | `SPREADER_AUGER_RUNNING` | `spreaderAugerRunning` | Spreader auger running flag. |
+| `SPREADER_BLAST_STATE` | `spreaderBlastState` | General spreader blast state. |
 | `SPREADER_BLOCK_HEIGHT` | `spreaderBlockHeight` | Spreader block height. |
 | `SPREADER_CONVEYOR_RUNNING` | `spreaderConveyorRunning` | Spreader conveyor running flag. |
 | `SPREADER_GRANULAR_BLAST_STATE` | `spreaderGranularBlastState` | Spreader granular blast state. |
@@ -266,6 +280,7 @@ Current upstream exposes 63 values. The package omits auxiliary inputs, immobili
 | `SPREADER_LIQUID_NAME` | `spreaderLiquidName` | Spreader liquid material name. |
 | `SPREADER_LIQUID_RATE` | `spreaderLiquidRate` | Spreader liquid rate. |
 | `SPREADER_ON_GROUND` | `spreaderOnGround` | Spreader on-ground flag. |
+| `SPREADER_ON_STATE` | `spreaderOnState` | General spreader on/off state. |
 | `SPREADER_PLOW_STATUS` | `spreaderPlowStatus` | Spreader plow status. |
 | `SPREADER_PREWET_BLAST_STATE` | `spreaderPrewetBlastState` | Spreader pre-wet blast state. |
 | `SPREADER_PREWET_NAME` | `spreaderPrewetName` | Spreader pre-wet material name. |
@@ -274,6 +289,8 @@ Current upstream exposes 63 values. The package omits auxiliary inputs, immobili
 | `SPREADER_ROAD_TEMP` | `spreaderRoadTemp` | Spreader road temperature. |
 | `SPREADER_VIBRATOR_RUNNING` | `spreaderVibratorRunning` | Spreader vibrator running flag. |
 | `SPREADER_WORK_LIGHT` | `spreaderWorkLight` | Spreader work-light flag. |
+| `SYNTHETIC_ENGINE_SECONDS` | `syntheticEngineSeconds` | Synthetic cumulative engine seconds. |
+| `TELL_TALES` | `tellTales` | Dashboard tell-tale indicator states. |
 | `TIRE_PRESSURE_MILLI_PSIS` | `tirePressureMilliPsis` | Tire pressure, in milli-PSI. |
 
 ## WebhookEvent
@@ -282,13 +299,15 @@ Current upstream exposes 63 values. The package omits auxiliary inputs, immobili
 
 The valid event types for Samsara webhook subscriptions. See the [Webhooks](resources/webhooks.html) resource. The enum exposes three helpers: `WebhookEvent::all()` returns every wire value as an `array<int, string>`, `WebhookEvent::collect()` returns a Laravel `Collection` of cases, and `WebhookEvent::values()` returns a `Collection` of wire values.
 
-The package has 27 cases. Current upstream has eight additional values: `AlertIncident`, `AlertObjectEvent`, `MissingDvirPastDue`, `ShipmentTrackingEvent`, `SuddenFuelLevelDrop`, `SuddenFuelLevelRise`, `VisualSearchMatch`, and `WorkOrderCreatedOrChanged`.
+The package has all 35 event values from the pinned contract.
 
 | Case | Value | Description |
 |------|-------|-------------|
 | `ADDRESS_CREATED` | `AddressCreated` | An address was created. |
 | `ADDRESS_DELETED` | `AddressDeleted` | An address was deleted. |
 | `ADDRESS_UPDATED` | `AddressUpdated` | An address was updated. |
+| `ALERT_INCIDENT` | `AlertIncident` | An alert incident was created or updated. |
+| `ALERT_OBJECT_EVENT` | `AlertObjectEvent` | An alert-object event occurred. |
 | `DOCUMENT_SUBMITTED` | `DocumentSubmitted` | A driver submitted a document. |
 | `DRIVER_CREATED` | `DriverCreated` | A driver was created. |
 | `DRIVER_UPDATED` | `DriverUpdated` | A driver was updated. |
@@ -301,6 +320,7 @@ The package has 27 cases. Current upstream has eight additional values: `AlertIn
 | `GEOFENCE_ENTRY` | `GeofenceEntry` | A geofence was entered. |
 | `GEOFENCE_EXIT` | `GeofenceExit` | A geofence was exited. |
 | `ISSUE_CREATED` | `IssueCreated` | An issue was created. |
+| `MISSING_DVIR_PAST_DUE` | `MissingDvirPastDue` | A required DVIR became past due. |
 | `PREDICTIVE_MAINTENANCE_ALERT` | `PredictiveMaintenanceAlert` | A predictive-maintenance alert fired. |
 | `ROUTE_STOP_ARRIVAL` | `RouteStopArrival` | A driver arrived at a route stop. |
 | `ROUTE_STOP_DEPARTURE` | `RouteStopDeparture` | A driver departed a route stop. |
@@ -309,7 +329,12 @@ The package has 27 cases. Current upstream has eight additional values: `AlertIn
 | `ROUTE_STOP_RESEQUENCE` | `RouteStopResequence` | A route-stop sequence was changed. |
 | `SEVERE_SPEEDING_ENDED` | `SevereSpeedingEnded` | A severe-speeding event ended. |
 | `SEVERE_SPEEDING_STARTED` | `SevereSpeedingStarted` | A severe-speeding event started. |
+| `SHIPMENT_TRACKING_EVENT` | `ShipmentTrackingEvent` | A shipment tracking event occurred. |
 | `SPEEDING_EVENT_ENDED` | `SpeedingEventEnded` | A speeding event ended. |
 | `SPEEDING_EVENT_STARTED` | `SpeedingEventStarted` | A speeding event started. |
+| `SUDDEN_FUEL_LEVEL_DROP` | `SuddenFuelLevelDrop` | A sudden fuel-level decrease was detected. |
+| `SUDDEN_FUEL_LEVEL_RISE` | `SuddenFuelLevelRise` | A sudden fuel-level increase was detected. |
 | `VEHICLE_CREATED` | `VehicleCreated` | A vehicle was created. |
 | `VEHICLE_UPDATED` | `VehicleUpdated` | A vehicle was updated. |
+| `VISUAL_SEARCH_MATCH` | `VisualSearchMatch` | A visual-search match was detected. |
+| `WORK_ORDER_CREATED_OR_CHANGED` | `WorkOrderCreatedOrChanged` | A work order was created or changed. |

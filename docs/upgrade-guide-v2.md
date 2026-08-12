@@ -15,27 +15,22 @@ Version 2 is a breaking contract-alignment release. This guide is the canonical 
 
 ## What this guide proves
 
-The release audit compares tag `v1.1.0` with audited `dev` head `1750395c98c1724c40c82ba82b96b4866dd2106b`:
+The release audit compares tag `v1.1.0` with the integrated v2 worktree while retaining audited `dev` head `1750395c98c1724c40c82ba82b96b4866dd2106b` as its frozen implementation baseline:
 
 - 239 implementation-baseline files were reviewed exactly once at that audited head.
-- 18 publication artifacts—the root entry point, canonical guide, final disposition ledger, checker, Composer registration, and Laravel Boost agent-documentation overhaul—extend the final tag-to-`dev` scope to 257 paths.
-- 86 files require a consumer upgrade action.
-- 91 files supply tests, contract evidence, or tooling for those actions.
-- 12 files are additive and require no migration by themselves.
+- Integrated quality, documentation, testing, and publication work extends the final tag-to-worktree scope to 337 paths.
+- 91 files require a consumer upgrade action.
+- 139 files supply tests, contract evidence, fixtures, or tooling for those actions.
+- 35 files are additive and require no migration by themselves.
 - 1 file is internal-only.
-- 67 files are documentation-only.
+- 71 files are documentation-only.
 - The pinned OpenAPI and runtime ledgers cover 372 official declarations, 195 package operations, 41 concrete resource gates, 240 public request variants, and 170 source files with zero runtime-capture failures.
 
-The machine-readable [v2 disposition ledger](api-sync/v2-upgrade-disposition.json) records all 257 final release paths and their migration section or no-action reason, while retaining the frozen 239-file implementation comparison as a separate proof boundary. `composer check:v2-upgrade-guide` fails if either scope, the counts, section references, or required evidence are incomplete.
+The machine-readable [v2 disposition ledger](api-sync/v2-upgrade-disposition.json) records all 337 final release paths and their migration section or no-action reason, while retaining the frozen 239-file implementation comparison as a separate proof boundary. `composer check:v2-upgrade-guide` fails if the live tag-to-worktree scope, counts, section references, or required evidence are incomplete.
 
-## Maintainer integration gate
+## Maintainer integration result
 
-{: .warning }
-> This guide does not classify parallel quality-lane commits made after the documentation lane's starting `dev` commit, `3b475a16340eb23e341f51dba7135fa38b62364f`. Before release, inventory every incoming path and update this guide, the compact breaking record, changelog, and disposition ledger—or record an explicit no-action rationale—before carrying the 257-path proof claim forward.
-
-The starting commit also has one known checker allowlist defect: `tests/Unit/BoostDocumentationTest.php` is already recorded as a publication artifact and supporting evidence, but `scripts/check-v2-upgrade-guide.php` omits it from `$allowedPostAuditPaths`. The tooling owner must add that existing path to the allowlist and rerun `composer check:v2-upgrade-guide`; until then, the command fails even on the clean starting commit. This is a proof-tool defect, not evidence that the path is absent from the ledger.
-
-For each incoming lane, the integrator must check public signatures and capability gates, request method/path/query/body encoding, error and pagination behavior, endpoint-specific DTOs, null/empty semantics, serialized enum values, tests, and consumer documentation. Add a new `MIG-*` action for every new consumer migration; do not hide it in a changelog-only note.
+All quality lanes were classified after integration. The live ledger now derives its 337-path scope directly from the tag-to-worktree diff, so a future changed path makes the checked ledger stale until it receives a consumer action or explicit no-action rationale. The resource/query, fixture, enum, pagination, error, and documentation follow-ups are included in the counts above.
 
 ## Agent execution contract
 
@@ -60,7 +55,7 @@ An upgrading agent must:
 - [ ] `MIG-09`: migrate the persisted duty-status string.
 - [ ] `MIG-10` through `MIG-17`: migrate every resource family the application uses.
 - [ ] `MIG-18`: simplify SDK fake installation.
-- [ ] `MIG-19`: review additive features without inventing migration work.
+- [ ] `MIG-19`: review compatibility corrections and optional additions.
 - [ ] Complete the verification and completion record.
 
 <a id="mig-01"></a>
@@ -805,12 +800,23 @@ $fake = Samsara::fake();
 Add one test asserting all three resolutions are the exact same instance. Remove manual swaps/rebinds so tests do not hide stale roots.
 
 <a id="mig-19"></a>
-## MIG-19 — Additive changes require no migration
+## MIG-19 — Compatibility corrections and additive options
 
-The following are optional adoption, not mandatory work:
+Most items below are optional adoption. Audit the edge behaviors first if your application asserted them exactly:
+
+- Time formatting now uses a non-mutating clone before converting mutable date objects to UTC. Callers no longer observe their supplied `Carbon` or `DateTime` instance being changed.
+- `EntityCollection::ids()` retains the valid string ID `"0"` while continuing to discard `null` and empty-string IDs.
+- `CursorPaginator::hasMorePages()` now requires both `hasNextPage=true` and a usable end cursor. `nextPage()` returns `null` rather than replaying the first page when pagination metadata is internally inconsistent. Keep the nullable guard shown in the query-builder documentation.
+- A malformed webhook timestamp consistently raises `InvalidSignatureException`, allowing middleware to return the same authentication failure as other invalid signatures instead of leaking a timestamp parser exception.
+- Generic `find()`, `update()`, and `delete()` encode IDs as one URL path segment. Ordinary IDs generate the same URLs; reserved characters no longer alter the path. Update exact URL fakes only if they used reserved characters.
+
+The following are additive options with no required migration:
 
 - Canadian organizations may set `SAMSARA_REGION=ca` or call `useCanadaEndpoint()`.
-- Twenty-eight contract-valid convenience helpers were added across DTOs.
+- Compatible proxies and test servers may use `useBaseUrl()`; a `null` token omits the authorization header.
+- Camera media, fuel/energy reports, IFTA vehicle reports, and legacy asset feeds now expose query builders for cursor traversal while their raw-envelope methods remain unchanged.
+- `VehicleStatType` now includes the complete pinned contract plus retained legacy spellings, and `WebhookEvent` includes all 35 pinned events.
+- Contract-valid convenience helpers were added across DTOs; legacy callable helpers were deprecated where removal would be unnecessarily disruptive.
 - Driver, Vehicle, and Gateway annotations improve static property discovery.
 - `AssetLocation` and other endpoint-specific DTOs are additive files but may be required return migrations when an existing operation now selects them; those operations are already covered in `MIG-07`.
 - 183 unique official-only OpenAPI operations remain unimplemented and require no consumer migration.
@@ -890,7 +896,7 @@ Copy this table into the consuming repository's upgrade pull request. One row pe
 | MIG-16 | path/method literals and infrastructure |  |  |  |  |
 | MIG-17 | Industrial/Beta/Preview |  |  |  |  |
 | MIG-18 | fake setup |  |  |  |  |
-| MIG-19 | optional adoption only |  |  |  |  |
+| MIG-19 | compatibility edges and optional adoption |  |  |  |  |
 
 ## Definition of done for a consuming application
 

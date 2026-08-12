@@ -113,7 +113,7 @@ $stats = Samsara::vehicleStats()
     ->get();
 ```
 
-The `VehicleStatType` enum lists the 52 stat types currently shipped by the package. Current upstream exposes 63 and has renamed several EV values; see [Enums](../enums.html#vehiclestattype). Pass an enum's `value` — **do not pass enum cases directly to `types()`**, which expects an `array<string>|string`.
+The `VehicleStatType` enum lists 81 values: the complete pinned contract plus retained legacy EV spellings. See [Enums](../enums.html#vehiclestattype). Pass an enum's `value` — **do not pass enum cases directly to `types()`**, which expects an `array<string>|string`.
 
 ```php
 use Samsara\Enums\VehicleStatType;
@@ -143,7 +143,7 @@ The most commonly requested stat types:
 | `defLevelMilliPercent` | DEF level as milli-percent. |
 | `obdEngineSeconds` | Cumulative engine seconds. |
 
-> **Note:** `VehicleStatType` defines 52 cases covering EV battery telemetry, spreader inputs, and tire pressures. See [Enums](../enums.html#vehiclestattype) for the complete list.
+> **Note:** `VehicleStatType` defines 81 cases covering auxiliary inputs, EV battery telemetry, fault codes, spreader inputs, and tire pressures. See [Enums](../enums.html#vehiclestattype) for the complete list and legacy spelling notes.
 
 ## Filtering
 

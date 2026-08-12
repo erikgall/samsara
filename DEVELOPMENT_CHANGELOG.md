@@ -4,6 +4,33 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 
 ## Unreleased
 
+### 2026-08-12 — Integrated repository-wide quality and developer-experience pass
+
+#### Scope and accounting
+
+- Audited all 399 tracked package files exactly once across isolated core, DTO, resource, tooling/testing, and documentation lanes. The final coverage ledger records 233 changed and 166 keep decisions with zero missing, duplicate, or out-of-scope paths.
+- Integrated two bounded cross-lane follow-ups for current fake-response fixtures and nonstandard cursor envelopes. Preserved the pre-existing untracked `docs/.bundle/` directory and made no database, runtime-dependency, or package-configuration behavior change.
+
+#### Developer experience and quality
+
+- Added contract-backed DTO helpers and annotations, complete pinned vehicle-stat/webhook enums, non-mutating UTC conversion, stable `"0"` collection IDs, safer paginator navigation, consistent webhook timestamp failures, custom base URLs, and one-segment generic ID encoding.
+- Centralized resource builder creation and request/error handling, corrected query serialization and unsupported implicit limits, and added nested collection/custom-cursor configuration for camera media, fuel/energy reports, IFTA vehicle reports, and legacy asset feeds while preserving their raw-envelope methods.
+- Reconciled all 12 shipped fake fixtures with current endpoint/DTO shapes and added focused structural assertions so future drift fails locally.
+- Made the maintainer `composer check` alias self-contained with PHPStan's verified 512 MB requirement. CI, local maintenance aliases, formatting ownership, snapshot provenance, and linked-worktree reconciliation now exercise the same contracts.
+
+#### Documentation, compatibility, and release proof
+
+- Updated the changelog, compact breaking record, entry-point upgrade guide, canonical v2 guide, configuration/query references, enum catalog, topical resource pages, contract inventory, and documentation coverage for the integrated result.
+- Expanded the machine-checked tag-to-worktree disposition from 257 to 337 paths: 91 upgrade actions, 139 supporting-evidence paths, 35 additive/no-action paths, 71 documentation-only paths, and one internal-only path. The frozen 239-path audited implementation baseline remains explicit.
+- Added no intentional break beyond the staged-v2 migrations already recorded. `MIG-19` now calls out observable compatibility corrections: non-mutating dates, nullable inconsistent-cursor navigation, encoded reserved-character IDs, and normalized invalid webhook timestamps.
+
+#### Verification
+
+- `composer check` — passed: 1,627 tests / 3,657 assertions, PHPStan with no errors, Pint, 15 maintenance-validator tests, pinned-snapshot verification, and 109 contract-reconciliation assertions.
+- `vendor/bin/phpunit --fail-on-warning --fail-on-risky` — passed: 1,627 tests / 3,657 assertions.
+- `composer check:v2-upgrade-guide` — passed: all 337 release paths classified once with 91 linked upgrade actions.
+- Strict Composer validation, Prettier ownership check, all repository JSON parsing, 669 local Markdown link/fragment checks, and `git diff --check` — passed.
+
 ### 2026-08-12 — Documentation quality and developer-experience lane
 
 #### Scope and decisions

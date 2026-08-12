@@ -40,6 +40,24 @@ $vehicleReport = Samsara::fuelAndEnergy()->vehiclesFuelEnergyReport([
 ]);
 ```
 
+The raw helpers preserve the complete response envelope. Their companion builders select the nested report rows and expose normal cursor traversal:
+
+```php
+$drivers = Samsara::fuelAndEnergy()
+    ->driversFuelEnergyReportQuery()
+    ->where('startDate', '2026-01-01')
+    ->where('endDate', '2026-01-31')
+    ->paginate();
+
+$vehicles = Samsara::fuelAndEnergy()
+    ->vehiclesFuelEnergyReportQuery()
+    ->where('startDate', '2026-01-01')
+    ->where('endDate', '2026-01-31')
+    ->get();
+```
+
+The builders map `data.driverReports` or `data.vehicleReports` to generic `Entity` rows and do not add an unsupported `limit`. Use the raw helpers when page-level metadata outside those collections matters.
+
 ## Efficiency Streams
 
 The efficiency endpoints expose query builders whose timestamp window uses `startTime` and `endTime`.
@@ -111,11 +129,11 @@ $driverEfficiency = Samsara::fuelAndEnergy()
 | `vehicleIds` | comma-separated `string` | Vehicle-report filter, including external IDs when documented. |
 | `driverIds` | comma-separated `string` | Driver-report filter, including external IDs when documented. |
 
-The raw report helpers forward `$params` unchanged. Join multi-ID filters before calling them; a PHP array would use bracket encoding and violate these report contracts.
+The driver report helper also accepts a non-empty `driverIds` array and serializes it as one comma-separated value. Other raw report filters are forwarded unchanged; join multi-ID values unless the method explicitly documents array support.
 
 ## Properties
 
-This resource does not declare a typed entity. Reports and `createFuelPurchase()` return raw `array<string, mixed>` payloads from the API; the efficiency streams return generic `Samsara\Data\Entity` instances.
+This resource does not declare a domain-specific entity. Raw reports and `createFuelPurchase()` return `array<string, mixed>` payloads; report builders and efficiency streams return generic `Samsara\Data\Entity` instances.
 
 ## Related Resources
 

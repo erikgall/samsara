@@ -19,6 +19,7 @@ permalink: /configuration
   - [Webhook Secret](#webhook-secret)
 - [Runtime Configuration](#runtime-configuration)
   - [Switching Regions](#switching-regions)
+  - [Using a Custom Base URL](#using-a-custom-base-url)
   - [Using a Different Token](#using-a-different-token)
   - [Reading Configuration at Runtime](#reading-configuration-at-runtime)
   - [Creating a Fresh Instance](#creating-a-fresh-instance)
@@ -149,7 +150,19 @@ Samsara::useUsEndpoint();
 Samsara::useCanadaEndpoint();
 ```
 
-Both methods mutate the singleton client. Pair them with `withToken()` if each region has a different token.
+These methods mutate the singleton client. Pair them with `withToken()` if each region has a different token.
+
+### Using a Custom Base URL
+
+`useBaseUrl()` supports a compatible proxy, test server, or gateway while preserving the SDK's normal request configuration. A trailing slash is removed automatically:
+
+```php
+Samsara::useBaseUrl('https://samsara-proxy.example.test/');
+
+$drivers = Samsara::drivers()->all();
+```
+
+Like the region helpers, this mutates the current client. `getBaseUrl()` returns the active value. Constructing a client with `null` as its token omits the `Authorization` header, which is useful for a proxy that owns authentication.
 
 ### Using a Different Token
 

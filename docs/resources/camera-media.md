@@ -37,6 +37,22 @@ $media = $response['data']['media'];
 
 `get(array $parameters): array` preserves the complete response envelope, including nested `data.media` and top-level `pagination`. The `inputs`, `mediaTypes`, and `triggerReasons` arrays are serialized as repeated query keys.
 
+For fluent pagination, use `query()`. It selects the nested media collection while preserving the API's top-level cursor metadata:
+
+```php
+$page = Samsara::cameraMedia()
+    ->query()
+    ->between($start, $end)
+    ->whereVehicle('vehicle-id')
+    ->paginate();
+
+foreach ($page as $media) {
+    // Generic Entity rows from data.media.
+}
+```
+
+The endpoint does not declare `limit`, so `query()` never adds the configured page size. Keep using `get()` when you need the complete raw envelope.
+
 ## Requesting Footage
 
 Submit a retrieval request for one vehicle, time range, and media type. Depending on the installed hardware, add `inputs` or `cameraRoles` to select camera views.
@@ -86,7 +102,7 @@ The same pattern applies to PDF exports on [forms](forms.html) and to CSV export
 
 ## Properties
 
-This resource has no generic entity surface. `get()` returns the full raw envelope; `retrieve()` and `getRetrieval()` return the raw `data` payload when present.
+This resource has no domain-specific entity type. `query()` maps media rows to generic `Entity` objects; `get()` returns the full raw envelope; `retrieve()` and `getRetrieval()` return the raw `data` payload when present.
 
 ## Related Resources
 

@@ -117,6 +117,22 @@ $reefers = Samsara::assets()->reefers([
 ]);
 ```
 
+The raw helpers above preserve their complete legacy envelopes. For cursor traversal, use `locationsQuery()` or `reefersQuery()`; both send the v1 `startingAfter` cursor expected by these endpoints:
+
+```php
+$locations = Samsara::assets()
+    ->locationsQuery()
+    ->where('groupId', 'group-123')
+    ->paginate(100);
+
+$reefers = Samsara::assets()
+    ->reefersQuery()
+    ->where('groupId', 'group-123')
+    ->lazy(100);
+```
+
+The builders select `assets` and `data` respectively and map rows to generic `Entity` objects.
+
 ## Asset Types
 
 The `Samsara\Enums\AssetType` enum is the package's current value set; it is not the current upstream `/assets` request enum.

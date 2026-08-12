@@ -15,7 +15,7 @@ permalink: /resources/ifta
 
 ## Introduction
 
-The four explicit methods on `IftaResource` return raw decoded JSON (`array<string, mixed>`); there is no typed entity, query builder, or supported generic CRUD operation.
+The four raw methods on `IftaResource` return decoded JSON (`array<string, mixed>`). `vehicleReportQuery()` provides fluent cursor traversal for vehicle rows. There is no domain-specific entity or supported generic CRUD operation.
 
 The helpers implement `POST /ifta-detail/csv`, `GET /ifta-detail/csv/{id}`, `GET /fleet/reports/ifta/jurisdiction`, and `GET /fleet/reports/ifta/vehicle`.
 
@@ -47,6 +47,18 @@ $vehicle = Samsara::ifta()->vehicleReport([
 | `vehicleIds` | comma-separated `string` | Limit to specific vehicles or external IDs. |
 
 These raw helpers forward `$params` unchanged. Join multi-value filters before calling them; passing PHP arrays would produce bracket encoding, not the required comma-separated query value.
+
+Use the vehicle-report builder when you want only the paginated rows:
+
+```php
+$vehicles = Samsara::ifta()
+    ->vehicleReportQuery()
+    ->where('year', 2026)
+    ->where('quarter', 'Q1')
+    ->paginate();
+```
+
+It maps `data.vehicleReports` to generic `Entity` objects without adding an unsupported `limit`. Keep using `vehicleReport()` when you also need page-level `year`, `month`, `quarter`, or troubleshooting data.
 
 ## CSV Exports
 
@@ -80,6 +92,7 @@ Each detail job may span at most one month. Split a quarterly or longer export i
 |--------|---------|-------------|
 | `jurisdictionReport(array $params)` | `array` | Miles and gallons aggregated by jurisdiction. |
 | `vehicleReport(array $params)` | `array` | Miles and gallons aggregated by vehicle. |
+| `vehicleReportQuery()` | `Builder` | Fluent cursor traversal over `data.vehicleReports`. |
 | `detailCsv(array $params)` | `array` | Queues a detail CSV export. |
 | `getDetailCsv(string $jobId)` | `array` | Fetches an export job by `jobId`. |
 

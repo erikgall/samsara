@@ -20,10 +20,10 @@
     "current_package_source": {
       "root": "/Users/erikgall/Code/samsara",
       "git_branch": "dev",
-      "git_head": "1750395c98c1724c40c82ba82b96b4866dd2106b",
-      "source_sha256": "dab1b5365c3aae585fdde7163323b7f6ade05e4b96e628b3e65e0992d9fc7398",
+      "git_head": "8814cd4cfbb81fb4634becb06b98d4e0e8b86324",
+      "source_sha256": "7ebdee7a04f00c35a0cc00ac18930fe3ab307327387c6b0c93ac24d06b4c3cbb",
       "source_files": 170,
-      "source_bytes": 341623,
+      "source_bytes": 374927,
       "source_file_count": 170,
       "hash_definition": "SHA-256 of a sorted manifest whose rows are '<file-sha256>  <relative-path>\\n' for src/**/*.php, src/**/*.json, and config/samsara.php"
     },
@@ -87,7 +87,7 @@
     "package_resources": 41,
     "package_resource_capability_gates": 41,
     "package_enums": 12,
-    "package_enum_cases": 160,
+    "package_enum_cases": 197,
     "package_data_classes": 75,
     "package_data_properties": 704,
     "official_component_schemas": 5157,
@@ -7726,7 +7726,7 @@
             "query": null,
             "request_data": [],
             "request_body": "",
-            "source": "src/Resources/Industrial/AssetsResource.php:95",
+            "source": "src/Resources/Industrial/AssetsResource.php:106",
             "signature": "query(): Builder",
             "return_type": "Builder",
             "response_mapping": {
@@ -12729,7 +12729,7 @@
             "query": null,
             "request_data": [],
             "request_body": "",
-            "source": "src/Resources/Additional/FuelAndEnergyResource.php:68",
+            "source": "src/Resources/Additional/FuelAndEnergyResource.php:79",
             "signature": "vehicleEfficiency(): Builder",
             "return_type": "Builder",
             "response_mapping": {
@@ -21948,7 +21948,7 @@
             "query": null,
             "request_data": [],
             "request_body": "",
-            "source": "src/Resources/Additional/FuelAndEnergyResource.php:80",
+            "source": "src/Resources/Additional/FuelAndEnergyResource.php:91",
             "signature": "vehiclesFuelEnergyReport(array $params): array",
             "return_type": "array",
             "response_mapping": {
@@ -21973,7 +21973,7 @@
           "classification": "additive",
           "status": "confirmed",
           "summary": "The direct array-returning helper preserves the official pagination envelope and accepts pass-through cursor parameters, but it does not expose Builder/CursorPaginator automatic traversal.",
-          "source": "src/Resources/Additional/FuelAndEnergyResource.php:80",
+          "source": "src/Resources/Additional/FuelAndEnergyResource.php:91",
           "implementation_direction": "Add an operation-specific Builder/CursorPaginator path while preserving the raw envelope helper; test after/endCursor/hasNextPage traversal."
         }
       ],
@@ -25863,7 +25863,7 @@
             "query": null,
             "request_data": [],
             "request_body": "",
-            "source": "src/Resources/Beta/BetaResource.php:288",
+            "source": "src/Resources/Beta/BetaResource.php:296",
             "signature": "vehicleImmobilizerStream(): Builder",
             "return_type": "Builder",
             "response_mapping": {
@@ -46135,7 +46135,7 @@
             "query": null,
             "request_data": [],
             "request_body": "",
-            "source": "src/Resources/Industrial/AssetsResource.php:107",
+            "source": "src/Resources/Industrial/AssetsResource.php:118",
             "signature": "reefers(array $data): array",
             "return_type": "array",
             "response_mapping": {
@@ -46160,7 +46160,7 @@
           "classification": "additive",
           "status": "confirmed",
           "summary": "The direct array-returning helper preserves the official pagination envelope and accepts pass-through cursor parameters, but it does not expose Builder/CursorPaginator automatic traversal.",
-          "source": "src/Resources/Industrial/AssetsResource.php:107",
+          "source": "src/Resources/Industrial/AssetsResource.php:118",
           "implementation_direction": "Add an operation-specific Builder/CursorPaginator path while preserving the raw envelope helper; test after/endCursor/hasNextPage traversal."
         }
       ],
@@ -49621,7 +49621,7 @@
             "query": "id=123",
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Industrial/AssetsResource.php:123",
+            "source": "src/Resources/Industrial/AssetsResource.php:145",
             "signature": "update(string $id, array $data): Asset",
             "return_type": "Asset",
             "response_mapping": {
@@ -57897,7 +57897,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Additional/CameraMediaResource.php:60",
+            "source": "src/Resources/Additional/CameraMediaResource.php:72",
             "signature": "retrieve(array $data): array",
             "return_type": "array",
             "response_mapping": {
@@ -72883,7 +72883,7 @@
     {
       "class": "CameraMediaResource",
       "method": "retrieve",
-      "source": "src/Resources/Additional/CameraMediaResource.php:60",
+      "source": "src/Resources/Additional/CameraMediaResource.php:72",
       "operations": [
         [
           "POST",
@@ -73223,7 +73223,7 @@
     {
       "class": "FuelAndEnergyResource",
       "method": "vehicleEfficiency",
-      "source": "src/Resources/Additional/FuelAndEnergyResource.php:68",
+      "source": "src/Resources/Additional/FuelAndEnergyResource.php:79",
       "operations": [
         [
           "GET",
@@ -73239,7 +73239,7 @@
     {
       "class": "FuelAndEnergyResource",
       "method": "vehiclesFuelEnergyReport",
-      "source": "src/Resources/Additional/FuelAndEnergyResource.php:80",
+      "source": "src/Resources/Additional/FuelAndEnergyResource.php:91",
       "operations": [
         [
           "GET",
@@ -74089,7 +74089,7 @@
     {
       "class": "BetaResource",
       "method": "vehicleImmobilizerStream",
-      "source": "src/Resources/Beta/BetaResource.php:288",
+      "source": "src/Resources/Beta/BetaResource.php:296",
       "operations": [
         [
           "GET",
@@ -74999,7 +74999,7 @@
     {
       "class": "AssetsResource",
       "method": "query",
-      "source": "src/Resources/Industrial/AssetsResource.php:95",
+      "source": "src/Resources/Industrial/AssetsResource.php:106",
       "operations": [
         [
           "GET",
@@ -75015,7 +75015,7 @@
     {
       "class": "AssetsResource",
       "method": "reefers",
-      "source": "src/Resources/Industrial/AssetsResource.php:107",
+      "source": "src/Resources/Industrial/AssetsResource.php:118",
       "operations": [
         [
           "GET",
@@ -75031,7 +75031,7 @@
     {
       "class": "AssetsResource",
       "method": "update",
-      "source": "src/Resources/Industrial/AssetsResource.php:123",
+      "source": "src/Resources/Industrial/AssetsResource.php:145",
       "operations": [
         [
           "PATCH",
@@ -134510,7 +134510,7 @@
           "query": null,
           "request_data": [],
           "request_body": "",
-          "source": "src/Resources/Industrial/AssetsResource.php:95",
+          "source": "src/Resources/Industrial/AssetsResource.php:106",
           "signature": "query(): Builder",
           "return_type": "Builder",
           "response_mapping": {
@@ -135086,7 +135086,7 @@
           "query": null,
           "request_data": [],
           "request_body": "",
-          "source": "src/Resources/Additional/FuelAndEnergyResource.php:68",
+          "source": "src/Resources/Additional/FuelAndEnergyResource.php:79",
           "signature": "vehicleEfficiency(): Builder",
           "return_type": "Builder",
           "response_mapping": {
@@ -136194,7 +136194,7 @@
           "query": null,
           "request_data": [],
           "request_body": "",
-          "source": "src/Resources/Additional/FuelAndEnergyResource.php:80",
+          "source": "src/Resources/Additional/FuelAndEnergyResource.php:91",
           "signature": "vehiclesFuelEnergyReport(array $params): array",
           "return_type": "array",
           "response_mapping": {
@@ -136805,7 +136805,7 @@
           "query": null,
           "request_data": [],
           "request_body": "",
-          "source": "src/Resources/Beta/BetaResource.php:288",
+          "source": "src/Resources/Beta/BetaResource.php:296",
           "signature": "vehicleImmobilizerStream(): Builder",
           "return_type": "Builder",
           "response_mapping": {
@@ -138992,7 +138992,7 @@
           "query": null,
           "request_data": [],
           "request_body": "",
-          "source": "src/Resources/Industrial/AssetsResource.php:107",
+          "source": "src/Resources/Industrial/AssetsResource.php:118",
           "signature": "reefers(array $data): array",
           "return_type": "array",
           "response_mapping": {
@@ -139377,7 +139377,7 @@
           "query": "id=123",
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Industrial/AssetsResource.php:123",
+          "source": "src/Resources/Industrial/AssetsResource.php:145",
           "signature": "update(string $id, array $data): Asset",
           "return_type": "Asset",
           "response_mapping": {
@@ -140162,7 +140162,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Additional/CameraMediaResource.php:60",
+          "source": "src/Resources/Additional/CameraMediaResource.php:72",
           "signature": "retrieve(array $data): array",
           "return_type": "array",
           "response_mapping": {
@@ -143892,7 +143892,7 @@
       "classification": "additive",
       "status": "confirmed",
       "summary": "The direct array-returning helper preserves the official pagination envelope and accepts pass-through cursor parameters, but it does not expose Builder/CursorPaginator automatic traversal.",
-      "source": "src/Resources/Additional/FuelAndEnergyResource.php:80",
+      "source": "src/Resources/Additional/FuelAndEnergyResource.php:91",
       "implementation_direction": "Add an operation-specific Builder/CursorPaginator path while preserving the raw envelope helper; test after/endCursor/hasNextPage traversal."
     },
     {
@@ -143910,7 +143910,7 @@
       "classification": "additive",
       "status": "confirmed",
       "summary": "The direct array-returning helper preserves the official pagination envelope and accepts pass-through cursor parameters, but it does not expose Builder/CursorPaginator automatic traversal.",
-      "source": "src/Resources/Industrial/AssetsResource.php:107",
+      "source": "src/Resources/Industrial/AssetsResource.php:118",
       "implementation_direction": "Add an operation-specific Builder/CursorPaginator path while preserving the raw envelope helper; test after/endCursor/hasNextPage traversal."
     }
   ],
@@ -174398,257 +174398,402 @@
         {
           "case": "BAROMETRIC_PRESSURE_PA",
           "value": "barometricPressurePa",
-          "source": "src/Enums/VehicleStatType.php:13"
+          "source": "src/Enums/VehicleStatType.php:26"
         },
         {
           "case": "BATTERY_MILLI_VOLTS",
           "value": "batteryMilliVolts",
-          "source": "src/Enums/VehicleStatType.php:14"
+          "source": "src/Enums/VehicleStatType.php:27"
         },
         {
           "case": "DEF_LEVEL_MILLI_PERCENT",
           "value": "defLevelMilliPercent",
-          "source": "src/Enums/VehicleStatType.php:15"
+          "source": "src/Enums/VehicleStatType.php:28"
         },
         {
           "case": "ENGINE_COOLANT_TEMPERATURE_MILLIC",
           "value": "engineCoolantTemperatureMilliC",
-          "source": "src/Enums/VehicleStatType.php:16"
+          "source": "src/Enums/VehicleStatType.php:31"
         },
         {
           "case": "ENGINE_LOAD_PERCENT",
           "value": "engineLoadPercent",
-          "source": "src/Enums/VehicleStatType.php:17"
+          "source": "src/Enums/VehicleStatType.php:33"
         },
         {
           "case": "ENGINE_OIL_PRESSURE_K_PA",
           "value": "engineOilPressureKPa",
-          "source": "src/Enums/VehicleStatType.php:18"
+          "source": "src/Enums/VehicleStatType.php:34"
         },
         {
           "case": "ENGINE_RPM",
           "value": "engineRpm",
-          "source": "src/Enums/VehicleStatType.php:19"
+          "source": "src/Enums/VehicleStatType.php:35"
         },
         {
           "case": "ENGINE_STATES",
           "value": "engineStates",
-          "source": "src/Enums/VehicleStatType.php:20"
+          "source": "src/Enums/VehicleStatType.php:36"
         },
         {
           "case": "EV_BATTERY_CURRENT_MILLI_AMPS",
           "value": "evBatteryCurrentMilliAmps",
-          "source": "src/Enums/VehicleStatType.php:21"
+          "source": "src/Enums/VehicleStatType.php:39"
         },
         {
           "case": "EV_BATTERY_STATE_OF_HEALTH_MILLI_PERCENT",
           "value": "evBatteryStateOfHealthMilliPercent",
-          "source": "src/Enums/VehicleStatType.php:22"
+          "source": "src/Enums/VehicleStatType.php:40"
         },
         {
           "case": "EV_BATTERY_TEMPERATURE_MILLIC",
           "value": "evBatteryTemperatureMilliC",
-          "source": "src/Enums/VehicleStatType.php:23"
+          "source": "src/Enums/VehicleStatType.php:41"
         },
         {
           "case": "EV_BATTERY_VOLTAGE_MILLI_VOLTS",
           "value": "evBatteryVoltageMilliVolts",
-          "source": "src/Enums/VehicleStatType.php:24"
+          "source": "src/Enums/VehicleStatType.php:43"
         },
         {
           "case": "EV_CHARGING_CURRENT_MILLI_AMPS",
           "value": "evChargingCurrentMilliAmps",
-          "source": "src/Enums/VehicleStatType.php:25"
+          "source": "src/Enums/VehicleStatType.php:45"
         },
         {
           "case": "EV_CHARGING_ENERGY_MICRO_WH",
           "value": "evChargingEnergyMicroWh",
-          "source": "src/Enums/VehicleStatType.php:26"
+          "source": "src/Enums/VehicleStatType.php:46"
         },
         {
           "case": "EV_CHARGING_STATUS",
           "value": "evChargingStatus",
-          "source": "src/Enums/VehicleStatType.php:27"
+          "source": "src/Enums/VehicleStatType.php:47"
         },
         {
           "case": "EV_CHARGING_VOLTAGE_MILLI_VOLTS",
           "value": "evChargingVoltageMilliVolts",
-          "source": "src/Enums/VehicleStatType.php:28"
+          "source": "src/Enums/VehicleStatType.php:49"
         },
         {
           "case": "EV_CONSUMED_ENERGY_MICRO_WH",
           "value": "evConsumedEnergyMicroWh",
-          "source": "src/Enums/VehicleStatType.php:29"
+          "source": "src/Enums/VehicleStatType.php:50"
         },
         {
           "case": "EV_DISTANCE_DRIVEN_METERS",
           "value": "evDistanceDrivenMeters",
-          "source": "src/Enums/VehicleStatType.php:30"
+          "source": "src/Enums/VehicleStatType.php:51"
         },
         {
           "case": "EV_REGENERATED_ENERGY_MICRO_WH",
           "value": "evRegeneratedEnergyMicroWh",
-          "source": "src/Enums/VehicleStatType.php:31"
+          "source": "src/Enums/VehicleStatType.php:52"
         },
         {
           "case": "EV_STATE_OF_CHARGE_MILLI_PERCENT",
           "value": "evStateOfChargeMilliPercent",
-          "source": "src/Enums/VehicleStatType.php:32"
+          "source": "src/Enums/VehicleStatType.php:53"
         },
         {
           "case": "FUEL_PERCENTS",
           "value": "fuelPercents",
-          "source": "src/Enums/VehicleStatType.php:33"
+          "source": "src/Enums/VehicleStatType.php:56"
         },
         {
           "case": "GPS",
           "value": "gps",
-          "source": "src/Enums/VehicleStatType.php:34"
+          "source": "src/Enums/VehicleStatType.php:57"
         },
         {
           "case": "GPS_DISTANCE_METERS",
           "value": "gpsDistanceMeters",
-          "source": "src/Enums/VehicleStatType.php:35"
+          "source": "src/Enums/VehicleStatType.php:58"
         },
         {
           "case": "GPS_ODOMETER_METERS",
           "value": "gpsOdometerMeters",
-          "source": "src/Enums/VehicleStatType.php:36"
+          "source": "src/Enums/VehicleStatType.php:59"
         },
         {
           "case": "INTAKE_MANIFOLD_TEMPERATURE_MILLIC",
           "value": "intakeManifoldTemperatureMilliC",
-          "source": "src/Enums/VehicleStatType.php:37"
+          "source": "src/Enums/VehicleStatType.php:61"
         },
         {
           "case": "OBD_ENGINE_SECONDS",
           "value": "obdEngineSeconds",
-          "source": "src/Enums/VehicleStatType.php:38"
+          "source": "src/Enums/VehicleStatType.php:63"
         },
         {
           "case": "OBD_ODOMETER_METERS",
           "value": "obdOdometerMeters",
-          "source": "src/Enums/VehicleStatType.php:39"
+          "source": "src/Enums/VehicleStatType.php:64"
         },
         {
           "case": "SEATBELT_DRIVER",
           "value": "seatbeltDriver",
-          "source": "src/Enums/VehicleStatType.php:40"
+          "source": "src/Enums/VehicleStatType.php:65"
         },
         {
           "case": "SPREADER_ACTIVE",
           "value": "spreaderActive",
-          "source": "src/Enums/VehicleStatType.php:41"
+          "source": "src/Enums/VehicleStatType.php:66"
         },
         {
           "case": "SPREADER_AIR_TEMP",
           "value": "spreaderAirTemp",
-          "source": "src/Enums/VehicleStatType.php:42"
+          "source": "src/Enums/VehicleStatType.php:67"
         },
         {
           "case": "SPREADER_AUGER_RUNNING",
           "value": "spreaderAugerRunning",
-          "source": "src/Enums/VehicleStatType.php:43"
+          "source": "src/Enums/VehicleStatType.php:68"
         },
         {
           "case": "SPREADER_BLOCK_HEIGHT",
           "value": "spreaderBlockHeight",
-          "source": "src/Enums/VehicleStatType.php:44"
+          "source": "src/Enums/VehicleStatType.php:70"
         },
         {
           "case": "SPREADER_CONVEYOR_RUNNING",
           "value": "spreaderConveyorRunning",
-          "source": "src/Enums/VehicleStatType.php:45"
+          "source": "src/Enums/VehicleStatType.php:71"
         },
         {
           "case": "SPREADER_GRANULAR_BLAST_STATE",
           "value": "spreaderGranularBlastState",
-          "source": "src/Enums/VehicleStatType.php:46"
+          "source": "src/Enums/VehicleStatType.php:72"
         },
         {
           "case": "SPREADER_GRANULAR_NAME",
           "value": "spreaderGranularName",
-          "source": "src/Enums/VehicleStatType.php:47"
+          "source": "src/Enums/VehicleStatType.php:73"
         },
         {
           "case": "SPREADER_GRANULAR_RATE",
           "value": "spreaderGranularRate",
-          "source": "src/Enums/VehicleStatType.php:48"
+          "source": "src/Enums/VehicleStatType.php:74"
         },
         {
           "case": "SPREADER_HOPPER_PERCENT_FULL",
           "value": "spreaderHopperPercentFull",
-          "source": "src/Enums/VehicleStatType.php:49"
+          "source": "src/Enums/VehicleStatType.php:75"
         },
         {
           "case": "SPREADER_LEFT_SPINNER_RUNNING",
           "value": "spreaderLeftSpinnerRunning",
-          "source": "src/Enums/VehicleStatType.php:50"
+          "source": "src/Enums/VehicleStatType.php:76"
         },
         {
           "case": "SPREADER_LIQUID_BLAST_STATE",
           "value": "spreaderLiquidBlastState",
-          "source": "src/Enums/VehicleStatType.php:51"
+          "source": "src/Enums/VehicleStatType.php:77"
         },
         {
           "case": "SPREADER_LIQUID_NAME",
           "value": "spreaderLiquidName",
-          "source": "src/Enums/VehicleStatType.php:52"
+          "source": "src/Enums/VehicleStatType.php:78"
         },
         {
           "case": "SPREADER_LIQUID_RATE",
           "value": "spreaderLiquidRate",
-          "source": "src/Enums/VehicleStatType.php:53"
+          "source": "src/Enums/VehicleStatType.php:79"
         },
         {
           "case": "SPREADER_ON_GROUND",
           "value": "spreaderOnGround",
-          "source": "src/Enums/VehicleStatType.php:54"
+          "source": "src/Enums/VehicleStatType.php:80"
         },
         {
           "case": "SPREADER_PLOW_STATUS",
           "value": "spreaderPlowStatus",
-          "source": "src/Enums/VehicleStatType.php:55"
+          "source": "src/Enums/VehicleStatType.php:82"
         },
         {
           "case": "SPREADER_PREWET_BLAST_STATE",
           "value": "spreaderPrewetBlastState",
-          "source": "src/Enums/VehicleStatType.php:56"
+          "source": "src/Enums/VehicleStatType.php:83"
         },
         {
           "case": "SPREADER_PREWET_NAME",
           "value": "spreaderPrewetName",
-          "source": "src/Enums/VehicleStatType.php:57"
+          "source": "src/Enums/VehicleStatType.php:84"
         },
         {
           "case": "SPREADER_PREWET_RATE",
           "value": "spreaderPrewetRate",
-          "source": "src/Enums/VehicleStatType.php:58"
+          "source": "src/Enums/VehicleStatType.php:85"
         },
         {
           "case": "SPREADER_RIGHT_SPINNER_RUNNING",
           "value": "spreaderRightSpinnerRunning",
-          "source": "src/Enums/VehicleStatType.php:59"
+          "source": "src/Enums/VehicleStatType.php:86"
         },
         {
           "case": "SPREADER_ROAD_TEMP",
           "value": "spreaderRoadTemp",
-          "source": "src/Enums/VehicleStatType.php:60"
+          "source": "src/Enums/VehicleStatType.php:87"
         },
         {
           "case": "SPREADER_VIBRATOR_RUNNING",
           "value": "spreaderVibratorRunning",
-          "source": "src/Enums/VehicleStatType.php:61"
+          "source": "src/Enums/VehicleStatType.php:88"
         },
         {
           "case": "SPREADER_WORK_LIGHT",
           "value": "spreaderWorkLight",
-          "source": "src/Enums/VehicleStatType.php:62"
+          "source": "src/Enums/VehicleStatType.php:89"
         },
         {
           "case": "TIRE_PRESSURE_MILLI_PSIS",
           "value": "tirePressureMilliPsis",
-          "source": "src/Enums/VehicleStatType.php:63"
+          "source": "src/Enums/VehicleStatType.php:92"
+        },
+        {
+          "case": "AUX_INPUT_1",
+          "value": "auxInput1",
+          "source": "src/Enums/VehicleStatType.php:13"
+        },
+        {
+          "case": "AUX_INPUT_10",
+          "value": "auxInput10",
+          "source": "src/Enums/VehicleStatType.php:14"
+        },
+        {
+          "case": "AUX_INPUT_11",
+          "value": "auxInput11",
+          "source": "src/Enums/VehicleStatType.php:15"
+        },
+        {
+          "case": "AUX_INPUT_12",
+          "value": "auxInput12",
+          "source": "src/Enums/VehicleStatType.php:16"
+        },
+        {
+          "case": "AUX_INPUT_13",
+          "value": "auxInput13",
+          "source": "src/Enums/VehicleStatType.php:17"
+        },
+        {
+          "case": "AUX_INPUT_2",
+          "value": "auxInput2",
+          "source": "src/Enums/VehicleStatType.php:18"
+        },
+        {
+          "case": "AUX_INPUT_3",
+          "value": "auxInput3",
+          "source": "src/Enums/VehicleStatType.php:19"
+        },
+        {
+          "case": "AUX_INPUT_4",
+          "value": "auxInput4",
+          "source": "src/Enums/VehicleStatType.php:20"
+        },
+        {
+          "case": "AUX_INPUT_5",
+          "value": "auxInput5",
+          "source": "src/Enums/VehicleStatType.php:21"
+        },
+        {
+          "case": "AUX_INPUT_6",
+          "value": "auxInput6",
+          "source": "src/Enums/VehicleStatType.php:22"
+        },
+        {
+          "case": "AUX_INPUT_7",
+          "value": "auxInput7",
+          "source": "src/Enums/VehicleStatType.php:23"
+        },
+        {
+          "case": "AUX_INPUT_8",
+          "value": "auxInput8",
+          "source": "src/Enums/VehicleStatType.php:24"
+        },
+        {
+          "case": "AUX_INPUT_9",
+          "value": "auxInput9",
+          "source": "src/Enums/VehicleStatType.php:25"
+        },
+        {
+          "case": "ECU_DOOR_STATUS",
+          "value": "ecuDoorStatus",
+          "source": "src/Enums/VehicleStatType.php:29"
+        },
+        {
+          "case": "ECU_SPEED_MPH",
+          "value": "ecuSpeedMph",
+          "source": "src/Enums/VehicleStatType.php:30"
+        },
+        {
+          "case": "ENGINE_IMMOBILIZER",
+          "value": "engineImmobilizer",
+          "source": "src/Enums/VehicleStatType.php:32"
+        },
+        {
+          "case": "EV_AVERAGE_BATTERY_TEMPERATURE_MILLI_CELSIUS",
+          "value": "evAverageBatteryTemperatureMilliCelsius",
+          "source": "src/Enums/VehicleStatType.php:37"
+        },
+        {
+          "case": "EV_BATTERY_CURRENT_MILLI_AMP",
+          "value": "evBatteryCurrentMilliAmp",
+          "source": "src/Enums/VehicleStatType.php:38"
+        },
+        {
+          "case": "EV_BATTERY_VOLTAGE_MILLI_VOLT",
+          "value": "evBatteryVoltageMilliVolt",
+          "source": "src/Enums/VehicleStatType.php:42"
+        },
+        {
+          "case": "EV_CHARGING_CURRENT_MILLI_AMP",
+          "value": "evChargingCurrentMilliAmp",
+          "source": "src/Enums/VehicleStatType.php:44"
+        },
+        {
+          "case": "EV_CHARGING_VOLTAGE_MILLI_VOLT",
+          "value": "evChargingVoltageMilliVolt",
+          "source": "src/Enums/VehicleStatType.php:48"
+        },
+        {
+          "case": "FAULT_CODES",
+          "value": "faultCodes",
+          "source": "src/Enums/VehicleStatType.php:54"
+        },
+        {
+          "case": "FUEL_CONSUMED_MILLILITERS",
+          "value": "fuelConsumedMilliliters",
+          "source": "src/Enums/VehicleStatType.php:55"
+        },
+        {
+          "case": "IDLING_DURATION_MILLISECONDS",
+          "value": "idlingDurationMilliseconds",
+          "source": "src/Enums/VehicleStatType.php:60"
+        },
+        {
+          "case": "NFC_CARD_SCANS",
+          "value": "nfcCardScans",
+          "source": "src/Enums/VehicleStatType.php:62"
+        },
+        {
+          "case": "SPREADER_BLAST_STATE",
+          "value": "spreaderBlastState",
+          "source": "src/Enums/VehicleStatType.php:69"
+        },
+        {
+          "case": "SPREADER_ON_STATE",
+          "value": "spreaderOnState",
+          "source": "src/Enums/VehicleStatType.php:81"
+        },
+        {
+          "case": "SYNTHETIC_ENGINE_SECONDS",
+          "value": "syntheticEngineSeconds",
+          "source": "src/Enums/VehicleStatType.php:90"
+        },
+        {
+          "case": "TELL_TALES",
+          "value": "tellTales",
+          "source": "src/Enums/VehicleStatType.php:91"
         }
       ]
     },
@@ -174674,122 +174819,162 @@
         {
           "case": "DOCUMENT_SUBMITTED",
           "value": "DocumentSubmitted",
-          "source": "src/Enums/WebhookEvent.php:21"
+          "source": "src/Enums/WebhookEvent.php:23"
         },
         {
           "case": "DRIVER_CREATED",
           "value": "DriverCreated",
-          "source": "src/Enums/WebhookEvent.php:22"
+          "source": "src/Enums/WebhookEvent.php:24"
         },
         {
           "case": "DRIVER_UPDATED",
           "value": "DriverUpdated",
-          "source": "src/Enums/WebhookEvent.php:23"
+          "source": "src/Enums/WebhookEvent.php:25"
         },
         {
           "case": "DVIR_SUBMITTED",
           "value": "DvirSubmitted",
-          "source": "src/Enums/WebhookEvent.php:24"
+          "source": "src/Enums/WebhookEvent.php:26"
         },
         {
           "case": "ENGINE_FAULT_OFF",
           "value": "EngineFaultOff",
-          "source": "src/Enums/WebhookEvent.php:25"
+          "source": "src/Enums/WebhookEvent.php:27"
         },
         {
           "case": "ENGINE_FAULT_ON",
           "value": "EngineFaultOn",
-          "source": "src/Enums/WebhookEvent.php:26"
+          "source": "src/Enums/WebhookEvent.php:28"
         },
         {
           "case": "FORM_SUBMITTED",
           "value": "FormSubmitted",
-          "source": "src/Enums/WebhookEvent.php:27"
+          "source": "src/Enums/WebhookEvent.php:29"
         },
         {
           "case": "FORM_UPDATED",
           "value": "FormUpdated",
-          "source": "src/Enums/WebhookEvent.php:28"
+          "source": "src/Enums/WebhookEvent.php:30"
         },
         {
           "case": "GATEWAY_UNPLUGGED",
           "value": "GatewayUnplugged",
-          "source": "src/Enums/WebhookEvent.php:29"
+          "source": "src/Enums/WebhookEvent.php:31"
         },
         {
           "case": "GEOFENCE_ENTRY",
           "value": "GeofenceEntry",
-          "source": "src/Enums/WebhookEvent.php:30"
+          "source": "src/Enums/WebhookEvent.php:32"
         },
         {
           "case": "GEOFENCE_EXIT",
           "value": "GeofenceExit",
-          "source": "src/Enums/WebhookEvent.php:31"
+          "source": "src/Enums/WebhookEvent.php:33"
         },
         {
           "case": "ISSUE_CREATED",
           "value": "IssueCreated",
-          "source": "src/Enums/WebhookEvent.php:32"
+          "source": "src/Enums/WebhookEvent.php:34"
         },
         {
           "case": "PREDICTIVE_MAINTENANCE_ALERT",
           "value": "PredictiveMaintenanceAlert",
-          "source": "src/Enums/WebhookEvent.php:33"
+          "source": "src/Enums/WebhookEvent.php:36"
         },
         {
           "case": "ROUTE_STOP_ARRIVAL",
           "value": "RouteStopArrival",
-          "source": "src/Enums/WebhookEvent.php:34"
+          "source": "src/Enums/WebhookEvent.php:37"
         },
         {
           "case": "ROUTE_STOP_DEPARTURE",
           "value": "RouteStopDeparture",
-          "source": "src/Enums/WebhookEvent.php:35"
+          "source": "src/Enums/WebhookEvent.php:38"
         },
         {
           "case": "ROUTE_STOP_EARLY_LATE_ARRIVAL",
           "value": "RouteStopEarlyLateArrival",
-          "source": "src/Enums/WebhookEvent.php:36"
+          "source": "src/Enums/WebhookEvent.php:39"
         },
         {
           "case": "ROUTE_STOP_ETA_UPDATED",
           "value": "RouteStopEtaUpdated",
-          "source": "src/Enums/WebhookEvent.php:37"
+          "source": "src/Enums/WebhookEvent.php:40"
         },
         {
           "case": "ROUTE_STOP_RESEQUENCE",
           "value": "RouteStopResequence",
-          "source": "src/Enums/WebhookEvent.php:38"
+          "source": "src/Enums/WebhookEvent.php:41"
         },
         {
           "case": "SEVERE_SPEEDING_ENDED",
           "value": "SevereSpeedingEnded",
-          "source": "src/Enums/WebhookEvent.php:39"
+          "source": "src/Enums/WebhookEvent.php:42"
         },
         {
           "case": "SEVERE_SPEEDING_STARTED",
           "value": "SevereSpeedingStarted",
-          "source": "src/Enums/WebhookEvent.php:40"
+          "source": "src/Enums/WebhookEvent.php:43"
         },
         {
           "case": "SPEEDING_EVENT_ENDED",
           "value": "SpeedingEventEnded",
-          "source": "src/Enums/WebhookEvent.php:41"
+          "source": "src/Enums/WebhookEvent.php:45"
         },
         {
           "case": "SPEEDING_EVENT_STARTED",
           "value": "SpeedingEventStarted",
-          "source": "src/Enums/WebhookEvent.php:42"
+          "source": "src/Enums/WebhookEvent.php:46"
         },
         {
           "case": "VEHICLE_CREATED",
           "value": "VehicleCreated",
-          "source": "src/Enums/WebhookEvent.php:43"
+          "source": "src/Enums/WebhookEvent.php:49"
         },
         {
           "case": "VEHICLE_UPDATED",
           "value": "VehicleUpdated",
+          "source": "src/Enums/WebhookEvent.php:50"
+        },
+        {
+          "case": "ALERT_INCIDENT",
+          "value": "AlertIncident",
+          "source": "src/Enums/WebhookEvent.php:21"
+        },
+        {
+          "case": "ALERT_OBJECT_EVENT",
+          "value": "AlertObjectEvent",
+          "source": "src/Enums/WebhookEvent.php:22"
+        },
+        {
+          "case": "MISSING_DVIR_PAST_DUE",
+          "value": "MissingDvirPastDue",
+          "source": "src/Enums/WebhookEvent.php:35"
+        },
+        {
+          "case": "SHIPMENT_TRACKING_EVENT",
+          "value": "ShipmentTrackingEvent",
           "source": "src/Enums/WebhookEvent.php:44"
+        },
+        {
+          "case": "SUDDEN_FUEL_LEVEL_DROP",
+          "value": "SuddenFuelLevelDrop",
+          "source": "src/Enums/WebhookEvent.php:47"
+        },
+        {
+          "case": "SUDDEN_FUEL_LEVEL_RISE",
+          "value": "SuddenFuelLevelRise",
+          "source": "src/Enums/WebhookEvent.php:48"
+        },
+        {
+          "case": "VISUAL_SEARCH_MATCH",
+          "value": "VisualSearchMatch",
+          "source": "src/Enums/WebhookEvent.php:51"
+        },
+        {
+          "case": "WORK_ORDER_CREATED_OR_CHANGED",
+          "value": "WorkOrderCreatedOrChanged",
+          "source": "src/Enums/WebhookEvent.php:52"
         }
       ]
     }

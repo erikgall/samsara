@@ -2,15 +2,15 @@
 
 This file lists verified consumer actions for the integrated staged-v2 behavior. Engineering evidence belongs in `DEVELOPMENT_CHANGELOG.md`.
 
-For an executable, agent-oriented migration sequence with before/after code, exact searches, endpoint-path tables, verification steps, and a 257-path final release ledger (239 frozen implementation paths plus 18 publication artifacts), use the canonical [v1.1.0 to v2.0.0 upgrade guide](UPGRADE.md). This file is the compact release record; the upgrade guide is the migration authority.
+For an executable, agent-oriented migration sequence with before/after code, exact searches, endpoint-path tables, verification steps, and a 337-path final release ledger, use the canonical [v1.1.0 to v2.0.0 upgrade guide](UPGRADE.md). This file is the compact release record; the upgrade guide is the migration authority.
 
 ## Unreleased — staged v2
 
 The final audit maps 195 package operations: 187 match the pinned first-party contract and 8 are explicit legacy helpers. Six matched operations retain only additive pagination-ergonomics gaps; no matched operation retains a classified wire, request-body, response-loss, or error-mapping break. Exact capability gates now reject 133 unsupported public operation calls locally, so consumers must apply the migrations below instead of relying on inherited CRUD. The 183 unique official-only operations are additive backlog and do not require a consumer migration until implemented.
 
-### Release integration gate
+### Integrated quality-pass compatibility notes
 
-These are the verified migrations through the documentation lane's starting `dev` commit, `3b475a16340eb23e341f51dba7135fa38b62364f`, subject to the frozen proof boundary described in `UPGRADE.md`. Parallel quality-lane commits are not release claims until the integrator classifies their consumer impact, updates the guide and ledger or records explicit no-action rationale, and reruns the release checks.
+All quality lanes are included in the release ledger. No new signature removal or intentional break was added by that pass. Applications with exact edge assertions should note that generic item IDs are now encoded as one path segment, mutable date inputs are no longer modified during UTC formatting, inconsistent cursor metadata returns no next page, and malformed webhook timestamps consistently raise `InvalidSignatureException`. See `MIG-19` for exact behavior and tests.
 
 ### Required DTO and enum migrations
 

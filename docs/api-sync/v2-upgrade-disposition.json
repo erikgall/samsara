@@ -8,7 +8,7 @@
     },
     "release_scope": {
         "comparison": "v1.1.0..final-dev",
-        "changed_files": 257,
+        "changed_files": 337,
         "publication_artifacts_added_after_audited_head": [
             "composer.json",
             "UPGRADE.md",
@@ -31,13 +31,20 @@
         ]
     },
     "summary": {
-        "additive_no_action": 12,
-        "documentation_only": 67,
+        "additive_no_action": 35,
+        "documentation_only": 71,
         "internal_only": 1,
-        "supporting_evidence": 91,
-        "upgrade_action": 86
+        "supporting_evidence": 139,
+        "upgrade_action": 91
     },
     "records": [
+        {
+            "path": ".ai/skills/post-release-docs-checklist/SKILL.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
         {
             "path": ".ai/skills/samsara-sdk-development/SKILL.md",
             "disposition": "documentation_only",
@@ -47,6 +54,20 @@
         },
         {
             "path": ".ai/skills/samsara-sdk-maintenance/SKILL.md",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": ".github/workflows/tests.yml",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
+            "path": ".prettierrc",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -538,6 +559,13 @@
             "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
         },
         {
+            "path": "package.json",
+            "disposition": "documentation_only",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
+        },
+        {
             "path": "resources/boost/guidelines/core.blade.php",
             "disposition": "documentation_only",
             "guide_sections": [],
@@ -628,6 +656,15 @@
             "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
         },
         {
+            "path": "src/Concerns/InteractsWithTime.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-19"
+            ],
+            "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
+            "no_action_reason": null
+        },
+        {
             "path": "src/Contracts/QueryBuilderInterface.php",
             "disposition": "upgrade_action",
             "guide_sections": [
@@ -635,6 +672,13 @@
             ],
             "consumer_action": "Add repeatQueryParameters(string ...$parameters): static to every third-party implementation and verify interface conformance.",
             "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Address/Address.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
         },
         {
             "path": "src/Data/Alert/AlertConfiguration.php",
@@ -677,6 +721,34 @@
             "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
         },
         {
+            "path": "src/Data/Attribute/Attribute.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Attribute/AttributeValue.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Document/Document.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Document/DocumentType.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
             "path": "src/Data/Driver/Driver.php",
             "disposition": "additive_no_action",
             "guide_sections": [],
@@ -709,6 +781,29 @@
             ],
             "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
             "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Driver/EldSettings.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/EntityCollection.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-19"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Equipment/Equipment.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
         },
         {
             "path": "src/Data/Equipment/EquipmentGpsLocation.php",
@@ -814,6 +909,20 @@
             "no_action_reason": null
         },
         {
+            "path": "src/Data/HoursOfService/HosDailyLog.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/HoursOfService/HosLog.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
             "path": "src/Data/HoursOfService/HosLogsForDriver.php",
             "disposition": "upgrade_action",
             "guide_sections": [
@@ -867,6 +976,34 @@
             "no_action_reason": null
         },
         {
+            "path": "src/Data/Industrial/IndustrialAsset.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Industrial/Machine.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Industrial/VisionCamera.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Industrial/VisionRun.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
             "path": "src/Data/LiveShare/LiveShare.php",
             "disposition": "upgrade_action",
             "guide_sections": [
@@ -889,7 +1026,35 @@
             "no_action_reason": null
         },
         {
+            "path": "src/Data/Maintenance/DefectType.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
             "path": "src/Data/Maintenance/Dvir.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Maintenance/ServiceTask.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Maintenance/WorkOrder.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Data/Organization/Organization.php",
             "disposition": "additive_no_action",
             "guide_sections": [],
             "consumer_action": null,
@@ -929,6 +1094,13 @@
             "no_action_reason": null
         },
         {
+            "path": "src/Data/Safety/CoachingSession.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
             "path": "src/Data/Safety/SafetyEvent.php",
             "disposition": "additive_no_action",
             "guide_sections": [],
@@ -944,6 +1116,13 @@
             ],
             "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
             "no_action_reason": null
+        },
+        {
+            "path": "src/Data/Safety/SafetyScore.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
         },
         {
             "path": "src/Data/Tag/Tag.php",
@@ -966,6 +1145,13 @@
             "no_action_reason": null
         },
         {
+            "path": "src/Data/Trailer/TrailerStats.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
             "path": "src/Data/Trip/Trip.php",
             "disposition": "upgrade_action",
             "guide_sections": [
@@ -983,6 +1169,13 @@
             ],
             "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
             "no_action_reason": null
+        },
+        {
+            "path": "src/Data/User/UserRole.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
         },
         {
             "path": "src/Data/Vehicle/Gateway.php",
@@ -1094,6 +1287,29 @@
             "no_action_reason": null
         },
         {
+            "path": "src/Enums/VehicleStatType.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Enums/WebhookEvent.php",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
+            "path": "src/Exceptions/InvalidSignatureException.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-19"
+            ],
+            "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
+            "no_action_reason": null
+        },
+        {
             "path": "src/Exceptions/ValidationException.php",
             "disposition": "upgrade_action",
             "guide_sections": [
@@ -1135,6 +1351,15 @@
                 "mig-07"
             ],
             "consumer_action": "Update pagination, query encoding, exception, and endpoint-DTO expectations for builder terminals.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Query/Pagination/CursorPaginator.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-19"
+            ],
+            "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
             "no_action_reason": null
         },
         {
@@ -1626,6 +1851,123 @@
             "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
         },
         {
+            "path": "src/Testing/Fixtures/addresses.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/drivers.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/dvirs.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/equipment.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/hos-logs.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/routes.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/safety-events.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/trailers.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/users.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/vehicle-stats.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/vehicles.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Testing/Fixtures/webhooks.json",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Webhooks/WebhookSignatureVerifier.php",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-19"
+            ],
+            "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
+            "no_action_reason": null
+        },
+        {
             "path": "tests/Maintenance/ApiSnapshotValidatorTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
@@ -1636,6 +1978,33 @@
         },
         {
             "path": "tests/Unit/BoostDocumentationTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Concerns/InteractsWithTimeTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/ConfigTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Address/AddressTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -1680,7 +2049,61 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Data/Attribute/AttributeTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Attribute/AttributeValueTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Document/DocumentTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Document/DocumentTypeTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Data/Driver/DriverTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Driver/EldSettingsTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/EntityCollectionTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -1716,6 +2139,15 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Data/Equipment/EquipmentTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Data/Form/FormSubmissionTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
@@ -1734,6 +2166,15 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Data/HoursOfService/HosDailyLogTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Data/HoursOfService/HosLogTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
@@ -1743,7 +2184,61 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Data/HoursOfService/HosViolationTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Data/Industrial/DataInputTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Industrial/DataPointTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Industrial/IndustrialAssetTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Industrial/MachineTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Industrial/VisionCameraTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Industrial/VisionRunTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -1770,7 +2265,43 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Data/Maintenance/DefectTypeTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Data/Maintenance/DvirTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Maintenance/ServiceTaskTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Maintenance/WorkOrderTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Organization/OrganizationTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -1797,6 +2328,24 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Data/Safety/CoachingSessionTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Safety/SafetyEventActivityTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Data/Safety/SafetyEventTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
@@ -1806,7 +2355,25 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Data/Safety/SafetyScoreTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Data/Tag/TagTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Trailer/TrailerStatsTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -1825,6 +2392,15 @@
         },
         {
             "path": "tests/Unit/Data/Trip/TripTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/User/UserRoleTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -1860,6 +2436,42 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Data/Vehicle/VehicleLocationTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Vehicle/VehicleStatValueTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Vehicle/VehicleStatsSeriesTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Data/Vehicle/VehicleStatsTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Data/Vehicle/VehicleTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
@@ -1887,7 +2499,34 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Enums/VehicleStatTypeTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Enums/WebhookEventTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Exceptions/HttpExceptionsTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Exceptions/InvalidSignatureExceptionTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -1915,6 +2554,15 @@
         },
         {
             "path": "tests/Unit/Query/BuilderTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Query/Pagination/CursorPaginatorTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -2338,6 +2986,24 @@
         },
         {
             "path": "tests/Unit/SamsaraTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Testing/FixturesTest.php",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Webhooks/WebhookSignatureVerifierTest.php",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"

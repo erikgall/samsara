@@ -254,6 +254,16 @@ All builder terminal methods (`get()`, `first()`, `paginate()`, `getWithPaginati
 
 Endpoint builders may also select an endpoint-specific result shape through `usingEntity()` or `mapUsing()`. That mapping persists across eager, paginated, and lazy execution, which is why snapshot and time-series endpoints can return distinct DTOs instead of reusing a resource-wide entity class.
 
+Package extenders can adapt nonstandard cursor envelopes without replacing pagination logic:
+
+```php
+return $this->createBuilderWithEndpoint('/v1/example')
+    ->withResponseCollectionKey('data.rows')
+    ->withCursorParameter('startingAfter');
+```
+
+`withResponseCollectionKey()` accepts dot notation for nested arrays. `withCursorParameter()` changes only the outgoing cursor name; response metadata still comes from the top-level `pagination` object. Both settings persist across `paginate()`, `nextPage()`, and `lazy()` clones.
+
 ## Working with Results
 
 `get()` returns a `Samsara\Data\EntityCollection`, which extends Laravel's base `Collection` with two SDK-specific helpers.
@@ -270,7 +280,7 @@ $driver = $drivers->findById('driver-1');
 
 | Method | Returns | Description |
 |---|---|---|
-| `ids()` | `array<int, string>` | Every entity's ID, with empty values filtered out. |
+| `ids()` | `array<int, string>` | Every non-null, non-empty entity ID; the valid string ID `"0"` is retained. |
 | `findById(string $id)` | `?Entity` | The first entity whose `getId()` matches, or `null`. |
 
 Because `EntityCollection` is a Laravel collection, every method on the base class — `filter()`, `map()`, `pluck()`, `keyBy()`, `groupBy()`, and so on — works without modification.
