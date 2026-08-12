@@ -26,10 +26,10 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 
 #### Verification
 
-- `composer check` — passed: 1,627 tests / 3,675 assertions, PHPStan with no errors, Pint, 15 maintenance-validator tests, pinned-snapshot verification, and 109 contract-reconciliation assertions.
-- `vendor/bin/phpunit --fail-on-warning --fail-on-risky` — passed: 1,627 tests / 3,675 assertions.
+- `composer check` — passed: 1,632 tests / 4,801 assertions, PHPStan with no errors, Pint, 15 maintenance-validator tests, pinned-snapshot verification, and 109 contract-reconciliation assertions.
+- `vendor/bin/phpunit --fail-on-warning --fail-on-risky` — passed: 1,632 tests / 4,801 assertions.
 - `composer check:v2-upgrade-guide` — passed: all 338 release paths classified once with 91 linked upgrade actions.
-- Strict Composer validation, Prettier ownership check, all repository JSON parsing, 669 local Markdown link/fragment checks, and `git diff --check` — passed.
+- Strict Composer validation, Prettier ownership check, all tracked JSON parsing, 810 local Markdown link/fragment checks, and `git diff --check` — passed.
 
 ### 2026-08-12 — Documentation quality and developer-experience lane
 

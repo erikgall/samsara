@@ -120,7 +120,7 @@
         {
             "path": "DEVELOPMENT_CHANGELOG.md",
             "content_state": "present",
-            "content_sha256": "3c1671af19a7a793e7ec7a546e9d84e87411f333dd4ca607d0f83a491400d2f4",
+            "content_sha256": "d4d1b12bc9a3742ebf6e6d2f562e8c93d878e1379bf7b8bd146d8c685d5b3fc8",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -238,7 +238,7 @@
         {
             "path": "docs/api-sync/contract-inventory.json",
             "content_state": "present",
-            "content_sha256": "0b9e90c15be0f9888fc7d893508097709a9998c732577ec11f7113a9b6618631",
+            "content_sha256": "d7466f227b4f2241ea62a8b1daebac82997de02cbda01ac69d46137a0db437e7",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3697,7 +3697,7 @@
         {
             "path": "tests/Unit/Webhooks/WebhookSignatureVerifierTest.php",
             "content_state": "present",
-            "content_sha256": "1cd464d0f21f70087e9f5d4fe4322b847235bdfa6c5b28909c6160ed2eb4a81a",
+            "content_sha256": "98f00f48b86c66e6d4d226f7ac59a27540937b8c0d0eb3486da73b6349b0eb01",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"

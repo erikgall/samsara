@@ -210,34 +210,21 @@ class WebhookSignatureVerifierTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_timing_safe_comparison(): void
+    public function it_uses_hash_equals_for_timing_safe_comparison(): void
     {
-        // This test ensures timing-safe comparison is used by verifying
-        // both valid and invalid signatures complete in similar time
-        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+        $method = new \ReflectionMethod(WebhookSignatureVerifier::class, 'isValid');
+        $filename = $method->getFileName();
 
-        $decodedSecret = base64_decode(self::TEST_SECRET);
-        $message = 'v1:'.self::TEST_TIMESTAMP.':'.self::TEST_BODY;
-        $validSignature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
+        $this->assertIsString($filename);
+        $source = file($filename);
+        $this->assertIsArray($source);
+        $methodSource = implode('', array_slice(
+            $source,
+            $method->getStartLine() - 1,
+            $method->getEndLine() - $method->getStartLine() + 1,
+        ));
 
-        // Run multiple iterations to smooth out timing variations
-        $iterations = 100;
-
-        $startValid = hrtime(true);
-        for ($i = 0; $i < $iterations; $i++) {
-            $verifier->isValid(self::TEST_BODY, $validSignature, self::TEST_TIMESTAMP);
-        }
-        $validTime = hrtime(true) - $startValid;
-
-        $startInvalid = hrtime(true);
-        for ($i = 0; $i < $iterations; $i++) {
-            $verifier->isValid(self::TEST_BODY, 'v1=0000000000000000000000000000000000000000000000000000000000000000', self::TEST_TIMESTAMP);
-        }
-        $invalidTime = hrtime(true) - $startInvalid;
-
-        // Times should be within 50% of each other (very lenient to avoid flaky tests)
-        $ratio = max($validTime, $invalidTime) / max(min($validTime, $invalidTime), 1);
-        $this->assertLessThan(2.0, $ratio, 'Timing-safe comparison should result in similar execution times');
+        $this->assertStringContainsString('hash_equals(', $methodSource);
     }
 
     #[Test]

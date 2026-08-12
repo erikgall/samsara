@@ -20,10 +20,10 @@
     "current_package_source": {
       "root": "/Users/erikgall/Code/samsara",
       "git_branch": "dev",
-      "git_head": "5f0857c86319149b81c7f6a54afc5a2d7085612c",
-      "source_sha256": "fe777ccded2beba074ab2adfeeffa3ac3b34756fdc2af36f941033a56d204951",
+      "git_head": "76f9cfe195d1d5f633ebafe8eb470dd8a9c01526",
+      "source_sha256": "007dfb6a3088a19f227d797a4826409fb417632f49f91d6c2fdd95497b2c30ec",
       "source_files": 170,
-      "source_bytes": 375379,
+      "source_bytes": 374970,
       "source_file_count": 170,
       "hash_definition": "SHA-256 of a sorted manifest whose rows are '<file-sha256>  <relative-path>\\n' for src/**/*.php, src/**/*.json, and config/samsara.php"
     },
@@ -49196,7 +49196,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Resource.php:224",
+            "source": "src/Resources/Resource.php:209",
             "signature": "update",
             "return_type": "inherited generic",
             "response_mapping": {
@@ -50435,7 +50435,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Resource.php:224",
+            "source": "src/Resources/Resource.php:209",
             "signature": "update",
             "return_type": "inherited generic",
             "response_mapping": {
@@ -51261,7 +51261,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Resource.php:224",
+            "source": "src/Resources/Resource.php:209",
             "signature": "update",
             "return_type": "inherited generic",
             "response_mapping": {
@@ -51770,7 +51770,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Resource.php:224",
+            "source": "src/Resources/Resource.php:209",
             "signature": "update",
             "return_type": "inherited generic",
             "response_mapping": {
@@ -52398,7 +52398,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Resource.php:224",
+            "source": "src/Resources/Resource.php:209",
             "signature": "update",
             "return_type": "inherited generic",
             "response_mapping": {
@@ -52514,7 +52514,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Resource.php:224",
+            "source": "src/Resources/Resource.php:209",
             "signature": "update",
             "return_type": "inherited generic",
             "response_mapping": {
@@ -53827,7 +53827,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Resource.php:224",
+            "source": "src/Resources/Resource.php:209",
             "signature": "update",
             "return_type": "inherited generic",
             "response_mapping": {
@@ -56324,7 +56324,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Resource.php:224",
+            "source": "src/Resources/Resource.php:209",
             "signature": "update",
             "return_type": "inherited generic",
             "response_mapping": {
@@ -56640,7 +56640,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Resource.php:224",
+            "source": "src/Resources/Resource.php:209",
             "signature": "update",
             "return_type": "inherited generic",
             "response_mapping": {
@@ -56856,7 +56856,7 @@
             "query": null,
             "request_data": [],
             "request_body": "[]",
-            "source": "src/Resources/Resource.php:224",
+            "source": "src/Resources/Resource.php:209",
             "signature": "update",
             "return_type": "inherited generic",
             "response_mapping": {
@@ -74185,7 +74185,7 @@
     {
       "class": "AddressesResource",
       "method": "update",
-      "source": "src/Resources/Resource.php:224",
+      "source": "src/Resources/Resource.php:209",
       "operations": [
         [
           "PATCH",
@@ -74281,7 +74281,7 @@
     {
       "class": "RoutesResource",
       "method": "update",
-      "source": "src/Resources/Resource.php:224",
+      "source": "src/Resources/Resource.php:209",
       "operations": [
         [
           "PATCH",
@@ -74535,7 +74535,7 @@
     {
       "class": "DriversResource",
       "method": "update",
-      "source": "src/Resources/Resource.php:224",
+      "source": "src/Resources/Resource.php:209",
       "operations": [
         [
           "PATCH",
@@ -74791,7 +74791,7 @@
     {
       "class": "TrailersResource",
       "method": "update",
-      "source": "src/Resources/Resource.php:224",
+      "source": "src/Resources/Resource.php:209",
       "operations": [
         [
           "PATCH",
@@ -74871,7 +74871,7 @@
     {
       "class": "VehiclesResource",
       "method": "update",
-      "source": "src/Resources/Resource.php:224",
+      "source": "src/Resources/Resource.php:209",
       "operations": [
         [
           "PATCH",
@@ -75223,7 +75223,7 @@
     {
       "class": "IndustrialResource",
       "method": "update",
-      "source": "src/Resources/Resource.php:224",
+      "source": "src/Resources/Resource.php:209",
       "operations": [
         [
           "PATCH",
@@ -75575,7 +75575,7 @@
     {
       "class": "WebhooksResource",
       "method": "update",
-      "source": "src/Resources/Resource.php:224",
+      "source": "src/Resources/Resource.php:209",
       "operations": [
         [
           "PATCH",
@@ -75879,7 +75879,7 @@
     {
       "class": "ContactsResource",
       "method": "update",
-      "source": "src/Resources/Resource.php:224",
+      "source": "src/Resources/Resource.php:209",
       "operations": [
         [
           "PATCH",
@@ -75975,7 +75975,7 @@
     {
       "class": "TagsResource",
       "method": "update",
-      "source": "src/Resources/Resource.php:224",
+      "source": "src/Resources/Resource.php:209",
       "operations": [
         [
           "PATCH",
@@ -76071,7 +76071,7 @@
     {
       "class": "UsersResource",
       "method": "update",
-      "source": "src/Resources/Resource.php:224",
+      "source": "src/Resources/Resource.php:209",
       "operations": [
         [
           "PATCH",
@@ -139301,7 +139301,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Resource.php:224",
+          "source": "src/Resources/Resource.php:209",
           "signature": "update",
           "return_type": "inherited generic",
           "response_mapping": {
@@ -139450,7 +139450,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Resource.php:224",
+          "source": "src/Resources/Resource.php:209",
           "signature": "update",
           "return_type": "inherited generic",
           "response_mapping": {
@@ -139531,7 +139531,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Resource.php:224",
+          "source": "src/Resources/Resource.php:209",
           "signature": "update",
           "return_type": "inherited generic",
           "response_mapping": {
@@ -139568,7 +139568,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Resource.php:224",
+          "source": "src/Resources/Resource.php:209",
           "signature": "update",
           "return_type": "inherited generic",
           "response_mapping": {
@@ -139677,7 +139677,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Resource.php:224",
+          "source": "src/Resources/Resource.php:209",
           "signature": "update",
           "return_type": "inherited generic",
           "response_mapping": {
@@ -139714,7 +139714,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Resource.php:224",
+          "source": "src/Resources/Resource.php:209",
           "signature": "update",
           "return_type": "inherited generic",
           "response_mapping": {
@@ -139790,7 +139790,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Resource.php:224",
+          "source": "src/Resources/Resource.php:209",
           "signature": "update",
           "return_type": "inherited generic",
           "response_mapping": {
@@ -139884,7 +139884,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Resource.php:224",
+          "source": "src/Resources/Resource.php:209",
           "signature": "update",
           "return_type": "inherited generic",
           "response_mapping": {
@@ -139921,7 +139921,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Resource.php:224",
+          "source": "src/Resources/Resource.php:209",
           "signature": "update",
           "return_type": "inherited generic",
           "response_mapping": {
@@ -139958,7 +139958,7 @@
           "query": null,
           "request_data": [],
           "request_body": "[]",
-          "source": "src/Resources/Resource.php:224",
+          "source": "src/Resources/Resource.php:209",
           "signature": "update",
           "return_type": "inherited generic",
           "response_mapping": {
