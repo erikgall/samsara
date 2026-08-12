@@ -13,6 +13,17 @@ use PHPUnit\Framework\Attributes\Test;
 class ConfigTest extends TestCase
 {
     #[Test]
+    public function config_exposes_the_complete_public_key_set(): void
+    {
+        $config = require __DIR__.'/../../config/samsara.php';
+
+        $this->assertSame(
+            ['api_key', 'region', 'timeout', 'retry', 'per_page', 'webhook_secret'],
+            array_keys($config),
+        );
+    }
+
+    #[Test]
     public function config_has_api_key_setting(): void
     {
         $config = require __DIR__.'/../../config/samsara.php';

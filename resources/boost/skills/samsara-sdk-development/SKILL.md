@@ -11,10 +11,10 @@ Work from the installed SDK, not from memory or a similarly named Samsara API cl
 
 1. Confirm the installed version and package root:
 
-   ```bash
-   composer show erikgall/samsara
-   composer show erikgall/samsara --path
-   ```
+    ```bash
+    composer show erikgall/samsara
+    composer show erikgall/samsara --path
+    ```
 
 2. Inspect the consuming application's existing Samsara calls, configuration, service boundaries, and tests before choosing a pattern.
 3. Read the relevant local package documentation and source. Use the package root returned above; do not assume it is `vendor/erikgall/samsara`.

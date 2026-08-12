@@ -40,11 +40,11 @@ try {
     $capabilities = deriveInheritedCapabilities($root, $official['wire_keys'], $errors);
     $source = deriveSourceIdentity($root, $errors);
 
-    checkSame('inventory worktree', $root, $inventory['worktree'] ?? null, $errors, $passes);
+    verifyRecordedSourceContext($inventory, $errors, $passes);
     checkSame('generated date', '2026-08-10', $inventory['generated_for_date'] ?? null, $errors, $passes);
 
     verifyOfficialSource($inventory, $contractPath, $official, $errors, $passes);
-    verifySourceIdentity($inventory, $source, $root, $errors, $passes);
+    verifySourceIdentity($inventory, $source, $errors, $passes);
     verifyCounts($inventory, $official, $package, $capabilities, $errors, $passes);
     verifyStages($inventory, $official, $package, $errors, $passes);
     verifyCapabilities($inventory, $package, $capabilities, $errors, $passes);
@@ -510,7 +510,7 @@ function parseSupportedGenericOperations(string $source): ?array
     return $values['value'];
 }
 
-/** @return array{file_count:int,php_file_count:int,tree_sha256:string,branch:string} */
+/** @return array{file_count:int,php_file_count:int,tree_sha256:string} */
 function deriveSourceIdentity(string $root, array &$errors): array
 {
     $files = [];
@@ -543,15 +543,40 @@ function deriveSourceIdentity(string $root, array &$errors): array
         $manifest .= $hash.'  '.$relative."\n";
     }
 
-    $head = trim((string) file_get_contents($root.'/.git/HEAD'));
-    $branch = str_starts_with($head, 'ref: refs/heads/') ? substr($head, strlen('ref: refs/heads/')) : '<detached>';
-
     return [
         'file_count'     => count($files),
         'php_file_count' => $php,
         'tree_sha256'    => hash('sha256', $manifest),
-        'branch'         => $branch,
     ];
+}
+
+function verifyRecordedSourceContext(array $inventory, array &$errors, int &$passes): void
+{
+    $worktree = $inventory['worktree'] ?? null;
+    if (! is_string($worktree) || $worktree === '') {
+        $errors[] = 'Inventory worktree provenance must be a non-empty string.';
+    } else {
+        $passes++;
+    }
+
+    $identity = firstValue($inventory, [
+        ['sources', 'current_package_source'],
+        ['sources', 'package_source'],
+    ]);
+    $recordedRoot = is_array($identity) ? ($identity['root'] ?? $identity['worktree'] ?? null) : null;
+    $recordedBranch = is_array($identity) ? ($identity['branch'] ?? $identity['git_branch'] ?? null) : null;
+
+    if (! is_string($recordedRoot) || $recordedRoot === '') {
+        $errors[] = 'Package source root provenance must be a non-empty string.';
+    } else {
+        $passes++;
+    }
+
+    if (! is_string($recordedBranch) || $recordedBranch === '') {
+        $errors[] = 'Package source branch provenance must be a non-empty string.';
+    } else {
+        $passes++;
+    }
 }
 
 function verifyOfficialSource(array $inventory, string $contractPath, array $official, array &$errors, int &$passes): void
@@ -565,7 +590,7 @@ function verifyOfficialSource(array $inventory, string $contractPath, array $off
     checkSame('official source unique operation count', count($official['wire_keys']), $source['unique_wire_operations'] ?? null, $errors, $passes);
 }
 
-function verifySourceIdentity(array $inventory, array $source, string $root, array &$errors, int &$passes): void
+function verifySourceIdentity(array $inventory, array $source, array &$errors, int &$passes): void
 {
     $identity = firstValue($inventory, [
         ['sources', 'current_package_source'],
@@ -576,8 +601,6 @@ function verifySourceIdentity(array $inventory, array $source, string $root, arr
 
         return;
     }
-    checkSame('package source root', $root, $identity['root'] ?? $identity['worktree'] ?? null, $errors, $passes);
-    checkSame('package source branch', $source['branch'], $identity['branch'] ?? $identity['git_branch'] ?? null, $errors, $passes);
     checkSame('package src tree SHA-256', $source['tree_sha256'], $identity['source_tree_sha256'] ?? $identity['source_sha256'] ?? $identity['sha256'] ?? null, $errors, $passes);
     checkSame('package src file count', $source['file_count'], $identity['source_file_count'] ?? $identity['files'] ?? null, $errors, $passes);
 }

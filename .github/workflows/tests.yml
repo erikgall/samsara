@@ -2,9 +2,12 @@ name: tests
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
+
+permissions:
+  contents: read
 
 jobs:
   tests:
@@ -53,10 +56,50 @@ jobs:
           jq -r '.["packages-dev"][]|select(.name=="orchestra/testbench" or .name=="phpunit/phpunit" or .name=="phpstan/phpstan")|.name + " " + .version' composer.lock
 
       - name: Run phpunit
-        run: vendor/bin/phpunit
+        run: composer test
 
       - name: Run phpstan
-        run: vendor/bin/phpstan analyse --no-progress
+        run: composer analyse
 
       - name: Run pint --test
-        run: vendor/bin/pint --test
+        run: composer format:test
+
+  maintenance:
+    name: Contract and release maintenance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+
+      - name: Run dependency-free maintenance checks
+        run: composer check:maintenance
+
+  formatting:
+    name: Agent and maintenance artifact formatting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install formatting dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Check formatting
+        run: npm run format:check

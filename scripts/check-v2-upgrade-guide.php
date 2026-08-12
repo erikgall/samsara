@@ -423,7 +423,13 @@ README.md
 UPGRADE.md
 .ai/skills/samsara-sdk-development/SKILL.md
 .ai/skills/samsara-sdk-maintenance/SKILL.md
+.ai/skills/post-release-docs-checklist/SKILL.md
+.github/workflows/tests.yml
+.prettierrc
 composer.json
+package-lock.json
+package.json
+contracts/samsara/README.md
 docs/_config.yml
 docs/api-maintenance.md
 docs/api-sync/contract-inventory.json
@@ -448,7 +454,11 @@ resources/boost/skills/samsara-sdk-development/references/integration.md
 resources/boost/skills/samsara-sdk-development/references/querying-and-responses.md
 resources/boost/skills/samsara-sdk-development/references/testing-and-webhooks.md
 resources/boost/skills/upgrade-samsara-sdk-v2/SKILL.md
+scripts/check-samsara-contract-reconciliation.php
 scripts/check-v2-upgrade-guide.php
+tests/Maintenance/ApiSnapshotValidatorTest.php
+tests/Unit/BoostDocumentationTest.php
+tests/Unit/ConfigTest.php
 tests/Unit/Resources/Additional/CurrentContractBResourceTest.php
 tests/Unit/Resources/Additional/CameraMediaResourceTest.php
 tests/Unit/Resources/Additional/FormsResourceTest.php
@@ -506,7 +516,10 @@ $finalWorkspaceScope = array_values(array_unique(array_merge(
 )));
 sort($finalWorkspaceScope);
 if ($finalScopeStatus !== 0 || $finalWorkspaceScope !== $releaseScope) {
-    fwrite(STDERR, 'FAIL: final tag-to-worktree scope differs from the 257-path release ledger.'."\n");
+    fwrite(STDERR, 'FAIL: final tag-to-worktree scope differs from the 257-path release ledger: '.json_encode([
+        'unclassified_paths' => array_values(array_diff($finalWorkspaceScope, $releaseScope)),
+        'missing_paths'      => array_values(array_diff($releaseScope, $finalWorkspaceScope)),
+    ], JSON_UNESCAPED_SLASHES)."\n");
     exit(1);
 }
 

@@ -4,6 +4,7 @@
         "prettier": "^3.5.3"
     },
     "scripts": {
-        "format": "prettier --plugin=@prettier/plugin-php --write \"src/**/*.php\""
+        "format": "prettier --plugin=@prettier/plugin-php --write \"src/**/*.php\"",
+        "format:check": "prettier --check \".ai/**/*.md\" \".github/**/*.yml\" \"contracts/**/*.md\" \"resources/boost/**/*.md\" package.json package-lock.json .prettierrc"
     }
 }

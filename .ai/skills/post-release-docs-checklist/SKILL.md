@@ -11,11 +11,11 @@ Use this skill after releasing code changes (new version tag, merged PR, or depl
 
 ## Checklist
 
-Run through each section below. Use subagents in parallel to audit all areas simultaneously.
+Run through each section below. Split an independent section into a helper only when it materially shortens the audit and does not broaden the release scope.
 
 ### 1. Webhook Documentation (`docs/resources/webhooks.md`)
 
-- [ ] Event type count matches `WebhookEvent` enum (currently 27)
+- [ ] Event type count matches the current `WebhookEvent::cases()` count
 - [ ] All listed event types actually exist in the enum
 - [ ] No valid enum values are missing from the docs
 - [ ] Code examples reference real event type values
@@ -85,17 +85,10 @@ Run through each section below. Use subagents in parallel to audit all areas sim
 
 ## How to Run This Audit
 
-```
-Use 4-5 parallel subagents:
-
-Agent 1: Webhook docs vs WebhookEvent enum + middleware source
-Agent 2: Resource docs vs Resource classes (check for new/removed methods, exceptions)
-Agent 3: README + getting-started + config docs vs config/samsara.php
-Agent 4: Error handling docs vs src/Exceptions/*.php
-Agent 5: CHANGELOG + Jekyll config + composer.json version checks
-```
+Audit each checklist section against its named source of truth. Independent sections may be delegated, but one owner must deduplicate findings and verify the final scoped diff.
 
 Each agent should:
+
 1. Read the documentation file(s)
 2. Read the corresponding source file(s)
 3. Diff the two and report discrepancies
@@ -109,5 +102,5 @@ These are issues that have been caught in past audits:
 - **Showing unsupported operations as working** - Check if any resource methods throw `UnsupportedOperationException`
 - **Stale config examples** - The "Complete Configuration File" section drifts from the actual config file
 - **Broken cross-links** - Resource docs linking to wrong pages (e.g., `../query-builder.md` instead of `vehicle-locations.md`)
-- **Overstated counts** - Documentation claiming "70+ event types" when only 27 exist
+- **Overstated counts** - Derive counts from the current enum rather than retaining a release-specific number
 - **Missing env vars** - New config keys added without documenting the corresponding env variable

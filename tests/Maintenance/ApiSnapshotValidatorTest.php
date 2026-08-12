@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Dependency-free behavior tests for the API snapshot validator.
+ * Dependency-free behavior tests for repository maintenance validators.
  *
  * Run with: php tests/Maintenance/ApiSnapshotValidatorTest.php
  *
@@ -31,6 +31,7 @@ final class ApiSnapshotValidatorTest
             'rejects metadata that names a different path'                => fn () => $this->rejectsMismatchedMetadataPath(),
             'rejects symlinked evidence'                                  => fn () => $this->rejectsSymlinkedEvidence(),
             'rejects duplicate and conflicting options'                   => fn () => $this->rejectsInvalidOptionCombinations(),
+            'reconciles contracts from a linked worktree'                 => fn () => $this->reconcilesContractsFromLinkedWorktree(),
         ];
 
         try {
@@ -135,6 +136,14 @@ final class ApiSnapshotValidatorTest
     private function metadataPath(string $snapshot): string
     {
         return $snapshot.'.metadata.json';
+    }
+
+    private function reconcilesContractsFromLinkedWorktree(): void
+    {
+        $result = $this->runRepositoryScript('scripts/check-samsara-contract-reconciliation.php');
+
+        $this->assertSame(0, $result['exit_code'], $result['stderr']);
+        $this->assertContains('unclassified differences = 0', $result['stdout']);
     }
 
     private function rejectsDigestMismatch(): void
@@ -315,13 +324,14 @@ final class ApiSnapshotValidatorTest
     }
 
     /**
+     * @param  list<string>  $arguments
      * @return array{exit_code: int, stdout: string, stderr: string}
      */
-    private function runValidator(array $arguments): array
+    private function runRepositoryScript(string $script, array $arguments = []): array
     {
         $repositoryRoot = dirname(__DIR__, 2);
         $command = array_merge(
-            [PHP_BINARY, $repositoryRoot.'/scripts/validate-samsara-snapshot.php'],
+            [PHP_BINARY, $repositoryRoot.'/'.$script],
             $arguments,
         );
         $pipes = [];
@@ -351,6 +361,14 @@ final class ApiSnapshotValidatorTest
             'stdout'    => $stdout,
             'stderr'    => $stderr,
         ];
+    }
+
+    /**
+     * @return array{exit_code: int, stdout: string, stderr: string}
+     */
+    private function runValidator(array $arguments): array
+    {
+        return $this->runRepositoryScript('scripts/validate-samsara-snapshot.php', $arguments);
     }
 
     private function writeMetadata(string $snapshot, string $digest): void

@@ -11,11 +11,11 @@ Treat the installed package's complete upgrade guide as the migration authority.
 
 1. Confirm the current constraint, installed version, and target package root:
 
-   ```bash
-   composer show erikgall/samsara
-   composer show erikgall/samsara --path
-   composer why-not erikgall/samsara ^2.0
-   ```
+    ```bash
+    composer show erikgall/samsara
+    composer show erikgall/samsara --path
+    composer why-not erikgall/samsara ^2.0
+    ```
 
 2. From the package root, read `UPGRADE.md`, then read the linked `docs/upgrade-guide-v2.md` completely before editing.
 3. Inventory every Samsara import, facade or client call, resource extension, query-builder extension, caught exception, DTO access, serialized field, stored enum value, HTTP fake, fixture, cassette, cache key, signature, proxy rule, and outbound allowlist in the consuming repository.

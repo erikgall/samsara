@@ -83,21 +83,21 @@ a7255e2d5b7a94eea97e11f47db1c7b969931f639366bcae49e4922b02ba3fc6  contracts/sams
 3. Choose a dated filename. If more than one snapshot is taken on the same date, include the UTC retrieval time or a digest prefix so filenames stay unambiguous.
 4. Download the response directly without a formatter or parser:
 
-   ```sh
-   curl --fail --silent --show-error --location \
-     --dump-header /tmp/samsara-openapi.headers \
-     --output contracts/samsara/samsara-api-YYYY-MM-DD.json \
-     https://developers.samsara.com/openapi/samsara-api.json
-   ```
+    ```sh
+    curl --fail --silent --show-error --location \
+      --dump-header /tmp/samsara-openapi.headers \
+      --output contracts/samsara/samsara-api-YYYY-MM-DD.json \
+      https://developers.samsara.com/openapi/samsara-api.json
+    ```
 
 5. Record the retrieval timestamp with timezone, HTTP status, Content-Type, ETag, Last-Modified value, and raw byte count. Preserve the response body exactly.
 6. Parse, hash, and validate the stored file:
 
-   ```sh
-   jq empty contracts/samsara/samsara-api-YYYY-MM-DD.json
-   shasum -a 256 contracts/samsara/samsara-api-YYYY-MM-DD.json
-   wc -c contracts/samsara/samsara-api-YYYY-MM-DD.json
-   ```
+    ```sh
+    jq empty contracts/samsara/samsara-api-YYYY-MM-DD.json
+    shasum -a 256 contracts/samsara/samsara-api-YYYY-MM-DD.json
+    wc -c contracts/samsara/samsara-api-YYYY-MM-DD.json
+    ```
 
 7. Add or update the adjacent `.metadata.json` sidecar and this README. Do not insert metadata into the snapshot itself.
-8. Re-run the maintained repository validator, if present, plus a standards-aware OpenAPI validator. Record the exact tool version, command, exit status, and result.
+8. Run `composer check:maintenance` plus a standards-aware OpenAPI validator. Record the exact tool version, command, exit status, and result.

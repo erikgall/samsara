@@ -15,7 +15,7 @@ Keep the v2 SDK aligned with its pinned contract, explicit resource capabilities
 4. Make the smallest coherent contract change. Preserve generic capability gates, exact HTTP method and path, query encoding, response unwrap, mapped entity, return type, and error behavior.
 5. Add or update focused HTTP-fake tests before changing broader documentation.
 6. Update every directly affected consumer page, capability matrix entry, v2 upgrade disposition, and public agent artifact.
-7. Run the focused test, full PHPUnit suite, PHPStan, Pint, and relevant maintenance checkers.
+7. Run the focused test, then `composer check` for the full PHPUnit, PHPStan, Pint, and contract-maintenance gate. Run `composer check:v2-upgrade-guide` when the v2 release ledger changes, and `npm run format:check` when agent or contract documentation changed.
 
 ## Package Contracts
 

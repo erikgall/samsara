@@ -45,8 +45,20 @@
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
-        "analyse": "vendor/bin/phpstan analyse",
+        "analyse": "vendor/bin/phpstan analyse --no-progress",
         "format": "vendor/bin/pint",
+        "format:test": "vendor/bin/pint --test",
+        "check:maintenance": [
+            "@php scripts/validate-samsara-snapshot.php",
+            "@php tests/Maintenance/ApiSnapshotValidatorTest.php",
+            "@php scripts/check-samsara-contract-reconciliation.php"
+        ],
+        "check": [
+            "@test",
+            "@analyse",
+            "@format:test",
+            "@check:maintenance"
+        ],
         "check:v2-upgrade-guide": "php scripts/check-v2-upgrade-guide.php"
     },
     "config": {

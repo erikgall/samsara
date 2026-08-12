@@ -30,12 +30,12 @@ Do not replace these helpers with hand-built query strings. When encoding matter
 
 ## Choose the Terminal Operation Deliberately
 
-| Terminal | Result | Behavior |
-| --- | --- | --- |
-| `get()` | `EntityCollection` | Reads one response page; it does not follow later cursors. |
-| `first()` | `?object` | Applies a limit of one and returns the first mapped item. |
-| `paginate()` | `CursorPaginator` | Reads one page and preserves cursor metadata. |
-| `lazy()` | `LazyCollection` | Walks pages until the API reports no next cursor. |
+| Terminal     | Result             | Behavior                                                   |
+| ------------ | ------------------ | ---------------------------------------------------------- |
+| `get()`      | `EntityCollection` | Reads one response page; it does not follow later cursors. |
+| `first()`    | `?object`          | Applies a limit of one and returns the first mapped item.  |
+| `paginate()` | `CursorPaginator`  | Reads one page and preserves cursor metadata.              |
+| `lazy()`     | `LazyCollection`   | Walks pages until the API reports no next cursor.          |
 
 The mapped item type comes from the selected resource or helper. Inspect the PHP return type, PHPDoc, resource page, and focused test before accessing fields or serializing the result. Some explicit helpers return raw arrays or scalars rather than mapped entities.
 

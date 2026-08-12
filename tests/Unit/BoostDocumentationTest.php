@@ -32,6 +32,17 @@ class BoostDocumentationTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_the_post_release_checklist_current_and_scope_safe(): void
+    {
+        $checklist = $this->readProjectFile('.ai/skills/post-release-docs-checklist/SKILL.md');
+
+        $this->assertStringContainsString('WebhookEvent::cases()', $checklist);
+        $this->assertStringContainsString('does not broaden the release scope', $checklist);
+        $this->assertDoesNotMatchRegularExpression('/currently \d+/', $checklist);
+        $this->assertStringNotContainsString('Use 4-5 parallel subagents', $checklist);
+    }
+
+    #[Test]
     public function it_publishes_a_concise_guideline_that_routes_to_skills(): void
     {
         $guidelineFiles = glob($this->projectPath('resources/boost/guidelines/*')) ?: [];
