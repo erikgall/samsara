@@ -3,7 +3,6 @@
         {
             "id": "tag-001",
             "name": "West Coast",
-            "parentTagId": null,
             "addresses": [
                 {"id": "address-001", "name": "Main Warehouse"},
                 {"id": "address-002", "name": "LA Distribution Center"}
@@ -20,7 +19,6 @@
         {
             "id": "tag-002",
             "name": "South Region",
-            "parentTagId": null,
             "addresses": [
                 {"id": "address-002", "name": "LA Distribution Center"}
             ],
@@ -35,7 +33,6 @@
         {
             "id": "tag-003",
             "name": "Priority Fleet",
-            "parentTagId": null,
             "addresses": [
                 {"id": "address-004", "name": "Customer B - Warehouse"}
             ],

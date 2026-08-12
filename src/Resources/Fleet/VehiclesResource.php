@@ -40,7 +40,7 @@ class VehiclesResource extends Resource
     public function findByExternalId(string $key, string $value): ?Vehicle
     {
         /** @var Vehicle|null */
-        return $this->find(rawurlencode($key).':'.rawurlencode($value));
+        return $this->findByEncodedPathSegment(rawurlencode($key).':'.rawurlencode($value));
     }
 
     /**

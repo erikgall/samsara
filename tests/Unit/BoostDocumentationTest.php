@@ -32,6 +32,64 @@ class BoostDocumentationTest extends TestCase
     }
 
     #[Test]
+    public function it_enforces_content_aware_release_dispositions_in_maintenance_checks(): void
+    {
+        $composer = json_decode(
+            $this->readProjectFile('composer.json'),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+        $ledger = json_decode(
+            $this->readProjectFile('docs/api-sync/v2-upgrade-disposition.json'),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+
+        $this->assertContains('@check:v2-upgrade-guide', $composer['scripts']['check:maintenance']);
+        $this->assertSame(
+            ['docs/api-sync/v2-upgrade-disposition.json'],
+            $ledger['release_scope']['content_digest_exclusions'],
+        );
+
+        $records = array_column($ledger['records'], null, 'path');
+        foreach (['.github/workflows/tests.yml', '.prettierrc', 'package.json'] as $path) {
+            $this->assertSame('supporting_evidence', $records[$path]['disposition']);
+        }
+
+        $deletedPaths = [
+            '.ai/skills/samsara-sdk-development/SKILL.md',
+            'resources/boost/guidelines/query-builder.blade.php',
+            'resources/boost/guidelines/resources.blade.php',
+            'resources/boost/guidelines/testing.blade.php',
+        ];
+
+        foreach ($ledger['records'] as $record) {
+            if ($record['path'] === 'docs/api-sync/v2-upgrade-disposition.json') {
+                $this->assertSame('excluded', $record['content_state']);
+                $this->assertNull($record['content_sha256']);
+
+                continue;
+            }
+
+            if (in_array($record['path'], $deletedPaths, true)) {
+                $this->assertSame('deleted', $record['content_state']);
+                $this->assertNull($record['content_sha256']);
+                $this->assertFileDoesNotExist($this->projectPath($record['path']));
+
+                continue;
+            }
+
+            $this->assertSame('present', $record['content_state']);
+            $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $record['content_sha256']);
+            $this->assertSame(
+                hash_file('sha256', $this->projectPath($record['path'])),
+                $record['content_sha256'],
+                "Stale release disposition content hash for {$record['path']}.",
+            );
+        }
+    }
+
+    #[Test]
     public function it_keeps_the_post_release_checklist_current_and_scope_safe(): void
     {
         $checklist = $this->readProjectFile('.ai/skills/post-release-docs-checklist/SKILL.md');

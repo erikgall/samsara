@@ -281,7 +281,10 @@ class Builder implements QueryBuilderInterface
 
                 $cursor = $pagination['endCursor'] ?? null;
                 $hasNext = $pagination['hasNextPage'] ?? false;
-            } while ($hasNext && $cursor !== null);
+                if (! $hasNext || $cursor === '') {
+                    $cursor = null;
+                }
+            } while ($cursor !== null);
         });
     }
 

@@ -986,6 +986,27 @@ class BuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_stops_lazy_pagination_when_the_next_cursor_is_empty(): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->fake(['*' => $http->response([
+            'data'       => [['id' => 'only-page']],
+            'pagination' => ['endCursor' => '', 'hasNextPage' => true],
+        ])]);
+
+        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara->setHttpFactory($http);
+        $builder = (new Builder(new TestQueryResource($samsara)))
+            ->withoutDefaultPageSize();
+
+        $items = $builder->lazy()->all();
+
+        $this->assertCount(1, $items);
+        $this->assertSame('only-page', $items[0]->getId());
+        $http->assertSentCount(1);
+    }
+
+    #[Test]
     public function it_uses_custom_endpoint_when_provided(): void
     {
         $samsara = new Samsara('test-token');

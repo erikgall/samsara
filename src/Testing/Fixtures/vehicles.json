@@ -51,7 +51,6 @@
                 "serial": "GW002",
                 "model": "AG46"
             },
-            "staticAssignedDriver": null,
             "notes": "Regional delivery truck",
             "tags": [{"id": "tag-002", "name": "South Region"}],
             "attributes": []

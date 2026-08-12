@@ -336,6 +336,21 @@ class ResourceTest extends TestCase
         $this->assertInstanceOf(Samsara::class, $resource->getSamsara());
     }
 
+    #[Test]
+    public function it_treats_a_percent_triplet_as_literal_id_content(): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->fake(['*' => $http->response(['data' => ['id' => 'abc%2Fdef']])]);
+
+        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara->setHttpFactory($http);
+
+        (new TestResource($samsara))->find('abc%2Fdef');
+
+        $http->assertSent(fn ($request) => parse_url($request->url(), PHP_URL_PATH)
+            === '/test-endpoint/abc%252Fdef');
+    }
+
     /**
      * @return array<string, array{string, string, string}>
      */

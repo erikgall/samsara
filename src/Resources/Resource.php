@@ -155,22 +155,7 @@ abstract class Resource implements ResourceInterface
      */
     public function find(string $id): ?object
     {
-        $endpoint = $this->endpoint.'/'.$this->encodePathSegment($id);
-        $this->ensureGenericOperationIsSupported('find', $endpoint);
-
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->get($endpoint),
-            $endpoint,
-            [404]
-        );
-
-        if ($response->status() === 404) {
-            return null;
-        }
-
-        $data = $response->json('data', $response->json());
-
-        return $this->mapToEntity($data);
+        return $this->findByEncodedPathSegment($this->encodePathSegment($id));
     }
 
     /**
@@ -292,6 +277,29 @@ abstract class Resource implements ResourceInterface
     }
 
     /**
+     * Find an entity using an already encoded single path segment.
+     */
+    final protected function findByEncodedPathSegment(string $id): ?object
+    {
+        $endpoint = $this->endpoint.'/'.$id;
+        $this->ensureGenericOperationIsSupported('find', $endpoint);
+
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint),
+            $endpoint,
+            [404]
+        );
+
+        if ($response->status() === 404) {
+            return null;
+        }
+
+        $data = $response->json('data', $response->json());
+
+        return $this->mapToEntity($data);
+    }
+
+    /**
      * Handle API error responses.
      *
      * @throws AuthenticationException When API returns 401
@@ -380,16 +388,11 @@ abstract class Resource implements ResourceInterface
     }
 
     /**
-     * Encode an ID as one URL path segment without double-encoding callers
-     * that already encode external ID components.
+     * Encode an ID as exactly one URL path segment.
      */
     private function encodePathSegment(string $id): string
     {
-        return preg_replace_callback(
-            '/%(?![0-9A-Fa-f]{2})|[^A-Za-z0-9\-._~%!$&\'()*+,;=:@]/',
-            static fn (array $match): string => rawurlencode($match[0]),
-            $id
-        ) ?? rawurlencode($id);
+        return rawurlencode($id);
     }
 
     /**

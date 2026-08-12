@@ -43,7 +43,6 @@
             "externalIds": {
                 "payroll": "EMP002"
             },
-            "staticAssignedVehicle": null,
             "eldSettings": {
                 "rulesets": [{"cycle": "USA 70 hour / 8 day"}]
             },
@@ -68,7 +67,6 @@
             "externalIds": {
                 "payroll": "EMP003"
             },
-            "staticAssignedVehicle": null,
             "eldSettings": {
                 "rulesets": [{"cycle": "USA 70 hour / 8 day"}]
             },

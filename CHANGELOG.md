@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Upgrade documentation**: Added a canonical v1.1.0-to-v2.0.0 guide with executable migrations, exact before/after wire contracts, an agent completion record, and a machine-checked disposition for all 337 final release paths.
+- **Upgrade documentation**: Added a canonical v1.1.0-to-v2.0.0 guide with executable migrations, exact before/after wire contracts, an agent completion record, and a machine-checked disposition for all 338 final release paths.
 - **Laravel Boost guidance**: Added package-discovered Agent Skills for current v2 application development and v1.1-to-v2 migration work, with focused references for integration, querying, responses, testing, and webhooks.
 - **Form submissions**: Added seven exact current-status predicates: `isNotStarted()`, `isCompleted()`, `isArchived()`, `isInProgress()`, `needsReview()`, `hasChangesRequested()`, and `isApproved()`.
 - **Route stops**: Added six exact state predicates plus actual/planned distance conversion helpers for kilometers and miles.
@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tags**: `hasParent()` now recognizes either `parentTagId` or a documented nested `parentTag` payload.
 - **Hours of Service**: `DutyStatus::SLEEPER_BERTH` now uses the upstream `sleeperBed` backing value, allowing `HosLog::getDutyStatus()` to hydrate current sleeper-berth rows. This changes the enum's serialized value; see `BREAKING_CHANGES.md`.
 - **Core quality**: UTC formatting no longer mutates caller-owned dates; collection IDs retain `"0"`; paginator navigation rejects inconsistent cursor metadata; generic item IDs remain one encoded path segment; malformed webhook timestamps use `InvalidSignatureException`.
-- **Testing fixtures**: Reconciled all 12 shipped fake-response fixtures with their current DTO and endpoint contracts and added executable shape assertions.
+- **Testing fixtures**: Reconciled all 13 shipped fake-response fixtures with their current DTO and endpoint contracts and added recursive envelope and item-shape assertions.
 
 ### Deprecated
 

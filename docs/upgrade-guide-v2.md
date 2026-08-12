@@ -18,19 +18,19 @@ Version 2 is a breaking contract-alignment release. This guide is the canonical 
 The release audit compares tag `v1.1.0` with the integrated v2 worktree while retaining audited `dev` head `1750395c98c1724c40c82ba82b96b4866dd2106b` as its frozen implementation baseline:
 
 - 239 implementation-baseline files were reviewed exactly once at that audited head.
-- Integrated quality, documentation, testing, and publication work extends the final tag-to-worktree scope to 337 paths.
+- Integrated quality, documentation, testing, and publication work extends the final tag-to-worktree scope to 338 paths.
 - 91 files require a consumer upgrade action.
-- 139 files supply tests, contract evidence, fixtures, or tooling for those actions.
+- 143 files supply tests, contract evidence, fixtures, or tooling for those actions.
 - 35 files are additive and require no migration by themselves.
 - 1 file is internal-only.
-- 71 files are documentation-only.
+- 68 files are documentation-only.
 - The pinned OpenAPI and runtime ledgers cover 372 official declarations, 195 package operations, 41 concrete resource gates, 240 public request variants, and 170 source files with zero runtime-capture failures.
 
-The machine-readable [v2 disposition ledger](api-sync/v2-upgrade-disposition.json) records all 337 final release paths and their migration section or no-action reason, while retaining the frozen 239-file implementation comparison as a separate proof boundary. `composer check:v2-upgrade-guide` fails if the live tag-to-worktree scope, counts, section references, or required evidence are incomplete.
+The machine-readable [v2 disposition ledger](api-sync/v2-upgrade-disposition.json) records all 338 final release paths and their migration section or no-action reason, while retaining the frozen 239-file implementation comparison as a separate proof boundary. `composer check:v2-upgrade-guide` fails if the live tag-to-worktree scope, counts, section references, or required evidence are incomplete.
 
 ## Maintainer integration result
 
-All quality lanes were classified after integration. The live ledger now derives its 337-path scope directly from the tag-to-worktree diff, so a future changed path makes the checked ledger stale until it receives a consumer action or explicit no-action rationale. The resource/query, fixture, enum, pagination, error, and documentation follow-ups are included in the counts above.
+All quality lanes were classified after integration. The live ledger derives its 338-path scope directly from the tag-to-worktree diff, stores a SHA-256 content identity for every present classified file, records deletions explicitly, and excludes only the self-referential ledger. The normal maintenance/CI gate therefore fails for new, edited, deleted, or restored paths until the migration or explicit no-action rationale is reviewed and the ledger is regenerated. The resource/query, fixture, enum, pagination, error, and documentation follow-ups are included in the counts above.
 
 ## Agent execution contract
 
@@ -806,9 +806,9 @@ Most items below are optional adoption. Audit the edge behaviors first if your a
 
 - Time formatting now uses a non-mutating clone before converting mutable date objects to UTC. Callers no longer observe their supplied `Carbon` or `DateTime` instance being changed.
 - `EntityCollection::ids()` retains the valid string ID `"0"` while continuing to discard `null` and empty-string IDs.
-- `CursorPaginator::hasMorePages()` now requires both `hasNextPage=true` and a usable end cursor. `nextPage()` returns `null` rather than replaying the first page when pagination metadata is internally inconsistent. Keep the nullable guard shown in the query-builder documentation.
+- `CursorPaginator::hasMorePages()` now requires both `hasNextPage=true` and a non-null, non-empty end cursor. `nextPage()` and `lazy()` stop rather than replaying the first page when pagination metadata is internally inconsistent. Keep the nullable guard shown in the query-builder documentation.
 - A malformed webhook timestamp consistently raises `InvalidSignatureException`, allowing middleware to return the same authentication failure as other invalid signatures instead of leaking a timestamp parser exception.
-- Generic `find()`, `update()`, and `delete()` encode IDs as one URL path segment. Ordinary IDs generate the same URLs; reserved characters no longer alter the path. Update exact URL fakes only if they used reserved characters.
+- Generic `find()`, `update()`, and `delete()` encode IDs as one URL path segment. Ordinary IDs and the literal external-ID separator generate the same URLs; reserved characters no longer alter the path, and a literal percent triplet such as `%2F` remains literal ID content. Update exact URL fakes only if they used reserved characters.
 
 The following are additive options with no required migration:
 

@@ -165,6 +165,19 @@ class CursorPaginatorTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_false_when_the_next_page_cursor_is_empty(): void
+    {
+        $paginator = new CursorPaginator(
+            new EntityCollection,
+            new Cursor('', true),
+            $this->createBuilder()
+        );
+
+        $this->assertFalse($paginator->hasMorePages());
+        $this->assertNull($paginator->nextPage());
+    }
+
+    #[Test]
     public function it_returns_false_when_the_next_page_cursor_is_missing(): void
     {
         $paginator = new CursorPaginator(

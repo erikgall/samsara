@@ -14,6 +14,44 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class FixturesTest extends TestCase
 {
+    /** @var array<string, string> */
+    private const FIXTURE_SCHEMAS = [
+        'addresses.json'     => 'Address',
+        'drivers.json'       => 'Driver',
+        'dvirs.json'         => 'DvirStreamResponseDataResponseBody',
+        'equipment.json'     => 'Equipment',
+        'hos-logs.json'      => 'HosLogsForDriver',
+        'routes.json'        => 'BaseRouteWithOrdersResponseObjectResponseBody',
+        'safety-events.json' => 'SafetyEvent',
+        'tags.json'          => 'Tag',
+        'trailers.json'      => 'TrailerResponseObjectResponseBody',
+        'users.json'         => 'User',
+        'vehicle-stats.json' => 'VehicleStatsResponse_data',
+        'vehicles.json'      => 'VehicleResponseObjectResponseBody',
+        'webhooks.json'      => 'WebhookResponseResponseBody',
+    ];
+
+    #[Test]
+    public function all_named_fixtures_match_the_pinned_contract_recursively(): void
+    {
+        foreach (self::FIXTURE_SCHEMAS as $filename => $schemaName) {
+            $fixture = Fixtures::load($filename);
+            $keys = array_keys($fixture);
+            sort($keys);
+
+            $this->assertSame(['data', 'pagination'], $keys, "Invalid fixture envelope for {$filename}.");
+            $this->assertIsArray($fixture['data']);
+            $this->assertSame(
+                ['endCursor', 'hasNextPage'],
+                array_keys($fixture['pagination']),
+                "Invalid pagination envelope for {$filename}.",
+            );
+            $this->assertIsString($fixture['pagination']['endCursor']);
+            $this->assertIsBool($fixture['pagination']['hasNextPage']);
+            $this->assertFixtureRowsMatchContractSchema($fixture, $schemaName);
+        }
+    }
+
     #[Test]
     public function fixtures_have_pagination_data(): void
     {
@@ -325,19 +363,173 @@ class FixturesTest extends TestCase
             true,
             flags: JSON_THROW_ON_ERROR,
         );
-        $schema = $contract['components']['schemas'][$schemaName];
-        $allowedKeys = array_keys($schema['properties']);
-        $requiredKeys = $schema['required'] ?? [];
+        $schemas = $contract['components']['schemas'];
+        $schema = $schemas[$schemaName];
 
         foreach ($fixture['data'] as $index => $row) {
-            $this->assertEmpty(
-                array_diff($requiredKeys, array_keys($row)),
-                "Fixture row {$index} is missing required {$schemaName} keys.",
+            $errors = $this->contractSchemaErrors(
+                $row,
+                $schema,
+                $schemas,
+                "{$schemaName}[{$index}]",
             );
-            $this->assertEmpty(
-                array_diff(array_keys($row), $allowedKeys),
-                "Fixture row {$index} contains keys outside {$schemaName}.",
+
+            $this->assertSame(
+                [],
+                $errors,
+                "Fixture row {$index} does not match {$schemaName}: ".implode('; ', $errors),
             );
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $schema
+     * @param  array<string, array<string, mixed>>  $schemas
+     * @return list<string>
+     */
+    private function contractSchemaErrors(
+        mixed $value,
+        array $schema,
+        array $schemas,
+        string $path,
+    ): array {
+        if (isset($schema['$ref'])) {
+            $name = basename($schema['$ref']);
+
+            return $this->contractSchemaErrors($value, $schemas[$name], $schemas, $path);
+        }
+
+        if (isset($schema['allOf'])) {
+            $schema = $this->mergeContractSchemas($schema, $schemas);
+        }
+
+        if ($value === null) {
+            return ($schema['nullable'] ?? false) ? [] : ["{$path} must not be null"];
+        }
+
+        foreach (['oneOf', 'anyOf'] as $alternativesKey) {
+            if (! isset($schema[$alternativesKey])) {
+                continue;
+            }
+
+            foreach ($schema[$alternativesKey] as $alternative) {
+                if ($this->contractSchemaErrors($value, $alternative, $schemas, $path) === []) {
+                    return [];
+                }
+            }
+
+            return ["{$path} does not match any {$alternativesKey} schema"];
+        }
+
+        if (isset($schema['enum']) && ! in_array($value, $schema['enum'], true)) {
+            return ["{$path} has a value outside the contract enum"];
+        }
+
+        $type = $schema['type'] ?? (isset($schema['properties']) ? 'object' : null);
+        if ($type === 'string' && ! is_string($value)) {
+            return ["{$path} must be a string"];
+        }
+        if ($type === 'integer' && ! is_int($value)) {
+            return ["{$path} must be an integer"];
+        }
+        if ($type === 'number' && ! is_int($value) && ! is_float($value)) {
+            return ["{$path} must be a number"];
+        }
+        if ($type === 'boolean' && ! is_bool($value)) {
+            return ["{$path} must be a boolean"];
+        }
+        if ($type === 'array') {
+            if (! is_array($value) || ! array_is_list($value)) {
+                return ["{$path} must be an array"];
+            }
+
+            $errors = [];
+            foreach ($value as $index => $item) {
+                $errors = [
+                    ...$errors,
+                    ...$this->contractSchemaErrors($item, $schema['items'] ?? [], $schemas, "{$path}[{$index}]"),
+                ];
+            }
+
+            return $errors;
+        }
+        if ($type !== 'object') {
+            return [];
+        }
+        if (! is_array($value)) {
+            return ["{$path} must be an object"];
+        }
+
+        $properties = $schema['properties'] ?? [];
+        $errors = [];
+        foreach ($schema['required'] ?? [] as $required) {
+            if (! array_key_exists($required, $value)) {
+                $errors[] = "{$path}.{$required} is required";
+            }
+        }
+
+        foreach ($value as $key => $item) {
+            if (isset($properties[$key])) {
+                $errors = [
+                    ...$errors,
+                    ...$this->contractSchemaErrors($item, $properties[$key], $schemas, "{$path}.{$key}"),
+                ];
+
+                continue;
+            }
+
+            if (is_array($schema['additionalProperties'] ?? null)) {
+                $errors = [
+                    ...$errors,
+                    ...$this->contractSchemaErrors(
+                        $item,
+                        $schema['additionalProperties'],
+                        $schemas,
+                        "{$path}.{$key}",
+                    ),
+                ];
+            } elseif ($properties !== [] && ($schema['additionalProperties'] ?? false) !== true) {
+                $errors[] = "{$path}.{$key} is not defined by the contract";
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * @param  array<string, mixed>  $schema
+     * @param  array<string, array<string, mixed>>  $schemas
+     * @return array<string, mixed>
+     */
+    private function mergeContractSchemas(array $schema, array $schemas): array
+    {
+        $parts = $schema['allOf'];
+        unset($schema['allOf']);
+
+        foreach ($parts as $part) {
+            if (isset($part['$ref'])) {
+                $part = $schemas[basename($part['$ref'])];
+            }
+            if (isset($part['allOf'])) {
+                $part = $this->mergeContractSchemas($part, $schemas);
+            }
+
+            $schema['properties'] = array_merge(
+                $schema['properties'] ?? [],
+                $part['properties'] ?? [],
+            );
+            $schema['required'] = array_values(array_unique([
+                ...($schema['required'] ?? []),
+                ...($part['required'] ?? []),
+            ]));
+
+            foreach ($part as $key => $value) {
+                if (! in_array($key, ['properties', 'required'], true) && ! isset($schema[$key])) {
+                    $schema[$key] = $value;
+                }
+            }
+        }
+
+        return $schema;
     }
 }

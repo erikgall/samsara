@@ -36,7 +36,7 @@ class TrailersResource extends Resource
     public function findByExternalId(string $key, string $value): ?Trailer
     {
         /** @var Trailer|null */
-        return $this->find(rawurlencode($key).':'.rawurlencode($value));
+        return $this->findByEncodedPathSegment(rawurlencode($key).':'.rawurlencode($value));
     }
 
     /**

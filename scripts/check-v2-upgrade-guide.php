@@ -108,6 +108,8 @@ src/Webhooks/WebhookSignatureVerifier.php
 PATHS);
 
 $supportingEvidence = listedPaths(<<<'PATHS'
+.github/workflows/tests.yml
+.prettierrc
 DEVELOPMENT_CHANGELOG.md
 contracts/samsara/README.md
 contracts/samsara/samsara-api-2026-08-10.json
@@ -116,6 +118,7 @@ docs/api-sync/contract-drift.md
 docs/api-sync/contract-inventory.json
 docs/api-sync/documentation-coverage.md
 docs/api-sync/v2-upgrade-disposition.json
+package.json
 scripts/check-samsara-contract-reconciliation.php
 scripts/check-v2-upgrade-guide.php
 scripts/validate-samsara-snapshot.php
@@ -427,18 +430,45 @@ function actionFor(string $path): string
 function noActionReason(string $path, string $disposition): string
 {
     if ($path === 'composer.json') {
-        return 'Adds the maintainer-only check:v2-upgrade-guide Composer script; it does not change the installed SDK runtime or require consumer migration.';
+        return 'Adds maintainer-only validation and memory-limit settings; it does not change the installed SDK runtime or require consumer migration.';
     }
 
     return match ($disposition) {
         'supporting_evidence' => str_starts_with($path, 'tests/')
             ? 'Executable regression evidence for one or more documented migrations; it does not add a separate consumer action.'
-            : 'Contract, audit, or validation evidence for the documented migration; it does not add a separate consumer action.',
+            : 'Contract, audit, validation, CI, or formatting evidence for the documented migration; it does not add a separate consumer action.',
         'additive_no_action' => 'Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere.',
         'internal_only'      => 'Repository ignore hygiene only; no shipped package or consumer behavior.',
         'documentation_only' => 'Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide.',
         default              => '',
     };
+}
+
+/** @return array{content_state: 'deleted'|'excluded'|'present', content_sha256: ?string} */
+function contentIdentity(string $path): array
+{
+    if ($path === 'docs/api-sync/v2-upgrade-disposition.json') {
+        return ['content_state' => 'excluded', 'content_sha256' => null];
+    }
+
+    if (! is_file(__DIR__.'/../'.$path)) {
+        return ['content_state' => 'deleted', 'content_sha256' => null];
+    }
+
+    $hash = hash_file('sha256', __DIR__.'/../'.$path);
+    if ($hash === false) {
+        throw new RuntimeException("Unable to hash release path: {$path}.");
+    }
+
+    return ['content_state' => 'present', 'content_sha256' => $hash];
+}
+
+function isDocumentationOnlyPath(string $path): bool
+{
+    return str_ends_with($path, '.md')
+        || str_starts_with($path, 'docs/')
+        || str_starts_with($path, 'resources/boost/guidelines/')
+        || str_starts_with($path, 'resources/boost/skills/');
 }
 
 $baselineOutput = [];
@@ -516,11 +546,17 @@ foreach ($releaseScope as $path) {
         str_starts_with($path, 'tests/'),
         str_starts_with($path, 'src/Testing/') => 'supporting_evidence',
         $path === 'docs/.gitignore'            => 'internal_only',
-        default                                => 'documentation_only',
+        isDocumentationOnlyPath($path)         => 'documentation_only',
+        default                                => throw new RuntimeException(
+            "Release path requires an explicit disposition: {$path}."
+        ),
     };
 
+    $identity = contentIdentity($path);
+
     $records[] = [
-        'path'           => $path,
+        'path' => $path,
+        ...$identity,
         'disposition'    => $disposition,
         'guide_sections' => $disposition === 'upgrade_action'
             ? guideSections($path)
@@ -544,6 +580,7 @@ $ledger = [
     'release_scope' => [
         'comparison'                                     => BASELINE_TAG.'..final-dev',
         'changed_files'                                  => count($releaseScope),
+        'content_digest_exclusions'                      => ['docs/api-sync/v2-upgrade-disposition.json'],
         'publication_artifacts_added_after_audited_head' => $publicationArtifacts,
     ],
     'summary' => $counts,
@@ -552,13 +589,13 @@ $ledger = [
 
 $expectedCounts = [
     'additive_no_action'  => 35,
-    'documentation_only'  => 71,
+    'documentation_only'  => 68,
     'internal_only'       => 1,
-    'supporting_evidence' => 139,
+    'supporting_evidence' => 143,
     'upgrade_action'      => 91,
 ];
 
-if ($counts !== $expectedCounts || count($baseline) !== 239 || count($releaseScope) !== 337) {
+if ($counts !== $expectedCounts || count($baseline) !== 239 || count($releaseScope) !== 338) {
     fwrite(STDERR, 'FAIL: audited disposition counts drifted: '.json_encode($counts)."\n");
     exit(1);
 }

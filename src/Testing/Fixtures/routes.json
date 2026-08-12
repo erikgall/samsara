@@ -7,7 +7,6 @@
             "scheduledRouteStartTime": "2024-06-15T08:00:00Z",
             "scheduledRouteEndTime": "2024-06-15T18:00:00Z",
             "actualRouteStartTime": "2024-06-15T08:15:00Z",
-            "actualRouteEndTime": null,
             "driver": {
                 "id": "driver-001",
                 "name": "John Doe"
@@ -28,6 +27,7 @@
                     "scheduledDepartureTime": "2024-06-15T09:00:00Z",
                     "actualArrivalTime": "2024-06-15T08:15:00Z",
                     "actualDepartureTime": "2024-06-15T09:10:00Z",
+                    "orders": [],
                     "state": "departed",
                     "notes": "Load pallets",
                     "externalIds": {
@@ -43,8 +43,7 @@
                     },
                     "scheduledArrivalTime": "2024-06-15T16:00:00Z",
                     "scheduledDepartureTime": "2024-06-15T17:00:00Z",
-                    "actualArrivalTime": null,
-                    "actualDepartureTime": null,
+                    "orders": [],
                     "state": "en route",
                     "notes": "Deliver to loading dock B",
                     "externalIds": {
@@ -63,8 +62,6 @@
             "notes": "Daily local delivery route",
             "scheduledRouteStartTime": "2024-06-15T09:00:00Z",
             "scheduledRouteEndTime": "2024-06-15T17:00:00Z",
-            "actualRouteStartTime": null,
-            "actualRouteEndTime": null,
             "driver": {
                 "id": "driver-002",
                 "name": "Jane Smith"
@@ -83,10 +80,8 @@
                     },
                     "scheduledArrivalTime": "2024-06-15T10:00:00Z",
                     "scheduledDepartureTime": "2024-06-15T10:30:00Z",
-                    "actualArrivalTime": null,
-                    "actualDepartureTime": null,
+                    "orders": [],
                     "state": "scheduled",
-                    "notes": null,
                     "externalIds": {}
                 },
                 {
@@ -98,10 +93,8 @@
                     },
                     "scheduledArrivalTime": "2024-06-15T11:30:00Z",
                     "scheduledDepartureTime": "2024-06-15T12:00:00Z",
-                    "actualArrivalTime": null,
-                    "actualDepartureTime": null,
+                    "orders": [],
                     "state": "scheduled",
-                    "notes": null,
                     "externalIds": {}
                 }
             ],
