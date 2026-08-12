@@ -6,7 +6,7 @@
             "vin": "1HGBH41JXMN109186",
             "make": "Freightliner",
             "model": "Cascadia",
-            "year": 2022,
+            "year": "2022",
             "licensePlate": "ABC1234",
             "serial": "SER001",
             "externalIds": {
@@ -21,12 +21,15 @@
                 "name": "John Doe"
             },
             "notes": "Primary long-haul truck",
-            "tagIds": ["tag-001", "tag-003"],
+            "tags": [
+                {"id": "tag-001", "name": "West Coast"},
+                {"id": "tag-003", "name": "Priority Fleet"}
+            ],
             "attributes": [
                 {
                     "id": "attr-001",
                     "name": "Department",
-                    "stringValue": "Long Haul"
+                    "stringValues": ["Long Haul"]
                 }
             ]
         },
@@ -36,7 +39,7 @@
             "vin": "1HGBH41JXMN109187",
             "make": "Peterbilt",
             "model": "579",
-            "year": 2021,
+            "year": "2021",
             "licensePlate": "XYZ5678",
             "serial": "SER002",
             "externalIds": {
@@ -48,7 +51,7 @@
             },
             "staticAssignedDriver": null,
             "notes": "Regional delivery truck",
-            "tagIds": ["tag-002"],
+            "tags": [{"id": "tag-002", "name": "South Region"}],
             "attributes": []
         },
         {
@@ -57,7 +60,7 @@
             "vin": "1HGBH41JXMN109188",
             "make": "Ford",
             "model": "Transit",
-            "year": 2023,
+            "year": "2023",
             "licensePlate": "VAN9999",
             "serial": "SER003",
             "externalIds": {
@@ -72,12 +75,15 @@
                 "name": "Jane Smith"
             },
             "notes": "Last mile delivery van",
-            "tagIds": ["tag-001", "tag-002"],
+            "tags": [
+                {"id": "tag-001", "name": "West Coast"},
+                {"id": "tag-002", "name": "South Region"}
+            ],
             "attributes": [
                 {
                     "id": "attr-002",
                     "name": "Department",
-                    "stringValue": "Local Delivery"
+                    "stringValues": ["Local Delivery"]
                 }
             ]
         }

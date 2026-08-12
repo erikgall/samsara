@@ -20,13 +20,13 @@
                 "name": "Truck 001"
             },
             "eldSettings": {
-                "rulesets": ["USA Property (8/70)"]
+                "rulesets": [{"cycle": "USA 70 hour / 8 day"}]
             },
             "carrierSettings": {
                 "carrierName": "ABC Trucking",
-                "dotNumber": "1234567"
+                "dotNumber": 1234567
             },
-            "tagIds": ["tag-001", "tag-002"]
+            "tags": [{"id": "tag-001"}, {"id": "tag-002"}]
         },
         {
             "id": "driver-002",
@@ -45,13 +45,13 @@
             },
             "staticAssignedVehicle": null,
             "eldSettings": {
-                "rulesets": ["USA Property (8/70)"]
+                "rulesets": [{"cycle": "USA 70 hour / 8 day"}]
             },
             "carrierSettings": {
                 "carrierName": "ABC Trucking",
-                "dotNumber": "1234567"
+                "dotNumber": 1234567
             },
-            "tagIds": ["tag-001"]
+            "tags": [{"id": "tag-001"}]
         },
         {
             "id": "driver-003",
@@ -70,13 +70,13 @@
             },
             "staticAssignedVehicle": null,
             "eldSettings": {
-                "rulesets": ["USA Property (8/70)"]
+                "rulesets": [{"cycle": "USA 70 hour / 8 day"}]
             },
             "carrierSettings": {
                 "carrierName": "ABC Trucking",
-                "dotNumber": "1234567"
+                "dotNumber": 1234567
             },
-            "tagIds": []
+            "tags": []
         }
     ],
     "pagination": {

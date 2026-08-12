@@ -4,23 +4,31 @@
             "id": "route-001",
             "name": "SF to LA Delivery",
             "notes": "Weekly delivery route",
-            "scheduledStartTime": "2024-06-15T08:00:00Z",
-            "scheduledEndTime": "2024-06-15T18:00:00Z",
-            "actualStartTime": "2024-06-15T08:15:00Z",
-            "actualEndTime": null,
-            "state": "inProgress",
-            "assignedDriverId": "driver-001",
-            "assignedVehicleId": "vehicle-001",
+            "scheduledRouteStartTime": "2024-06-15T08:00:00Z",
+            "scheduledRouteEndTime": "2024-06-15T18:00:00Z",
+            "actualRouteStartTime": "2024-06-15T08:15:00Z",
+            "actualRouteEndTime": null,
+            "driver": {
+                "id": "driver-001",
+                "name": "John Doe"
+            },
+            "vehicle": {
+                "id": "vehicle-001",
+                "name": "Truck 001"
+            },
             "stops": [
                 {
                     "id": "stop-001",
                     "name": "Warehouse Pickup",
-                    "addressId": "address-001",
+                    "address": {
+                        "id": "address-001",
+                        "name": "Main Warehouse"
+                    },
                     "scheduledArrivalTime": "2024-06-15T08:00:00Z",
                     "scheduledDepartureTime": "2024-06-15T09:00:00Z",
                     "actualArrivalTime": "2024-06-15T08:15:00Z",
                     "actualDepartureTime": "2024-06-15T09:10:00Z",
-                    "state": "completed",
+                    "state": "departed",
                     "notes": "Load pallets",
                     "externalIds": {
                         "order": "ORD001"
@@ -29,21 +37,22 @@
                 {
                     "id": "stop-002",
                     "name": "Customer Delivery",
-                    "addressId": "address-002",
+                    "address": {
+                        "id": "address-002",
+                        "name": "LA Distribution Center"
+                    },
                     "scheduledArrivalTime": "2024-06-15T16:00:00Z",
                     "scheduledDepartureTime": "2024-06-15T17:00:00Z",
                     "actualArrivalTime": null,
                     "actualDepartureTime": null,
-                    "state": "enRoute",
+                    "state": "en route",
                     "notes": "Deliver to loading dock B",
                     "externalIds": {
                         "order": "ORD002"
                     }
                 }
             ],
-            "settings": {
-                "routeStartEndStopOption": "startAndEnd"
-            },
+            "settings": {},
             "externalIds": {
                 "dispatch": "DSP001"
             }
@@ -52,18 +61,26 @@
             "id": "route-002",
             "name": "Local Deliveries",
             "notes": "Daily local delivery route",
-            "scheduledStartTime": "2024-06-15T09:00:00Z",
-            "scheduledEndTime": "2024-06-15T17:00:00Z",
-            "actualStartTime": null,
-            "actualEndTime": null,
-            "state": "scheduled",
-            "assignedDriverId": "driver-002",
-            "assignedVehicleId": "vehicle-003",
+            "scheduledRouteStartTime": "2024-06-15T09:00:00Z",
+            "scheduledRouteEndTime": "2024-06-15T17:00:00Z",
+            "actualRouteStartTime": null,
+            "actualRouteEndTime": null,
+            "driver": {
+                "id": "driver-002",
+                "name": "Jane Smith"
+            },
+            "vehicle": {
+                "id": "vehicle-003",
+                "name": "Van 001"
+            },
             "stops": [
                 {
                     "id": "stop-003",
                     "name": "Customer A",
-                    "addressId": "address-003",
+                    "address": {
+                        "id": "address-003",
+                        "name": "Customer A - Office"
+                    },
                     "scheduledArrivalTime": "2024-06-15T10:00:00Z",
                     "scheduledDepartureTime": "2024-06-15T10:30:00Z",
                     "actualArrivalTime": null,
@@ -75,7 +92,10 @@
                 {
                     "id": "stop-004",
                     "name": "Customer B",
-                    "addressId": "address-004",
+                    "address": {
+                        "id": "address-004",
+                        "name": "Customer B - Warehouse"
+                    },
                     "scheduledArrivalTime": "2024-06-15T11:30:00Z",
                     "scheduledDepartureTime": "2024-06-15T12:00:00Z",
                     "actualArrivalTime": null,
@@ -85,9 +105,7 @@
                     "externalIds": {}
                 }
             ],
-            "settings": {
-                "routeStartEndStopOption": "startOnly"
-            },
+            "settings": {},
             "externalIds": {
                 "dispatch": "DSP002"
             }

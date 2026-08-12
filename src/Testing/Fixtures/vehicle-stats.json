@@ -3,7 +3,6 @@
         {
             "id": "vehicle-001",
             "name": "Truck 001",
-            "time": "2024-06-15T14:30:00Z",
             "gps": {
                 "latitude": 37.7749,
                 "longitude": -122.4194,
@@ -14,12 +13,12 @@
                     "formattedLocation": "San Francisco, CA 94102"
                 }
             },
-            "engineStates": {
+            "engineState": {
                 "value": "On",
                 "time": "2024-06-15T14:30:00Z"
             },
-            "fuelPercents": {
-                "value": 75.5,
+            "fuelPercent": {
+                "value": 75,
                 "time": "2024-06-15T14:30:00Z"
             },
             "obdOdometerMeters": {
@@ -38,7 +37,6 @@
         {
             "id": "vehicle-002",
             "name": "Truck 002",
-            "time": "2024-06-15T14:30:00Z",
             "gps": {
                 "latitude": 32.7767,
                 "longitude": -96.7970,
@@ -49,12 +47,12 @@
                     "formattedLocation": "Dallas, TX 75201"
                 }
             },
-            "engineStates": {
+            "engineState": {
                 "value": "Off",
                 "time": "2024-06-15T14:30:00Z"
             },
-            "fuelPercents": {
-                "value": 45.0,
+            "fuelPercent": {
+                "value": 45,
                 "time": "2024-06-15T14:30:00Z"
             },
             "obdOdometerMeters": {
@@ -73,7 +71,6 @@
         {
             "id": "vehicle-003",
             "name": "Van 001",
-            "time": "2024-06-15T14:30:00Z",
             "gps": {
                 "latitude": 25.7617,
                 "longitude": -80.1918,
@@ -84,12 +81,12 @@
                     "formattedLocation": "Miami, FL 33101"
                 }
             },
-            "engineStates": {
+            "engineState": {
                 "value": "On",
                 "time": "2024-06-15T14:30:00Z"
             },
-            "fuelPercents": {
-                "value": 90.0,
+            "fuelPercent": {
+                "value": 90,
                 "time": "2024-06-15T14:30:00Z"
             },
             "obdOdometerMeters": {

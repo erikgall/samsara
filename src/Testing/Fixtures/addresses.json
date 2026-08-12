@@ -14,7 +14,7 @@
                     "radiusMeters": 100
                 }
             },
-            "tagIds": ["tag-001"],
+            "tags": [{"id": "tag-001"}],
             "externalIds": {
                 "facility": "FAC001"
             },
@@ -34,14 +34,15 @@
                     "radiusMeters": 150
                 }
             },
-            "tagIds": ["tag-002"],
+            "tags": [{"id": "tag-002"}],
             "externalIds": {
                 "facility": "FAC002"
             },
             "contacts": [
                 {
                     "id": "contact-001",
-                    "name": "Receiving Manager"
+                    "firstName": "Receiving",
+                    "lastName": "Manager"
                 }
             ]
         },
@@ -62,7 +63,7 @@
                     ]
                 }
             },
-            "tagIds": [],
+            "tags": [],
             "externalIds": {
                 "customer": "CUST001"
             },
@@ -82,7 +83,7 @@
                     "radiusMeters": 75
                 }
             },
-            "tagIds": ["tag-003"],
+            "tags": [{"id": "tag-003"}],
             "externalIds": {
                 "customer": "CUST002"
             },
