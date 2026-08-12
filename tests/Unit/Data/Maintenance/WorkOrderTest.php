@@ -193,7 +193,7 @@ class WorkOrderTest extends TestCase
     {
         $workOrder = new WorkOrder([
             'serviceTaskInstances' => [
-                ['id' => 'task-1', 'name' => 'Oil Change'],
+                ['id' => 'instance-1', 'serviceTaskId' => 'task-1', 'status' => 'Open'],
             ],
         ]);
 
@@ -214,6 +214,27 @@ class WorkOrderTest extends TestCase
         $this->assertSame('2024-04-11T10:00:00Z', $workOrder->updatedAtTime);
         $this->assertSame('2024-04-12T15:00:00Z', $workOrder->completedAtTime);
         $this->assertSame('2024-04-15T17:00:00Z', $workOrder->dueAtTime);
+    }
+
+    #[Test]
+    public function it_counts_service_tasks_and_matches_an_exact_status(): void
+    {
+        $workOrder = new WorkOrder([
+            'serviceTaskInstances' => [
+                ['id' => 'instance-1', 'serviceTaskId' => 'task-1', 'status' => 'Open'],
+                ['id' => 'instance-2', 'serviceTaskId' => 'task-2', 'status' => 'Completed'],
+            ],
+        ]);
+
+        $this->assertSame(2, $workOrder->getServiceTaskCount());
+        $this->assertTrue($workOrder->hasServiceTaskWithStatus('Completed'));
+        $this->assertFalse($workOrder->hasServiceTaskWithStatus('completed'));
+        $this->assertFalse($workOrder->hasServiceTaskWithStatus('On Hold'));
+
+        foreach ([new WorkOrder, new WorkOrder(['serviceTaskInstances' => null]), new WorkOrder(['serviceTaskInstances' => []])] as $empty) {
+            $this->assertSame(0, $empty->getServiceTaskCount());
+            $this->assertFalse($empty->hasServiceTaskWithStatus('Open'));
+        }
     }
 
     #[Test]

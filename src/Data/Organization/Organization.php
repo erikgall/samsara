@@ -13,8 +13,6 @@ use Samsara\Data\Entity;
  *
  * @property-read string|null $id Organization ID
  * @property-read string|null $name Organization name
- * @property-read string|null $address Organization address
- * @property-read array{dotNumber?: string, mcNumber?: string}|null $carrierSettings Carrier settings
- * @property-read array{timezone?: string}|null $settings Organization settings
+ * @property-read array{carrierName?: string, dotNumber?: int, mainOfficeAddress?: string}|null $carrierSettings Carrier settings
  */
 class Organization extends Entity {}

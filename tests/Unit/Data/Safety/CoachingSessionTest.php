@@ -125,8 +125,8 @@ class CoachingSessionTest extends TestCase
     {
         $session = new CoachingSession([
             'behaviors' => [
-                ['type' => 'harshBrake'],
-                ['type' => 'speeding'],
+                ['coachableBehaviorType' => 'braking'],
+                ['coachableBehaviorType' => 'speeding'],
             ],
         ]);
 
@@ -175,5 +175,24 @@ class CoachingSessionTest extends TestCase
         $session = new CoachingSession;
 
         $this->assertInstanceOf(Entity::class, $session);
+    }
+
+    #[Test]
+    public function it_matches_an_exact_coachable_behavior_type(): void
+    {
+        $session = new CoachingSession([
+            'behaviors' => [
+                ['coachableBehaviorType' => 'braking'],
+                ['coachableBehaviorType' => 'speeding'],
+            ],
+        ]);
+
+        $this->assertTrue($session->hasCoachableBehavior('speeding'));
+        $this->assertFalse($session->hasCoachableBehavior('Speeding'));
+        $this->assertFalse($session->hasCoachableBehavior('mobileUsage'));
+
+        foreach ([new CoachingSession, new CoachingSession(['behaviors' => null]), new CoachingSession(['behaviors' => []])] as $empty) {
+            $this->assertFalse($empty->hasCoachableBehavior('speeding'));
+        }
     }
 }

@@ -21,4 +21,28 @@ class SafetyEventActivity extends Entity
     {
         return SafetyEvent::make($this->get('safetyEvent', []));
     }
+
+    /**
+     * Check if this item records a behavior-label change.
+     */
+    public function isBehaviorLabelActivity(): bool
+    {
+        return $this->type === 'BehaviorLabelActivityType';
+    }
+
+    /**
+     * Check if this item records a coaching-state change.
+     */
+    public function isCoachingStateActivity(): bool
+    {
+        return $this->type === 'CoachingStateActivityType';
+    }
+
+    /**
+     * Check if this item records safety-event creation.
+     */
+    public function isCreateSafetyEventActivity(): bool
+    {
+        return $this->type === 'CreateSafetyEventActivityType';
+    }
 }

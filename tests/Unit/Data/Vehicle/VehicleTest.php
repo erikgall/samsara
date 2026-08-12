@@ -330,6 +330,18 @@ class VehicleTest extends TestCase
     }
 
     #[Test]
+    public function it_checks_for_non_empty_gateway_data(): void
+    {
+        $this->assertTrue((new Vehicle([
+            'gateway' => ['serial' => 'VG-123', 'model' => 'VG54NA'],
+        ]))->hasGateway());
+
+        foreach ([new Vehicle, new Vehicle(['gateway' => null]), new Vehicle(['gateway' => []]), new Vehicle(['gateway' => 'invalid'])] as $vehicle) {
+            $this->assertFalse($vehicle->hasGateway());
+        }
+    }
+
+    #[Test]
     public function it_extends_entity(): void
     {
         $vehicle = new Vehicle;

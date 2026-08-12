@@ -30,6 +30,28 @@ use Samsara\Data\Entity;
 class DataInput extends Entity
 {
     /**
+     * Check whether this response contains any data points.
+     */
+    public function hasDataPoints(): bool
+    {
+        foreach (['fftSpectraPoint', 'j1939D1StatusPoint', 'locationPoint', 'numberPoint', 'stringPoint'] as $key) {
+            if ($this->get($key) !== null) {
+                return true;
+            }
+        }
+
+        foreach (['fftSpectraPoints', 'j1939D1StatusPoints', 'locationPoints', 'numberPoints', 'stringPoints'] as $key) {
+            $points = $this->get($key);
+
+            if (is_array($points) && $points !== []) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Hydrate the point envelopes used by current industrial data endpoints.
      */
     public static function make(mixed $attributes = []): static

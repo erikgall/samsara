@@ -18,4 +18,16 @@ use Samsara\Data\Entity;
  * @property-read array<string, mixed>|null $connectionStatus Connection status
  * @property-read array<string, mixed>|null $dataUsageLast30Days Recent data usage
  */
-class Gateway extends Entity {}
+class Gateway extends Entity
+{
+    /**
+     * Check whether the gateway's latest health status is connected.
+     */
+    public function isConnected(): bool
+    {
+        $connectionStatus = $this->get('connectionStatus');
+
+        return is_array($connectionStatus)
+            && ($connectionStatus['healthStatus'] ?? null) === 'Connected';
+    }
+}

@@ -3,6 +3,7 @@
 namespace Samsara\Data\Trailer;
 
 use Samsara\Data\Entity;
+use Samsara\Data\Vehicle\Gateway;
 
 /**
  * Trailer entity.
@@ -40,6 +41,20 @@ class Trailer extends Entity
         $externalIds = $this->externalIds ?? [];
 
         return $externalIds[$key] ?? null;
+    }
+
+    /**
+     * Get the installed gateway as an entity.
+     */
+    public function getInstalledGateway(): ?Gateway
+    {
+        $gateway = $this->get('installedGateway');
+
+        if (! is_array($gateway) || $gateway === []) {
+            return null;
+        }
+
+        return Gateway::make($gateway);
     }
 
     /**

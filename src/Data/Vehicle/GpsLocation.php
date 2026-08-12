@@ -52,4 +52,12 @@ class GpsLocation extends Entity
 
         return $this->speedMilesPerHour * self::MILES_TO_KM;
     }
+
+    /**
+     * Check whether the vehicle was moving at this reading.
+     */
+    public function isMoving(): bool
+    {
+        return $this->speedMilesPerHour !== null && $this->speedMilesPerHour > 0;
+    }
 }

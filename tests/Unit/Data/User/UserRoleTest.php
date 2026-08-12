@@ -18,14 +18,12 @@ class UserRoleTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $userRole = new UserRole([
-            'id'          => '12345',
-            'name'        => 'Fleet Manager',
-            'description' => 'Manages fleet operations',
+            'id'   => '12345',
+            'name' => 'Fleet Manager',
         ]);
 
         $this->assertSame('12345', $userRole->id);
         $this->assertSame('Fleet Manager', $userRole->name);
-        $this->assertSame('Manages fleet operations', $userRole->description);
     }
 
     #[Test]
@@ -53,16 +51,13 @@ class UserRoleTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_permissions(): void
+    public function it_can_have_a_name(): void
     {
         $userRole = new UserRole([
-            'permissions' => [
-                ['name' => 'read', 'resource' => 'vehicles'],
-                ['name' => 'write', 'resource' => 'drivers'],
-            ],
+            'name' => 'Full Admin',
         ]);
 
-        $this->assertCount(2, $userRole->permissions);
+        $this->assertSame('Full Admin', $userRole->name);
     }
 
     #[Test]

@@ -88,6 +88,30 @@ class LiveShareTest extends TestCase
     }
 
     #[Test]
+    public function it_checks_each_documented_link_type(): void
+    {
+        $typeMethods = [
+            'assetsLocation'     => 'isAssetsLocationType',
+            'assetsNearLocation' => 'isAssetsNearLocationType',
+            'assetsOnRoute'      => 'isAssetsOnRouteType',
+        ];
+
+        foreach ($typeMethods as $type => $expectedMethod) {
+            $liveShare = new LiveShare(['type' => $type]);
+
+            foreach ($typeMethods as $method) {
+                $this->assertSame($method === $expectedMethod, $liveShare->{$method}());
+            }
+        }
+
+        foreach ([new LiveShare, new LiveShare(['type' => null]), new LiveShare(['type' => 'unknown'])] as $liveShare) {
+            foreach ($typeMethods as $method) {
+                $this->assertFalse($liveShare->{$method}());
+            }
+        }
+    }
+
+    #[Test]
     public function it_extends_entity(): void
     {
         $liveShare = new LiveShare;

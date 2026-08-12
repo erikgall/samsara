@@ -11,7 +11,7 @@ use Samsara\Data\Entity;
  *
  * @author Erik Galloway <erik@erikgall.com>
  *
- * @property-read string|null $id Machine ID
+ * @property-read int|null $id Machine ID
  * @property-read string|null $name Machine name
  * @property-read string|null $notes Machine notes
  */

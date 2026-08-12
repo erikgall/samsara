@@ -21,10 +21,30 @@ use Samsara\Data\Entity;
  * @property-read string|null $completedCoachId Completed coach user ID
  * @property-read string|null $sessionNote Session note
  * @property-read array{id?: string, name?: string}|null $driver Driver information
- * @property-read array<int, array{type?: string}>|null $behaviors Behavior references
+ * @property-read array<int, array{coachableBehaviorType: string}>|null $behaviors Behavior references
  */
 class CoachingSession extends Entity
 {
+    /**
+     * Check whether the session contains a coachable behavior type.
+     */
+    public function hasCoachableBehavior(string $behaviorType): bool
+    {
+        $behaviors = $this->get('behaviors');
+
+        if (! is_array($behaviors)) {
+            return false;
+        }
+
+        foreach ($behaviors as $behavior) {
+            if (is_array($behavior) && ($behavior['coachableBehaviorType'] ?? null) === $behaviorType) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Check if the session is completed.
      */

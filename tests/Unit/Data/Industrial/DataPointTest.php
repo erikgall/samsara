@@ -2,6 +2,7 @@
 
 namespace Samsara\Tests\Unit\Data\Industrial;
 
+use DateTimeImmutable;
 use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
@@ -50,16 +51,15 @@ class DataPointTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_data_input(): void
+    public function it_can_have_variant_specific_data(): void
     {
         $point = new DataPoint([
-            'dataInput' => [
-                'id'   => 'input-1',
-                'name' => 'Temperature',
-            ],
+            'fftSpectra'  => ['frequencies' => [100, 200]],
+            'gpsLocation' => ['latitude' => 37.7749, 'longitude' => -122.4194],
         ]);
 
-        $this->assertSame('input-1', $point->dataInput['id']);
+        $this->assertSame([100, 200], $point->fftSpectra['frequencies']);
+        $this->assertSame(37.7749, $point->gpsLocation['latitude']);
     }
 
     #[Test]
@@ -68,5 +68,24 @@ class DataPointTest extends TestCase
         $point = new DataPoint;
 
         $this->assertInstanceOf(Entity::class, $point);
+    }
+
+    #[Test]
+    public function it_parses_the_recorded_time(): void
+    {
+        $point = new DataPoint(['time' => '2024-04-10T07:06:25.123-04:00']);
+
+        $recordedAt = $point->getRecordedAt();
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $recordedAt);
+        $this->assertSame('2024-04-10T07:06:25.123-04:00', $recordedAt->format('Y-m-d\TH:i:s.vP'));
+    }
+
+    #[Test]
+    public function it_returns_null_without_a_recorded_time(): void
+    {
+        foreach ([new DataPoint, new DataPoint(['time' => null]), new DataPoint(['time' => ''])] as $point) {
+            $this->assertNull($point->getRecordedAt());
+        }
     }
 }

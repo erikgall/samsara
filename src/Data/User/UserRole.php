@@ -13,7 +13,5 @@ use Samsara\Data\Entity;
  *
  * @property-read string|null $id Role ID
  * @property-read string|null $name Role name
- * @property-read string|null $description Role description
- * @property-read array<int, array{name?: string, resource?: string}>|null $permissions Role permissions
  */
 class UserRole extends Entity {}

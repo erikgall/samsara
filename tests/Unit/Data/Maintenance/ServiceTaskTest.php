@@ -18,18 +18,18 @@ class ServiceTaskTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $serviceTask = new ServiceTask([
-            'id'                    => '12345',
-            'name'                  => 'Oil Change',
-            'description'           => 'Standard oil change service',
-            'estimatedLaborHours'   => 1.5,
-            'estimatedPartsCostUsd' => 50.00,
+            'id'                        => '12345',
+            'name'                      => 'Oil Change',
+            'description'               => 'Standard oil change service',
+            'estimatedLaborTimeMinutes' => 90,
+            'estimatedPartsCost'        => ['amount' => 50.00, 'currency' => 'USD'],
         ]);
 
         $this->assertSame('12345', $serviceTask->id);
         $this->assertSame('Oil Change', $serviceTask->name);
         $this->assertSame('Standard oil change service', $serviceTask->description);
-        $this->assertSame(1.5, $serviceTask->estimatedLaborHours);
-        $this->assertSame(50.00, $serviceTask->estimatedPartsCostUsd);
+        $this->assertSame(90, $serviceTask->estimatedLaborTimeMinutes);
+        $this->assertSame(50.00, $serviceTask->estimatedPartsCost['amount']);
     }
 
     #[Test]
@@ -58,27 +58,24 @@ class ServiceTaskTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_actual_values(): void
+    public function it_can_have_category_values(): void
     {
         $serviceTask = new ServiceTask([
-            'actualLaborHours'   => 2.0,
-            'actualPartsCostUsd' => 75.00,
+            'category'    => 'Engine',
+            'subcategory' => 'Oil and Lubrication',
         ]);
 
-        $this->assertSame(2.0, $serviceTask->actualLaborHours);
-        $this->assertSame(75.00, $serviceTask->actualPartsCostUsd);
+        $this->assertSame('Engine', $serviceTask->category);
+        $this->assertSame('Oil and Lubrication', $serviceTask->subcategory);
     }
 
     #[Test]
-    public function it_can_have_timestamps(): void
+    public function it_converts_estimated_labor_minutes_to_hours(): void
     {
-        $serviceTask = new ServiceTask([
-            'createdAtTime' => '2024-04-10T07:06:25Z',
-            'updatedAtTime' => '2024-04-11T10:00:00Z',
-        ]);
-
-        $this->assertSame('2024-04-10T07:06:25Z', $serviceTask->createdAtTime);
-        $this->assertSame('2024-04-11T10:00:00Z', $serviceTask->updatedAtTime);
+        $this->assertSame(1.5, (new ServiceTask(['estimatedLaborTimeMinutes' => 90]))->getEstimatedLaborHours());
+        $this->assertSame(0.0, (new ServiceTask(['estimatedLaborTimeMinutes' => 0]))->getEstimatedLaborHours());
+        $this->assertNull((new ServiceTask)->getEstimatedLaborHours());
+        $this->assertNull((new ServiceTask(['estimatedLaborTimeMinutes' => null]))->getEstimatedLaborHours());
     }
 
     #[Test]

@@ -11,8 +11,9 @@ use Samsara\Data\Entity;
  *
  * @author Erik Galloway <erik@erikgall.com>
  *
- * @property-read string|null $id Camera ID
- * @property-read string|null $serialNo Camera serial number
- * @property-read string|null $streamingUrl Streaming URL
+ * @property-read int|null $cameraId Camera ID
+ * @property-read string|null $cameraName Camera name
+ * @property-read string|null $ethernetIp Ethernet IP address
+ * @property-read string|null $wifiIp Wi-Fi IP address
  */
 class VisionCamera extends Entity {}

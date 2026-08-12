@@ -77,6 +77,23 @@ class RouteTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_an_exact_string_external_id(): void
+    {
+        $route = new Route([
+            'externalIds' => [
+                'customer' => 'route-123',
+                'empty'    => '',
+            ],
+        ]);
+
+        $this->assertSame('route-123', $route->getExternalId('customer'));
+        $this->assertSame('', $route->getExternalId('empty'));
+        $this->assertNull($route->getExternalId('missing'));
+        $this->assertNull((new Route)->getExternalId('customer'));
+        $this->assertNull((new Route(['externalIds' => null]))->getExternalId('customer'));
+    }
+
+    #[Test]
     public function it_returns_current_route_fields_without_obsolete_plan_helpers(): void
     {
         $route = new Route([

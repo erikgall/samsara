@@ -15,8 +15,8 @@ use Samsara\Data\Entity;
  * @property-read int|null $driverScore Driver safety score (0-100)
  * @property-read int|null $driveDistanceMeters Total drive distance in meters
  * @property-read int|null $driveTimeMilliseconds Total drive time in milliseconds
- * @property-read array<int, array{type?: string, count?: int}>|null $behaviors Behavior aggregations
- * @property-read array<int, array{type?: string, count?: int}>|null $speeding Speeding aggregations
+ * @property-read array<int, array{behaviorType: string, count: int, scoreImpact: float}>|null $behaviors Behavior aggregations
+ * @property-read array<int, array{speedingType: string, durationMilliseconds: int, scoreImpact: float}>|null $speeding Speeding aggregations
  */
 class SafetyScore extends Entity
 {
@@ -39,6 +39,48 @@ class SafetyScore extends Entity
      * Good score threshold.
      */
     protected const SCORE_GOOD = 70;
+
+    /**
+     * Get average driving speed in kilometers per hour.
+     */
+    public function getAverageSpeedKilometersPerHour(): ?float
+    {
+        if ($this->driveDistanceMeters === null
+            || $this->driveTimeMilliseconds === null
+            || $this->driveTimeMilliseconds <= 0) {
+            return null;
+        }
+
+        return ($this->driveDistanceMeters / 1000) / ($this->driveTimeMilliseconds / self::MS_PER_HOUR);
+    }
+
+    /**
+     * Get the total count for an exact behavior type.
+     */
+    public function getBehaviorCount(string $behaviorType): int
+    {
+        $behaviors = $this->get('behaviors');
+
+        if (! is_array($behaviors)) {
+            return 0;
+        }
+
+        $count = 0;
+
+        foreach ($behaviors as $behavior) {
+            if (! is_array($behavior) || ($behavior['behaviorType'] ?? null) !== $behaviorType) {
+                continue;
+            }
+
+            $behaviorCount = $behavior['count'] ?? null;
+
+            if (is_int($behaviorCount)) {
+                $count += $behaviorCount;
+            }
+        }
+
+        return $count;
+    }
 
     /**
      * Get the drive distance in kilometers.

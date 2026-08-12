@@ -17,10 +17,34 @@ use Samsara\Data\Entity;
  * @property-read string|null $secretKey Webhook secret
  * @property-read string|null $version Webhook API version
  * @property-read array<int, string>|null $eventTypes Event types
- * @property-read array<int, array{name?: string, value?: string}>|null $customHeaders Custom headers
+ * @property-read array<int, array{key: string, value: string}>|null $customHeaders Custom headers
  */
 class Webhook extends Entity
 {
+    /**
+     * Get the first custom header value for an exact key.
+     */
+    public function getCustomHeader(string $key): ?string
+    {
+        $headers = $this->get('customHeaders');
+
+        if (! is_array($headers)) {
+            return null;
+        }
+
+        foreach ($headers as $header) {
+            if (! is_array($header) || ($header['key'] ?? null) !== $key) {
+                continue;
+            }
+
+            $value = $header['value'] ?? null;
+
+            return is_string($value) ? $value : null;
+        }
+
+        return null;
+    }
+
     /**
      * Check if the webhook has a specific event type.
      */

@@ -75,12 +75,12 @@ class WebhookTest extends TestCase
     {
         $webhook = new Webhook([
             'customHeaders' => [
-                ['name' => 'X-Custom-Header', 'value' => 'custom-value'],
+                ['key' => 'X-Custom-Header', 'value' => 'custom-value'],
             ],
         ]);
 
         $this->assertCount(1, $webhook->customHeaders);
-        $this->assertSame('X-Custom-Header', $webhook->customHeaders[0]['name']);
+        $this->assertSame('X-Custom-Header', $webhook->customHeaders[0]['key']);
     }
 
     #[Test]
@@ -98,6 +98,23 @@ class WebhookTest extends TestCase
         $webhook = new Webhook;
 
         $this->assertInstanceOf(Entity::class, $webhook);
+    }
+
+    #[Test]
+    public function it_gets_the_first_exact_custom_header_value(): void
+    {
+        $webhook = new Webhook([
+            'customHeaders' => [
+                ['key' => 'X-Region', 'value' => 'east'],
+                ['key' => 'X-Region', 'value' => 'west'],
+            ],
+        ]);
+
+        $this->assertSame('east', $webhook->getCustomHeader('X-Region'));
+        $this->assertNull($webhook->getCustomHeader('x-region'));
+        $this->assertNull($webhook->getCustomHeader('Missing'));
+        $this->assertNull((new Webhook)->getCustomHeader('X-Region'));
+        $this->assertNull((new Webhook(['customHeaders' => null]))->getCustomHeader('X-Region'));
     }
 
     #[Test]

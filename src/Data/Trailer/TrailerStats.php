@@ -13,6 +13,7 @@ use Samsara\Data\Entity;
  *
  * @property-read string|null $id Trailer ID
  * @property-read string|null $name Trailer name
+ * @property-read array<string, string>|null $externalIds External ID mappings
  * @property-read array{value: int, time?: string}|null $gpsOdometerMeters GPS odometer reading
  * @property-read array{value: int, time?: string}|null $reeferFuelPercent Reefer fuel percentage
  * @property-read array{value: int, time?: string}|null $reeferAmbientAirTemperatureMilliC Reefer ambient air temperature
@@ -28,6 +29,13 @@ use Samsara\Data\Entity;
  * @property-read array{value: string, time?: string}|null $reeferDoorStateZone1 Reefer door state zone 1
  * @property-read array{value: string, time?: string}|null $reeferDoorStateZone2 Reefer door state zone 2
  * @property-read array{value: string, time?: string}|null $reeferDoorStateZone3 Reefer door state zone 3
+ * @property-read array{alarms: array<int, array{alarmCode: string, description: string, operatorAction: string, severity: int}>, time: string}|null $reeferAlarms Reefer alarms
+ * @property-read array{value: string, time?: string}|null $reeferStateZone1 Reefer state zone 1
+ * @property-read array{value: string, time?: string}|null $reeferStateZone2 Reefer state zone 2
+ * @property-read array{value: string, time?: string}|null $reeferStateZone3 Reefer state zone 3
+ * @property-read array{value: int, time?: string}|null $reeferSupplyAirTemperatureMilliCZone1 Reefer supply air temperature zone 1
+ * @property-read array{value: int, time?: string}|null $reeferSupplyAirTemperatureMilliCZone2 Reefer supply air temperature zone 2
+ * @property-read array{value: int, time?: string}|null $reeferSupplyAirTemperatureMilliCZone3 Reefer supply air temperature zone 3
  * @property-read array{latitude: float, longitude: float, time: string, headingDegrees?: int, speedMilesPerHour?: float}|null $gps GPS location data
  */
 class TrailerStats extends Entity
@@ -38,6 +46,22 @@ class TrailerStats extends Entity
     public function getCarrierReeferState(): ?string
     {
         return $this->carrierReeferState['value'] ?? null;
+    }
+
+    /**
+     * Get an external ID by key.
+     */
+    public function getExternalId(string $key): ?string
+    {
+        $externalIds = $this->get('externalIds');
+
+        if (! is_array($externalIds)) {
+            return null;
+        }
+
+        $externalId = $externalIds[$key] ?? null;
+
+        return is_string($externalId) ? $externalId : null;
     }
 
     /**
@@ -56,6 +80,24 @@ class TrailerStats extends Entity
     public function getGpsOdometerMeters(): ?int
     {
         return $this->gpsOdometerMeters['value'] ?? null;
+    }
+
+    /**
+     * Get the reported reefer alarms.
+     *
+     * @return array<int, array{alarmCode: string, description: string, operatorAction: string, severity: int}>
+     */
+    public function getReeferAlarms(): array
+    {
+        $reeferAlarms = $this->get('reeferAlarms');
+
+        if (! is_array($reeferAlarms)) {
+            return [];
+        }
+
+        $alarms = $reeferAlarms['alarms'] ?? null;
+
+        return is_array($alarms) ? $alarms : [];
     }
 
     /**
@@ -191,6 +233,6 @@ class TrailerStats extends Entity
      */
     public function isReeferRunning(): bool
     {
-        return $this->getCarrierReeferState() === 'running';
+        return in_array($this->getCarrierReeferState(), ['On', 'running'], true);
     }
 }

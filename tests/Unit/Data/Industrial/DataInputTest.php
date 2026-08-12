@@ -52,6 +52,25 @@ class DataInputTest extends TestCase
     }
 
     #[Test]
+    public function it_detects_singular_and_plural_data_points(): void
+    {
+        $this->assertTrue(DataInput::make([
+            'numberPoint' => ['time' => '2026-08-10T12:00:00Z', 'value' => 98.6],
+        ])->hasDataPoints());
+        $this->assertTrue(DataInput::make([
+            'stringPoints' => [['time' => '2026-08-10T12:00:01Z', 'value' => 'running']],
+        ])->hasDataPoints());
+
+        foreach ([
+            [],
+            ['numberPoint'  => null, 'stringPoints' => null],
+            ['stringPoints' => []],
+        ] as $attributes) {
+            $this->assertFalse(DataInput::make($attributes)->hasDataPoints());
+        }
+    }
+
+    #[Test]
     public function it_extends_entity(): void
     {
         $input = new DataInput;

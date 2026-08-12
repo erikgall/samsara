@@ -33,6 +33,30 @@ class LiveShare extends Entity
     }
 
     /**
+     * Check if this link shares asset locations.
+     */
+    public function isAssetsLocationType(): bool
+    {
+        return $this->type === 'assetsLocation';
+    }
+
+    /**
+     * Check if this link shares assets near a location.
+     */
+    public function isAssetsNearLocationType(): bool
+    {
+        return $this->type === 'assetsNearLocation';
+    }
+
+    /**
+     * Check if this link shares assets on a route.
+     */
+    public function isAssetsOnRouteType(): bool
+    {
+        return $this->type === 'assetsOnRoute';
+    }
+
+    /**
      * Check if the live share is expired.
      */
     public function isExpired(): bool

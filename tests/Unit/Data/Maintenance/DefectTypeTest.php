@@ -18,12 +18,15 @@ class DefectTypeTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $defectType = new DefectType([
-            'id'   => '12345',
-            'name' => 'Air Compressor',
+            'id'            => '12345',
+            'label'         => 'Air Compressor',
+            'sectionType'   => 'exteriorFront',
+            'createdAtTime' => '2024-04-10T07:06:25Z',
         ]);
 
         $this->assertSame('12345', $defectType->id);
-        $this->assertSame('Air Compressor', $defectType->name);
+        $this->assertSame('Air Compressor', $defectType->label);
+        $this->assertSame('exteriorFront', $defectType->sectionType);
     }
 
     #[Test]
@@ -41,8 +44,9 @@ class DefectTypeTest extends TestCase
     public function it_can_convert_to_array(): void
     {
         $data = [
-            'id'   => '12345',
-            'name' => 'Air Compressor',
+            'id'       => '12345',
+            'label'    => 'Air Compressor',
+            'severity' => 'major',
         ];
 
         $defectType = new DefectType($data);

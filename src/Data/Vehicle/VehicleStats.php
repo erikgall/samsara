@@ -127,6 +127,22 @@ class VehicleStats extends Entity
     }
 
     /**
+     * Get an external ID by key.
+     */
+    public function getExternalId(string $key): ?string
+    {
+        $externalIds = $this->get('externalIds');
+
+        if (! is_array($externalIds)) {
+            return null;
+        }
+
+        $externalId = $externalIds[$key] ?? null;
+
+        return is_string($externalId) ? $externalId : null;
+    }
+
+    /**
      * Get the fuel percentage.
      */
     public function getFuelPercent(): ?int

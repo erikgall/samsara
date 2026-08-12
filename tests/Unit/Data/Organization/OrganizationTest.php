@@ -18,14 +18,12 @@ class OrganizationTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $org = new Organization([
-            'id'      => '12345',
-            'name'    => 'Acme Trucking',
-            'address' => '123 Main St, San Francisco, CA',
+            'id'   => '12345',
+            'name' => 'Acme Trucking',
         ]);
 
         $this->assertSame('12345', $org->id);
         $this->assertSame('Acme Trucking', $org->name);
-        $this->assertSame('123 Main St, San Francisco, CA', $org->address);
     }
 
     #[Test]
@@ -53,28 +51,30 @@ class OrganizationTest extends TestCase
     }
 
     #[Test]
+    public function it_can_have_a_main_office_address(): void
+    {
+        $org = new Organization([
+            'carrierSettings' => [
+                'mainOfficeAddress' => '123 Main St, San Francisco, CA',
+            ],
+        ]);
+
+        $this->assertSame('123 Main St, San Francisco, CA', $org->carrierSettings['mainOfficeAddress']);
+    }
+
+    #[Test]
     public function it_can_have_carrier_settings(): void
     {
         $org = new Organization([
             'carrierSettings' => [
-                'dotNumber' => '12345678',
-                'mcNumber'  => 'MC-987654',
+                'carrierName'       => 'Acme Trucking',
+                'dotNumber'         => 12345678,
+                'mainOfficeAddress' => '123 Main St, San Francisco, CA',
             ],
         ]);
 
-        $this->assertSame('12345678', $org->carrierSettings['dotNumber']);
-    }
-
-    #[Test]
-    public function it_can_have_settings(): void
-    {
-        $org = new Organization([
-            'settings' => [
-                'timezone' => 'America/Los_Angeles',
-            ],
-        ]);
-
-        $this->assertSame('America/Los_Angeles', $org->settings['timezone']);
+        $this->assertSame(12345678, $org->carrierSettings['dotNumber']);
+        $this->assertSame('Acme Trucking', $org->carrierSettings['carrierName']);
     }
 
     #[Test]

@@ -113,6 +113,16 @@ class Vehicle extends Entity
     }
 
     /**
+     * Check if the vehicle has gateway data.
+     */
+    public function hasGateway(): bool
+    {
+        $gateway = $this->get('gateway');
+
+        return is_array($gateway) && $gateway !== [];
+    }
+
+    /**
      * Check if the vehicle has a static assigned driver.
      */
     public function hasStaticAssignedDriver(): bool

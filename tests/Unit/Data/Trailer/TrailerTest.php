@@ -5,6 +5,7 @@ namespace Samsara\Tests\Unit\Data\Trailer;
 use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Trailer\Trailer;
+use Samsara\Data\Vehicle\Gateway;
 use PHPUnit\Framework\Attributes\Test;
 
 /**
@@ -88,6 +89,23 @@ class TrailerTest extends TestCase
         ]);
 
         $this->assertSame(['3914', '4815'], $trailer->getTagIds());
+    }
+
+    #[Test]
+    public function it_can_get_the_installed_gateway_as_an_entity(): void
+    {
+        $trailer = new Trailer([
+            'installedGateway' => ['serial' => 'AG-123', 'model' => 'AG52'],
+        ]);
+
+        $gateway = $trailer->getInstalledGateway();
+
+        $this->assertInstanceOf(Gateway::class, $gateway);
+        $this->assertSame('AG-123', $gateway->serial);
+
+        foreach ([new Trailer, new Trailer(['installedGateway' => null]), new Trailer(['installedGateway' => []]), new Trailer(['installedGateway' => 'invalid'])] as $empty) {
+            $this->assertNull($empty->getInstalledGateway());
+        }
     }
 
     #[Test]

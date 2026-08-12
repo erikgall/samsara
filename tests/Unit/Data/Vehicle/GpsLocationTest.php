@@ -135,6 +135,16 @@ class GpsLocationTest extends TestCase
     }
 
     #[Test]
+    public function it_only_reports_positive_speed_as_moving(): void
+    {
+        $this->assertTrue((new GpsLocation(['speedMilesPerHour' => 0.1]))->isMoving());
+
+        foreach ([new GpsLocation, new GpsLocation(['speedMilesPerHour' => null]), new GpsLocation(['speedMilesPerHour' => 0]), new GpsLocation(['speedMilesPerHour' => -1])] as $gps) {
+            $this->assertFalse($gps->isMoving());
+        }
+    }
+
+    #[Test]
     public function it_returns_null_for_speed_when_not_set(): void
     {
         $gps = new GpsLocation;

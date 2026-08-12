@@ -15,6 +15,27 @@ use PHPUnit\Framework\Attributes\Test;
 class SafetyScoreTest extends TestCase
 {
     #[Test]
+    public function it_calculates_average_speed_in_kilometers_per_hour(): void
+    {
+        $this->assertSame(50.0, (new SafetyScore([
+            'driveDistanceMeters'   => 100000,
+            'driveTimeMilliseconds' => 7200000,
+        ]))->getAverageSpeedKilometersPerHour());
+        $this->assertSame(0.0, (new SafetyScore([
+            'driveDistanceMeters'   => 0,
+            'driveTimeMilliseconds' => 3600000,
+        ]))->getAverageSpeedKilometersPerHour());
+
+        foreach ([
+            new SafetyScore,
+            new SafetyScore(['driveDistanceMeters' => 1000]),
+            new SafetyScore(['driveDistanceMeters' => 1000, 'driveTimeMilliseconds' => 0]),
+        ] as $score) {
+            $this->assertNull($score->getAverageSpeedKilometersPerHour());
+        }
+    }
+
+    #[Test]
     public function it_can_be_created_with_attributes(): void
     {
         $score = new SafetyScore([
@@ -130,8 +151,8 @@ class SafetyScoreTest extends TestCase
     {
         $score = new SafetyScore([
             'behaviors' => [
-                ['type' => 'harshBrake', 'count' => 5],
-                ['type' => 'harshAcceleration', 'count' => 3],
+                ['behaviorType' => 'braking', 'count' => 5, 'scoreImpact' => -10.0],
+                ['behaviorType' => 'acceleration', 'count' => 3, 'scoreImpact' => -6.0],
             ],
         ]);
 
@@ -143,8 +164,8 @@ class SafetyScoreTest extends TestCase
     {
         $score = new SafetyScore([
             'speeding' => [
-                ['type' => 'light', 'count' => 10],
-                ['type' => 'moderate', 'count' => 2],
+                ['speedingType' => 'light', 'durationMilliseconds' => 10000, 'scoreImpact' => -1.0],
+                ['speedingType' => 'moderate', 'durationMilliseconds' => 2000, 'scoreImpact' => -2.0],
             ],
         ]);
 
@@ -182,5 +203,22 @@ class SafetyScoreTest extends TestCase
         $score = new SafetyScore;
 
         $this->assertNull($score->getScore());
+    }
+
+    #[Test]
+    public function it_sums_counts_for_an_exact_behavior_type(): void
+    {
+        $score = new SafetyScore([
+            'behaviors' => [
+                ['behaviorType' => 'braking', 'count' => 2],
+                ['behaviorType' => 'acceleration', 'count' => 4],
+                ['behaviorType' => 'braking', 'count' => 3],
+            ],
+        ]);
+
+        $this->assertSame(5, $score->getBehaviorCount('braking'));
+        $this->assertSame(0, $score->getBehaviorCount('Braking'));
+        $this->assertSame(0, $score->getBehaviorCount('unknown'));
+        $this->assertSame(0, (new SafetyScore)->getBehaviorCount('braking'));
     }
 }

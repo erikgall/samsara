@@ -277,6 +277,23 @@ class VehicleStatsTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_an_exact_string_external_id(): void
+    {
+        $stats = new VehicleStats([
+            'externalIds' => [
+                'fleet' => 'vehicle-123',
+                'empty' => '',
+            ],
+        ]);
+
+        $this->assertSame('vehicle-123', $stats->getExternalId('fleet'));
+        $this->assertSame('', $stats->getExternalId('empty'));
+        $this->assertNull($stats->getExternalId('missing'));
+        $this->assertNull((new VehicleStats)->getExternalId('fleet'));
+        $this->assertNull((new VehicleStats(['externalIds' => null]))->getExternalId('fleet'));
+    }
+
+    #[Test]
     public function it_returns_null_engine_state_when_not_set(): void
     {
         $stats = new VehicleStats;

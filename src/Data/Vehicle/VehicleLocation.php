@@ -17,6 +17,19 @@ use Samsara\Data\Entity;
 class VehicleLocation extends Entity
 {
     /**
+     * Get the coordinates as an array.
+     *
+     * @return array{latitude: float|null, longitude: float|null}
+     */
+    public function getCoordinates(): array
+    {
+        return [
+            'latitude'  => $this->latitude,
+            'longitude' => $this->longitude,
+        ];
+    }
+
+    /**
      * Get speed in kilometers per hour.
      */
     public function getSpeedKilometersPerHour(): ?float

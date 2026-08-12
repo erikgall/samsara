@@ -38,6 +38,22 @@ class Route extends Entity
     }
 
     /**
+     * Get an external ID by key.
+     */
+    public function getExternalId(string $key): ?string
+    {
+        $externalIds = $this->get('externalIds');
+
+        if (! is_array($externalIds)) {
+            return null;
+        }
+
+        $externalId = $externalIds[$key] ?? null;
+
+        return is_string($externalId) ? $externalId : null;
+    }
+
+    /**
      * Get the route settings as an entity.
      */
     public function getSettings(): ?RouteSettings

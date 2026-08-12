@@ -52,20 +52,28 @@ class TrailerStatsTest extends TestCase
     {
         $running = new TrailerStats([
             'carrierReeferState' => [
-                'value' => 'running',
+                'value' => 'On',
                 'time'  => '2025-01-17T10:00:00Z',
             ],
         ]);
 
         $stopped = new TrailerStats([
             'carrierReeferState' => [
-                'value' => 'stopped',
+                'value' => 'Off',
+                'time'  => '2025-01-17T10:00:00Z',
+            ],
+        ]);
+
+        $legacyRunning = new TrailerStats([
+            'carrierReeferState' => [
+                'value' => 'running',
                 'time'  => '2025-01-17T10:00:00Z',
             ],
         ]);
 
         $this->assertTrue($running->isReeferRunning());
         $this->assertFalse($stopped->isReeferRunning());
+        $this->assertTrue($legacyRunning->isReeferRunning());
     }
 
     #[Test]
@@ -73,12 +81,12 @@ class TrailerStatsTest extends TestCase
     {
         $stats = new TrailerStats([
             'carrierReeferState' => [
-                'value' => 'running',
+                'value' => 'On',
                 'time'  => '2025-01-17T10:00:00Z',
             ],
         ]);
 
-        $this->assertSame('running', $stats->getCarrierReeferState());
+        $this->assertSame('On', $stats->getCarrierReeferState());
     }
 
     #[Test]
@@ -184,12 +192,12 @@ class TrailerStatsTest extends TestCase
     {
         $stats = new TrailerStats([
             'reeferRunMode' => [
-                'value' => 'continuous',
+                'value' => 'Continuous',
                 'time'  => '2025-01-17T10:00:00Z',
             ],
         ]);
 
-        $this->assertSame('continuous', $stats->getReeferRunMode());
+        $this->assertSame('Continuous', $stats->getReeferRunMode());
     }
 
     #[Test]
@@ -211,6 +219,31 @@ class TrailerStatsTest extends TestCase
         $stats = new TrailerStats([]);
 
         $this->assertInstanceOf(Entity::class, $stats);
+    }
+
+    #[Test]
+    public function it_gets_external_ids_and_reefer_alarms(): void
+    {
+        $stats = new TrailerStats([
+            'externalIds'  => ['fleet' => 'trailer-123'],
+            'reeferAlarms' => [
+                'time'   => '2025-01-17T10:00:00Z',
+                'alarms' => [[
+                    'alarmCode'      => '3',
+                    'description'    => 'Test alarm',
+                    'operatorAction' => 'Manually disable alarm',
+                    'severity'       => 3,
+                ]],
+            ],
+        ]);
+
+        $this->assertSame('trailer-123', $stats->getExternalId('fleet'));
+        $this->assertSame('3', $stats->getReeferAlarms()[0]['alarmCode']);
+        $this->assertNull($stats->getExternalId('missing'));
+
+        foreach ([new TrailerStats, new TrailerStats(['reeferAlarms' => null]), new TrailerStats(['reeferAlarms' => ['alarms' => []]])] as $empty) {
+            $this->assertSame([], $empty->getReeferAlarms());
+        }
     }
 
     #[Test]

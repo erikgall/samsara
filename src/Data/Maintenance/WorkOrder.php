@@ -30,14 +30,47 @@ use Samsara\Data\Entity;
  * @property-read string|null $archivedAtTime Archive time (RFC 3339)
  * @property-read int|null $odometerMeters Odometer reading in meters
  * @property-read int|null $engineHours Engine hours
- * @property-read array<int, array{name?: string, quantity?: int}>|null $items Work order items
- * @property-read array<int, array{id?: string, name?: string}>|null $serviceTaskInstances Service task instances
- * @property-read array<int, array{name?: string, url?: string}>|null $attachments Attachments
- * @property-read array{amount?: float}|null $discount Discount information
- * @property-read array{amount?: float}|null $tax Tax information
+ * @property-read array<int, array<string, mixed>>|null $items Work order items
+ * @property-read array<int, array{id: string, serviceTaskId: string, status: string}>|null $serviceTaskInstances Service task instances
+ * @property-read array<int, array<string, mixed>>|null $attachments Attachments
+ * @property-read array<string, mixed>|null $discount Discount information
+ * @property-read array<string, mixed>|null $tax Tax information
+ * @property-read array<string, mixed>|null $maintenanceSite Maintenance site
+ * @property-read array<string, mixed>|null $unallocatedLabor Unallocated labor
+ * @property-read array<int, string>|null $workOrderTemplateIds Source template IDs
  */
 class WorkOrder extends Entity
 {
+    /**
+     * Get the number of service task instances.
+     */
+    public function getServiceTaskCount(): int
+    {
+        $tasks = $this->get('serviceTaskInstances');
+
+        return is_array($tasks) ? count($tasks) : 0;
+    }
+
+    /**
+     * Check for a service task instance with the given status.
+     */
+    public function hasServiceTaskWithStatus(string $status): bool
+    {
+        $tasks = $this->get('serviceTaskInstances');
+
+        if (! is_array($tasks)) {
+            return false;
+        }
+
+        foreach ($tasks as $task) {
+            if (is_array($task) && ($task['status'] ?? null) === $status) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Check if the work order is cancelled.
      */

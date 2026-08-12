@@ -82,9 +82,33 @@ class VehicleStatsSeries extends Entity
     /**
      * @return EntityCollection<int, VehicleStatValue>
      */
+    public function getEngineRpmReadings(): EntityCollection
+    {
+        return $this->statReadings('engineRpm');
+    }
+
+    /**
+     * @return EntityCollection<int, VehicleStatValue>
+     */
     public function getEngineStateReadings(): EntityCollection
     {
         return $this->statReadings('engineStates');
+    }
+
+    /**
+     * Get an external ID by key.
+     */
+    public function getExternalId(string $key): ?string
+    {
+        $externalIds = $this->get('externalIds');
+
+        if (! is_array($externalIds)) {
+            return null;
+        }
+
+        $externalId = $externalIds[$key] ?? null;
+
+        return is_string($externalId) ? $externalId : null;
     }
 
     /**

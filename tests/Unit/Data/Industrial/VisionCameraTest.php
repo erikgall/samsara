@@ -18,33 +18,35 @@ class VisionCameraTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $camera = new VisionCamera([
-            'id'           => '12345',
-            'serialNo'     => 'CAM-001',
-            'streamingUrl' => 'rtsp://camera.example.com/stream1',
+            'cameraId'   => 12345,
+            'cameraName' => 'Line 32',
+            'ethernetIp' => '10.1.2.34',
+            'wifiIp'     => '10.1.2.35',
         ]);
 
-        $this->assertSame('12345', $camera->id);
-        $this->assertSame('CAM-001', $camera->serialNo);
-        $this->assertSame('rtsp://camera.example.com/stream1', $camera->streamingUrl);
+        $this->assertSame(12345, $camera->cameraId);
+        $this->assertSame('Line 32', $camera->cameraName);
+        $this->assertSame('10.1.2.34', $camera->ethernetIp);
+        $this->assertSame('10.1.2.35', $camera->wifiIp);
     }
 
     #[Test]
     public function it_can_be_created_with_make(): void
     {
         $camera = VisionCamera::make([
-            'id' => '12345',
+            'cameraId' => 12345,
         ]);
 
         $this->assertInstanceOf(VisionCamera::class, $camera);
-        $this->assertSame('12345', $camera->getId());
+        $this->assertNull($camera->getId());
     }
 
     #[Test]
     public function it_can_convert_to_array(): void
     {
         $data = [
-            'id'       => '12345',
-            'serialNo' => 'CAM-001',
+            'cameraId'   => 12345,
+            'cameraName' => 'Line 32',
         ];
 
         $camera = new VisionCamera($data);

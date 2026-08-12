@@ -18,11 +18,11 @@ class MachineTest extends TestCase
     public function it_can_be_created_with_attributes(): void
     {
         $machine = new Machine([
-            'id'   => '12345',
+            'id'   => 12345,
             'name' => 'CNC Machine 1',
         ]);
 
-        $this->assertSame('12345', $machine->id);
+        $this->assertSame(12345, $machine->id);
         $this->assertSame('CNC Machine 1', $machine->name);
     }
 
@@ -30,7 +30,7 @@ class MachineTest extends TestCase
     public function it_can_be_created_with_make(): void
     {
         $machine = Machine::make([
-            'id' => '12345',
+            'id' => 12345,
         ]);
 
         $this->assertInstanceOf(Machine::class, $machine);
@@ -41,7 +41,7 @@ class MachineTest extends TestCase
     public function it_can_convert_to_array(): void
     {
         $data = [
-            'id'   => '12345',
+            'id'   => 12345,
             'name' => 'CNC Machine 1',
         ];
 
