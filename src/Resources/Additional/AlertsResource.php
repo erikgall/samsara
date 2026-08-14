@@ -49,7 +49,7 @@ class AlertsResource extends Resource
         );
 
         /** @var AlertConfiguration */
-        return $this->mapToEntity($response->json('data', $response->json()));
+        return $this->mapToEntity($this->decodeJsonData($response, $this->endpoint));
     }
 
     /**
@@ -102,7 +102,7 @@ class AlertsResource extends Resource
         );
 
         /** @var AlertConfiguration */
-        return $this->mapToEntity($response->json('data', $response->json()));
+        return $this->mapToEntity($this->decodeJsonData($response, $this->endpoint));
     }
 
     /**

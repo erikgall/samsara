@@ -76,6 +76,8 @@ use Samsara\Data\EntityCollection;
  * @property-read array<int, array<string, mixed>>|null $spreaderPrewetRate Spreader prewet-rate readings
  * @property-read array<int, array<string, mixed>>|null $spreaderRoadTemp Spreader road-temperature readings
  * @property-read array<int, array<string, mixed>>|null $syntheticEngineSeconds Synthetic engine-second readings
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class VehicleStatsSeries extends Entity
 {

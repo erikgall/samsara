@@ -4,7 +4,11 @@ namespace Samsara\Resources\Industrial;
 
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
+use Samsara\Data\EntityCollection;
+use Samsara\Data\Industrial\Machine;
 use Samsara\Data\Industrial\DataInput;
+use Samsara\Exceptions\SamsaraException;
+use Samsara\Data\Industrial\VisionCamera;
 use Samsara\Data\Industrial\IndustrialAsset;
 
 /**
@@ -95,6 +99,23 @@ class IndustrialResource extends Resource
     }
 
     /**
+     * Get legacy industrial machines as typed entities.
+     *
+     * @return EntityCollection<int, Machine>
+     */
+    public function machines(): EntityCollection
+    {
+        $endpoint = '/v1/machines/list';
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($endpoint),
+            $endpoint,
+        );
+        $machines = $this->decodeJsonList($response, $endpoint, 'machines');
+
+        return new EntityCollection(array_map(Machine::make(...), $machines));
+    }
+
+    /**
      * Create a new query builder for this resource.
      */
     public function query(): Builder
@@ -112,6 +133,29 @@ class IndustrialResource extends Resource
     {
         /** @var IndustrialAsset */
         return $this->update($id, $data);
+    }
+
+    /**
+     * Get legacy vision cameras as typed entities.
+     *
+     * @return EntityCollection<int, VisionCamera>
+     */
+    public function visionCameras(): EntityCollection
+    {
+        $endpoint = '/v1/industrial/vision/cameras';
+        $response = $this->executeSdkGet($endpoint);
+        $cameras = $this->decodeJsonArray($response, $endpoint);
+
+        if (! array_is_list($cameras)) {
+            throw new SamsaraException(
+                "Expected a JSON list from successful response for [{$endpoint}].",
+                $response->status(),
+                null,
+                ['status' => $response->status(), 'endpoint' => $endpoint, 'body' => $response->body()],
+            );
+        }
+
+        return new EntityCollection(array_map(VisionCamera::make(...), $cameras));
     }
 
     /**

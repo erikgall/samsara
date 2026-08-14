@@ -53,8 +53,8 @@ class EquipmentResourceTest extends TestCase
         try {
             $resource->create(['name' => 'New Equipment']);
             $this->fail('Equipment create must fail before sending HTTP.');
-        } catch (UnsupportedOperationException) {
-            $this->assertTrue(true);
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('create', $exception->getContext()['operation'] ?? null);
         }
 
         $this->http->assertNothingSent();
@@ -68,8 +68,8 @@ class EquipmentResourceTest extends TestCase
         try {
             $resource->delete('123');
             $this->fail('Equipment delete must fail before sending HTTP.');
-        } catch (UnsupportedOperationException) {
-            $this->assertTrue(true);
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('delete', $exception->getContext()['operation'] ?? null);
         }
 
         $this->http->assertNothingSent();
@@ -87,8 +87,11 @@ class EquipmentResourceTest extends TestCase
         try {
             $resource->findByExternalId('asset_code', 'EQ-123');
             $this->fail('Equipment external-ID lookup must fail before sending HTTP.');
-        } catch (UnsupportedOperationException) {
-            $this->assertTrue(true);
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame(
+                'Equipment cannot be looked up by external ID in the current API contract. Use find() with a Samsara equipment ID.',
+                $exception->getMessage()
+            );
         }
 
         $this->http->assertNothingSent();
@@ -194,8 +197,8 @@ class EquipmentResourceTest extends TestCase
         try {
             $resource->update('123', ['name' => 'Updated Equipment']);
             $this->fail('Equipment update must fail before sending HTTP.');
-        } catch (UnsupportedOperationException) {
-            $this->assertTrue(true);
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('update', $exception->getContext()['operation'] ?? null);
         }
 
         $this->http->assertNothingSent();

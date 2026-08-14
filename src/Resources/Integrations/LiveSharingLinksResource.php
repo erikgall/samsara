@@ -63,7 +63,7 @@ class LiveSharingLinksResource extends Resource
         );
 
         /** @var LiveShare */
-        return $this->mapToEntity($response->json('data', []));
+        return $this->mapToEntity($this->decodeJsonData($response, $endpoint, false));
     }
 
     /**

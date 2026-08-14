@@ -9,13 +9,14 @@ permalink: /resources/issues
 
 - [Introduction](#introduction)
 - [Retrieving Records](#retrieving-records)
+- [Updating Records](#updating-records)
 - [Filtering](#filtering)
 - [Properties](#properties)
 - [Related Resources](#related-resources)
 
 ## Introduction
 
-The `Samsara::issues()` resource exposes the `/issues/stream` feed of vehicle and equipment fault data. Stream rows are generic `Entity` instances. The only supported generic mutation is `create()` on the resource's configured endpoint; `all`, `find`, `update`, and `delete` are rejected.
+The `Samsara::issues()` resource exposes the `/issues/stream` feed of vehicle and equipment fault data. Stream rows are generic `Entity` instances. Generic `create()` and the dedicated collection-level `updateIssue()` method are supported; `all`, `find`, `update`, and `delete` are rejected because their inherited item paths do not match this API.
 
 ## Retrieving Records
 
@@ -42,6 +43,17 @@ Samsara::issues()
     ->between(now()->subYear(), now())
     ->lazy()
     ->each(fn ($issue) => Issue::record($issue->toArray()));
+```
+
+## Updating Records
+
+`updateIssue()` sends the issue ID inside the collection-level PATCH body and returns the updated generic `Entity`.
+
+```php
+$issue = Samsara::issues()->updateIssue([
+    'id' => 'issue-id',
+    'status' => 'resolved',
+]);
 ```
 
 ## Filtering

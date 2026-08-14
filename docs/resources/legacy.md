@@ -17,13 +17,13 @@ permalink: /resources/legacy
 
 Legacy resources expose v1 Samsara endpoints that have no v2 replacement, or that you may still need to call when a v2 migration is incomplete. Reach them through `Samsara::legacy()`, which returns a `LegacyResource` instance. Every method returns the raw decoded JSON response (`array<string, mixed>`) rather than a typed entity. When a stable v2 resource covers the same data, prefer it.
 
-The current first-party OpenAPI still lists several v1 operations, but it uses `GET` where the package sends `POST` for asset locations, asset reefers, HOS authentication logs, maintenance list, trips, and vision cameras. `/v1/fleet/dispatch/routes` and `POST /v1/fleet/assets` were not verified in the current spec; the OpenAPI notes that not every legacy endpoint is included, so absence is not proof of removal. Treat the method reference below as package behavior, not current upstream verification.
+The methods below use the verbs and paths declared by the pinned first-party OpenAPI snapshot. The former `dispatchRoutes()` helper was removed because its collection path does not exist in either the pinned or current live contract.
 
 ## Method Reference
 
 ### `assetLocations(array $data): array`
 
-`POST /v1/fleet/assets/locations`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.html).
+`GET /v1/fleet/assets/locations`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.html).
 
 ```php
 use Samsara\Facades\Samsara;
@@ -36,22 +36,12 @@ $payload = Samsara::legacy()->assetLocations([
 
 ### `assetReefers(array $data): array`
 
-`POST /v1/fleet/assets/reefers`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.html).
+`GET /v1/fleet/assets/reefers`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.html).
 
 ```php
 $payload = Samsara::legacy()->assetReefers([
     'startMs' => 1714521600000,
     'endMs' => 1714608000000,
-]);
-```
-
-### `dispatchRoutes(array $data): array`
-
-`GET /v1/fleet/dispatch/routes`. Returns the raw v1 response. No v2 equivalent in the SDK.
-
-```php
-$payload = Samsara::legacy()->dispatchRoutes([
-    'group_id' => 'group-id',
 ]);
 ```
 
@@ -68,7 +58,7 @@ $payload = Samsara::legacy()->driverSafetyScore('driver-id', [
 
 ### `fleetAssets(array $data): array`
 
-`POST /v1/fleet/assets`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.html).
+`GET /v1/fleet/assets`. Returns the raw v1 response. Prefer the v2 equivalent on [Assets](assets.html).
 
 ```php
 $payload = Samsara::legacy()->fleetAssets([
@@ -78,7 +68,7 @@ $payload = Samsara::legacy()->fleetAssets([
 
 ### `hosAuthenticationLogs(array $data): array`
 
-`POST /v1/fleet/hos_authentication_logs`. Returns the raw v1 response. No v2 equivalent in the SDK.
+`GET /v1/fleet/hos_authentication_logs`. Returns the raw v1 response. No v2 equivalent in the SDK.
 
 ```php
 $payload = Samsara::legacy()->hosAuthenticationLogs([
@@ -99,7 +89,7 @@ $payload = Samsara::legacy()->machines([
 
 ### `maintenanceList(array $data): array`
 
-`POST /v1/fleet/maintenance/list`. Returns the raw v1 response. Prefer the v2 equivalent on [Maintenance](maintenance.html).
+`GET /v1/fleet/maintenance/list`. Returns the raw v1 response. Prefer the v2 equivalent on [Maintenance](maintenance.html).
 
 ```php
 $payload = Samsara::legacy()->maintenanceList([
@@ -109,7 +99,7 @@ $payload = Samsara::legacy()->maintenanceList([
 
 ### `messages(array $data): array`
 
-`POST /v1/fleet/messages`. Returns the raw v1 response. No v2 equivalent in the SDK.
+`GET /v1/fleet/messages`. Returns message history as a raw v1 response. This method does not send messages.
 
 ```php
 $payload = Samsara::legacy()->messages([
@@ -119,9 +109,18 @@ $payload = Samsara::legacy()->messages([
 ]);
 ```
 
+`messages()` is the GET read operation. Send a message through the distinct POST helper:
+
+```php
+$result = Samsara::legacy()->sendMessage([
+    'driverIds' => [111, 222],
+    'text' => 'Dispatch update',
+]);
+```
+
 ### `trips(array $data): array`
 
-`POST /v1/fleet/trips`. Returns the raw v1 response. Prefer the v2 equivalent on [Trips](trips.html).
+`GET /v1/fleet/trips`. Returns the raw v1 response. Prefer the v2 equivalent on [Trips](trips.html).
 
 ```php
 $payload = Samsara::legacy()->trips([
@@ -154,7 +153,7 @@ $payload = Samsara::legacy()->vehicleSafetyScore('vehicle-id', [
 
 ### `visionCameras(array $data): array`
 
-`POST /v1/industrial/vision/cameras`. Returns the raw v1 response. Prefer the v2 equivalent on [Camera Media](camera-media.html).
+`GET /v1/industrial/vision/cameras`. Returns the raw v1 response. Prefer the v2 equivalent on [Camera Media](camera-media.html).
 
 ```php
 $payload = Samsara::legacy()->visionCameras([

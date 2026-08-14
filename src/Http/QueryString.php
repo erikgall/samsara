@@ -2,6 +2,11 @@
 
 namespace Samsara\Http;
 
+/**
+ * Prepare query values for Laravel's HTTP client.
+ *
+ * @author Erik Galloway <erik@erikgall.com>
+ */
 final class QueryString
 {
     /**
@@ -28,7 +33,13 @@ final class QueryString
             unset($query[$parameter]);
 
             foreach ($values as $value) {
-                $pairs[] = rawurlencode($parameter).'='.rawurlencode((string) $value);
+                $pairs[] = rawurlencode($parameter).'='.rawurlencode(self::stringify($value));
+            }
+        }
+
+        foreach ($query as $parameter => $value) {
+            if (is_bool($value)) {
+                $query[$parameter] = self::stringify($value);
             }
         }
 
@@ -45,5 +56,17 @@ final class QueryString
             $endpoint.(str_contains($endpoint, '?') ? '&' : '?').implode('&', $pairs),
             [],
         ];
+    }
+
+    /**
+     * Serialize one scalar query value using OpenAPI-compatible booleans.
+     */
+    private static function stringify(mixed $value): string
+    {
+        return match ($value) {
+            true    => 'true',
+            false   => 'false',
+            default => (string) $value,
+        };
     }
 }

@@ -41,7 +41,7 @@ class FormsResource extends Resource
         );
 
         /** @var FormSubmission */
-        return $this->mapToEntity($response->json('data', $response->json()));
+        return $this->mapToEntity($this->decodeJsonData($response, $this->endpoint));
     }
 
     /**
@@ -59,7 +59,7 @@ class FormsResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**
@@ -75,7 +75,7 @@ class FormsResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**
@@ -128,7 +128,7 @@ class FormsResource extends Resource
         );
 
         /** @var FormSubmission */
-        return $this->mapToEntity($response->json('data', $response->json()));
+        return $this->mapToEntity($this->decodeJsonData($response, $this->endpoint));
     }
 
     /**

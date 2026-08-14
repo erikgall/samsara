@@ -34,7 +34,9 @@ class WebhookSignatureVerifier
         $decoded = base64_decode($secret, true);
 
         if ($decoded === false || $decoded === '') {
-            throw new \InvalidArgumentException('Invalid Base64-encoded webhook secret provided.');
+            throw new \InvalidArgumentException(
+                'Invalid Base64-encoded webhook secret in SAMSARA_WEBHOOK_SECRET.'
+            );
         }
 
         $this->decodedSecret = $decoded;
@@ -121,8 +123,11 @@ class WebhookSignatureVerifier
             throw InvalidSignatureException::invalidTimestamp($timestamp);
         }
 
-        // Check if timestamp is within tolerance
-        $timestampAge = abs(time() - $timestampValue);
+        $timestampAge = time() - $timestampValue;
+
+        if ($timestampAge < 0) {
+            throw InvalidSignatureException::futureTimestamp(-$timestampAge);
+        }
 
         if ($timestampAge > $tolerance) {
             throw InvalidSignatureException::expiredTimestamp($tolerance, $timestampAge);

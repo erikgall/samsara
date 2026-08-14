@@ -33,7 +33,7 @@ class IftaResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**
@@ -49,7 +49,7 @@ class IftaResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**
@@ -63,7 +63,7 @@ class IftaResource extends Resource
         $endpoint = '/fleet/reports/ifta/jurisdiction';
         $response = $this->executeSdkGet($endpoint, $params);
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**
@@ -77,7 +77,7 @@ class IftaResource extends Resource
         $endpoint = '/fleet/reports/ifta/vehicle';
         $response = $this->executeSdkGet($endpoint, $params);
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**

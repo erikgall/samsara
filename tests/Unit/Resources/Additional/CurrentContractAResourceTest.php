@@ -410,7 +410,7 @@ class CurrentContractAResourceTest extends TestCase
         $this->assertRawQueryPairs([
             ['ids', 'work-order-1'],
             ['ids', 'work-order-2'],
-            ['includeExternalIds', '1'],
+            ['includeExternalIds', 'true'],
         ]);
 
         $this->resetHttp();
@@ -431,7 +431,7 @@ class CurrentContractAResourceTest extends TestCase
         $this->assertRawQueryPairs([
             ['ids', 'service-task-1'],
             ['ids', 'service-task-2'],
-            ['includeArchived', '0'],
+            ['includeArchived', 'false'],
         ]);
 
         $this->resetHttp();

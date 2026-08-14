@@ -13,6 +13,8 @@ use Samsara\Data\Entity;
  * @property-read float|null $heading Heading in degrees
  * @property-read float|null $speed Speed in miles per hour
  * @property-read array<string, mixed>|null $reverseGeo Reverse-geocoded location
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class VehicleLocation extends Entity
 {

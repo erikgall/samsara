@@ -3,8 +3,10 @@
 namespace Samsara\Tests\Unit\Resources\Additional;
 
 use Samsara\Samsara;
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Additional\IssuesResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
@@ -80,5 +82,27 @@ class IssuesResourceTest extends TestCase
         }
 
         $this->http->assertNothingSent();
+    }
+
+    #[Test]
+    public function it_updates_an_issue_at_the_collection_endpoint(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['data' => [
+                'id'     => 'issue-123',
+                'status' => 'resolved',
+            ]]),
+        ]);
+
+        $issue = (new IssuesResource($this->samsara))->updateIssue([
+            'id'     => 'issue-123',
+            'status' => 'resolved',
+        ]);
+
+        $this->assertInstanceOf(Entity::class, $issue);
+        $this->assertSame('issue-123', $issue->id);
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'PATCH'
+            && parse_url($request->url(), PHP_URL_PATH) === '/issues'
+            && $request->data() === ['id' => 'issue-123', 'status' => 'resolved']);
     }
 }

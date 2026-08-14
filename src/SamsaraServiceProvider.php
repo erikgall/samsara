@@ -2,41 +2,35 @@
 
 namespace Samsara;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Support\DeferrableProvider;
+use Samsara\Webhooks\VerifyWebhookSignature;
+use Illuminate\Http\Client\Factory as HttpFactory;
 
 /**
  * Samsara service provider for Laravel.
  *
- * Registers the Samsara client as a singleton and publishes configuration.
+ * Registers the Samsara client as a scoped service and publishes configuration.
  *
  * @author Erik Galloway <erik@erikgall.com>
  */
-class SamsaraServiceProvider extends ServiceProvider implements DeferrableProvider
+class SamsaraServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap services.
      */
     public function boot(): void
     {
+        $this->app->make(Router::class)->aliasMiddleware(
+            'samsara.webhook',
+            VerifyWebhookSignature::class,
+        );
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/samsara.php' => config_path('samsara.php'),
             ], 'samsara-config');
         }
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array<int, string>
-     */
-    public function provides(): array
-    {
-        return [
-            Samsara::class,
-            'samsara',
-        ];
     }
 
     /**
@@ -49,25 +43,20 @@ class SamsaraServiceProvider extends ServiceProvider implements DeferrableProvid
             'samsara'
         );
 
-        $this->app->singleton(Samsara::class, function ($app) {
+        $this->app->scoped(Samsara::class, function ($app) {
             $config = $app['config']['samsara'];
 
-            $samsara = new Samsara(
+            return new Samsara(
                 $config['api_key'] ?? null,
                 [
-                    'timeout'  => $config['timeout'] ?? 30,
-                    'retry'    => $config['retry'] ?? 3,
-                    'per_page' => $config['per_page'] ?? 100,
-                ]
+                    'timeout'                 => $config['timeout'] ?? 30,
+                    'attempts'                => $config['attempts'] ?? 3,
+                    'retry_after_max_seconds' => $config['retry_after_max_seconds'] ?? 30,
+                    'per_page'                => $config['per_page'] ?? 100,
+                    'region'                  => $config['region'] ?? 'us',
+                ],
+                $app->make(HttpFactory::class),
             );
-
-            if (($config['region'] ?? 'us') === 'eu') {
-                $samsara->useEuEndpoint();
-            } elseif (($config['region'] ?? 'us') === 'ca') {
-                $samsara->useCanadaEndpoint();
-            }
-
-            return $samsara;
         });
 
         $this->app->alias(Samsara::class, 'samsara');

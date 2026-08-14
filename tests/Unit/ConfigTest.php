@@ -18,7 +18,7 @@ class ConfigTest extends TestCase
         $config = require __DIR__.'/../../config/samsara.php';
 
         $this->assertSame(
-            ['api_key', 'region', 'timeout', 'retry', 'per_page', 'webhook_secret'],
+            ['api_key', 'region', 'timeout', 'attempts', 'retry_after_max_seconds', 'per_page', 'webhook_secret'],
             array_keys($config),
         );
     }
@@ -29,6 +29,14 @@ class ConfigTest extends TestCase
         $config = require __DIR__.'/../../config/samsara.php';
 
         $this->assertArrayHasKey('api_key', $config);
+    }
+
+    #[Test]
+    public function config_has_attempts_setting(): void
+    {
+        $config = require __DIR__.'/../../config/samsara.php';
+
+        $this->assertArrayHasKey('attempts', $config);
     }
 
     #[Test]
@@ -48,19 +56,19 @@ class ConfigTest extends TestCase
     }
 
     #[Test]
-    public function config_has_retry_setting(): void
-    {
-        $config = require __DIR__.'/../../config/samsara.php';
-
-        $this->assertArrayHasKey('retry', $config);
-    }
-
-    #[Test]
     public function config_has_timeout_setting(): void
     {
         $config = require __DIR__.'/../../config/samsara.php';
 
         $this->assertArrayHasKey('timeout', $config);
+    }
+
+    #[Test]
+    public function default_attempts_is_3(): void
+    {
+        $config = require __DIR__.'/../../config/samsara.php';
+
+        $this->assertSame(3, $config['attempts']);
     }
 
     #[Test]
@@ -81,11 +89,11 @@ class ConfigTest extends TestCase
     }
 
     #[Test]
-    public function default_retry_is_3(): void
+    public function default_retry_after_max_seconds_is_30(): void
     {
         $config = require __DIR__.'/../../config/samsara.php';
 
-        $this->assertSame(3, $config['retry']);
+        $this->assertSame(30, $config['retry_after_max_seconds']);
     }
 
     #[Test]

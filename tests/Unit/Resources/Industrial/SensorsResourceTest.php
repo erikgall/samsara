@@ -6,6 +6,7 @@ use Samsara\Samsara;
 use Samsara\Tests\TestCase;
 use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
+use Samsara\Exceptions\SamsaraException;
 use Samsara\Resources\Industrial\SensorsResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Exceptions\UnsupportedOperationException;
@@ -188,6 +189,24 @@ class SensorsResourceTest extends TestCase
         $resource = new SensorsResource($this->samsara);
 
         $this->assertSame('/v1/sensors', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_rejects_a_non_list_sensor_collection(): void
+    {
+        $this->http->preventStrayRequests();
+        $this->http->fake([
+            '*/v1/sensors/list' => $this->http->response(
+                '{"sensors":null}',
+                200,
+                ['Content-Type' => 'application/json'],
+            ),
+        ]);
+
+        $this->expectException(SamsaraException::class);
+        $this->expectExceptionMessage('Expected response data to be a JSON list');
+
+        (new SensorsResource($this->samsara))->list();
     }
 
     #[Test]

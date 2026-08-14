@@ -2,15 +2,15 @@
 
 This file lists verified consumer actions for the integrated staged-v2 behavior. Engineering evidence belongs in `DEVELOPMENT_CHANGELOG.md`.
 
-For an executable, agent-oriented migration sequence with before/after code, exact searches, endpoint-path tables, verification steps, and a 338-path final release ledger, use the canonical [v1.1.0 to v2.0.0 upgrade guide](UPGRADE.md). This file is the compact release record; the upgrade guide is the migration authority.
+For an executable, agent-oriented migration sequence with before/after code, exact searches, endpoint-path tables, verification steps, and a 348-path final release ledger, use the canonical [v1.1.0 to v2.0.0 upgrade guide](UPGRADE.md). This file is the compact release record; the upgrade guide is the migration authority.
 
 ## Unreleased — staged v2
 
-The final audit maps 195 package operations: 187 match the pinned first-party contract and 8 are explicit legacy helpers. Six matched operations retain only additive pagination-ergonomics gaps; no matched operation retains a classified wire, request-body, response-loss, or error-mapping break. Exact capability gates now reject 133 unsupported public operation calls locally, so consumers must apply the migrations below instead of relying on inherited CRUD. The 183 unique official-only operations are additive backlog and do not require a consumer migration until implemented.
+The final audit maps 206 package operations, all of which match the pinned first-party contract with no classified operation difference. Exact capability gates now reject 138 unsupported public operation calls locally, so consumers must apply the migrations below instead of relying on inherited CRUD. The 164 unique official-only operations are additive backlog and do not require a consumer migration until implemented.
 
 ### Integrated quality-pass compatibility notes
 
-All quality lanes are included in the release ledger. No new signature removal or intentional break was added by that pass. Applications with exact edge assertions should note that generic item IDs are now encoded as one path segment, mutable date inputs are no longer modified during UTC formatting, inconsistent cursor metadata returns no next page, and malformed webhook timestamps consistently raise `InvalidSignatureException`. See `MIG-19` for exact behavior and tests.
+All quality lanes are included in the release ledger. Applications with exact edge assertions should note that generic item IDs are now encoded as one path segment, mutable date inputs are no longer modified during UTC formatting, inconsistent cursor metadata returns no next page, and malformed webhook timestamps consistently raise `InvalidSignatureException`. See `MIG-19` for exact behavior and tests. Token-cloning and lifecycle-scoping changes are recorded under `MIG-23`.
 
 ### Required DTO and enum migrations
 
@@ -18,18 +18,20 @@ All quality lanes are included in the release ledger. No new signature removal o
 
 `DutyStatus::SLEEPER_BERTH->value` changes from `sleeperBerth` to the upstream `sleeperBed` value. Code that compares enum cases remains stable. Update persisted strings, serialized fixtures, validation lists, and direct string comparisons to `sleeperBed`. `HosLog::getDutyStatus()` now returns `DutyStatus::SLEEPER_BERTH` for current sleeper-berth rows.
 
+`SafetyEventType` now models the pinned behavior-label schema: eleven historical case names are removed, and `NEAR_COLLISION->value` changes from `nearCollision` to the upstream `nearCollison` spelling. Search all twelve historical values under `MIG-08`, including persisted strings, enum casts, queues, caches, validation rules, and serialized fixtures.
+
 #### Replace removed DTO helpers
 
 The staged-v2 contract reconciliation removed **17 public helpers** whose source fields are absent, renamed, semantically different, or owned by another endpoint. They are not restored by the additive helper wave.
 
-| DTO | Removed helpers | Migration |
-|---|---|---|
-| `EquipmentLocation` | `getFormattedAddress()`, `getReverseGeoLocation()` | Location snapshots have no address fields. For equipment stats GPS, use `EquipmentStats::getGps()` and then `EquipmentGpsLocation::getAddressName()` or `getReverseGeoLocation()`. No formatted-address equivalent exists because the stats address shape is `{id,name}`. |
-| `Route` | `getDistanceKilometers()`, `getDistanceMiles()`, `getDurationHours()`, `getDurationMinutes()`, `isEdited()`, `isPinned()` | The current `/fleet/routes` row lacks those fields. Use the new actual/planned distance helpers on each `RouteStop`; there is no current duration, edited, or pinned replacement. |
-| `RouteStop` | `hasHubLocation()` | The current stop payload has no `hubLocationId`; use `hasSingleUseLocation()` only when that documented object is relevant. |
-| `Trip` | `getDistanceKilometers()`, `getDistanceMiles()`, `getDrivingTimeHours()`, `getDrivingTimeMinutes()` | The current `/trips/stream` row has no distance or driving-duration field. Use `isCompleted()` / `isInProgress()` only for documented state checks; derive telemetry elsewhere if the application needs distance. |
-| `User` | `isAdmin()`, `isDriver()` | `authType` now means `default` or `saml`, not authorization. Use `getRoleIds()` and inspect role assignments; use the Drivers resource for driver records. |
-| `Webhook` | `isActive()`, `isPaused()` | Current webhook responses have no status field. Remove these checks or derive lifecycle state in application-owned data. |
+| DTO                 | Removed helpers                                                                                                           | Migration                                                                                                                                                                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EquipmentLocation` | `getFormattedAddress()`, `getReverseGeoLocation()`                                                                        | Location snapshots have no address fields. For equipment stats GPS, use `EquipmentStats::getGps()` and then `EquipmentGpsLocation::getAddressName()` or `getReverseGeoLocation()`. No formatted-address equivalent exists because the stats address shape is `{id,name}`. |
+| `Route`             | `getDistanceKilometers()`, `getDistanceMiles()`, `getDurationHours()`, `getDurationMinutes()`, `isEdited()`, `isPinned()` | The current `/fleet/routes` row lacks those fields. Use the new actual/planned distance helpers on each `RouteStop`; there is no current duration, edited, or pinned replacement.                                                                                         |
+| `RouteStop`         | `hasHubLocation()`                                                                                                        | The current stop payload has no `hubLocationId`; use `hasSingleUseLocation()` only when that documented object is relevant.                                                                                                                                               |
+| `Trip`              | `getDistanceKilometers()`, `getDistanceMiles()`, `getDrivingTimeHours()`, `getDrivingTimeMinutes()`                       | The current `/trips/stream` row has no distance or driving-duration field. Use `isCompleted()` / `isInProgress()` only for documented state checks; derive telemetry elsewhere if the application needs distance.                                                         |
+| `User`              | `isAdmin()`, `isDriver()`                                                                                                 | `authType` now means `default` or `saml`, not authorization. Use `getRoleIds()` and inspect role assignments; use the Drivers resource for driver records.                                                                                                                |
+| `Webhook`           | `isActive()`, `isPaused()`                                                                                                | Current webhook responses have no status field. Remove these checks or derive lifecycle state in application-owned data.                                                                                                                                                  |
 
 `EquipmentStats::getGps()` now returns `?EquipmentGpsLocation` instead of `?EquipmentLocation`. Update concrete type declarations and imports. The split is required because stats GPS uses `headingDegrees`, `speedMilesPerHour`, `address`, and `reverseGeo`, while equipment location snapshots use `heading` and `speed` and contain no address data.
 
@@ -37,28 +39,95 @@ The staged-v2 contract reconciliation removed **17 public helpers** whose source
 
 These entities extend an open fluent data object, so the following are payload/schema migrations rather than declared PHP-property removals. Update array projections, serializers, fixtures, and direct dynamic-field reads.
 
-| DTO | Old fields or assumptions | Current replacement |
-|---|---|---|
-| `AlertConfiguration` | `description`, `enabled`, `notificationSettings`, `tagIds`, legacy `alertType` | Use `isEnabled` plus current `actions`, `externalIds`, `operationalSettings`, `scope`, and `triggers`. Current responses have no `alertType`; do not use the four legacy type helpers. |
-| `AlertIncident` | `id`, `alertConfigurationId`, `triggeredAtTime`, flat driver/vehicle/location, string status | Use `configurationId`, `happenedAtTime`, `conditions`, `incidentUrl`, `isResolved`, and resolution/update timestamps. |
-| `EquipmentLocation` | `headingDegrees`, `speedMilesPerHour`, `address`, `reverseGeo` | Use snapshot fields `heading` and `speed`; address and reverse geocode belong only to `EquipmentGpsLocation`. |
-| `FormSubmission` | `formTemplateId`, `driver`, `vehicle`, `draft` / `submitted` status | Use nested `formTemplate`, `asset`, assignment/submission objects, and the seven current status values documented on the Forms page. |
-| `FormTemplate` | `name`, numeric `revision`, `fieldDefinitions` | Use `title`, `revisionId`, and `fields`, plus current sections and approval metadata. |
-| `LiveShare` | flat `url`, `status`, `expiresAt`, `createdAtTime`, `assets`, `recipients` | Use `liveSharingUrl`, `expiresAtTime`, and the current nested configuration objects. |
-| `Route` | type/hub/plan/dispatch IDs, cost, route distance/duration, edited/pinned flags, legacy timestamps/quantities | Use current route identity, notes, timezone, scheduled/actual route timestamps, driver/vehicle, external IDs, tags, stops, links, and settings. |
-| `Trip` | `startTime`, `endTime`, `distanceMeters`, `drivingTimeMs`, `driver`, `vehicle` | Use `tripStartTime`, `tripEndTime`, `completionStatus`, timestamps, `asset`, and start/end locations. |
-| `User` | flat role IDs, `tagIds`, user timestamps, role meaning inferred from `authType` | Use nested `roles[*].role`, optional role tag/expiry, and `authType` only for `default` / `saml` authentication. |
-| `Webhook` | `secret`, `status`, creation/update timestamps | Use `secretKey`, `version`, event types, and current header/name fields. |
-| `Asset` | `serial`, `assetType` | Use `serialNumber` and `type`. |
-| `Defect` | `defectType` | Use `defectTypeId` and `defectSafetyStatus`. |
-| `HosViolation` | `day.date`, `day.timezone` | Use nullable `day.startTime` and `day.endTime`. |
-| `DataPoint` | numeric-only `float|null` value | Treat `value` as `mixed` and validate/cast it for the selected input before arithmetic or serialization. |
-| `GpsLocation` | integer-only `headingDegrees` | Accept nullable `float` and test fractional headings. |
-| `RouteStop` | `hubLocationId` and the narrow legacy shape | Use current stop state, addresses, windows, documents/forms/issues, times/distances/orders, and `singleUseLocation`; there is no hub-location field. |
-| `Trailer` | `assetSerialNumber` | Use `trailerSerialNumber`. |
-| `Vehicle` | scalar `grossVehicleWeight` | Treat `grossVehicleWeight` as the current structured response value; list responses expose their own vehicle-weight fields. |
+| DTO                  | Old fields or assumptions                                                                                                  | Current replacement                                                                                                                                                                    |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AlertConfiguration` | `description`, `enabled`, `notificationSettings`, `tagIds`, legacy `alertType`                                             | Use `isEnabled` plus current `actions`, `externalIds`, `operationalSettings`, `scope`, and `triggers`. Current responses have no `alertType`; do not use the four legacy type helpers. |
+| `AlertIncident`      | `id`, `alertConfigurationId`, `triggeredAtTime`, flat driver/vehicle/location, string status                               | Use `configurationId`, `happenedAtTime`, `conditions`, `incidentUrl`, `isResolved`, and resolution/update timestamps.                                                                  |
+| `EquipmentLocation`  | `headingDegrees`, `speedMilesPerHour`, `address`, `reverseGeo`                                                             | Use snapshot fields `heading` and `speed`; address and reverse geocode belong only to `EquipmentGpsLocation`.                                                                          |
+| `AssetLocation`      | flat `latitude`, `longitude`, `headingDegrees`, `speedMilesPerHour`, `time`, and `address`                                 | Use nested `location` and `speed`, plus `happenedAtTime`. The nested `asset` shape now uses `id` and optional `externalIds`.                                                           |
+| `Document`           | `documentTypeId`, `documentTypeUid`, `submittedAtUtc`; `pending` / `approved` / `rejected` state values                    | Use nested `documentType`; current states are `submitted`, `required`, or `archived`. Current rows can also expose conditional sections, route, and route-stop data.                   |
+| `DocumentType`       | `uid`, `isDriverEditable`, `requireDriverSignature`, `fieldDefinitions`, `conditionSets`; string `orgId`                   | Use `conditionalFieldSections` and `fieldTypes`; treat `orgId` as an integer.                                                                                                          |
+| `Attribute`          | generic entity/type descriptions and legacy `{id,value}` rows                                                              | Entity type is `driver` or `asset`; use current attribute types and `numberValues`, `stringValues`, `unit`, or `{id,stringValue}` value rows.                                          |
+| `AttributeValue`     | `attributeId`, `value`                                                                                                     | Use `stringValue`. `numberValue` remains only as a deprecated compatibility property and is not returned by the current API.                                                           |
+| `FormSubmission`     | `formTemplateId`, `driver`, `vehicle`, `draft` / `submitted` status                                                        | Use nested `formTemplate`, `asset`, assignment/submission objects, and the seven current status values documented on the Forms page.                                                   |
+| `FormTemplate`       | `name`, numeric `revision`, `fieldDefinitions`                                                                             | Use `title`, `revisionId`, and `fields`, plus current sections and approval metadata.                                                                                                  |
+| `LiveShare`          | flat `url`, `status`, `expiresAt`, `createdAtTime`, `assets`, `recipients`                                                 | Use `liveSharingUrl`, `expiresAtTime`, and the current nested configuration objects.                                                                                                   |
+| `Route`              | type/hub/plan/dispatch IDs, cost, route distance/duration, edited/pinned flags, legacy timestamps/quantities               | Use current route identity, notes, timezone, scheduled/actual route timestamps, driver/vehicle, external IDs, tags, stops, links, and settings.                                        |
+| `Trip`               | `startTime`, `endTime`, `distanceMeters`, `drivingTimeMs`, `driver`, `vehicle`                                             | Use `tripStartTime`, `tripEndTime`, `completionStatus`, timestamps, `asset`, and start/end locations.                                                                                  |
+| `User`               | flat role IDs, `tagIds`, user timestamps, role meaning inferred from `authType`                                            | Use nested `roles[*].role`, optional role tag/expiry, and `authType` only for `default` / `saml` authentication.                                                                       |
+| `Webhook`            | `secret`, `status`, creation/update timestamps                                                                             | Use `secretKey`, `version`, event types, and current header/name fields.                                                                                                               |
+| `ServiceTask`        | `estimatedLaborHours`, `estimatedPartsCostUsd`, `actualLaborHours`, `actualPartsCostUsd`, `createdAtTime`, `updatedAtTime` | Use `estimatedLaborTimeMinutes`, structured `estimatedPartsCost`, `category`, and `subcategory`. The current service-task row has no actual-cost/time or timestamp replacements.       |
+| `DefectType`         | `name`                                                                                                                     | Use `label`; current rows also expose `sectionType`, `severity`, and `createdAtTime`.                                                                                                  |
+| `Organization`       | `address`, `settings`, and legacy carrier-setting shape                                                                    | Use the current `carrierSettings` shape (`carrierName`, integer `dotNumber`, and `mainOfficeAddress`). No general organization address/settings replacement exists in this row.        |
+| `UserRole`           | `description`, `permissions`                                                                                               | Current role rows expose only `id` and `name`.                                                                                                                                         |
+| `VisionCamera`       | `id`, `serialNo`, `streamingUrl`                                                                                           | Use integer `cameraId`, `cameraName`, `ethernetIp`, and `wifiIp`.                                                                                                                      |
+| `VisionRun`          | string `id`, `startTime`, `endTime`, string `programId`                                                                    | Use `cameraId` or `deviceId`, millisecond `startedAtMs` / `endedAtMs`, integer `programId`, and current program/summary/result objects.                                                |
+| `IndustrialAsset`    | `dataInputs`                                                                                                               | Use current `dataOutputs`, `locationDataInput`, `runningStatusDataInput`, parent/custom metadata, and running/location fields.                                                         |
+| `Asset`              | `serial`, `assetType`, `purchasePrice`, `gateway`, and `location`                                                          | Use `serialNumber` and `type`. The removed price/gateway/location fields have no current replacement on this row.                                                                      |
+| `Defect`             | `defectType`, `mechanicNotesUpdatedAtTime`                                                                                 | Use `defectTypeId` and `defectSafetyStatus`; the current row uses `updatedAtTime` for its last update.                                                                                 |
+| `HosViolation`       | `day.date`, `day.timezone`                                                                                                 | Use nullable `day.startTime` and `day.endTime`.                                                                                                                                        |
+| `DataPoint`          | numeric-only `float\|null` value and nested `dataInput`                                                                                                                                  | Treat `value` as `mixed` and validate/cast it for the selected input before arithmetic or serialization. Current rows expose optional `fftSpectra` and `gpsLocation`; they no longer include `dataInput`. |
+| `GpsLocation`        | integer-only `headingDegrees`                                                                                              | Accept nullable `float` and test fractional headings.                                                                                                                                  |
+| `RouteStop`          | `hubLocationId` and the narrow legacy shape                                                                                | Use current stop state, addresses, windows, documents/forms/issues, times/distances/orders, and `singleUseLocation`; there is no hub-location field.                                   |
+| `Trailer`            | `assetSerialNumber`                                                                                                        | Use `trailerSerialNumber`.                                                                                                                                                             |
+| `Vehicle`            | scalar `grossVehicleWeight`                                                                                                | Treat `grossVehicleWeight` as the current structured response value; list responses expose their own vehicle-weight fields.                                                            |
+
+Applications that copied or extended the package's 13 shipped response fixtures
+must migrate their fixture records too. The exact address, driver, DVIR,
+equipment, HOS, route, safety-event, trailer, user, vehicle-stat, vehicle,
+webhook, and tag replacements are listed under `MIG-08` in the canonical
+upgrade guide. Re-run consumer factories, snapshots, serializers, and HTTP-fake
+assertions after replacing those shapes.
 
 ### Required core migrations
+
+#### Rename the request-attempt configuration
+
+- Replace the `retry` config key with `attempts` and `SAMSARA_RETRY` with `SAMSARA_ATTEMPTS`.
+- `attempts` is the maximum total request count, including the initial request. `1` makes one request without retries; `3` permits the initial request plus up to two retries.
+- Values below `1` now throw `InvalidArgumentException` during client construction instead of reaching the HTTP client as an invalid retry configuration.
+- Update published config files, deployment variables, secret/config stores, test overrides, and calls to `getConfig('retry')`.
+
+#### Bound synchronous rate-limit waits and validate collection envelopes
+
+- Add `retry_after_max_seconds` / `SAMSARA_RETRY_AFTER_MAX_SECONDS` to published configuration. The default ceiling is 30 seconds.
+- A 429 whose `Retry-After` exceeds the ceiling is no longer retried inside the current process; the SDK throws `RateLimitException` immediately so the caller can reschedule work. Smaller delta-seconds and HTTP-date delays remain honored.
+- Successful collection reads now require the selected response key to contain a JSON list. Missing collection keys still produce an empty collection; present null/scalar/object values and non-JSON successful bodies throw `SamsaraException` instead of leaking `TypeError`, emitting warnings, hydrating an envelope, or silently looking empty.
+- Review response fakes and exception handling under `MIG-21`.
+
+#### Use Laravel's shared HTTP factory for the container binding
+
+- The package binding now resolves `Illuminate\\Http\\Client\\Factory` from Laravel and injects it into the SDK client. `Http::fake()`, `Http::preventStrayRequests()`, global middleware, and global options now cover container/facade-resolved Samsara traffic.
+- Standalone `new Samsara(...)` remains supported and creates its own factory when none is injected. Tests for standalone clients may pass an optional third constructor argument or call `setHttpFactory()`.
+- Review custom HTTP instrumentation and fakes under `MIG-22`; remove duplicate SDK-only factory setup where Laravel's shared factory is intended.
+
+#### Isolate tenant credentials and lifecycle state
+
+- `withToken()` now returns an isolated clone with an empty resource cache instead of mutating the current client. Retain or chain its return value; a standalone `Samsara::withToken($token);` statement no longer changes later facade calls.
+- The Laravel binding is scoped instead of process-wide singleton state, so Octane requests and queue-job lifecycles receive fresh clients.
+- `withoutToken()` returns an isolated tokenless clone. `Samsara::make()` inherits the configured region and request settings unless explicitly overridden.
+- Review multi-tenant middleware and jobs under `MIG-23`; every tenant execution path must supply its own credentials and region.
+
+#### Harden webhook rejection behavior
+
+- Invalid, missing-header, expired, and future-dated webhook requests now render HTTP 401 through Laravel instead of surfacing as HTTP 500 or accepting a future timestamp.
+- `InvalidSignatureException` context no longer contains the valid expected signature; it retains only attacker-supplied received data where applicable.
+- The documented `samsara.webhook` alias is registered. Webhook handlers must remain idempotent because a valid request can still be replayed inside the accepted timestamp window.
+- Update feature tests and exception-context logging under `MIG-24`.
+
+#### Update legacy v1 verbs and message semantics
+
+- `assetLocations()`, `assetReefers()`, `fleetAssets()`, `hosAuthenticationLogs()`, `maintenanceList()`, `trips()`, and `visionCameras()` now use their pinned GET operations instead of POST.
+- `messages()` now means GET/read. Replace calls that used it to send with `sendMessage()`, which owns `POST /v1/fleet/messages`.
+- `dispatchRoutes()` is removed because its collection path is absent from the pinned contract; only an unrelated item DELETE exists.
+- Update HTTP fakes, proxy rules, and calls under `MIG-25`.
+
+#### Stage exact SamsaraFake request paths
+
+- `SamsaraFake` always prevents stray requests and no longer supplies a zero-stub fallback response.
+- Fake helpers and `fakeResponse()` match an exact URL path while ignoring query parameters. A collection path no longer covers item or subresource paths; suffixes from unrelated endpoints cannot collide.
+- `assertRequested()` and `assertRequestedWithParams()` use the same exact-path rule, and adding a later fake no longer erases already recorded requests.
+- Update tests under the expanded `MIG-18` guidance.
 
 #### Catch SDK exceptions for every wrapped request
 
@@ -78,11 +147,11 @@ These entities extend an open fluent data object, so the following are payload/s
 
 These are current-contract audits for pass-through arrays, not new PHP signature changes. The calls continue to compile with stale keys, but the API does not accept the old shapes:
 
-| Operation | Stale assumption | Current contract |
-|---|---|---|
-| Live Share create | flat `assets`, `recipients`, `expiresAt` | required `name`, `type`, the matching nested link-config object, and optional `expiresAtTime` |
-| DVIR create | nested `vehicle`, `preTrip`, client timestamps/defect rows | required `authorId`, `safetyStatus`, `type: mechanic`, and either `vehicleId` or `trailerId` |
-| Work Order create | `vehicleId`, `serviceTasks[*].id` | `assetId`, `serviceTaskInstances[*].serviceTaskId`, and a current title-cased task status |
+| Operation         | Stale assumption                                           | Current contract                                                                              |
+| ----------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Live Share create | flat `assets`, `recipients`, `expiresAt`                   | required `name`, `type`, the matching nested link-config object, and optional `expiresAtTime` |
+| DVIR create       | nested `vehicle`, `preTrip`, client timestamps/defect rows | required `authorId`, `safetyStatus`, `type: mechanic`, and either `vehicleId` or `trailerId`  |
+| Work Order create | `vehicleId`, `serviceTasks[*].id`                          | `assetId`, `serviceTaskInstances[*].serviceTaskId`, and a current title-cased task status     |
 
 Revalidate read filters too: Trips requires `startTime` and comma-separated asset `ids`; Idling requires both timestamps; Issues and Work Order streams require `startTime`; Speeding requires `assetIds` and `startTime`; assignment feeds require `filterBy` or `driverIds` as documented; HOS daily logs use date keys. The shared Builder does not validate endpoint parameters. On no-limit operations, `first()` and `lazy($chunkSize)` add an undocumented `limit`; use `get()->first()` or `lazy()`.
 
@@ -91,12 +160,14 @@ Revalidate read filters too: Trips requires `startTime` and comma-separated asse
 - `types`, `expand`, `withDecorations`, `whereAttribute`, `whereDriver`, `whereParentTag`, `whereTag`, and `whereVehicle` encode arrays as comma-separated values.
 - Resource-declared form/`explode=true` arrays encode as repeated keys.
 - Arbitrary arrays passed to `where()` retain Laravel's standard encoding.
+- Top-level boolean query values now encode as `true` / `false`, not `1` / `0`.
 - A scalar passed to `whereAttribute`, `whereDriver`, `whereParentTag`, `whereTag`, or `whereVehicle` now produces a scalar value such as `driverIds=d1`, not v1's one-element bracket array.
 - Update URL assertions, caches, signatures, and hand-built workarounds. Keep passing logical arrays to dedicated helpers.
 
 Repeated-key parameters now include:
 
 - Vehicle list `attributes`.
+- Asset list `attributes` and asset-depreciation `assetIds`.
 - Alert configuration `ids` and incident `configurationIds`.
 - Camera Media `inputs`, `mediaTypes`, and `triggerReasons`.
 - DVIR `safetyStatus`.
@@ -119,14 +190,14 @@ Canadian organizations may set `SAMSARA_REGION=ca` or call `useCanadaEndpoint()`
 
 #### Drivers
 
-| Old call/assumption | Required replacement |
-|---|---|
+| Old call/assumption               | Required replacement                                                                                                                                                                                                                                              |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `createAuthToken(string): string` | `createAuthToken(array): DriverAuthToken`; send required 12+ character `code` plus one of integer `driverId`, `externalId`, or `username`, then read `$result->token` and `$result->expirationTime`. Do not confuse this production body with Preview's `id` key. |
-| Untyped QR create | `createQrCode(array): DriverQrCode`. |
-| `getQrCodes()` with no IDs | `getQrCodes(array|string $driverIds): EntityCollection<DriverQrCode>`. |
-| `deleteQrCode(string $qrCodeId)` | `deleteQrCode(int $driverId): bool`; the ID is sent in the DELETE body. |
-| Untyped/item-path remote sign-out | `remoteSignOut(string $driverId): DriverRemoteSignOutResult`. |
-| `drivers()->delete($id)` | No supported driver-delete operation; remove the call. |
+| Untyped QR create                 | `createQrCode(array): DriverQrCode`.                                                                                                                                                                                                                              |
+| `getQrCodes()` with no IDs        | `getQrCodes(array\|string $driverIds): EntityCollection<DriverQrCode>`.                                                                                                                                                                                                                                                         |
+| `deleteQrCode(string $qrCodeId)`  | `deleteQrCode(int $driverId): bool`; the ID is sent in the DELETE body.                                                                                                                                                                                           |
+| Untyped/item-path remote sign-out | `remoteSignOut(string $driverId): DriverRemoteSignOutResult`.                                                                                                                                                                                                     |
+| `drivers()->delete($id)`          | No supported driver-delete operation; remove the call.                                                                                                                                                                                                            |
 
 Driver auth uses `POST /fleet/drivers/auth-token`; QR operations use `/drivers/qr-codes`; remote sign-out uses `POST /fleet/drivers/remote-sign-out`.
 
@@ -141,48 +212,48 @@ Driver auth uses `POST /fleet/drivers/auth-token`; QR operations use `/drivers/q
 
 #### Fleet telemetry DTOs
 
-| Operation | Result class |
-|---|---|
-| Equipment location snapshot | `EquipmentLocationResult` |
+| Operation                       | Result class              |
+| ------------------------------- | ------------------------- |
+| Equipment location snapshot     | `EquipmentLocationResult` |
 | Equipment location feed/history | `EquipmentLocationSeries` |
-| Equipment stats snapshot | `EquipmentStats` |
-| Equipment stats feed/history | `EquipmentStatsSeries` |
-| Vehicle location snapshot | `VehicleLocationResult` |
-| Vehicle location feed/history | `VehicleLocationSeries` |
-| Vehicle stats snapshot | `VehicleStats` |
-| Vehicle stats feed/history | `VehicleStatsSeries` |
-| Route audit-log feed | `RouteAuditLog` |
+| Equipment stats snapshot        | `EquipmentStats`          |
+| Equipment stats feed/history    | `EquipmentStatsSeries`    |
+| Vehicle location snapshot       | `VehicleLocationResult`   |
+| Vehicle location feed/history   | `VehicleLocationSeries`   |
+| Vehicle stats snapshot          | `VehicleStats`            |
+| Vehicle stats feed/history      | `VehicleStatsSeries`      |
+| Route audit-log feed            | `RouteAuditLog`           |
 
 Trailer DTOs expose `trailerSerialNumber`. Vehicle DTOs expose list fields `vehicleWeight`, `vehicleWeightInKilograms`, and `vehicleWeightInPounds` plus item field `grossVehicleWeight`. Rename consumer projections accordingly.
 
 ### Safety and operations migrations
 
-| Old call/assumption | Required replacement |
-|---|---|
-| `deleteConfigurations(array $ids)` | Call `deleteConfigurations(string $id)` once per ID. |
-| Camera `get()` returned mapped rows | Call `get(array $parameters): array` and read the preserved `data` and `pagination` envelope. |
-| Camera retrieval used `cameraSerial` / `eventId`, response `id`, or top-level `completed` / `url` | Send required `vehicleId`, `startTime`, `endTime`, and `mediaType`; poll with `retrievalId`; inspect each `media[*].status` and read `media[*].urlInfo.url` only when `available`. |
-| `forms()->exportPdf(array)` | `exportPdf(string $submissionId): array`. |
-| `forms()->templates()` returned a collection/parent DTO | Add a terminal call; it is now `Builder<FormTemplate>`. |
-| `workOrders()->serviceTasks()` returned parent DTOs | It is now `Builder<ServiceTask>`. |
-| `trailerAssignments()->forTrailer(string)` | `forTrailer(int $trailerId, array $params = []): Trailer`. |
-| HOS rows were treated as `HosLog` everywhere | Use `HosLogsForDriver`, `HosClocksForDriver`, `HosDailyLog`, and `HosViolationGroup`; unwrap with their typed helpers. |
-| Safety audit-log rows were `SafetyEvent` | Use `SafetyEventActivity::getSafetyEvent()` for the nested event. |
-| Alert fields `enabled` or string incident status | Use boolean `isEnabled` and `isResolved`. |
-| `AlertIncident::isTriggered()` / `isDismissed()` | Current incidents have no legacy string status. Use `isResolved()` only for actual resolution checks; otherwise inspect conditions or application-owned state. |
-| Alert create/update used flat `type`, `threshold`, or `tagIds` | Create with current required `actions`, `isEnabled`, `name`, `scope`, and `triggers`; update with current configuration fields and collection-body `id`. |
-| Alert incidents were read without bounded configuration filters | Every `/alerts/incidents/stream` read requires `startTime` plus one to 50 repeated `configurationIds`; `endTime` and `after` are optional. |
-| Form submission create used flat `formTemplateId`, `driverId`, or generic `{id,value}` fields | Send required `formTemplate: {id,...}` and `status: notStarted`; use `assignedTo: {id,type}` and `{id,type,<type>Value}` field objects. |
-| Form submissions used a bare GET or generic driver/tag filters | Supply required comma-separated `ids` (and optional comma-separated `include`) or use the time-bounded submissions stream. |
-| Form PDF polling used `$export['id']`, `status`, or `url` | Poll `getPdfExport($export['pdfId'])`; read `jobStatus` and `pdfUrl` when `jobStatus === 'done'`. |
-| Fuel report windows used `startTime`/`endTime` | Reports use `startDate`/`endDate`; efficiency streams continue to use `startTime`/`endTime`. |
+| Old call/assumption                                                                                | Required replacement                                                                                                                                                                                                                                            |
+| -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `deleteConfigurations(array $ids)`                                                                 | Call `deleteConfigurations(string $id)` once per ID.                                                                                                                                                                                                            |
+| Camera `get()` returned mapped rows                                                                | Call `get(array $parameters): array` and read the preserved `data` and `pagination` envelope.                                                                                                                                                                   |
+| Camera retrieval used `cameraSerial` / `eventId`, response `id`, or top-level `completed` / `url`  | Send required `vehicleId`, `startTime`, `endTime`, and `mediaType`; poll with `retrievalId`; inspect each `media[*].status` and read `media[*].urlInfo.url` only when `available`.                                                                              |
+| `forms()->exportPdf(array)`                                                                        | `exportPdf(string $submissionId): array`.                                                                                                                                                                                                                       |
+| `forms()->templates()` returned a collection/parent DTO                                            | Add a terminal call; it is now `Builder<FormTemplate>`.                                                                                                                                                                                                         |
+| `workOrders()->serviceTasks()` returned parent DTOs                                                | It is now `Builder<ServiceTask>`.                                                                                                                                                                                                                               |
+| `trailerAssignments()->forTrailer(string)`                                                         | `forTrailer(int $trailerId, array $params = []): Trailer`.                                                                                                                                                                                                      |
+| HOS rows were treated as `HosLog` everywhere                                                       | Use `HosLogsForDriver`, `HosClocksForDriver`, `HosDailyLog`, and `HosViolationGroup`; unwrap with their typed helpers.                                                                                                                                          |
+| Safety audit-log rows were `SafetyEvent`                                                           | Use `SafetyEventActivity::getSafetyEvent()` for the nested event.                                                                                                                                                                                               |
+| Alert fields `enabled` or string incident status                                                   | Use boolean `isEnabled` and `isResolved`.                                                                                                                                                                                                                       |
+| `AlertIncident::isTriggered()` / `isDismissed()`                                                   | Current incidents have no legacy string status. Use `isResolved()` only for actual resolution checks; otherwise inspect conditions or application-owned state.                                                                                                  |
+| Alert create/update used flat `type`, `threshold`, or `tagIds`                                     | Create with current required `actions`, `isEnabled`, `name`, `scope`, and `triggers`; update with current configuration fields and collection-body `id`.                                                                                                        |
+| Alert incidents were read without bounded configuration filters                                    | Every `/alerts/incidents/stream` read requires `startTime` plus one to 50 repeated `configurationIds`; `endTime` and `after` are optional.                                                                                                                      |
+| Form submission create used flat `formTemplateId`, `driverId`, or generic `{id,value}` fields      | Send required `formTemplate: {id,...}` and `status: notStarted`; use `assignedTo: {id,type}` and `{id,type,<type>Value}` field objects.                                                                                                                         |
+| Form submissions used a bare GET or generic driver/tag filters                                     | Supply required comma-separated `ids` (and optional comma-separated `include`) or use the time-bounded submissions stream.                                                                                                                                      |
+| Form PDF polling used `$export['id']`, `status`, or `url`                                          | Poll `getPdfExport($export['pdfId'])`; read `jobStatus` and `pdfUrl` when `jobStatus === 'done'`.                                                                                                                                                               |
+| Fuel report windows used `startTime`/`endTime`                                                     | Reports use `startDate`/`endDate`; efficiency streams continue to use `startTime`/`endTime`.                                                                                                                                                                    |
 | Fuel purchase used gallon, scalar-price, total, purchase-time, flat location, or `fuelType` fields | Convert gallons to the required `fuelQuantityLiters` string; use `transactionLocation`, total `{amount,currency}` `transactionPrice`, `transactionReference`, and `transactionTime`; map fuel classification to current `iftaFuelType` values such as `Diesel`. |
-| IFTA detail export used quarter examples | Use `startHour`/`endHour`, split every range into jobs of at most one month, and combine the output files; jurisdiction/vehicle reports retain their own report parameters. |
-| IFTA detail polling used `id`, lowercase `status`, or a flat `downloadUrl` | Poll with `jobId`, compare case-sensitive `jobStatus`, and read each completed output from `files[*].downloadUrl`. |
+| IFTA detail export used quarter examples                                                           | Use `startHour`/`endHour`, split every range into jobs of at most one month, and combine the output files; jurisdiction/vehicle reports retain their own report parameters.                                                                                     |
+| IFTA detail polling used `id`, lowercase `status`, or a flat `downloadUrl`                         | Poll with `jobId`, compare case-sensitive `jobStatus`, and read each completed output from `files[*].downloadUrl`.                                                                                                                                              |
 
-Maintenance generic CRUD is no longer callable. `createDvir()` posts to `/fleet/dvirs`; `dvirs()` and `defects()` return builders, with `Defect` selected for defect rows. The official `PATCH /fleet/dvirs/{id}` operation is not yet implemented.
+Maintenance generic CRUD is no longer callable. `createDvir()` posts to `/fleet/dvirs`; `dvirs()` and `defects()` return builders, with `Defect` selected for defect rows. Use `findDvir()`, `resolveDvir()`, `findDefect()`, `updateDefect()`, and `defectTypes()` for the dedicated current operations.
 
-Work Orders supports generic `all` and `create` only. Query by repeated `ids`; generic `find`, `update`, and `delete` are rejected because the official mutations use collection-style identifiers not exposed by those signatures.
+Work Orders supports generic `all` and `create` only. Query by repeated `ids`; generic `find`, `update`, and `delete` remain rejected because their inherited signatures do not match the collection contract. Use `updateWorkOrder()` and `deleteWorkOrder()` for the dedicated collection mutations.
 
 The package still implements legacy `/fleet/safety-events` and its audit feed. The modern `/safety-events` family is deferred; do not change production paths until the SDK exposes and documents that additive replacement.
 
@@ -198,13 +269,13 @@ The package still implements legacy `/fleet/safety-events` and its audit feed. T
 
 #### Beta helpers
 
-| Old behavior | Required replacement |
-|---|---|
-| AEMP returned `Builder` | `aempFleet(string $pageNumber): array`; handle the raw Fleet wrapper. |
-| Flat industrial job body/item path | Nest under `job`; update/delete use `/beta/industrial/jobs?id={id}`. |
-| Industrial job delete returned `bool` | Handle the returned response `array`. |
-| Reading create accepted a flat payload/returned response data | Pass a top-level `data` envelope; handle `bool`. |
-| Immediate device/type/definition/config/course collections | `devices`, `qualificationsTypes`, `readingsDefinitions`, `reportsConfigs`, and `trainingCourses` return `Builder`; add `get`, `paginate`, or `lazy`. |
+| Old behavior                                                  | Required replacement                                                                                                                                 |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AEMP returned `Builder`                                       | `aempFleet(string $pageNumber): array`; handle the raw Fleet wrapper.                                                                                |
+| Flat industrial job body/item path                            | Nest under `job`; update/delete use `/beta/industrial/jobs?id={id}`.                                                                                 |
+| Industrial job delete returned `bool`                         | Handle the returned response `array`.                                                                                                                |
+| Reading create accepted a flat payload/returned response data | Pass a top-level `data` envelope; handle `bool`.                                                                                                     |
+| Immediate device/type/definition/config/course collections    | `devices`, `qualificationsTypes`, `readingsDefinitions`, `reportsConfigs`, and `trainingCourses` return `Builder`; add `get`, `paginate`, or `lazy`. |
 
 Qualification, training, HOS ELD-event, and industrial-job helpers now use their current documented paths. Update exact-path HTTP fakes.
 
@@ -226,7 +297,7 @@ Unsupported inherited operations now fail locally. Audit every consumer call to 
 
 ### Deferred official-only operations
 
-Operations present only in the 2026-08-10 first-party contract remain additive backlog, not implemented behavior. This includes the modern Safety Events family, `PATCH /fleet/dvirs/{id}`, unwrapped collection mutations not represented by explicit SDK methods, and additional Beta/Preview operations. No consumer migration is required until a later release explicitly adds one.
+Operations present only in the 2026-08-10 first-party contract remain additive backlog, not implemented behavior. This includes the modern Safety Events family, Attributes, Documents, coaching-session operations, training-assignment mutations, and additional Beta/Preview operations. No consumer migration is required until a later release explicitly adds one.
 
 ## 1.1.0 — 2026-05-07
 

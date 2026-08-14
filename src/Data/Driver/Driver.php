@@ -49,7 +49,7 @@ use Samsara\Enums\DriverActivationStatus;
  * @property-read array{id?: string, name?: string}|null $peerGroupTag Peer group tag
  * @property-read array{id?: string, name?: string}|null $trailerGroupTag Trailer group tag
  * @property-read array{id?: string, name?: string}|null $vehicleGroupTag Vehicle group tag
- * @property-read string|null $usDriverRulesetOverride US driver ruleset override
+ * @property-read array{cycle: string, restart: string, restbreak: string, usStateToOverride: string}|null $usDriverRulesetOverride US driver ruleset override
  */
 class Driver extends Entity
 {

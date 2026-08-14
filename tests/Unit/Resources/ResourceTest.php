@@ -12,6 +12,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Exceptions\ServerException;
+use Samsara\Exceptions\SamsaraException;
 use Illuminate\Http\Client\PendingRequest;
 use Samsara\Exceptions\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -31,13 +32,27 @@ class ResourceTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('findNotFoundAttempts')]
+    public function it_does_not_retry_find_not_found_responses(int $attempts): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->fake(['*' => $http->response(['message' => 'Not found'], 404)]);
+
+        $samsara = new Samsara('test-token', ['attempts' => $attempts]);
+        $samsara->setHttpFactory($http);
+
+        $this->assertNull((new TestResource($samsara))->find('missing'));
+        $http->assertSentCount(1);
+    }
+
+    #[Test]
     #[DataProvider('encodedPathOperations')]
     public function it_encodes_arbitrary_ids_as_one_path_segment(string $operation, string $method): void
     {
         $http = new \Illuminate\Http\Client\Factory;
         $http->fake(['*' => $http->response(['data' => ['id' => 'external/id with spaces?#']])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $resource = new TestResource($samsara);
 
@@ -57,7 +72,7 @@ class ResourceTest extends TestCase
         $http = new \Illuminate\Http\Client\Factory;
         $http->fake(['*' => $http->response(['data' => ['ok' => true]])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $response = (new TestExecutorResource($samsara))->getCustomEndpointWithRepeatedQuery();
 
@@ -99,20 +114,6 @@ class ResourceTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('findNotFoundAttempts')]
-    public function it_keeps_find_not_found_as_null_across_retry_paths(int $attempts): void
-    {
-        $http = new \Illuminate\Http\Client\Factory;
-        $http->fake(['*' => $http->response(['message' => 'Not found'], 404)]);
-
-        $samsara = new Samsara('test-token', ['retry' => $attempts]);
-        $samsara->setHttpFactory($http);
-
-        $this->assertNull((new TestResource($samsara))->find('missing'));
-        $http->assertSentCount($attempts);
-    }
-
-    #[Test]
     public function it_maps_data_to_entities_collection(): void
     {
         $samsara = new Samsara('test-token');
@@ -148,6 +149,7 @@ class ResourceTest extends TestCase
         string $operation,
         int $status,
         int $attempts,
+        int $expectedRequests,
         string $endpoint
     ): void {
         $body = [
@@ -158,7 +160,7 @@ class ResourceTest extends TestCase
         $http = new \Illuminate\Http\Client\Factory;
         $http->fake(['*' => $http->response($body, $status)]);
 
-        $samsara = new Samsara('test-token', ['retry' => $attempts]);
+        $samsara = new Samsara('test-token', ['attempts' => $attempts]);
         $samsara->setHttpFactory($http);
         $resource = new TestResource($samsara);
 
@@ -176,7 +178,7 @@ class ResourceTest extends TestCase
             $this->assertSame($status, $exception->getContext()['status']);
             $this->assertSame($endpoint, $exception->getContext()['endpoint']);
             $this->assertSame($body, $exception->getContext()['body']);
-            $http->assertSentCount($attempts);
+            $http->assertSentCount($expectedRequests);
         }
     }
 
@@ -192,7 +194,7 @@ class ResourceTest extends TestCase
             '*' => $http->response(['message' => 'Service unavailable'], 503),
         ]);
 
-        $samsara = new Samsara('test-token', ['retry' => 2]);
+        $samsara = new Samsara('test-token', ['attempts' => 2]);
         $samsara->setHttpFactory($http);
         $resource = new TestResource($samsara);
 
@@ -222,7 +224,7 @@ class ResourceTest extends TestCase
             '*' => $http->response(['message' => 'Service unavailable'], 503),
         ]);
 
-        $samsara = new Samsara('test-token', ['retry' => 2]);
+        $samsara = new Samsara('test-token', ['attempts' => 2]);
         $samsara->setHttpFactory($http);
         $resource = new TestExecutorResource($samsara);
 
@@ -232,6 +234,37 @@ class ResourceTest extends TestCase
         } catch (ServerException $exception) {
             $this->assertSame('/test-endpoint/custom', $exception->getContext()['endpoint']);
             $http->assertSentCount(2);
+        }
+    }
+
+    #[Test]
+    #[DataProvider('unexpectedSuccessfulBodies')]
+    public function it_maps_unexpected_successful_bodies_to_an_sdk_exception(
+        string $operation,
+        string $body,
+        int $status,
+        string $endpoint
+    ): void {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->fake(['*' => $http->response($body, $status)]);
+
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
+        $samsara->setHttpFactory($http);
+        $resource = new TestResource($samsara);
+
+        try {
+            match ($operation) {
+                'create' => $resource->create([]),
+                'find'   => $resource->find('entity-1'),
+                'raw'    => (new TestExecutorResource($samsara))->getDecodedCustomEndpoint(),
+            };
+
+            $this->fail('Expected a Samsara SDK exception.');
+        } catch (SamsaraException $exception) {
+            $this->assertSame($status, $exception->getCode());
+            $this->assertSame($endpoint, $exception->getContext()['endpoint']);
+            $this->assertSame($body, $exception->getContext()['body']);
+            $http->assertSentCount(1);
         }
     }
 
@@ -248,7 +281,7 @@ class ResourceTest extends TestCase
             : ['data' => ['id' => 'entity-1']];
         $http->fake(['*' => $http->response($body)]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $result = $this->executeGenericOperation(new TestResource($samsara), $operation);
 
@@ -265,6 +298,38 @@ class ResourceTest extends TestCase
         $http->assertSentCount(1);
         $http->assertSent(fn ($request) => $request->method() === $method
             && $request->url() === 'https://api.samsara.com'.$endpoint);
+    }
+
+    #[Test]
+    #[DataProvider('invalidCollectionBodies')]
+    public function it_rejects_present_non_list_collection_data(string $body): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->preventStrayRequests();
+        $http->fake([
+            '*' => $http->response($body, 200, ['Content-Type' => 'application/json']),
+        ]);
+
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
+        $samsara->setHttpFactory($http);
+
+        $this->expectException(SamsaraException::class);
+        $this->expectExceptionMessage('Expected response data to be a JSON list');
+
+        (new TestResource($samsara))->all();
+    }
+
+    #[Test]
+    public function it_returns_an_empty_collection_when_data_is_absent(): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response(['pagination' => ['hasNextPage' => false]])]);
+
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
+        $samsara->setHttpFactory($http);
+
+        $this->assertCount(0, (new TestResource($samsara))->all());
     }
 
     #[Test]
@@ -310,7 +375,7 @@ class ResourceTest extends TestCase
         $http = new \Illuminate\Http\Client\Factory;
         $http->fake(['*' => $http->response(['data' => []])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $resource = new UnsupportedGenericResource($samsara);
 
@@ -342,7 +407,7 @@ class ResourceTest extends TestCase
         $http = new \Illuminate\Http\Client\Factory;
         $http->fake(['*' => $http->response(['data' => ['id' => 'abc%2Fdef']])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
 
         (new TestResource($samsara))->find('abc%2Fdef');
@@ -403,13 +468,38 @@ class ResourceTest extends TestCase
     }
 
     /**
-     * @return array<string, array{string, int, int, string}>
+     * @return array<string, array{string}>
+     */
+    public static function invalidCollectionBodies(): array
+    {
+        return [
+            'null data'   => ['{"data":null}'],
+            'object data' => ['{"data":{"id":"entity-1"}}'],
+            'scalar data' => ['{"data":"entity-1"}'],
+        ];
+    }
+
+    /**
+     * @return array<string, array{string, string, int, string}>
+     */
+    public static function unexpectedSuccessfulBodies(): array
+    {
+        return [
+            'empty create response' => ['create', '', 201, '/test-endpoint'],
+            'html find response'    => ['find', '<html>not json</html>', 200, '/test-endpoint/entity-1'],
+            'empty raw response'    => ['raw', '', 200, '/test-endpoint/custom'],
+            'null data envelope'    => ['create', '{"data":null}', 201, '/test-endpoint'],
+        ];
+    }
+
+    /**
+     * @return array<string, array{string, int, int, int, string}>
      */
     public static function validationResponsePaths(): array
     {
         return [
-            'returned 400 response'    => ['create', 400, 1, '/test-endpoint'],
-            'post-retry 422 exception' => ['update', 422, 2, '/test-endpoint/123'],
+            'returned 400 response' => ['create', 400, 1, 1, '/test-endpoint'],
+            'returned 422 response' => ['update', 422, 2, 1, '/test-endpoint/123'],
         ];
     }
 
@@ -474,6 +564,20 @@ class TestExecutorResource extends Resource
             ],
             ['states'],
         );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getDecodedCustomEndpoint(): array
+    {
+        $endpoint = "{$this->endpoint}/custom";
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->get($endpoint),
+            $endpoint
+        );
+
+        return $this->decodeJsonArray($response, $endpoint);
     }
 }
 

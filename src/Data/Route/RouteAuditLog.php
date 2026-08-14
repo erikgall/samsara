@@ -13,6 +13,8 @@ use Samsara\Data\Entity;
  * @property-read string|null $source Change source
  * @property-read string|null $time Change time
  * @property-read string|null $type Feed item type
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class RouteAuditLog extends Entity
 {

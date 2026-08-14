@@ -13,6 +13,8 @@ use Samsara\Data\Entity;
  *
  * @property-read string|null $driverId Driver ID
  * @property-read int|null $driverScore Driver safety score (0-100)
+ * @property-read string|null $vehicleId Vehicle ID
+ * @property-read int|null $vehicleScore Vehicle safety score (0-100)
  * @property-read int|null $driveDistanceMeters Total drive distance in meters
  * @property-read int|null $driveTimeMilliseconds Total drive time in milliseconds
  * @property-read array<int, array{behaviorType: string, count: int, scoreImpact: float}>|null $behaviors Behavior aggregations
@@ -123,7 +125,7 @@ class SafetyScore extends Entity
      */
     public function getScore(): ?int
     {
-        return $this->driverScore;
+        return $this->driverScore ?? $this->vehicleScore;
     }
 
     /**
@@ -131,7 +133,9 @@ class SafetyScore extends Entity
      */
     public function isExcellent(): bool
     {
-        return $this->driverScore !== null && $this->driverScore >= self::SCORE_EXCELLENT;
+        $score = $this->getScore();
+
+        return $score !== null && $score >= self::SCORE_EXCELLENT;
     }
 
     /**
@@ -139,9 +143,11 @@ class SafetyScore extends Entity
      */
     public function isGood(): bool
     {
-        return $this->driverScore !== null
-            && $this->driverScore >= self::SCORE_GOOD
-            && $this->driverScore < self::SCORE_EXCELLENT;
+        $score = $this->getScore();
+
+        return $score !== null
+            && $score >= self::SCORE_GOOD
+            && $score < self::SCORE_EXCELLENT;
     }
 
     /**
@@ -149,6 +155,8 @@ class SafetyScore extends Entity
      */
     public function needsImprovement(): bool
     {
-        return $this->driverScore !== null && $this->driverScore < self::SCORE_GOOD;
+        $score = $this->getScore();
+
+        return $score !== null && $score < self::SCORE_GOOD;
     }
 }

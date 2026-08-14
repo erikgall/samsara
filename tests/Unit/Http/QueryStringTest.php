@@ -26,4 +26,24 @@ class QueryStringTest extends TestCase
         );
         $this->assertSame([], $query);
     }
+
+    #[Test]
+    public function it_preserves_arbitrary_arrays_and_serializes_booleans_for_openapi_queries(): void
+    {
+        [$endpoint, $query] = QueryString::prepare(
+            '/events',
+            [
+                'ids'       => ['asset-1', 'asset-2'],
+                'includeVg' => true,
+                'archived'  => false,
+            ],
+        );
+
+        $this->assertSame('/events', $endpoint);
+        $this->assertSame([
+            'ids'       => ['asset-1', 'asset-2'],
+            'includeVg' => 'true',
+            'archived'  => 'false',
+        ], $query);
+    }
 }

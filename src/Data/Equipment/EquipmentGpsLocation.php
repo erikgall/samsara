@@ -14,6 +14,8 @@ use Samsara\Data\Vehicle\GpsLocation;
  * @property-read float|null $speedMilesPerHour Speed in miles per hour
  * @property-read array{id?: string, name?: string}|null $address Matching Samsara address
  * @property-read array{formattedLocation?: string}|null $reverseGeo Reverse geocoded data
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class EquipmentGpsLocation extends GpsLocation
 {

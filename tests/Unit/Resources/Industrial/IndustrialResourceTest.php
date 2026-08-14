@@ -5,9 +5,13 @@ namespace Samsara\Tests\Unit\Resources\Industrial;
 use Samsara\Samsara;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
+use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
+use Samsara\Data\Industrial\Machine;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Industrial\DataInput;
 use Samsara\Data\Industrial\DataPoint;
+use Samsara\Data\Industrial\VisionCamera;
 use Samsara\Data\Industrial\IndustrialAsset;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Industrial\IndustrialResource;
@@ -185,6 +189,43 @@ class IndustrialResourceTest extends TestCase
                 'tagIds' => 'tag-1,tag-2',
                 'limit'  => '10',
             ]);
+    }
+
+    #[Test]
+    public function it_maps_the_legacy_machine_list_to_machine_entities(): void
+    {
+        $this->http->fake(['*' => $this->http->response([
+            'machines' => [
+                ['id' => 1, 'name' => 'Mixer'],
+                ['id' => 2, 'name' => 'Conveyor'],
+            ],
+        ])]);
+
+        $machines = (new IndustrialResource($this->samsara))->machines();
+
+        $this->assertInstanceOf(EntityCollection::class, $machines);
+        $this->assertCount(2, $machines);
+        $this->assertInstanceOf(Machine::class, $machines->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/v1/machines/list'
+            && $request->data() === []);
+    }
+
+    #[Test]
+    public function it_maps_the_legacy_vision_camera_list_to_camera_entities(): void
+    {
+        $this->http->fake(['*' => $this->http->response([
+            ['cameraId' => 1, 'cameraName' => 'Line 1'],
+            ['cameraId' => 2, 'cameraName' => 'Line 2'],
+        ])]);
+
+        $cameras = (new IndustrialResource($this->samsara))->visionCameras();
+
+        $this->assertInstanceOf(EntityCollection::class, $cameras);
+        $this->assertCount(2, $cameras);
+        $this->assertInstanceOf(VisionCamera::class, $cameras->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/v1/industrial/vision/cameras');
     }
 
     #[Test]

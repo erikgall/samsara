@@ -40,7 +40,7 @@ The retrieved OpenAPI is 3.0.1 with `info.version` `2025-10-23`, 260 paths, 372 
 | `vehicleLocations()` | [Vehicle Locations](../resources/vehicle-locations.html) | all | query/current/feed/history builders |
 | `trips()` | [Trips](../resources/trips.html) | none | stream builders only |
 | `hoursOfService()` | [Hours of Service](../resources/hours-of-service.html) | all | logs/clocks/daily logs/violations builders |
-| `maintenance()` | [Maintenance](../resources/maintenance.html) | none | `createDvir`, DVIR and defect builders |
+| `maintenance()` | [Maintenance](../resources/maintenance.html) | none | create/find/resolve DVIR helpers, defect find/update, defect types, and DVIR/defect builders |
 | `safetyEvents()` | [Safety Events](../resources/safety-events.html) | none | event and activity builders; implemented paths are upstream legacy |
 | `routes()` | [Routes](../resources/routes.html) | find, create, update, delete | collection reads use `query()->between(...)` |
 | `addresses()` | [Addresses](../resources/addresses.html) | all, find, create, update, delete | query builder also available |
@@ -56,20 +56,20 @@ The retrieved OpenAPI is 3.0.1 with `info.version` `2025-10-23`, 260 paths, 372 
 | `alerts()` | [Alerts](../resources/alerts.html) | all, create | explicit collection update/delete plus two builders |
 | `cameraMedia()` | [Camera Media](../resources/camera-media.html) | none | explicit raw-envelope media/retrieval helpers |
 | `carrierProposedAssignments()` | [Carrier Proposed Assignments](../resources/carrier-proposed-assignments.html) | all, create, delete | query builder; find/update rejected |
-| `driverTrailerAssignments()` | [Assignments](../resources/assignments.html) | create | query builder; other generic verbs rejected |
-| `driverVehicleAssignments()` | [Assignments](../resources/assignments.html) | create | query builder; other generic verbs rejected |
+| `driverTrailerAssignments()` | [Assignments](../resources/assignments.html) | create | query builder plus dedicated collection update; other generic verbs rejected |
+| `driverVehicleAssignments()` | [Assignments](../resources/assignments.html) | create | query builder plus dedicated collection update/delete; other generic verbs rejected |
 | `forms()` | [Forms](../resources/forms.html) | create | explicit update, PDF, submission/template builders |
 | `fuelAndEnergy()` | [Fuel and Energy](../resources/fuel-and-energy.html) | none | explicit report/efficiency/purchase helpers |
 | `hubs()` | [Hubs](../resources/hubs.html) | all | query builder; other generic verbs rejected |
 | `idling()` | [Idling](../resources/idling.html) | none | events builder only |
 | `ifta()` | [IFTA](../resources/ifta.html) | none | four raw-array report/export helpers |
-| `issues()` | [Issues](../resources/issues.html) | create | stream builder; other generic verbs rejected |
+| `issues()` | [Issues](../resources/issues.html) | create | stream builder plus dedicated collection update; other generic verbs rejected |
 | `routeEvents()` | [Route Events](../resources/route-events.html) | all | stream query builder |
 | `settings()` | [Settings](../resources/settings.html) | none | five explicit raw-array helpers |
 | `speeding()` | [Speeding](../resources/speeding.html) | none | intervals stream builder |
 | `tachograph()` | [Tachograph](../resources/tachograph.html) | none | three history builders |
-| `trailerAssignments()` | [Assignments](../resources/assignments.html) | none | `forTrailer(int, array): Trailer` only |
-| `workOrders()` | [Work Orders](../resources/work-orders.html) | all, create | query/stream/service-task/invoice helpers |
+| `trailerAssignments()` | [Assignments](../resources/assignments.html) | none | typed collection query and `forTrailer(int, array): Trailer` |
+| `workOrders()` | [Work Orders](../resources/work-orders.html) | all, create | query/stream/service-task/invoice helpers plus dedicated collection update/delete |
 | `beta()` | [Beta](../resources/beta.html) | none | explicit mixed-stage operations only |
 | `preview()` | [Preview](../resources/preview.html) | none | three contract-stage methods only |
 | `legacy()` | [Legacy](../resources/legacy.html) | none | explicit legacy methods only |
@@ -92,7 +92,7 @@ The retrieved OpenAPI is 3.0.1 with `info.version` `2025-10-23`, 260 paths, 372 
 | Before | Current method / wire contract / return |
 |---|---|
 | `createAuthToken(string): string` | `createAuthToken(array): DriverAuthToken`; `POST /fleet/drivers/auth-token`. |
-| QR helpers used old paths and untyped results | `createQrCode(array): DriverQrCode`; `getQrCodes(array|string): EntityCollection<DriverQrCode>`; `/drivers/qr-codes`. |
+| QR helpers used old paths and untyped results | `createQrCode(array): DriverQrCode`; `getQrCodes(array\|string): EntityCollection<DriverQrCode>`; `/drivers/qr-codes`. |
 | `deleteQrCode(string)` deleted a path ID | `deleteQrCode(int $driverId): bool`; `driverId` is in the DELETE body. |
 | Remote sign-out was untyped/item-path | `remoteSignOut(string): DriverRemoteSignOutResult`; POST collection body `driverId`. |
 | External item lookup encoded `externalIds[key]` | Driver, trailer, and vehicle lookups pass item ID `key:value`; equipment external lookup is unsupported. |
@@ -129,7 +129,7 @@ Repeated-key arrays are declared for alert configuration `ids`, incident `config
 | Asset `find()` and item mutation paths | find is rejected; update/delete use `/assets?id={id}`. |
 | `sensors()->list($data)` | `sensors()->list(): EntityCollection`. |
 | `aempFleet()` returned a builder | `aempFleet(string $pageNumber): array`; raw `/beta/aemp/Fleet/{pageNumber}` wrapper. |
-| Industrial data points omitted `data-inputs` | `/industrial/data-inputs/data-points[/feed|/history]`, returning `DataInput` with nested `DataPoint`. |
+| Industrial data points omitted `data-inputs` | `/industrial/data-inputs/data-points[/feed\|/history]`, returning `DataInput` with nested `DataPoint`. |
 | Job body/path used flat item semantics | Nest `job`; update/delete use `/beta/industrial/jobs?id=`; delete returns a response array. |
 | Reading create returned response data | Supply a top-level `data` envelope; `createReading(array): bool`. |
 | Device/type/definition/config/course helpers returned immediate collections | `devices`, `qualificationsTypes`, `readingsDefinitions`, `reportsConfigs`, and `trainingCourses` now return `Builder`. |
@@ -145,16 +145,16 @@ Repeated-key arrays are declared for alert configuration `ids`, incident `config
 | `docs/error-handling.md`, `testing.md` | shared typed boundary, 400/422, capability errors, facade fake | Reconciled |
 | `docs/enums.md` | package enum surface and upstream caveats | Reconciled; vehicle-stat and webhook additions are complete for the pinned contract |
 | `docs/api-maintenance.md` | snapshot and maintenance process | Reconciled |
-| 39 topical resource pages | all 41 facade accessors; Assignments covers three accessors | Reconciled against integrated source/tests |
+| 39 topical resource pages | all 41 resource accessors plus `me()`; Assignments covers three accessors | Reconciled against integrated source/tests |
 | `DEVELOPMENT_CHANGELOG.md` | engineering sequence and evidence | Reconciled |
 | `BREAKING_CHANGES.md` | consumer migration actions | Reconciled |
 
 ## Deferred official-only operations
 
-This reconciliation does not implement operations that exist only in the first-party contract. Examples include the modern `/safety-events` replacement family, `PATCH /fleet/dvirs/{id}`, collection-style form/work-order mutations not exposed by explicit methods, and additional beta/preview operations outside `BetaResource`/`PreviewResource`. The Industrial/unstable operation inventory counted 112 official-only Beta/Preview operations; they remain additive backlog, not promised SDK coverage.
+This reconciliation does not implement every operation that exists only in the first-party contract. Examples include the modern `/safety-events` replacement family, the Attributes and Documents families, coaching-session operations, `PUT /tags/{id}`, training-assignment mutations, and additional beta/preview operations outside `BetaResource`/`PreviewResource`. The 111 official-only Beta/Preview operations remain additive backlog, not promised SDK coverage.
 
 Enums remain bounded by package source. `VehicleStatType` and `WebhookEvent` now cover the pinned contract, but do not infer that every other package enum exhausts current alert triggers, work-order statuses, document types, route states, HOS types, or safety behavior labels. See [Enums](../enums.html) for exact shipped values and known upstream differences.
 
 ## Enum gaps
 
-`VehicleStatType` now exposes every value in the pinned contract and retains older plural-unit EV spellings as compatibility aliases, for 81 cases total. `WebhookEvent` now exposes all 35 pinned event values. Other enum families remain subject to the bounded-source caveat above.
+`VehicleStatType` now exposes exactly the 63 values accepted by each pinned vehicle-stats `types` parameter; the feed/history `decorations` parameters accept a 49-value subset, and unsupported historical aliases are removed. `WebhookEvent` exposes all 35 pinned event values. Other enum families remain subject to the bounded-source caveat above. See [Enums](../enums.html#vehiclestattype) for the exact shipped values.

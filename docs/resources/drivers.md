@@ -98,7 +98,7 @@ $driver = Samsara::drivers()->findByExternalId('payroll_id', '12345');
 |--------|---------|--------|
 | `createAuthToken(array $data)` | `POST /fleet/drivers/auth-token` | `DriverAuthToken` (`token`, `expirationTime`) |
 | `createQrCode(array $data)` | `POST /drivers/qr-codes` | `DriverQrCode` |
-| `getQrCodes(array|string $driverIds)` | `GET /drivers/qr-codes?driverIds=...` | `EntityCollection<int, DriverQrCode>` |
+| `getQrCodes(array\|string $driverIds)` | `GET /drivers/qr-codes?driverIds=...` | `EntityCollection<int, DriverQrCode>` |
 | `deleteQrCode(int $driverId)` | `DELETE /drivers/qr-codes` with `driverId` in the body | `bool` |
 | `remoteSignOut(string $id)` | `POST /fleet/drivers/remote-sign-out` with `driverId` in the body | `DriverRemoteSignOutResult` |
 

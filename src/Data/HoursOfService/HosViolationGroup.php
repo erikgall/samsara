@@ -9,6 +9,8 @@ use Samsara\Data\EntityCollection;
  * HOS violations grouped in one endpoint response item.
  *
  * @property-read array<int, array<string, mixed>>|null $violations
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class HosViolationGroup extends Entity
 {

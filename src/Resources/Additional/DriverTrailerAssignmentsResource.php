@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
@@ -25,6 +26,22 @@ class DriverTrailerAssignmentsResource extends Resource
     public function query(): Builder
     {
         return $this->createBuilderWithEndpoint($this->endpoint)->withoutDefaultPageSize();
+    }
+
+    /**
+     * Update a driver-trailer assignment using its required query ID.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function updateAssignment(string $id, array $data): Entity
+    {
+        $requestEndpoint = $this->endpoint.'?id='.rawurlencode($id);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($requestEndpoint, $data),
+            $this->endpoint,
+        );
+
+        return Entity::make($this->decodeJsonData($response, $this->endpoint, false));
     }
 
     /**

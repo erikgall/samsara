@@ -68,7 +68,7 @@ Catch exceptions from `Samsara\Exceptions`, not Laravel HTTP exceptions, around 
 - `NotFoundException`: HTTP 404 for operations other than supported `find()`.
 - `RateLimitException`: HTTP 429.
 - `ServerException`: HTTP 5xx.
-- `ConnectionException`: exhausted connection failure.
+- `Illuminate\Http\Client\ConnectionException`: exhausted connection failure. The SDK's reserved `Samsara\Exceptions\ConnectionException` class is not thrown.
 - `UnsupportedOperationException`: rejected locally before a request.
 - `SamsaraException`: base type for remaining mapped SDK failures.
 

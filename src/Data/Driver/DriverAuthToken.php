@@ -9,6 +9,8 @@ use Samsara\Data\Entity;
  *
  * @property-read int|null $expirationTime Expiration time in milliseconds since the Unix epoch
  * @property-read string|null $token Driver authentication token
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class DriverAuthToken extends Entity
 {

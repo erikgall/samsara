@@ -14,6 +14,7 @@ function listedPaths(string $paths): array
 }
 
 $upgradeActions = listedPaths(<<<'PATHS'
+config/samsara.php
 src/Contracts/QueryBuilderInterface.php
 src/Concerns/InteractsWithTime.php
 src/Data/Alert/AlertConfiguration.php
@@ -56,9 +57,12 @@ src/Data/Vehicle/VehicleStatValue.php
 src/Data/Vehicle/VehicleStatsSeries.php
 src/Data/Webhook/Webhook.php
 src/Enums/DutyStatus.php
+src/Enums/SafetyEventType.php
+src/Enums/VehicleStatType.php
 src/Exceptions/ValidationException.php
 src/Exceptions/InvalidSignatureException.php
 src/Facades/Samsara.php
+src/Http/ResponseDecoder.php
 src/Query/Builder.php
 src/Query/Pagination/CursorPaginator.php
 src/Resources/Additional/AlertsResource.php
@@ -104,6 +108,9 @@ src/Resources/Telematics/TripsResource.php
 src/Resources/Telematics/VehicleLocationsResource.php
 src/Resources/Telematics/VehicleStatsResource.php
 src/Data/EntityCollection.php
+src/Samsara.php
+src/SamsaraServiceProvider.php
+src/Webhooks/VerifyWebhookSignature.php
 src/Webhooks/WebhookSignatureVerifier.php
 PATHS);
 
@@ -205,8 +212,8 @@ tests/Unit/SamsaraTest.php
 PATHS);
 
 $additiveNoAction = listedPaths(<<<'PATHS'
+.gitattributes
 composer.json
-config/samsara.php
 src/Data/Address/Address.php
 src/Data/Attribute/Attribute.php
 src/Data/Attribute/AttributeValue.php
@@ -227,6 +234,7 @@ src/Data/Maintenance/DefectType.php
 src/Data/Maintenance/ServiceTask.php
 src/Data/Maintenance/WorkOrder.php
 src/Data/Organization/Organization.php
+src/Resources/Organization/OrganizationResource.php
 src/Data/Safety/CoachingSession.php
 src/Data/Safety/SafetyEvent.php
 src/Data/Safety/SafetyScore.php
@@ -234,12 +242,9 @@ src/Data/Trailer/TrailerStats.php
 src/Data/User/UserRole.php
 src/Data/Vehicle/Gateway.php
 src/Data/Vehicle/VehicleStats.php
-src/Enums/VehicleStatType.php
 src/Enums/WebhookEvent.php
 src/Http/QueryString.php
 src/Http/RequestExecutor.php
-src/Samsara.php
-src/SamsaraServiceProvider.php
 PATHS);
 
 /** @return list<string> */
@@ -276,7 +281,7 @@ function guideSections(string $path): array
         'src/Resources/Integrations/GatewaysResource.php'                 => ['mig-02', 'mig-05'],
         'src/Resources/Integrations/LiveSharingLinksResource.php'         => ['mig-02', 'mig-08', 'mig-14', 'mig-16'],
         'src/Resources/Integrations/WebhooksResource.php'                 => ['mig-02', 'mig-08'],
-        'src/Resources/Legacy/LegacyResource.php'                         => ['mig-02', 'mig-04'],
+        'src/Resources/Legacy/LegacyResource.php'                         => ['mig-02', 'mig-04', 'mig-25'],
         'src/Resources/Organization/ContactsResource.php'                 => ['mig-02'],
         'src/Resources/Organization/TagsResource.php'                     => ['mig-02', 'mig-08'],
         'src/Resources/Organization/UsersResource.php'                    => ['mig-02', 'mig-08'],
@@ -306,17 +311,39 @@ function guideSections(string $path): array
     if ($path === 'src/Facades/Samsara.php') {
         return ['mig-18'];
     }
+    if ($path === 'config/samsara.php') {
+        return ['mig-20', 'mig-21'];
+    }
+    if ($path === 'src/Samsara.php') {
+        return ['mig-20', 'mig-21', 'mig-22', 'mig-23'];
+    }
+    if ($path === 'src/SamsaraServiceProvider.php') {
+        return ['mig-20', 'mig-21', 'mig-22', 'mig-23', 'mig-24'];
+    }
     if ($path === 'src/Enums/DutyStatus.php') {
         return ['mig-09'];
+    }
+    if (in_array($path, ['src/Enums/SafetyEventType.php', 'src/Enums/VehicleStatType.php'], true)) {
+        return ['mig-08'];
+    }
+    if ($path === 'src/Http/ResponseDecoder.php') {
+        return ['mig-21'];
+    }
+    if ($path === 'src/Webhooks/VerifyWebhookSignature.php') {
+        return ['mig-24'];
     }
     if (in_array($path, [
         'src/Concerns/InteractsWithTime.php',
         'src/Data/EntityCollection.php',
-        'src/Exceptions/InvalidSignatureException.php',
         'src/Query/Pagination/CursorPaginator.php',
-        'src/Webhooks/WebhookSignatureVerifier.php',
     ], true)) {
         return ['mig-19'];
+    }
+    if (in_array($path, [
+        'src/Exceptions/InvalidSignatureException.php',
+        'src/Webhooks/WebhookSignatureVerifier.php',
+    ], true)) {
+        return ['mig-19', 'mig-24'];
     }
     if (str_starts_with($path, 'src/Data/Alert/')) {
         return ['mig-07', 'mig-08', 'mig-11'];
@@ -491,6 +518,7 @@ $baseline = array_values(array_filter(array_map('trim', $baselineOutput)));
 sort($baseline);
 
 $publicationArtifacts = [
+    '.gitattributes',
     'composer.json',
     'UPGRADE.md',
     'docs/api-sync/v2-upgrade-disposition.json',
@@ -510,12 +538,17 @@ $publicationArtifacts = [
     'resources/boost/skills/upgrade-samsara-sdk-v2/SKILL.md',
     'tests/Unit/BoostDocumentationTest.php',
 ];
+$implementationArtifacts = [
+    'src/Http/ResponseDecoder.php',
+    'src/Resources/Organization/OrganizationResource.php',
+];
 $finalScopeOutput = [];
 $finalScopeStatus = 0;
 exec(sprintf('git diff --name-only %s', escapeshellarg(BASELINE_TAG)), $finalScopeOutput, $finalScopeStatus);
 $finalWorkspaceScope = array_values(array_unique(array_merge(
     array_filter(array_map('trim', $finalScopeOutput)),
     array_filter($publicationArtifacts, fn (string $path): bool => is_file(__DIR__.'/../'.$path)),
+    array_filter($implementationArtifacts, fn (string $path): bool => is_file(__DIR__.'/../'.$path)),
 )));
 sort($finalWorkspaceScope);
 if ($finalScopeStatus !== 0) {
@@ -578,24 +611,25 @@ $ledger = [
         'changed_files' => count($baseline),
     ],
     'release_scope' => [
-        'comparison'                                     => BASELINE_TAG.'..final-dev',
-        'changed_files'                                  => count($releaseScope),
-        'content_digest_exclusions'                      => ['docs/api-sync/v2-upgrade-disposition.json'],
-        'publication_artifacts_added_after_audited_head' => $publicationArtifacts,
+        'comparison'                                        => BASELINE_TAG.'..final-dev',
+        'changed_files'                                     => count($releaseScope),
+        'content_digest_exclusions'                         => ['docs/api-sync/v2-upgrade-disposition.json'],
+        'publication_artifacts_added_after_audited_head'    => $publicationArtifacts,
+        'implementation_artifacts_added_after_audited_head' => $implementationArtifacts,
     ],
     'summary' => $counts,
     'records' => $records,
 ];
 
 $expectedCounts = [
-    'additive_no_action'  => 35,
+    'additive_no_action'  => 33,
     'documentation_only'  => 68,
     'internal_only'       => 1,
-    'supporting_evidence' => 143,
-    'upgrade_action'      => 91,
+    'supporting_evidence' => 149,
+    'upgrade_action'      => 98,
 ];
 
-if ($counts !== $expectedCounts || count($baseline) !== 239 || count($releaseScope) !== 338) {
+if ($counts !== $expectedCounts || count($baseline) !== 239 || count($releaseScope) !== 349) {
     fwrite(STDERR, 'FAIL: audited disposition counts drifted: '.json_encode($counts)."\n");
     exit(1);
 }
@@ -638,6 +672,12 @@ $sectionEvidence = [
     'mig-17'                      => ['createIndustrialJob', "'data' => [[", 'createDriverAuthToken(string $driverId, array $data = [])'],
     'mig-18'                      => ['same fake', 'Samsara::fake()'],
     'mig-19'                      => ['Compatibility corrections', 'non-mutating', 'nextPage()', 'InvalidSignatureException'],
+    'mig-20'                      => ['SAMSARA_RETRY', 'SAMSARA_ATTEMPTS', "getConfig('attempts')"],
+    'mig-21'                      => ['retry_after_max_seconds', 'Valid `{"data":[...]}` responses are unchanged'],
+    'mig-22'                      => ["Laravel's shared HTTP factory", 'Standalone construction still works'],
+    'mig-23'                      => ['withToken()', 'withoutToken()', 'Samsara::make()'],
+    'mig-24'                      => ['samsara.webhook', 'future timestamps', 'context.expected'],
+    'mig-25'                      => ['sendMessage', 'dispatchRoutes()', 'Eight legacy helpers'],
     'package-maintainer-evidence' => ['Contract Drift', 'v2 disposition ledger'],
 ];
 foreach ($referencedSections as $section) {
@@ -694,6 +734,8 @@ $requiredGuideTokens = [
     'HosDailyLog',
     'getSafetyEvent()',
     'DataPoint',
+    'SafetyEventType',
+    'VehicleStatType',
     'startDate',
     'endDate',
     'startHour',
@@ -708,6 +750,7 @@ $requiredGuideTokens = [
     '/industrial/data-inputs/data-points',
     'Agent completion record',
     'Rollback procedure',
+    'SAMSARA_ATTEMPTS',
 ];
 
 foreach ($requiredGuideTokens as $token) {

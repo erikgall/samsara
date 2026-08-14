@@ -18,7 +18,7 @@ permalink: /resources/assignments
 
 Assignments record which driver was paired with which vehicle or trailer over time. The SDK exposes four facade accessors: `driverVehicleAssignments()`, `driverTrailerAssignments()`, `trailerAssignments()`, and `carrierProposedAssignments()`. Reach for these resources when you need to reconstruct an audit trail of who drove what, or who pulled which trailer, over a given window. The driver-vehicle, driver-trailer, and carrier-proposed builders return generic `Samsara\Data\Entity` (`Fluent`) rows; the legacy `trailerAssignments()->forTrailer()` helper returns a typed `Trailer` wrapper.
 
-Driver-vehicle and driver-trailer resources support generic `create` plus their read builders; all other generic verbs are rejected. The legacy trailer-assignment resource supports only `forTrailer()`.
+Driver-vehicle and driver-trailer resources support generic `create`, read builders, and dedicated contract-shaped mutations. Generic update/delete verbs remain rejected. The legacy trailer-assignment resource exposes both `query()` for the wrapped `trailers` collection and `forTrailer()` for one trailer.
 
 For carrier-proposed driver-vehicle assignments, see the [Carrier Proposed Assignments](carrier-proposed-assignments.html) page.
 
@@ -44,6 +44,20 @@ $forVehicle = Samsara::driverVehicleAssignments()
 
 `filterBy` is required and must match the ID filter you supply.
 
+Update and delete operations identify assignments in their request bodies:
+
+```php
+Samsara::driverVehicleAssignments()->updateAssignment([
+    'driverId' => 'driver-123',
+    'vehicleId' => 'vehicle-456',
+    'startTime' => $startTime,
+]);
+
+Samsara::driverVehicleAssignments()->deleteAssignments([
+    'vehicleId' => 'vehicle-456',
+]);
+```
+
 ## Driver-Trailer Assignments
 
 The driver-trailer endpoint mirrors the driver-vehicle one.
@@ -57,11 +71,25 @@ $forDriver = Samsara::driverTrailerAssignments()
 
 The driver-trailer operation requires at least one `driverIds` value, which `whereDriver()` supplies.
 
+```php
+Samsara::driverTrailerAssignments()->updateAssignment(
+    'assignment-id',
+    ['endTime' => $endTime],
+);
+```
+
 ## Trailer Assignments (Legacy)
 
 > **Note:** Legacy v1 endpoint. Prefer driver-trailer assignments for new integrations.
 
-The legacy resource exposes a single helper that returns the assignment history for a single trailer.
+The legacy resource can read the wrapped collection for all trailers or return one trailer's assignment history.
+
+```php
+$trailers = Samsara::trailerAssignments()
+    ->query()
+    ->where('startMs', $startMs)
+    ->get();
+```
 
 ```php
 $trailer = Samsara::trailerAssignments()

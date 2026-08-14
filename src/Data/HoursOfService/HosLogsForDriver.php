@@ -10,6 +10,8 @@ use Samsara\Data\EntityCollection;
  *
  * @property-read array{id?: string, name?: string}|null $driver
  * @property-read array<int, array<string, mixed>>|null $hosLogs
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class HosLogsForDriver extends Entity
 {

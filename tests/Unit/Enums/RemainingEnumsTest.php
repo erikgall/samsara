@@ -98,8 +98,9 @@ class RemainingEnumsTest extends TestCase
     }
 
     #[Test]
-    public function safety_event_type_has_harsh_acceleration(): void
+    public function safety_event_type_uses_the_current_behavior_label_wire_value(): void
     {
-        $this->assertSame('harshAcceleration', SafetyEventType::HARSH_ACCELERATION->value);
+        $this->assertSame('acceleration', SafetyEventType::ACCELERATION->value);
+        $this->assertSame('nearCollison', SafetyEventType::NEAR_COLLISION->value);
     }
 }

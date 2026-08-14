@@ -56,34 +56,15 @@ $logs = Samsara::safetyEvents()
 
 Audit-log rows are `SafetyEventActivity` objects. Call `getSafetyEvent()` for the typed nested `SafetyEvent`. The two `/fleet/safety-events...` paths remain implemented legacy operations; `/safety-events` and `/safety-events/stream` are official-only replacements deferred from the package.
 
-## Event Types
+## Behavior Labels
 
-Filter by `eventTypes` using the string values backed by the `SafetyEventType` enum (20 cases):
+Safety-event payloads expose `behaviorLabels`. `SafetyEventType` retains its
+historical PHP class name, but its values now match Samsara's
+`SafetyEventBehaviorLabelType` schema exactly. The API does not expose an
+`eventTypes` query parameter on either supported safety-event endpoint.
 
-| Case | Value |
-|------|-------|
-| `CAMERA_OBSTRUCTION` | `cameraObstruction` |
-| `CELL_PHONE_USAGE` | `cellPhoneUsage` |
-| `CRASH` | `crash` |
-| `DEFENSIVE_DRIVING` | `defensiveDriving` |
-| `DISTRACTED_DRIVING` | `distractedDriving` |
-| `DRIVER_DETECTED` | `driverDetected` |
-| `DROWSY_DRIVING` | `drowsyDriving` |
-| `FOLLOWING_DISTANCE` | `followingDistance` |
-| `HARSH_ACCELERATION` | `harshAcceleration` |
-| `HARSH_BRAKING` | `harshBraking` |
-| `HARSH_TURN` | `harshTurn` |
-| `LANE_DEPARTURE` | `laneDeparture` |
-| `MAX_SPEED` | `maxSpeed` |
-| `NEAR_COLLISION` | `nearCollision` |
-| `NO_DRIVER_DETECTED` | `noDriverDetected` |
-| `ROLLING_STOP` | `rollingStop` |
-| `SEATBELT` | `seatbelt` |
-| `SMOKING` | `smoking` |
-| `SPEEDING` | `speeding` |
-| `UNKNOWN` | `unknown` |
-
-See [Enums](../enums.html#safetyeventtype) for the package reference. Current upstream safety-event payloads expose `behaviorLabels`; they do not define this enum as the endpoint's wire-value contract.
+See [Enums](../enums.html#safetyeventtype) for the current behavior-label wire
+values.
 
 ## Filtering
 

@@ -21,12 +21,12 @@ use Samsara\Exceptions\InvalidSignatureException;
  * With custom secret via route parameters:
  *
  *     Route::post('/webhook', WebhookController::class)
- *         ->middleware('samsara.webhook:my-secret-key,600');
+ *         ->middleware('samsara.webhook:rGoy+beNph0qGBLj6Aqoydj6SGA=,600');
  *
  * Or instantiate directly:
  *
  *     Route::post('/webhook', WebhookController::class)
- *         ->middleware(new VerifyWebhookSignature('my-secret-key', 600));
+ *         ->middleware(new VerifyWebhookSignature('rGoy+beNph0qGBLj6Aqoydj6SGA=', 600));
  *
  * @author Erik Galloway <erik@erikgall.com>
  *

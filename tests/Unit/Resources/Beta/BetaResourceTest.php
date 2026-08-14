@@ -111,16 +111,22 @@ class BetaResourceTest extends TestCase
         string $expectedClass,
         array $expectedQuery
     ): void {
-        $item = match ($expectedClass) {
-            TrailerStats::class => [
-                'id'                => 'trailer-1',
-                'gpsOdometerMeters' => ['value' => 1234],
-            ],
-            SafetyScore::class => [
+        $item = match ($method) {
+            'safetyScoresDrivers' => [
                 'driverId'    => 'driver-1',
                 'driverScore' => 91,
             ],
-            default => ['id' => 'entity-1'],
+            'safetyScoresVehicles' => [
+                'vehicleId'    => 'vehicle-1',
+                'vehicleScore' => 88,
+            ],
+            default => match ($expectedClass) {
+                TrailerStats::class => [
+                    'id'                => 'trailer-1',
+                    'gpsOdometerMeters' => ['value' => 1234],
+                ],
+                default => ['id' => 'entity-1'],
+            },
         };
         $this->http->fake([
             '*' => $this->http->response([
@@ -135,6 +141,15 @@ class BetaResourceTest extends TestCase
 
         $entity = $result->items()->first();
         $this->assertSame($expectedClass, $entity::class);
+        if ($method === 'safetyScoresDrivers') {
+            $this->assertSame('driver-1', $entity->driverId);
+            $this->assertSame(91, $entity->getScore());
+        }
+
+        if ($method === 'safetyScoresVehicles') {
+            $this->assertSame('vehicle-1', $entity->vehicleId);
+            $this->assertSame(88, $entity->getScore());
+        }
         $this->http->assertSent(fn ($request): bool => $request->method() === 'GET'
             && parse_url($request->url(), PHP_URL_PATH) === $path
             && $this->queryFor($request->url()) === $expectedQuery);
@@ -344,7 +359,7 @@ class BetaResourceTest extends TestCase
             'vehicle safety scores' => [
                 'safetyScoresVehicles',
                 '/safety-scores/vehicles',
-                Entity::class,
+                SafetyScore::class,
                 [
                     'startTime'  => '2026-08-10T12:00:00Z',
                     'endTime'    => '2026-08-10T13:00:00Z',

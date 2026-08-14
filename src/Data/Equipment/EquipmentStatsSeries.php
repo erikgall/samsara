@@ -22,6 +22,8 @@ use Samsara\Data\EntityCollection;
  * @property-read array<int, array<string, mixed>>|null $gpsOdometerMeters GPS odometer readings
  * @property-read array<int, array<string, mixed>>|null $obdEngineSeconds OBD engine-second readings
  * @property-read array<int, array<string, mixed>>|null $obdEngineStates OBD engine-state readings
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class EquipmentStatsSeries extends Entity
 {

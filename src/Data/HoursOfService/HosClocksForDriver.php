@@ -13,6 +13,8 @@ use Samsara\Enums\DutyStatus;
  * @property-read array<string, mixed>|null $currentDutyStatus
  * @property-read array<string, mixed>|null $clocks
  * @property-read array{cycleViolationDurationMs?: float|int, shiftDrivingViolationDurationMs?: float|int}|null $violations
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class HosClocksForDriver extends Entity
 {

@@ -337,6 +337,21 @@ class AssetsResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_repeats_exploded_asset_query_parameters(): void
+    {
+        $this->http->fake(['*' => $this->http->response(['data' => []])]);
+        $resource = new AssetsResource($this->samsara);
+
+        $resource->query()->where('attributes', ['Length:range(8,)', 'Date:range(2025-01-01,)'])->get();
+        $resource->depreciation()->where('assetIds', ['asset-1', 'asset-2'])->get();
+
+        $this->http->assertSent(fn ($request): bool => $request->url()
+            === 'https://api.samsara.com/assets?attributes=Length%3Arange%288%2C%29&attributes=Date%3Arange%282025-01-01%2C%29');
+        $this->http->assertSent(fn ($request): bool => $request->url()
+            === 'https://api.samsara.com/assets/depreciation?assetIds=asset-1&assetIds=asset-2');
+    }
+
+    #[Test]
     public function it_uses_the_current_depreciation_path_without_an_implicit_limit(): void
     {
         $this->http->fake([

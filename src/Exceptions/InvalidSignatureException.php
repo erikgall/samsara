@@ -2,6 +2,9 @@
 
 namespace Samsara\Exceptions;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
 /**
  * Exception thrown when webhook signature verification fails.
  *
@@ -9,6 +12,23 @@ namespace Samsara\Exceptions;
  */
 class InvalidSignatureException extends SamsaraException
 {
+    /**
+     * Render webhook verification failures with their intended HTTP status.
+     */
+    public function render(Request $request): JsonResponse
+    {
+        $status = match ($this->getCode()) {
+            500     => 500,
+            default => 401,
+        };
+        $message = match ($status) {
+            500     => 'Webhook verification is not configured.',
+            default => 'Unauthorized.',
+        };
+
+        return response()->json(['message' => $message], $status);
+    }
+
     /**
      * Create an exception for an expired timestamp.
      *
@@ -29,6 +49,19 @@ class InvalidSignatureException extends SamsaraException
     }
 
     /**
+     * Create an exception for a timestamp in the future.
+     */
+    public static function futureTimestamp(int $seconds): static
+    {
+        return static::make(
+            "Webhook signature verification failed: timestamp is {$seconds}s in the future.",
+            401,
+            null,
+            ['seconds_in_future' => $seconds],
+        );
+    }
+
+    /**
      * Create an exception for an invalid signature.
      *
      * @param  string  $expected  The expected signature
@@ -41,7 +74,6 @@ class InvalidSignatureException extends SamsaraException
             401,
             null,
             [
-                'expected' => $expected,
                 'received' => $received,
             ]
         );

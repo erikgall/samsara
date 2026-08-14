@@ -8,6 +8,7 @@ use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Http\QueryString;
 use Samsara\Http\RequestExecutor;
+use Samsara\Http\ResponseDecoder;
 use Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Response;
 use Samsara\Exceptions\ServerException;
@@ -51,6 +52,11 @@ abstract class Resource implements ResourceInterface
     private ?RequestExecutor $requestExecutor = null;
 
     /**
+     * The shared successful-response decoder.
+     */
+    private ?ResponseDecoder $responseDecoder = null;
+
+    /**
      * Create a new resource instance.
      */
     public function __construct(Samsara $samsara)
@@ -79,7 +85,7 @@ abstract class Resource implements ResourceInterface
             $this->endpoint
         );
 
-        $data = $response->json('data', []);
+        $data = $this->decodeJsonList($response, $this->endpoint);
 
         return $this->mapToEntities($data);
     }
@@ -114,7 +120,7 @@ abstract class Resource implements ResourceInterface
             $this->endpoint
         );
 
-        $responseData = $response->json('data', $response->json());
+        $responseData = $this->decodeJsonData($response, $this->endpoint);
 
         return $this->mapToEntity($responseData);
     }
@@ -216,7 +222,7 @@ abstract class Resource implements ResourceInterface
             $endpoint
         );
 
-        $responseData = $response->json('data', $response->json());
+        $responseData = $this->decodeJsonData($response, $endpoint);
 
         return $this->mapToEntity($responseData);
     }
@@ -230,6 +236,42 @@ abstract class Resource implements ResourceInterface
     protected function createBuilderWithEndpoint(string $endpoint): Builder
     {
         return new Builder($this, $endpoint);
+    }
+
+    /**
+     * Decode a successful response that must contain a JSON array or object.
+     *
+     * @return array<mixed>
+     */
+    protected function decodeJsonArray(Response $response, string $endpoint): array
+    {
+        return $this->responseDecoder()->decodeArray($response, $endpoint);
+    }
+
+    /**
+     * Decode a JSON response and unwrap its data key when present.
+     *
+     * @return array<mixed>
+     */
+    protected function decodeJsonData(
+        Response $response,
+        string $endpoint,
+        bool $fallbackToPayload = true,
+    ): array {
+        return $this->responseDecoder()->decodeData($response, $endpoint, $fallbackToPayload);
+    }
+
+    /**
+     * Decode a successful response collection.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function decodeJsonList(
+        Response $response,
+        string $endpoint,
+        string $collectionKey = 'data',
+    ): array {
+        return $this->responseDecoder()->decodeList($response, $endpoint, $collectionKey);
     }
 
     /**
@@ -294,7 +336,7 @@ abstract class Resource implements ResourceInterface
             return null;
         }
 
-        $data = $response->json('data', $response->json());
+        $data = $this->decodeJsonData($response, $endpoint);
 
         return $this->mapToEntity($data);
     }
@@ -338,7 +380,7 @@ abstract class Resource implements ResourceInterface
             ),
             429 => throw new RateLimitException(
                 $message,
-                $response->header('Retry-After') !== null ? (int) $response->header('Retry-After') : null,
+                $this->retryAfterSeconds($response),
                 null,
                 $context
             ),
@@ -416,5 +458,25 @@ abstract class Resource implements ResourceInterface
                 'endpoint'  => $endpoint,
             ]
         );
+    }
+
+    /**
+     * Get the successful-response decoder.
+     */
+    private function responseDecoder(): ResponseDecoder
+    {
+        return $this->responseDecoder ??= new ResponseDecoder;
+    }
+
+    /**
+     * Read a delta-seconds Retry-After value for the public exception API.
+     */
+    private function retryAfterSeconds(Response $response): ?int
+    {
+        $retryAfter = $response->header('Retry-After');
+
+        return $retryAfter !== null && ctype_digit($retryAfter)
+            ? (int) $retryAfter
+            : null;
     }
 }

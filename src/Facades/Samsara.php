@@ -13,6 +13,7 @@ use Illuminate\Http\Client\PendingRequest;
  * Core Methods:
  *
  * @method static SamsaraClient withToken(string $token)
+ * @method static SamsaraClient withoutToken()
  * @method static bool hasToken()
  * @method static string getBaseUrl()
  * @method static SamsaraClient useBaseUrl(string $baseUrl)
@@ -21,6 +22,7 @@ use Illuminate\Http\Client\PendingRequest;
  * @method static SamsaraClient useUsEndpoint()
  * @method static PendingRequest client()
  * @method static mixed getConfig(string $key, mixed $default = null)
+ * @method static \Samsara\Data\Organization\Organization me()
  *
  * Fleet Resources:
  * @method static \Samsara\Resources\Fleet\DriversResource drivers()

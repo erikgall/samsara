@@ -8,11 +8,12 @@
     },
     "release_scope": {
         "comparison": "v1.1.0..final-dev",
-        "changed_files": 338,
+        "changed_files": 349,
         "content_digest_exclusions": [
             "docs/api-sync/v2-upgrade-disposition.json"
         ],
         "publication_artifacts_added_after_audited_head": [
+            ".gitattributes",
             "composer.json",
             "UPGRADE.md",
             "docs/api-sync/v2-upgrade-disposition.json",
@@ -31,14 +32,18 @@
             "resources/boost/skills/samsara-sdk-development/references/testing-and-webhooks.md",
             "resources/boost/skills/upgrade-samsara-sdk-v2/SKILL.md",
             "tests/Unit/BoostDocumentationTest.php"
+        ],
+        "implementation_artifacts_added_after_audited_head": [
+            "src/Http/ResponseDecoder.php",
+            "src/Resources/Organization/OrganizationResource.php"
         ]
     },
     "summary": {
-        "additive_no_action": 35,
+        "additive_no_action": 33,
         "documentation_only": 68,
         "internal_only": 1,
-        "supporting_evidence": 143,
-        "upgrade_action": 91
+        "supporting_evidence": 149,
+        "upgrade_action": 98
     },
     "records": [
         {
@@ -69,6 +74,15 @@
             "no_action_reason": "Reference or release documentation only; current behavior is incorporated or linked by the canonical upgrade guide."
         },
         {
+            "path": ".gitattributes",
+            "content_state": "present",
+            "content_sha256": "fef805b5bb8aaa77ca6e4f7ebbf5564e6d1d57155064960e13ccac2d71af7d17",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+        },
+        {
             "path": ".github/workflows/tests.yml",
             "content_state": "present",
             "content_sha256": "c97c7c29f3126d3afb6efc0d561cc738a46f3c47a3a4600cdc56f3e489c11734",
@@ -93,7 +107,7 @@
         {
             "path": "BREAKING_CHANGES.md",
             "content_state": "present",
-            "content_sha256": "707b8bf4828abda385a1aed3cb4d1ab65cb8a58849688609886a90e7c09637f5",
+            "content_sha256": "3429663d30b538901a4565b19f7c838e0cd550511bb83af2cf85eef23fbe631d",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -102,7 +116,7 @@
         {
             "path": "CHANGELOG.md",
             "content_state": "present",
-            "content_sha256": "c70c5dbf6753676746a27021558b16c7774713b570975c9d0d95bd0faf1299ad",
+            "content_sha256": "054b989c0ebc15508401372a6094d37967105301ba4d89a40685722aedde9d7e",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -120,7 +134,7 @@
         {
             "path": "DEVELOPMENT_CHANGELOG.md",
             "content_state": "present",
-            "content_sha256": "d4d1b12bc9a3742ebf6e6d2f562e8c93d878e1379bf7b8bd146d8c685d5b3fc8",
+            "content_sha256": "e0f55e40dcd19d59a04af0b055595851b931681398f690b622d36167939dcf66",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -131,7 +145,7 @@
         {
             "path": "README.md",
             "content_state": "present",
-            "content_sha256": "2205caf170e57a14ddf5bf3ee9865c7db85f8a11279830cd98a94a55a863e722",
+            "content_sha256": "9a86e2695809053e175696c4ae327aebe1e6a6824226d6621ff031df2f002a54",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -140,7 +154,7 @@
         {
             "path": "UPGRADE.md",
             "content_state": "present",
-            "content_sha256": "ae3bc650bf2f460f6371d38e71a3d0364108fc0774e00419754096d54a3108dc",
+            "content_sha256": "115ce4a7a577355c67b80946657dbb49555839a1afefdc69fe14219425952a3d",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -149,7 +163,7 @@
         {
             "path": "composer.json",
             "content_state": "present",
-            "content_sha256": "8322827eace354b8d2e13d09122e75cf2261ec21d92ce3704bbfc66a67bef01a",
+            "content_sha256": "7095a8aa757ee75ce796267b4f1847bad6e15545b9408038a7f8226053c83d6c",
             "disposition": "additive_no_action",
             "guide_sections": [],
             "consumer_action": null,
@@ -158,16 +172,19 @@
         {
             "path": "config/samsara.php",
             "content_state": "present",
-            "content_sha256": "3816e0e9b8958b390603cacbda1bad6a52001b735053695d0a2740e0c278d572",
-            "disposition": "additive_no_action",
-            "guide_sections": [],
-            "consumer_action": null,
-            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+            "content_sha256": "e63c7e6e5dc164f6c9db83528713fba191a39c687697cbe7b6cd420acf9bda7b",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-20",
+                "mig-21"
+            ],
+            "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
+            "no_action_reason": null
         },
         {
             "path": "contracts/samsara/README.md",
             "content_state": "present",
-            "content_sha256": "5797cf0086c3e3402a910787226c46a5cc484f612d56064030bd80c0492c8889",
+            "content_sha256": "23b9a39ae352fed352fc1fea59b78f4f67895c5f1008a9e969ee9645b90f8c22",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -209,7 +226,7 @@
         {
             "path": "docs/_config.yml",
             "content_state": "present",
-            "content_sha256": "d74d988ae8fe3c2d84582af63a98cdd444f5f1d686acfde09f09e6df7481b419",
+            "content_sha256": "bcd8444245bcb7bf8414d3d8814d17394aecd31d0898858bf6e97d41f8fd3060",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -227,7 +244,7 @@
         {
             "path": "docs/api-sync/contract-drift.md",
             "content_state": "present",
-            "content_sha256": "b355decb2f0f4c105fa4f354987906e9e0649c75213bf4ca55010fe1a465207f",
+            "content_sha256": "1b3de73a5d3545904a071922539fe817ccf7c2f313217a64a3b47bf171372401",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -238,7 +255,7 @@
         {
             "path": "docs/api-sync/contract-inventory.json",
             "content_state": "present",
-            "content_sha256": "d7466f227b4f2241ea62a8b1daebac82997de02cbda01ac69d46137a0db437e7",
+            "content_sha256": "975c8280bafc9379096cf8e9c9cdca3573bc1e969bac5d15b7f0ea94bd06fe6c",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -249,7 +266,7 @@
         {
             "path": "docs/api-sync/documentation-coverage.md",
             "content_state": "present",
-            "content_sha256": "d7fdc4472cb86c48ae31302ed9d7dd02685fdd9b2ce6b6389daa49eb0cbaf171",
+            "content_sha256": "75a926ecdb48d585ced1ce6bc624e14b1dd3def80740a78e6594ea0b7fc6cd9d",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -260,7 +277,7 @@
         {
             "path": "docs/api-sync/dto-helper-catalog.md",
             "content_state": "present",
-            "content_sha256": "8cb9d3704f121d67a9d8e9ea66cc634823e947d4eea6afca229e3917ff250b7d",
+            "content_sha256": "cbb6acdb6ee456c9b38eb91b99511a1cdd66d5a5c888744300cba614087f7e3b",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -280,7 +297,7 @@
         {
             "path": "docs/configuration.md",
             "content_state": "present",
-            "content_sha256": "86aec87a0677e25c0d1ab893a03510f4be81b9c4e0a1113bc8ceafb0a23dd266",
+            "content_sha256": "2c58e9b265cc67f10528493550cba280bb67cb94159aa801697e6c58825ca4c4",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -289,7 +306,7 @@
         {
             "path": "docs/enums.md",
             "content_state": "present",
-            "content_sha256": "dd143a7c01c4a514c980417a24efc7cde5952fdd17bdff85db10d201dc06c601",
+            "content_sha256": "c25177a970c8ac766d5d0d975486401b0b7bb782b0c33ccb644d06c542966c9f",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -298,7 +315,7 @@
         {
             "path": "docs/error-handling.md",
             "content_state": "present",
-            "content_sha256": "582f087aea6aff2e72a8d3d0ec09f65b34c057f5dda6675ea20675a2c20ac450",
+            "content_sha256": "b78183613ebe2c20f324aa178f6db7a74e7391e0dfbdaed61b407f8aa0a0851e",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -307,7 +324,7 @@
         {
             "path": "docs/getting-started.md",
             "content_state": "present",
-            "content_sha256": "1431dfa812c97be66c2dded2ce5e5a910c0c36f789ea9a9678e6f6e91972ae17",
+            "content_sha256": "969dd02cf5a5a4162dad09d24dfd82d55e5a0fa2c5bc330b2c425b8c9f1bb2e5",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -316,7 +333,7 @@
         {
             "path": "docs/index.md",
             "content_state": "present",
-            "content_sha256": "c774783625551f2df50fe3d8ceef8766245f73e33b95f6925d5ecf7eaa38a19e",
+            "content_sha256": "3c2a81bdf2d728a36d7015104302837c7416430d1b603e84a8f41c9add9be278",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -325,7 +342,7 @@
         {
             "path": "docs/query-builder.md",
             "content_state": "present",
-            "content_sha256": "919c15cb5e3832d77ae018dd3f7085ef99511eb1e049b932e84ba3e9d70461ec",
+            "content_sha256": "6c33eabb2c2faf016aa3e929a429f843d5a36d122702f0866639859b0a696fb4",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -361,7 +378,7 @@
         {
             "path": "docs/resources/assignments.md",
             "content_state": "present",
-            "content_sha256": "c6dfacc7ec2d77dc7b2c8ea979229e292d3d5f25feee0ace32ec9b269b6c62a1",
+            "content_sha256": "f914fce47908620af6598897fc841cfa1ee747d5239e6e246f82c6cc1163b922",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -406,7 +423,7 @@
         {
             "path": "docs/resources/drivers.md",
             "content_state": "present",
-            "content_sha256": "ab33bb6a458fd1711d88f46f73d3376b6e5dd1889503a03a4e47e0ec8ee0de7f",
+            "content_sha256": "7d98ea110f8c4966608839932ff93a847071355410b216e889a0579204bffbb2",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -487,7 +504,7 @@
         {
             "path": "docs/resources/index.md",
             "content_state": "present",
-            "content_sha256": "b77ba9b0b2bef62b138db2cf3fca69ad5d9a2873520c3fcc1731590c37a54d6e",
+            "content_sha256": "6fd5affc78b89f077ab74c1a229f981b5b7142d5a39c3e0a0193a2663be7c4ea",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -496,7 +513,7 @@
         {
             "path": "docs/resources/industrial.md",
             "content_state": "present",
-            "content_sha256": "2827c10eae4e4c1ab7d7036cb4a45df3e20e8384d5fab1d96795948053e33a97",
+            "content_sha256": "bcdedbe2bca8fce8645be626c589cf571af1a1f1377c4c0173b7b9e1dacc4435",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -505,7 +522,7 @@
         {
             "path": "docs/resources/issues.md",
             "content_state": "present",
-            "content_sha256": "886cccc62d6ae2fed73f665ddf4980eeb97de5b7b41a86d5f400bbad5adb7f73",
+            "content_sha256": "0f4aa0bc8469d4b418c0dc276d662c8100561837151d231da247da61e7ada25a",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -514,7 +531,7 @@
         {
             "path": "docs/resources/legacy.md",
             "content_state": "present",
-            "content_sha256": "38d97a1b8c17681ead3ff3c94b59218fdb0cdbc1a777543dd8fab03a0666f374",
+            "content_sha256": "fe64b7190e7ea46d3b61e82e4a0a52f052f5bb152848ad5f8aa00ea755444029",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -532,7 +549,7 @@
         {
             "path": "docs/resources/maintenance.md",
             "content_state": "present",
-            "content_sha256": "62fe1bdc042370d999971eda25135a95e43212931e08594d46c997e31aa0ebc5",
+            "content_sha256": "a5d926e9765870b64ef75c9783334197e6767a0dd188c08b3412c0dcfaa7df50",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -568,7 +585,7 @@
         {
             "path": "docs/resources/safety-events.md",
             "content_state": "present",
-            "content_sha256": "a46da6d835bc709b875a03c6ead608af0897aeb73e501fb40415fadbabde9312",
+            "content_sha256": "b0063c8e0b32739c2f7f9714428fca260292d8e563ac0006a4c6fc4a69da5612",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -658,7 +675,7 @@
         {
             "path": "docs/resources/vehicle-stats.md",
             "content_state": "present",
-            "content_sha256": "c2a91c19589f64f73e2bde0a7aca9eb9223582ad5a6bd3a35c0c3ce3ac708222",
+            "content_sha256": "d87b7988a6612af0f6c5f32f72048d5cc116107429ca6987ba43c7bbc3ccb19f",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -676,7 +693,7 @@
         {
             "path": "docs/resources/webhooks.md",
             "content_state": "present",
-            "content_sha256": "fcbc3615d8557403230d2fa99ed5f3aa816a33664b9f8e0f67238246c17ffee8",
+            "content_sha256": "e3c9f49f801aa851b8227586b4f7429fa3eb78d0d2c74cf91f2625a231151b79",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -685,7 +702,7 @@
         {
             "path": "docs/resources/work-orders.md",
             "content_state": "present",
-            "content_sha256": "af8d27b80cf30ff61aa7413084871f5a616ed92cf404c8473558e3aea85365c4",
+            "content_sha256": "63c14c8869aba36a05f4ca09097a7f3e48f6302dd1ab421dc9bceb0ea9f079db",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -694,7 +711,7 @@
         {
             "path": "docs/testing.md",
             "content_state": "present",
-            "content_sha256": "7b91a3c8eb4d0be89688bc4f9445acd69a278c129fe7906eb2bd349a0de75a0e",
+            "content_sha256": "476bf8b381c0786ca9fb456afa7f6a9ee7f4bfc04a04b8b007448b9909192cc0",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -703,7 +720,7 @@
         {
             "path": "docs/upgrade-guide-v2.md",
             "content_state": "present",
-            "content_sha256": "bcb1255cf6416e87f3781d6dc17a60d2e8d83e588afd907863bcf43d64579389",
+            "content_sha256": "76b4649c6f42e2dd8d1a3f41e9770237fa5b8f5d6ff7111bcbbfe9fffd01e363",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -768,7 +785,7 @@
         {
             "path": "resources/boost/skills/samsara-sdk-development/references/integration.md",
             "content_state": "present",
-            "content_sha256": "d6483c7757170af2a5f0080af712b62de08d0e4da634389700c05004de9d92c3",
+            "content_sha256": "80e2a89b8b45a205bfb5d1cdece48c57d17b8d4dddb82557b2b1991a37aff788",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -777,7 +794,7 @@
         {
             "path": "resources/boost/skills/samsara-sdk-development/references/querying-and-responses.md",
             "content_state": "present",
-            "content_sha256": "5db7e1b94062758a14a46da677fbfa22b4dba56b68a754a3ff6cf8f1f38f1f5f",
+            "content_sha256": "57b9ba8716fd79429a386d0bc3804bdb212f091adfa7de840b8f2ddafdcdf0de",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -804,7 +821,7 @@
         {
             "path": "scripts/check-samsara-contract-reconciliation.php",
             "content_state": "present",
-            "content_sha256": "2f17366bac56393c9b87ea2510490cd1acd3a3b575471f35178da49d9d401459",
+            "content_sha256": "248505a6d400a41e2ddb063428d17e8c62043defa28ed8e72a49f7e03473d9b0",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -815,7 +832,7 @@
         {
             "path": "scripts/check-v2-upgrade-guide.php",
             "content_state": "present",
-            "content_sha256": "8010370f62c2a1d8a592f0c8e0b91f8f120401258de9ca11596d8d3a76223b53",
+            "content_sha256": "041f7aedc75474a96862ce7f2605440f10b354f64dc84335212d1ee26e1f5886",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -952,7 +969,7 @@
         {
             "path": "src/Data/Driver/Driver.php",
             "content_state": "present",
-            "content_sha256": "882d51e971ba7ad5e97cde5c22b4142a270dc1d4aef57371def9f69ef0a9d94f",
+            "content_sha256": "adc109c8bde861741181de7d30ead3aee2ba295ce77c079cc5c8f3c22859a7b1",
             "disposition": "additive_no_action",
             "guide_sections": [],
             "consumer_action": null,
@@ -961,7 +978,7 @@
         {
             "path": "src/Data/Driver/DriverAuthToken.php",
             "content_state": "present",
-            "content_sha256": "702fad9523bea9a01fe0d87d06c67b577d5b37056768b75a59f8e1b08038a7a8",
+            "content_sha256": "078afda586e07a58c76611d25d7a08c79a261ba4569214e5d58abea510f4e0c6",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-10"
@@ -972,7 +989,7 @@
         {
             "path": "src/Data/Driver/DriverQrCode.php",
             "content_state": "present",
-            "content_sha256": "d7e663882cd89ad5ea620cac77355ee568e32b8e0b67e45b28a9db02933f89f4",
+            "content_sha256": "4702787185f4016ad03615d2f5f9a6010aab7f9908f59b28bee7cefc01ab216c",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-10"
@@ -983,7 +1000,7 @@
         {
             "path": "src/Data/Driver/DriverRemoteSignOutResult.php",
             "content_state": "present",
-            "content_sha256": "c8d4a2f9ab82d4f9856d83101a49ddcbbe4b8fa1672c5d9e2455ad19ac445e8f",
+            "content_sha256": "834d87c34be8fe2b53b4c4be9a1ac1d25e93ebf3b9f6fb9c9dd70fd8da5b096c",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-10"
@@ -1023,7 +1040,7 @@
         {
             "path": "src/Data/Equipment/EquipmentGpsLocation.php",
             "content_state": "present",
-            "content_sha256": "35486b51b1cde0eedfbfa3e8cb62d6c8e448dd4dee9a8e23094ec2c9f7142112",
+            "content_sha256": "2d782612d0a9bcd73d67d24a9a153f79a37e581d3f80ebb849643df8a037e011",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1047,7 +1064,7 @@
         {
             "path": "src/Data/Equipment/EquipmentLocationResult.php",
             "content_state": "present",
-            "content_sha256": "77f10b0071621658df140be8b753fa77c9791a0462deb7083a307fbc900e33ca",
+            "content_sha256": "71518f1a98577f6e3e17d09701aaf1690f8c32fcddb52186dd6b6fdbca200dfd",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1059,7 +1076,7 @@
         {
             "path": "src/Data/Equipment/EquipmentLocationSeries.php",
             "content_state": "present",
-            "content_sha256": "15c592666777652b3d17df364c8e04489390798182b3b1a98e116e1339d96251",
+            "content_sha256": "83195f90aa021e3926b7da0839e15121fd8b69137ad2d729fb52e63f541de4c6",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1071,7 +1088,7 @@
         {
             "path": "src/Data/Equipment/EquipmentStatValue.php",
             "content_state": "present",
-            "content_sha256": "0b8b9d3c0d94eee68ffed7f3ecc2b2376c5d9fdcfcba83df121fb13f83b154f1",
+            "content_sha256": "e6b7c5a84e5dd2708fa74d1dd0ab6043ceb3146bb41d30f3efa2e2f7c67092d8",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1095,7 +1112,7 @@
         {
             "path": "src/Data/Equipment/EquipmentStatsSeries.php",
             "content_state": "present",
-            "content_sha256": "5ce290f84daf7cf72f4e086d3e4ae722f4530a5d35b4d51da154e8a103ec86a4",
+            "content_sha256": "edf2e3e055e751c110cc4591e39569542f0b3949e2e919d27c56de91e2a3b5cf",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1133,7 +1150,7 @@
         {
             "path": "src/Data/HoursOfService/HosClocksForDriver.php",
             "content_state": "present",
-            "content_sha256": "07687b4a4e0cd1ad297fc920748c4e331056abaa2d7660b0822f81478616cd66",
+            "content_sha256": "127046d8ab751937ed16cd74827d7ea88a19916702f3a3ab2285416c40be3a8d",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1164,7 +1181,7 @@
         {
             "path": "src/Data/HoursOfService/HosLogsForDriver.php",
             "content_state": "present",
-            "content_sha256": "79cd122497b52d8abce401ab79d9dc2fcbccd80dd0ea927791a93084e8d45754",
+            "content_sha256": "075a584f7c2a434969e3c1ab97bb38bf30c3a707b2e0f3f545ded48b3cbaa958",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1190,7 +1207,7 @@
         {
             "path": "src/Data/HoursOfService/HosViolationGroup.php",
             "content_state": "present",
-            "content_sha256": "8150cdb128915c28a2ca1350e182d551459f54abf17b1cc0c82ec765dbdc572c",
+            "content_sha256": "e917b937e3b1d06e26e2fe43ea48ce66bdd851f1e3b48e2eae65bf0d1e006e6c",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1298,7 +1315,7 @@
         {
             "path": "src/Data/Maintenance/Dvir.php",
             "content_state": "present",
-            "content_sha256": "76441158f8b82ce41116248f3eb51489026852a68b598fe40658870975f7890f",
+            "content_sha256": "38bc57db68533c9a02d7a5d401cd3ea1d15b6b7e24d456fcf24a24f99ab3bd6f",
             "disposition": "additive_no_action",
             "guide_sections": [],
             "consumer_action": null,
@@ -1347,7 +1364,7 @@
         {
             "path": "src/Data/Route/RouteAuditLog.php",
             "content_state": "present",
-            "content_sha256": "486832bbcf103437a54cb0b830514f67d6311e734ce1d203008808c379b73564",
+            "content_sha256": "15cd30051454df5c0e5f3a7f79598edbac0145463ca8e194b8dfcf38da41abc1",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1391,7 +1408,7 @@
         {
             "path": "src/Data/Safety/SafetyEventActivity.php",
             "content_state": "present",
-            "content_sha256": "0f079b28efae0b0dea25e4028c7cb5b46b7eace627bc162bb8fe346fca568537",
+            "content_sha256": "6f6d516727f9d64249d78207e57473f3de9979c54824d331e04b6dbb89d24c57",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1403,7 +1420,7 @@
         {
             "path": "src/Data/Safety/SafetyScore.php",
             "content_state": "present",
-            "content_sha256": "9fad3be4654e3bff44790523399b23c68fa183a35479d471c05591903ccb5fcc",
+            "content_sha256": "f759f76a368bf0bf3d6e0e4708fceb8a6a220943031cff4cc162dcf6b89fc10c",
             "disposition": "additive_no_action",
             "guide_sections": [],
             "consumer_action": null,
@@ -1512,7 +1529,7 @@
         {
             "path": "src/Data/Vehicle/VehicleLocation.php",
             "content_state": "present",
-            "content_sha256": "38ac17f2e40f7cb7a2d12fb4d2e03d37aab6d3f6403f113b4a8db4c7e7fc291d",
+            "content_sha256": "fcb26c380f7d551f396760648615aca16c959eb409eba1ed00275fb0c87ba727",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1525,7 +1542,7 @@
         {
             "path": "src/Data/Vehicle/VehicleLocationResult.php",
             "content_state": "present",
-            "content_sha256": "d2cc20686ef5b55134caa2c1646155ca49e668f8fca63348d3723aa6c39e63f1",
+            "content_sha256": "fdf96f7a7a911dde84dc71a2667b2ee75941e9580b463a11cbf13972f6d17ef0",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1538,7 +1555,7 @@
         {
             "path": "src/Data/Vehicle/VehicleLocationSeries.php",
             "content_state": "present",
-            "content_sha256": "635c6a78053f45052983099b9231edd221426f1a1ba0c80f331d75420ad26a40",
+            "content_sha256": "a4ca2dab90f2845663ba254032668f53f2578ba6622dca0b4b9ac16fb15474e4",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1551,7 +1568,7 @@
         {
             "path": "src/Data/Vehicle/VehicleStatValue.php",
             "content_state": "present",
-            "content_sha256": "6cb80e888d1d96f087a91c56ea4232c487b9906d855ed472c7fb9e25196b6b99",
+            "content_sha256": "3959b610ccc130b328547759364ae25ceffa354e66e08a215631fc38ba9a66e6",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1573,7 +1590,7 @@
         {
             "path": "src/Data/Vehicle/VehicleStatsSeries.php",
             "content_state": "present",
-            "content_sha256": "afe460a69558c35c4c0ab3ce6f3b3517027ce126265fc7960ba46f92c768165b",
+            "content_sha256": "50b2508550a40ed86b2db73d4d7430054f6d4ef4fdb6dd7a12fed9c45274f50f",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-07",
@@ -1606,13 +1623,26 @@
             "no_action_reason": null
         },
         {
+            "path": "src/Enums/SafetyEventType.php",
+            "content_state": "present",
+            "content_sha256": "344c0d77795cc9dccdbb0b2d0ddd75f33a2ae9449acc2fd580e7f6e7e51e93d4",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
+        },
+        {
             "path": "src/Enums/VehicleStatType.php",
             "content_state": "present",
-            "content_sha256": "41afbd35be096b64c764607c67c336bcc21a12c822fc0bfd56725ab2bcd30c6f",
-            "disposition": "additive_no_action",
-            "guide_sections": [],
-            "consumer_action": null,
-            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+            "content_sha256": "a9ec0934d3a72b410507256130b258778bd95e9121b404942120fd155d761134",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-08"
+            ],
+            "consumer_action": "Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.",
+            "no_action_reason": null
         },
         {
             "path": "src/Enums/WebhookEvent.php",
@@ -1626,10 +1656,11 @@
         {
             "path": "src/Exceptions/InvalidSignatureException.php",
             "content_state": "present",
-            "content_sha256": "f636a19efbc0ca17282932f75de700afef6c40bedfc34299f6bb973ba28efac6",
+            "content_sha256": "c0eaaa05402714b17c1932cbcaea49e03e1424f38438c429dcca9d2bb50ffdd8",
             "disposition": "upgrade_action",
             "guide_sections": [
-                "mig-19"
+                "mig-19",
+                "mig-24"
             ],
             "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
             "no_action_reason": null
@@ -1648,7 +1679,7 @@
         {
             "path": "src/Facades/Samsara.php",
             "content_state": "present",
-            "content_sha256": "7e14acf315e2f69b90df868c8a5fe97021fb73ecb4362afb94dc68401ec6788d",
+            "content_sha256": "7555a58d983f8cd2576b63fb41a9cc62ce9be4b6d97657f9bbaf2227a26398fe",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-18"
@@ -1659,7 +1690,7 @@
         {
             "path": "src/Http/QueryString.php",
             "content_state": "present",
-            "content_sha256": "17bad1d310afe2137978a2cad33e17bb62c97ea213dcb69f742b024a7d736148",
+            "content_sha256": "6c9a0735837210188a04aa337be27419f581791411bbce970663103e15ea4520",
             "disposition": "additive_no_action",
             "guide_sections": [],
             "consumer_action": null,
@@ -1668,16 +1699,27 @@
         {
             "path": "src/Http/RequestExecutor.php",
             "content_state": "present",
-            "content_sha256": "15057f4b7c434aa00028e9000154b0cd69a4195fd3444d53a64d1ff2ddc3ce83",
+            "content_sha256": "aebb259973cbbc915ec05fde4aeb485df6bb1e144ab1c918fd8c5b995672a2a2",
             "disposition": "additive_no_action",
             "guide_sections": [],
             "consumer_action": null,
             "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
         },
         {
+            "path": "src/Http/ResponseDecoder.php",
+            "content_state": "present",
+            "content_sha256": "346caca795011685d0113bc30b9fa3420b9dd61a609eb54094bbb82b291e4519",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-21"
+            ],
+            "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
+            "no_action_reason": null
+        },
+        {
             "path": "src/Query/Builder.php",
             "content_state": "present",
-            "content_sha256": "78a9539c9d76bb041200d67d9823fb33c08cca18ae477d895e1a919094fb5dcd",
+            "content_sha256": "755ee5d4ad0d0d375686aa9f1e05b43f4e7f4990cd76c009f9e2beeaaa19f6b4",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-04",
@@ -1702,7 +1744,7 @@
         {
             "path": "src/Resources/Additional/AlertsResource.php",
             "content_state": "present",
-            "content_sha256": "a412d30862a3593cdc4e1fd3cdad7a5b744b5b6a45a60b6d75f6bf448a7eec4f",
+            "content_sha256": "b733683fb7c01b805a6751ca18a1807ca442a92b36b425f390f96275a5e11a53",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1718,7 +1760,7 @@
         {
             "path": "src/Resources/Additional/CameraMediaResource.php",
             "content_state": "present",
-            "content_sha256": "6c8b71f2a622b33fb5fd28e0a29b3af240000b29b49614a6573625d843ce3ea6",
+            "content_sha256": "cd19d6da1be7c7d96ac14da5fa188543e8ccffd595f14b3d92662d80d9d2a1a9",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1744,7 +1786,7 @@
         {
             "path": "src/Resources/Additional/DriverTrailerAssignmentsResource.php",
             "content_state": "present",
-            "content_sha256": "1a4bb0fa8ec5b0d1d9e409459807bd06a389bcab9e40e47be3e7bfac4603b586",
+            "content_sha256": "d39780b7734984f0bbf50ee5283340cdcb79c226e4a7f6f0af5373b6ddb0db7c",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1757,7 +1799,7 @@
         {
             "path": "src/Resources/Additional/DriverVehicleAssignmentsResource.php",
             "content_state": "present",
-            "content_sha256": "df604695375d8dc873efc61c25ff3a1c32b23dde1e7552724a618786981cc45e",
+            "content_sha256": "4d4ca2a7962036284e2e99d2a145efd9c3b94b3435b8172a67f26fdd770186ac",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1770,7 +1812,7 @@
         {
             "path": "src/Resources/Additional/FormsResource.php",
             "content_state": "present",
-            "content_sha256": "403302880beaeb20a8a97bfced51c8f159e884777bd9a79e06034119c1e7e924",
+            "content_sha256": "88530e5e4a5658c94a0aa8e33fd221f4ab611a5a20ce40d086b3074eba6f833f",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1785,7 +1827,7 @@
         {
             "path": "src/Resources/Additional/FuelAndEnergyResource.php",
             "content_state": "present",
-            "content_sha256": "22192bbace0b82643d43ac359233201f05a014bc2aa306fdbb9620fdd1b29af8",
+            "content_sha256": "e17b4b8a138dfcf8a4425bf7575257c7145a9d6f036ab2b5afe0f4809c4f22a7",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1820,7 +1862,7 @@
         {
             "path": "src/Resources/Additional/IftaResource.php",
             "content_state": "present",
-            "content_sha256": "e7781f6b47ec614e346edbb347ce50a0b15c8334c6aa76ebb04d3f9e0b10d227",
+            "content_sha256": "b25fa9496a38b997c18c6de3731b9cbe47fdc49ae2617094f5a3911f1823a731",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1832,7 +1874,7 @@
         {
             "path": "src/Resources/Additional/IssuesResource.php",
             "content_state": "present",
-            "content_sha256": "ecb1fbe668aabeca4ae5480a1ce97e7e0332feccc5f3aebae41fa12ae10afb4f",
+            "content_sha256": "ea4b50e1d48e7289ad7bd4992f48cdf83dd23f77bfeded74e03a3a445344f03e",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1856,7 +1898,7 @@
         {
             "path": "src/Resources/Additional/SettingsResource.php",
             "content_state": "present",
-            "content_sha256": "20761352ab7444aa9af60c7a1c2b8978ee8d7ead7ee96e45f9ac67a7f1fda1b7",
+            "content_sha256": "04c4c6e71ade5abc64794e2789acaa0ef1632a15eb1fa154a1d48f490cd31806",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1893,7 +1935,7 @@
         {
             "path": "src/Resources/Additional/TrailerAssignmentsResource.php",
             "content_state": "present",
-            "content_sha256": "c34cce71c23cd7c541c1d650c5993fcfaac13a673ea06a474f4894b363d204e4",
+            "content_sha256": "1ea0ebf26d6ef43939fe9bf5cacd51bbf718d9617b56e90bddf628fc42b5576d",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1905,7 +1947,7 @@
         {
             "path": "src/Resources/Additional/WorkOrdersResource.php",
             "content_state": "present",
-            "content_sha256": "611f9a74941d3665d53b9cc72965d130736c19d5df160e176d829750b4375de4",
+            "content_sha256": "e1c1086ff2e3c53dc40783eb662f1bf5d0a1929bb255a05674a19263c579a522",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1920,7 +1962,7 @@
         {
             "path": "src/Resources/Beta/BetaResource.php",
             "content_state": "present",
-            "content_sha256": "2df179f62d402721c6a309d8f6ccda54eefc1105f36a929ba0a5bb051c16de07",
+            "content_sha256": "219fcbbd05228b0b97ba4f0e0f6db9a9dcf399e4bd16fa3d986646af5e5b3e32",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -1961,7 +2003,7 @@
         {
             "path": "src/Resources/Fleet/DriversResource.php",
             "content_state": "present",
-            "content_sha256": "4c8b87ded1a9ffd46b2790503d55e94f5d543f2b87784f943027b96880ac6aba",
+            "content_sha256": "d660527a00c7d100e1229aaf442b4e7f7b8bc0a9801b7f6fe777d1d90fedee26",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -2017,7 +2059,7 @@
         {
             "path": "src/Resources/Industrial/AssetsResource.php",
             "content_state": "present",
-            "content_sha256": "f7bedb67ca00879818fc97b3e86bf9d8c34e5fd57b2ccdea2f63ccee47ab6fe1",
+            "content_sha256": "f47ddd878f4be4d2dd8ad9a547b0441833094b801ad4281643f4459602d07bf0",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -2034,7 +2076,7 @@
         {
             "path": "src/Resources/Industrial/IndustrialResource.php",
             "content_state": "present",
-            "content_sha256": "3bf3bb113fab5126d8f45519ea30e11e1a06924fa3f4451aa9aab41883f5a1db",
+            "content_sha256": "373c99dfcfde516792d067c85321c033ab73e97459be45d09c0734d0e478335c",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -2049,7 +2091,7 @@
         {
             "path": "src/Resources/Industrial/SensorsResource.php",
             "content_state": "present",
-            "content_sha256": "66695598a786137e2ef64e06f99ce7a28217af98269dd632ebe089338ffe744b",
+            "content_sha256": "34c2a408bdd1ba7be4a89afa8f3399caff5407aa0565fd025f3ef18ef8403a77",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -2073,7 +2115,7 @@
         {
             "path": "src/Resources/Integrations/LiveSharingLinksResource.php",
             "content_state": "present",
-            "content_sha256": "d1fdd48359987d336412591bc69136fbe7a1d4a0875c4a9552c9026f82a66191",
+            "content_sha256": "a232045ccba9a58041405f8b59abc136a752f0f760c12b8da5e41363e38fe75b",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -2099,11 +2141,12 @@
         {
             "path": "src/Resources/Legacy/LegacyResource.php",
             "content_state": "present",
-            "content_sha256": "b2bfe03697a6fccd07c3c1202e85d1a7f337b7fabfb8f89e469774a2e47933c8",
+            "content_sha256": "074c7c2c7ab45300b77916631bee7e2d7a08e7f4b4632b2312cfa66b08603596",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
-                "mig-04"
+                "mig-04",
+                "mig-25"
             ],
             "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
             "no_action_reason": null
@@ -2118,6 +2161,15 @@
             ],
             "consumer_action": "Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.",
             "no_action_reason": null
+        },
+        {
+            "path": "src/Resources/Organization/OrganizationResource.php",
+            "content_state": "present",
+            "content_sha256": "5642b0cd66d86030b264926c7d05a09a7340a4e102318926cf06a42e97bad939",
+            "disposition": "additive_no_action",
+            "guide_sections": [],
+            "consumer_action": null,
+            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
         },
         {
             "path": "src/Resources/Organization/TagsResource.php",
@@ -2146,7 +2198,7 @@
         {
             "path": "src/Resources/Preview/PreviewResource.php",
             "content_state": "present",
-            "content_sha256": "c98d1d234a85033371229e9848bbf54c2508a0eba3caa43e950b9395eab29598",
+            "content_sha256": "2aa66c96c77ef9b247b44d1bc122e16c82239279d8b549ead2a5348deecd691f",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -2159,7 +2211,7 @@
         {
             "path": "src/Resources/Resource.php",
             "content_state": "present",
-            "content_sha256": "c45c442be4d1713fbf2da3179532df10a1790da40cdb92c255a81de6ef125c2d",
+            "content_sha256": "7c797f5baf305700e39df3c9667469e7fb89aa6e26ed1bdd3bbbaa1c980194c1",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -2187,7 +2239,7 @@
         {
             "path": "src/Resources/Safety/MaintenanceResource.php",
             "content_state": "present",
-            "content_sha256": "62ed350863679b8ef3809e6ecb1018b559274be16c97c626c92d938438da71db",
+            "content_sha256": "11464e8077c59bafc20e324dd8df5e43694d9b1bca3452dbb0ae9fc0aaa8da2b",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-02",
@@ -2260,20 +2312,31 @@
         {
             "path": "src/Samsara.php",
             "content_state": "present",
-            "content_sha256": "056ddacb6f0328ca98a970d1a8371a1d8df90032d3586025c47f8f9af0d3b14d",
-            "disposition": "additive_no_action",
-            "guide_sections": [],
-            "consumer_action": null,
-            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+            "content_sha256": "423deb144135d1753fff26a94f1cd210027441b5970362021222500ad79c7439",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-20",
+                "mig-21",
+                "mig-22",
+                "mig-23"
+            ],
+            "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
+            "no_action_reason": null
         },
         {
             "path": "src/SamsaraServiceProvider.php",
             "content_state": "present",
-            "content_sha256": "62a84db086b9bdc7a4f5ba142a7321d6acc0f8613c36a07857064a20f32cfaaa",
-            "disposition": "additive_no_action",
-            "guide_sections": [],
-            "consumer_action": null,
-            "no_action_reason": "Additive configuration, infrastructure, annotation, or DTO/helper behavior; optional adoption only unless an existing operation migration is linked elsewhere."
+            "content_sha256": "1c69352d8cf70e55626cb546735b629f5a88e4a44c6d42d9796a0e6b96a9a758",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-20",
+                "mig-21",
+                "mig-22",
+                "mig-23",
+                "mig-24"
+            ],
+            "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
+            "no_action_reason": null
         },
         {
             "path": "src/Testing/Fixtures/addresses.json",
@@ -2419,12 +2482,35 @@
             "no_action_reason": "Contract, audit, validation, CI, or formatting evidence for the documented migration; it does not add a separate consumer action."
         },
         {
-            "path": "src/Webhooks/WebhookSignatureVerifier.php",
+            "path": "src/Testing/SamsaraFake.php",
             "content_state": "present",
-            "content_sha256": "8ced4e81b5612ee3e5934d179c4aff72ecaa309c37f7e91b1b09c8bec0ce8afc",
+            "content_sha256": "82e15de5f309d87301e6bb874d645b0a10d22ab955079b98bc374e623ad5925c",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, validation, CI, or formatting evidence for the documented migration; it does not add a separate consumer action."
+        },
+        {
+            "path": "src/Webhooks/VerifyWebhookSignature.php",
+            "content_state": "present",
+            "content_sha256": "46832ed2fbf68bbafd38cf46a55040379728f54202c32a93cca45332441ba49b",
             "disposition": "upgrade_action",
             "guide_sections": [
-                "mig-19"
+                "mig-24"
+            ],
+            "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
+            "no_action_reason": null
+        },
+        {
+            "path": "src/Webhooks/WebhookSignatureVerifier.php",
+            "content_state": "present",
+            "content_sha256": "3fae0e2ffaeccb5462d7c34d1945d185def41e5073668f425b853be8840889e1",
+            "disposition": "upgrade_action",
+            "guide_sections": [
+                "mig-19",
+                "mig-24"
             ],
             "consumer_action": "Apply the linked mandatory migration and its focused verification steps.",
             "no_action_reason": null
@@ -2433,6 +2519,17 @@
             "path": "tests/Maintenance/ApiSnapshotValidatorTest.php",
             "content_state": "present",
             "content_sha256": "48abcc9be4d348177c29437e4be85aadb648bfe98d456b280b28c7c460697d6b",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/TestCase.php",
+            "content_state": "present",
+            "content_sha256": "8fe6f80c4f5171ebaa6379c8c20b5481a1b144872ab5000eb0f19c01edcb25b4",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -2465,7 +2562,7 @@
         {
             "path": "tests/Unit/ConfigTest.php",
             "content_state": "present",
-            "content_sha256": "42f2d6318da6a401ae6ed4e2e7c2cfab48081461a511976ae9be1c88d03308f1",
+            "content_sha256": "1535607381cf2e42ed4f6bc34b8849b1ee98c4e5a18253bb02381a1877309cf9",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -2905,7 +3002,7 @@
         {
             "path": "tests/Unit/Data/Safety/SafetyScoreTest.php",
             "content_state": "present",
-            "content_sha256": "5c12b4523c85162e0ed84bb9a84859f7ee4598d967367a94ce7c83b69e9a19d1",
+            "content_sha256": "4b7587a81d7fe7eb1f5c1dc798c3d94c899d943d57607805aacb6469fef12fdf",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3068,6 +3165,17 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/DistributionArchiveTest.php",
+            "content_state": "present",
+            "content_sha256": "1f26e47f16f2bee35f62effa91ce82ad451153442dba22e30325d953f7cd1815",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Enums/DutyStatusTest.php",
             "content_state": "present",
             "content_sha256": "a8c650918ab7f915095d577378f0422d3e369fe127623c8b10667da15131ad71",
@@ -3079,9 +3187,20 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Enums/RemainingEnumsTest.php",
+            "content_state": "present",
+            "content_sha256": "fee9ac17b3069d1ca3b0c74022e0a07743957367ea328af513dc9b128a7395b3",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Enums/VehicleStatTypeTest.php",
             "content_state": "present",
-            "content_sha256": "182af0e89c75320084370aaf5ee6bc7fca1fce0dfaf7a02b12b223d0488e5fcf",
+            "content_sha256": "96ddf6bac30bf9ec1b728f2114e93bebc3216e90548fce95a2b5557dc688fe51",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3114,7 +3233,7 @@
         {
             "path": "tests/Unit/Exceptions/InvalidSignatureExceptionTest.php",
             "content_state": "present",
-            "content_sha256": "30111124d8258c20a64ab96bdd9ae23ca410de2471c365dfb1e4e97a15cb5af2",
+            "content_sha256": "070cf23fdb84b9313c00b099a4c3cc3b184cd3c059ee4f17f8dbf167daad921f",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3125,7 +3244,7 @@
         {
             "path": "tests/Unit/Facades/SamsaraFacadeTest.php",
             "content_state": "present",
-            "content_sha256": "4915b1ec069b867f714fa19de388b062a7895832918d0756803187a00a68e59f",
+            "content_sha256": "f0f793fc07cce1293b923f212748f16b17f56d796055f0f4babcb06265e6a388",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3136,7 +3255,7 @@
         {
             "path": "tests/Unit/Http/QueryStringTest.php",
             "content_state": "present",
-            "content_sha256": "ae00b6895fcccb1c08ca9ea73534686a56790a648260e428cf7d5f022eb7befc",
+            "content_sha256": "02ecc3bfe33bbb0ad62227b4afd0917220cad28145902f566a6202b4df79b38a",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3147,7 +3266,7 @@
         {
             "path": "tests/Unit/Query/BuilderTest.php",
             "content_state": "present",
-            "content_sha256": "679f0cf75911e92589fb419040f2d2aeb355994cbb54b157b849cec53bf1bd42",
+            "content_sha256": "3d5c120151af3e8d006903fe5541d0eaa8f1c591b91c9b7ced2a731237d42e60",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3191,7 +3310,7 @@
         {
             "path": "tests/Unit/Resources/Additional/CurrentContractAResourceTest.php",
             "content_state": "present",
-            "content_sha256": "b357fbc70b31129802d085ae14da33cd81bf9be0587696a13af82c4b101cc755",
+            "content_sha256": "d92623f5c63fba36e29ed9cdf20c6b2f95b4c20b04f44142d84a58c74c1b6182",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3213,7 +3332,7 @@
         {
             "path": "tests/Unit/Resources/Additional/DriverTrailerAssignmentsResourceTest.php",
             "content_state": "present",
-            "content_sha256": "c68d6484bfacc4814b25cd174d279a403e5c03714cfca7c9cd165bec072cbafd",
+            "content_sha256": "039597235ba7554baa5dd560b47c1dd38a9fc493f14947405481a0d4f42ea63d",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3224,7 +3343,7 @@
         {
             "path": "tests/Unit/Resources/Additional/DriverVehicleAssignmentsResourceTest.php",
             "content_state": "present",
-            "content_sha256": "66eee746631455f280d272a1a0ed231cf54db87bbc817546c85a8d0d96be235f",
+            "content_sha256": "43491d4048f070315920644aaa6ff3ba2e7256fb20f9d0950844d997b28a73c1",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3290,7 +3409,7 @@
         {
             "path": "tests/Unit/Resources/Additional/IssuesResourceTest.php",
             "content_state": "present",
-            "content_sha256": "12012b90269eab724278c8b78d06ec1d3de4ab50ab4ac4c9ae23dd3795478b4a",
+            "content_sha256": "ebe3959095c17bac41bf26f03588fc2d1227e5ae19eb9452b6090b0555b6be5e",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3334,7 +3453,7 @@
         {
             "path": "tests/Unit/Resources/Additional/TrailerAssignmentsResourceTest.php",
             "content_state": "present",
-            "content_sha256": "a313da30395a33eba563cd989a0797ff31270f2edb972393670019fe2c18ef3c",
+            "content_sha256": "498f7f950b655b43b58c225f32962294d0dfcf5ee9a6ce8fc55d2547ebf15483",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3345,7 +3464,7 @@
         {
             "path": "tests/Unit/Resources/Additional/WorkOrdersResourceTest.php",
             "content_state": "present",
-            "content_sha256": "7501a8875ff19a74260afa049e49cf6b396d0ff9c70eae8b2d486a76a38966d8",
+            "content_sha256": "7cc9a0fafee3360f9a62990a0dad1061780e967362e12b034ac9051a6247f2d7",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3356,7 +3475,7 @@
         {
             "path": "tests/Unit/Resources/Beta/BetaResourceTest.php",
             "content_state": "present",
-            "content_sha256": "9675bb16d567f7f2345146eda811301e0f9157c77a83e64abca84a88cbc8e3ec",
+            "content_sha256": "200b2df04edbdd1c126af4b428af04129ef19088068a83b6d93e6204aabe8202",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3378,7 +3497,7 @@
         {
             "path": "tests/Unit/Resources/Dispatch/RoutesResourceTest.php",
             "content_state": "present",
-            "content_sha256": "1efb05f42073b650259125e450a204d77d5a8c0baac99a88e199c1caf6eb3165",
+            "content_sha256": "f4f76c9f8e1dde470ca98e96729323d91b6e930abbb156f76f1c9941400d6982",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3389,7 +3508,7 @@
         {
             "path": "tests/Unit/Resources/Fleet/DriversResourceTest.php",
             "content_state": "present",
-            "content_sha256": "e644dea41fbff0c4f4e3c44a622c4811e779bbf07db1aa6359eaf3c5efbec841",
+            "content_sha256": "ae4ec7c874870be7455c5756bcb86011b422a676977cb7f6407dfdbcc4a1136a",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3400,7 +3519,7 @@
         {
             "path": "tests/Unit/Resources/Fleet/EquipmentResourceTest.php",
             "content_state": "present",
-            "content_sha256": "5c445a9d165506d3505dd79355ce3c3d7b8f85272fa8ad7952f5b6ca527f7b39",
+            "content_sha256": "0fb0405b0230fc3713cd9f35eb65799f00fc8706782b9f93ecb193064c7726e4",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3433,7 +3552,7 @@
         {
             "path": "tests/Unit/Resources/Industrial/AssetsResourceTest.php",
             "content_state": "present",
-            "content_sha256": "fb20229f713816223f03f5d1b334dde92fa120e68b800282007983aa9020a738",
+            "content_sha256": "ab9274948848e1f4390b2cd1cecf01a4c7419e03afa86270802f431a8330a248",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3444,7 +3563,7 @@
         {
             "path": "tests/Unit/Resources/Industrial/IndustrialResourceTest.php",
             "content_state": "present",
-            "content_sha256": "609dfb11409a32700d5955478afa4482f28467d43a843d7a82befc740213d95b",
+            "content_sha256": "14b78213b3871ced2c990b09dbc0133a0bec32245833d93e5d54b9589e402163",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3455,7 +3574,7 @@
         {
             "path": "tests/Unit/Resources/Industrial/SensorsResourceTest.php",
             "content_state": "present",
-            "content_sha256": "6a1bae8855cb3420a17bad60cc06d976117b1565797e05e3e95d48f31889c6a5",
+            "content_sha256": "a2df43915ba09d38ab82db3aa41729f6908e1772d54f6943d0e9f4684ded80a6",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3466,7 +3585,7 @@
         {
             "path": "tests/Unit/Resources/Integrations/GatewaysResourceTest.php",
             "content_state": "present",
-            "content_sha256": "0087a84159fc8ddba5990b9c1635ebf3d596304def4a15293ca914d667fc72b3",
+            "content_sha256": "0a740a6759e541a5a1e1ebe3ebd0fb26ba2f748e42eccee777c0e2cad56c60f6",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3477,7 +3596,7 @@
         {
             "path": "tests/Unit/Resources/Integrations/LiveSharingLinksResourceTest.php",
             "content_state": "present",
-            "content_sha256": "d01235bd1ccd499f7d28ef5930a43e550042559f66e522605f7c1546f0cd0890",
+            "content_sha256": "13f7b336594f25fa089178aed930a7622727288c1cb29ab7e088af0536c7b367",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3499,7 +3618,7 @@
         {
             "path": "tests/Unit/Resources/Legacy/LegacyResourceTest.php",
             "content_state": "present",
-            "content_sha256": "bc9ccd4f1e8eb9f0ace1253c61437e8aed1c87096e7f2d061fbf072da784ddfa",
+            "content_sha256": "6607ec4d557c494b2771dcb5e279755706020f2f09408ddb65b2943158923f95",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3576,7 +3695,7 @@
         {
             "path": "tests/Unit/Resources/ResourceTest.php",
             "content_state": "present",
-            "content_sha256": "c692fd532a3a5928714b400fedb75ef121e7776823ad025e4ca284c687b7537f",
+            "content_sha256": "6868ec801f90bb8d2184f4db5a0d8560a1736468920357175d91c306def51e72",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3609,7 +3728,7 @@
         {
             "path": "tests/Unit/Resources/Safety/MaintenanceResourceTest.php",
             "content_state": "present",
-            "content_sha256": "cf1bc10e03fe8dd3201b99c866301ba7c80b88d7c5e228448f5fd9935e965912",
+            "content_sha256": "543e8b0e0f8cf34fad50ef05f03b2788f007160baee3e9dd7aa82da612ae138c",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3631,7 +3750,7 @@
         {
             "path": "tests/Unit/Resources/Telematics/TripsResourceTest.php",
             "content_state": "present",
-            "content_sha256": "d5240fd07ceac38ccb87da6a559ef8acd47fe7792ea116934bc08e15d744fea2",
+            "content_sha256": "067ce27af18c3db1061e5d0753b32084b71270254a5108442f8fe47049f851b2",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3653,7 +3772,7 @@
         {
             "path": "tests/Unit/Resources/Telematics/VehicleStatsResourceTest.php",
             "content_state": "present",
-            "content_sha256": "eb8dfb30a0bec8d6a78239055a2f5f47b5a140e0a4a14f9e3ff1ffef93b9ff61",
+            "content_sha256": "24e53a6d0417a47bbbae1dcf71c763f273145bd3c216aef8906282d857f4c290",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3664,7 +3783,7 @@
         {
             "path": "tests/Unit/SamsaraServiceProviderTest.php",
             "content_state": "present",
-            "content_sha256": "8c7ea38f3c789579dffd7c6113180ca7c747bc68c466b72f6d7eba3d073985cf",
+            "content_sha256": "4a828291fe20ffb2704895c026b7d597037008ed96ffe0d1a6bfc3393eb3118d",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3675,7 +3794,7 @@
         {
             "path": "tests/Unit/SamsaraTest.php",
             "content_state": "present",
-            "content_sha256": "6001476a03e6ef24accf599ef9aa748f28550db7cef53e7eff6b193aedf2c378",
+            "content_sha256": "6cb1404167988b09ab2064fcd33b1c434a2ca16d7d4d6843baa4323a079db662",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3695,9 +3814,31 @@
             "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
         },
         {
+            "path": "tests/Unit/Testing/SamsaraFakeTest.php",
+            "content_state": "present",
+            "content_sha256": "ab049814feeb60e2c9d3ff08b845e8112ac6b637cc3874a123fe2591892ce772",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
+            "path": "tests/Unit/Webhooks/VerifyWebhookSignatureTest.php",
+            "content_state": "present",
+            "content_sha256": "e3d28341baf24c275aa35ed2432bb5ed51b3ebb2d22419757a64d5751260ab9b",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Executable regression evidence for one or more documented migrations; it does not add a separate consumer action."
+        },
+        {
             "path": "tests/Unit/Webhooks/WebhookSignatureVerifierTest.php",
             "content_state": "present",
-            "content_sha256": "98f00f48b86c66e6d4d226f7ac59a27540937b8c0d0eb3486da73b6349b0eb01",
+            "content_sha256": "c7d016c06b98b11bb413788926fc6f493060f04e1e835b4dbff8d5d3db53f67e",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"

@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Trailer\Trailer;
 
@@ -32,7 +33,19 @@ class TrailerAssignmentsResource extends Resource
             $endpoint
         );
 
-        return Trailer::make($response->json());
+        return Trailer::make($this->decodeJsonArray($response, $endpoint));
+    }
+
+    /**
+     * Query all trailer assignments from the wrapped v1 collection.
+     */
+    public function query(): Builder
+    {
+        return $this->createBuilderWithEndpoint($this->endpoint)
+            ->withoutDefaultPageSize()
+            ->withCursorParameter('startingAfter')
+            ->withResponseCollectionKey('trailers')
+            ->usingEntity(Trailer::class);
     }
 
     /**

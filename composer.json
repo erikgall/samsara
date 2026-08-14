@@ -19,6 +19,28 @@
             "email": "8866568+erikgall@users.noreply.github.com"
         }
     ],
+    "archive": {
+        "exclude": [
+            "/.ai",
+            "/.github",
+            "/.prettierrc",
+            "/CLAUDE.md",
+            "/DEVELOPMENT_CHANGELOG.md",
+            "/composer.lock",
+            "/contracts",
+            "/docs",
+            "/node_modules",
+            "/package-lock.json",
+            "/package.json",
+            "/phpstan.neon",
+            "/phpunit.xml",
+            "/pint.json",
+            "/samsara.json",
+            "/scripts",
+            "/tests",
+            "/vendor"
+        ]
+    },
     "require": {
         "php": "^8.2",
         "illuminate/http": "^12.0|^13.0",

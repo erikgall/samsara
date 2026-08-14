@@ -35,7 +35,7 @@ class LegacyResource extends Resource
      */
     public function assetLocations(array $data): array
     {
-        return $this->postLegacy('/v1/fleet/assets/locations', $data);
+        return $this->getLegacy('/v1/fleet/assets/locations', $data);
     }
 
     /**
@@ -46,18 +46,7 @@ class LegacyResource extends Resource
      */
     public function assetReefers(array $data): array
     {
-        return $this->postLegacy('/v1/fleet/assets/reefers', $data);
-    }
-
-    /**
-     * Get dispatch routes (v1).
-     *
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    public function dispatchRoutes(array $data): array
-    {
-        return $this->getLegacy('/v1/fleet/dispatch/routes', $data);
+        return $this->getLegacy('/v1/fleet/assets/reefers', $data);
     }
 
     /**
@@ -81,7 +70,7 @@ class LegacyResource extends Resource
      */
     public function fleetAssets(array $data): array
     {
-        return $this->postLegacy('/v1/fleet/assets', $data);
+        return $this->getLegacy('/v1/fleet/assets', $data);
     }
 
     /**
@@ -92,7 +81,7 @@ class LegacyResource extends Resource
      */
     public function hosAuthenticationLogs(array $data): array
     {
-        return $this->postLegacy('/v1/fleet/hos_authentication_logs', $data);
+        return $this->getLegacy('/v1/fleet/hos_authentication_logs', $data);
     }
 
     /**
@@ -114,7 +103,7 @@ class LegacyResource extends Resource
      */
     public function maintenanceList(array $data): array
     {
-        return $this->postLegacy('/v1/fleet/maintenance/list', $data);
+        return $this->getLegacy('/v1/fleet/maintenance/list', $data);
     }
 
     /**
@@ -124,6 +113,17 @@ class LegacyResource extends Resource
      * @return array<string, mixed>
      */
     public function messages(array $data): array
+    {
+        return $this->getLegacy('/v1/fleet/messages', $data);
+    }
+
+    /**
+     * Send a message (v1).
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public function sendMessage(array $data): array
     {
         return $this->postLegacy('/v1/fleet/messages', $data);
     }
@@ -136,7 +136,7 @@ class LegacyResource extends Resource
      */
     public function trips(array $data): array
     {
-        return $this->postLegacy('/v1/fleet/trips', $data);
+        return $this->getLegacy('/v1/fleet/trips', $data);
     }
 
     /**
@@ -173,7 +173,7 @@ class LegacyResource extends Resource
      */
     public function visionCameras(array $data): array
     {
-        return $this->postLegacy('/v1/industrial/vision/cameras', $data);
+        return $this->getLegacy('/v1/industrial/vision/cameras', $data);
     }
 
     /**
@@ -197,7 +197,7 @@ class LegacyResource extends Resource
             $endpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**
@@ -213,6 +213,6 @@ class LegacyResource extends Resource
             $endpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 }

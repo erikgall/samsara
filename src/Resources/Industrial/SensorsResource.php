@@ -34,7 +34,7 @@ class SensorsResource extends Resource
             $endpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**
@@ -51,7 +51,7 @@ class SensorsResource extends Resource
             $endpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**
@@ -68,7 +68,7 @@ class SensorsResource extends Resource
             $endpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**
@@ -85,7 +85,7 @@ class SensorsResource extends Resource
             $endpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**
@@ -101,7 +101,7 @@ class SensorsResource extends Resource
             $endpoint
         );
 
-        $sensors = $response->json('sensors', []);
+        $sensors = $this->decodeJsonList($response, $endpoint, 'sensors');
 
         return $this->mapToEntities($sensors);
     }
@@ -120,7 +120,7 @@ class SensorsResource extends Resource
             $endpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**

@@ -33,7 +33,7 @@ class CameraMediaResource extends Resource
             ['inputs', 'mediaTypes', 'triggerReasons'],
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $this->endpoint);
     }
 
     /**
@@ -49,7 +49,7 @@ class CameraMediaResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**
@@ -77,7 +77,7 @@ class CameraMediaResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**

@@ -66,11 +66,16 @@ return [
     'api_key' => env('SAMSARA_API_KEY'),
     'region' => env('SAMSARA_REGION', 'us'),
     'timeout' => env('SAMSARA_TIMEOUT', 30),
-    'retry' => env('SAMSARA_RETRY', 3),
+    'attempts' => env('SAMSARA_ATTEMPTS', 3),
+    'retry_after_max_seconds' => env('SAMSARA_RETRY_AFTER_MAX_SECONDS', 30),
     'per_page' => env('SAMSARA_PER_PAGE', 100),
     'webhook_secret' => env('SAMSARA_WEBHOOK_SECRET'),
 ];
 ```
+
+`attempts` is the maximum total request count, including the initial request. Set it to `1` to make one request without retries; the default of `3` permits up to two retries.
+
+`retry_after_max_seconds` is the largest rate-limit delay the SDK will honor inside the current process. A larger `Retry-After` value throws `RateLimitException` immediately so a web request or worker can reschedule instead of blocking indefinitely.
 
 `per_page` is the implicit `limit` for `paginate()` and `lazy()` when the caller does not supply one. An explicit `paginate($perPage)`, `lazy($chunkSize)`, `limit()`, or `where('limit', ...)` value wins. Endpoint helpers whose official contract has cursors but no `limit` disable this default automatically; do not add an explicit limit to those endpoints.
 
@@ -213,6 +218,8 @@ $addresses = Samsara::addresses()->all();
 ### Organization Resources
 
 ```php
+$organization = Samsara::me();
+
 // Users
 $users = Samsara::users()->all();
 

@@ -42,7 +42,7 @@ class PreviewResource extends Resource
         );
 
         /** @var array<string, mixed> */
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**

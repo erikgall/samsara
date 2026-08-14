@@ -105,8 +105,8 @@ class LiveSharingLinksResourceTest extends TestCase
         try {
             $resource->find('share-123');
             $this->fail('Live sharing links do not support an item GET.');
-        } catch (UnsupportedOperationException) {
-            $this->assertTrue(true);
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('find', $exception->getContext()['operation'] ?? null);
         }
 
         $this->http->assertNothingSent();
@@ -174,6 +174,18 @@ class LiveSharingLinksResourceTest extends TestCase
             && parse_url($request->url(), PHP_URL_QUERY) === 'id=share-123'
             && $request->data() === ['name' => 'Updated Share']
         );
+    }
+
+    #[Test]
+    public function it_does_not_hydrate_an_updated_live_share_from_the_whole_payload(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['id' => 'wrong-level-share']),
+        ]);
+
+        $liveShare = (new LiveSharingLinksResource($this->samsara))->update('share-123', []);
+
+        $this->assertNull($liveShare->id);
     }
 
     #[Test]

@@ -6,6 +6,7 @@ use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Maintenance\Dvir;
 use Samsara\Data\Maintenance\Defect;
+use Samsara\Data\Maintenance\DefectType;
 
 /**
  * Maintenance resource for the Samsara API.
@@ -42,7 +43,7 @@ class MaintenanceResource extends Resource
         );
 
         /** @var Dvir */
-        return $this->mapToEntity($response->json('data', []));
+        return $this->mapToEntity($this->decodeJsonData($response, $endpoint, false));
     }
 
     /**
@@ -55,11 +56,47 @@ class MaintenanceResource extends Resource
     }
 
     /**
+     * Get a query builder for defect types.
+     */
+    public function defectTypes(): Builder
+    {
+        return $this->createBuilderWithEndpoint('/defect-types')
+            ->withoutDefaultPageSize()
+            ->usingEntity(DefectType::class);
+    }
+
+    /**
      * Get a query builder for DVIRs.
      */
     public function dvirs(): Builder
     {
         return $this->query();
+    }
+
+    /**
+     * Get one defect from its current item endpoint.
+     *
+     * @param  array<string, mixed>  $params
+     */
+    public function findDefect(string $id, array $params = []): Defect
+    {
+        $endpoint = '/defects/'.rawurlencode($id);
+        $response = $this->executeSdkGet($endpoint, $params);
+
+        return Defect::make($this->decodeJsonArray($response, $endpoint));
+    }
+
+    /**
+     * Get one DVIR from its current item endpoint.
+     *
+     * @param  array<string, mixed>  $params
+     */
+    public function findDvir(string $id, array $params = []): Dvir
+    {
+        $endpoint = '/dvirs/'.rawurlencode($id);
+        $response = $this->executeSdkGet($endpoint, $params);
+
+        return Dvir::make($this->decodeJsonArray($response, $endpoint));
     }
 
     /**
@@ -69,6 +106,38 @@ class MaintenanceResource extends Resource
     {
         return $this->createBuilderWithEndpoint($this->endpoint)
             ->repeatQueryParameters('safetyStatus');
+    }
+
+    /**
+     * Resolve a DVIR at the fleet item endpoint.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function resolveDvir(string $id, array $data): Dvir
+    {
+        $endpoint = '/fleet/dvirs/'.rawurlencode($id);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($endpoint, $data),
+            $endpoint,
+        );
+
+        return Dvir::make($this->decodeJsonData($response, $endpoint, false));
+    }
+
+    /**
+     * Update a defect at the fleet item endpoint.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function updateDefect(string $id, array $data): Defect
+    {
+        $endpoint = '/fleet/defects/'.rawurlencode($id);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($endpoint, $data),
+            $endpoint,
+        );
+
+        return Defect::make($this->decodeJsonData($response, $endpoint, false));
     }
 
     /**

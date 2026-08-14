@@ -8,6 +8,7 @@ use Samsara\Data\Entity;
 use Samsara\Http\QueryString;
 use Samsara\Resources\Resource;
 use Samsara\Http\RequestExecutor;
+use Samsara\Http\ResponseDecoder;
 use Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\LazyCollection;
@@ -102,6 +103,11 @@ class Builder implements QueryBuilderInterface
      * @var array<string>
      */
     protected array $types = [];
+
+    /**
+     * The successful-response decoder.
+     */
+    private ?ResponseDecoder $responseDecoder = null;
 
     /**
      * Create a new query builder instance.
@@ -216,7 +222,11 @@ class Builder implements QueryBuilderInterface
     {
         $response = $this->executeRequest();
 
-        $data = $response->json($this->responseCollectionKey, []);
+        $data = $this->responseDecoder()->decodeList(
+            $response,
+            $this->getEndpoint(),
+            $this->responseCollectionKey,
+        );
 
         return $this->mapToEntities($data);
     }
@@ -238,7 +248,11 @@ class Builder implements QueryBuilderInterface
 
         $response = $this->executeRequest();
 
-        $data = $response->json($this->responseCollectionKey, []);
+        $data = $this->responseDecoder()->decodeList(
+            $response,
+            $this->getEndpoint(),
+            $this->responseCollectionKey,
+        );
         $pagination = $response->json('pagination', []);
 
         $items = $this->mapToEntities($data);
@@ -272,7 +286,11 @@ class Builder implements QueryBuilderInterface
 
                 $response = $builder->executeRequest();
 
-                $data = $response->json($builder->responseCollectionKey, []);
+                $data = $builder->responseDecoder()->decodeList(
+                    $response,
+                    $builder->getEndpoint(),
+                    $builder->responseCollectionKey,
+                );
                 $pagination = $response->json('pagination', []);
 
                 foreach ($data as $item) {
@@ -567,6 +585,14 @@ class Builder implements QueryBuilderInterface
             fn (Response $response) => $this->resource->throwIfError($response),
             $endpoint,
         );
+    }
+
+    /**
+     * Get the successful-response decoder.
+     */
+    private function responseDecoder(): ResponseDecoder
+    {
+        return $this->responseDecoder ??= new ResponseDecoder;
     }
 
     /**

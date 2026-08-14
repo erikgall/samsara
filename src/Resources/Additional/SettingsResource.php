@@ -31,7 +31,7 @@ class SettingsResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**
@@ -47,7 +47,7 @@ class SettingsResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**
@@ -63,7 +63,7 @@ class SettingsResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**
@@ -80,7 +80,7 @@ class SettingsResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**
@@ -97,7 +97,7 @@ class SettingsResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**

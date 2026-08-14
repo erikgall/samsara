@@ -19,7 +19,7 @@ permalink: /testing
 
 ## Introduction
 
-The SDK ships a `SamsaraFake` class with its own faked HTTP client. You stage canned responses, run code through the returned fake or the facade, then assert on the requests it recorded. `Samsara::fake()` replaces the facade root and both container bindings, including when the service provider has not yet resolved the singleton.
+The SDK ships a `SamsaraFake` class with its own faked HTTP client. You stage canned responses, run code through the returned fake or the facade, then assert on the requests it recorded. `Samsara::fake()` replaces the facade root and both container bindings, including before the service provider has resolved the lifecycle-scoped client. Stray-request prevention is always enabled: every request path must have an exact staged response.
 
 ## Faking the Client
 
@@ -46,6 +46,23 @@ public function test_it_lists_drivers(): void
 ```
 
 `Samsara::fake()` returns a new `SamsaraFake`, swaps the facade root, and binds that same instance as `Samsara\Samsara` and `samsara`. Direct calls through `$fake` remain equivalent.
+
+The normal container-resolved client uses Laravel's shared HTTP factory. This means the framework-native seam covers SDK traffic:
+
+```php
+use Illuminate\Support\Facades\Http;
+use Samsara\Facades\Samsara;
+
+Http::preventStrayRequests();
+Http::fake([
+    'https://api.samsara.com/fleet/drivers*' => Http::response(['data' => []]),
+]);
+
+Samsara::drivers()->all();
+Http::assertSentCount(1);
+```
+
+Standalone `new Samsara(...)` remains container-independent and creates its own factory unless you pass one as the optional third constructor argument or call `setHttpFactory()`.
 
 ## Faking Responses
 
@@ -100,7 +117,7 @@ $fake->fakeVehicleStats([
 
 ### Custom Endpoints
 
-For endpoints without a dedicated helper, use `fakeResponse()`. The endpoint string is matched as a substring of the request URL.
+For endpoints without a dedicated helper, use `fakeResponse()`. The endpoint is matched to the exact URL path; query parameters do not affect the match. A collection fake does not cover item or subresource paths.
 
 ```php
 $fake->fakeResponse('/fleet/routes', [
@@ -129,13 +146,24 @@ $fake->fakeResponse('/fleet/drivers', [], 400);
 
 `fakeResponse()` always wraps the supplied array in a top-level `data` key. It cannot currently stage an arbitrary top-level error envelope such as `message` plus `errors`; use the [advanced HTTP factory](#advanced-http-mocking) when the error body or headers matter.
 
+Dedicated helpers are exact too. `fakeDrivers()` covers `/fleet/drivers`, not `/fleet/drivers/{id}`. `fakeVehicleStats()` covers `/fleet/vehicles/stats`, not `/fleet/vehicles/stats/history`. Stage those paths explicitly:
+
+```php
+$fake->fakeResponse('/fleet/drivers/driver-1', [
+    'id'   => 'driver-1',
+    'name' => 'John',
+]);
+
+$driver = $fake->drivers()->find('driver-1');
+```
+
 ## Assertions
 
 The fake records every request made against it. Three assertion helpers cover the common cases.
 
 ### `assertRequested(string $endpoint)`
 
-Asserts that at least one request URL contained the given endpoint substring.
+Asserts that at least one recorded request used the exact endpoint path. Query parameters are ignored by this endpoint check.
 
 ```php
 $fake = Samsara::fake();
@@ -154,7 +182,7 @@ Asserts that a request to the endpoint was made with each of the given query par
 use Carbon\Carbon;
 
 $fake = Samsara::fake();
-$fake->fakeVehicleStats([]);
+$fake->fakeResponse('/fleet/vehicles/stats/history', []);
 
 $start = Carbon::parse('2026-01-01T00:00:00Z');
 $end   = Carbon::parse('2026-01-02T00:00:00Z');

@@ -67,23 +67,6 @@ class LegacyResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_dispatch_routes(): void
-    {
-        $this->http->fake([
-            '*v1/fleet/dispatch/routes*' => $this->http->response([
-                ['id' => 1, 'name' => 'Route 1'],
-                ['id' => 2, 'name' => 'Route 2'],
-            ], 200),
-        ]);
-
-        $resource = new LegacyResource($this->samsara);
-
-        $result = $resource->dispatchRoutes(['groupId' => 123]);
-
-        $this->assertIsArray($result);
-    }
-
-    #[Test]
     public function it_can_get_driver_safety_score(): void
     {
         $this->http->fake([
@@ -264,6 +247,22 @@ class LegacyResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_can_send_a_message(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['messageId' => 123]),
+        ]);
+        $payload = ['driverIds' => [111, 222], 'text' => 'Dispatch update'];
+
+        $result = (new LegacyResource($this->samsara))->sendMessage($payload);
+
+        $this->assertSame(['messageId' => 123], $result);
+        $this->http->assertSent(fn ($request): bool => $request->method() === 'POST'
+            && parse_url($request->url(), PHP_URL_PATH) === '/v1/fleet/messages'
+            && $request->data() === $payload);
+    }
+
+    #[Test]
     public function it_rejects_phantom_generic_operations_on_the_legacy_root(): void
     {
         $this->http->fake();
@@ -315,9 +314,8 @@ class LegacyResourceTest extends TestCase
     public static function legacyRequestContracts(): array
     {
         return [
-            'asset locations'     => ['assetLocations', [['groupId' => 123]], 'POST', '/v1/fleet/assets/locations', ['groupId' => 123]],
-            'asset reefers'       => ['assetReefers', [['groupId' => 123]], 'POST', '/v1/fleet/assets/reefers', ['groupId' => 123]],
-            'dispatch routes'     => ['dispatchRoutes', [['groupId' => 123]], 'GET', '/v1/fleet/dispatch/routes', ['groupId' => 123]],
+            'asset locations'     => ['assetLocations', [['groupId' => 123]], 'GET', '/v1/fleet/assets/locations', ['groupId' => 123]],
+            'asset reefers'       => ['assetReefers', [['groupId' => 123]], 'GET', '/v1/fleet/assets/reefers', ['groupId' => 123]],
             'driver safety score' => [
                 'driverSafetyScore',
                 ['driver-123', ['startMs' => 1000, 'endMs' => 2000]],
@@ -325,21 +323,21 @@ class LegacyResourceTest extends TestCase
                 '/v1/fleet/drivers/driver-123/safety/score',
                 ['startMs' => 1000, 'endMs' => 2000],
             ],
-            'fleet assets'            => ['fleetAssets', [['groupId' => 123]], 'POST', '/v1/fleet/assets', ['groupId' => 123]],
+            'fleet assets'            => ['fleetAssets', [['groupId' => 123]], 'GET', '/v1/fleet/assets', ['groupId' => 123]],
             'hos authentication logs' => [
                 'hosAuthenticationLogs',
                 [['driverId' => 123]],
-                'POST',
+                'GET',
                 '/v1/fleet/hos_authentication_logs',
                 ['driverId' => 123],
             ],
             'machines'         => ['machines', [['groupId' => 123]], 'POST', '/v1/machines/list', ['groupId' => 123]],
-            'maintenance list' => ['maintenanceList', [['groupId' => 123]], 'POST', '/v1/fleet/maintenance/list', ['groupId' => 123]],
-            'messages'         => ['messages', [['groupId' => 123]], 'POST', '/v1/fleet/messages', ['groupId' => 123]],
+            'maintenance list' => ['maintenanceList', [['groupId' => 123]], 'GET', '/v1/fleet/maintenance/list', ['groupId' => 123]],
+            'messages'         => ['messages', [['groupId' => 123]], 'GET', '/v1/fleet/messages', ['groupId' => 123]],
             'trips'            => [
                 'trips',
                 [['vehicleId' => 123, 'startMs' => 1000, 'endMs' => 2000]],
-                'POST',
+                'GET',
                 '/v1/fleet/trips',
                 ['vehicleId' => 123, 'startMs' => 1000, 'endMs' => 2000],
             ],
@@ -357,7 +355,7 @@ class LegacyResourceTest extends TestCase
                 '/v1/fleet/vehicles/vehicle-123/safety/score',
                 ['startMs' => 1000, 'endMs' => 2000],
             ],
-            'vision cameras' => ['visionCameras', [['groupId' => 123]], 'POST', '/v1/industrial/vision/cameras', ['groupId' => 123]],
+            'vision cameras' => ['visionCameras', [['groupId' => 123]], 'GET', '/v1/industrial/vision/cameras', ['groupId' => 123]],
         ];
     }
 

@@ -27,7 +27,7 @@ use Samsara\Data\Entity;
  * @property-read string|null $trailerName Trailer name
  * @property-read array{id?: string, name?: string}|null $vehicle Vehicle information
  * @property-read array{id?: string, name?: string}|null $trailer Trailer information
- * @property-read array{latitude?: float, longitude?: float}|null $location Location
+ * @property-read string|null $location Formatted inspection location
  * @property-read array{signedAtTime?: string}|null $authorSignature Author signature
  * @property-read array{signedAtTime?: string}|null $secondSignature Second signature
  * @property-read array{signedAtTime?: string}|null $thirdSignature Third signature

@@ -50,6 +50,7 @@ class AssetsResource extends Resource
     {
         return $this->createBuilderWithEndpoint('/assets/depreciation')
             ->withoutDefaultPageSize()
+            ->repeatQueryParameters('assetIds')
             ->usingEntity(Entity::class);
     }
 
@@ -86,7 +87,7 @@ class AssetsResource extends Resource
             $endpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**
@@ -106,7 +107,8 @@ class AssetsResource extends Resource
     public function query(): Builder
     {
         return $this->createBuilderWithEndpoint($this->endpoint)
-            ->withoutDefaultPageSize();
+            ->withoutDefaultPageSize()
+            ->repeatQueryParameters('attributes');
     }
 
     /**
@@ -123,7 +125,7 @@ class AssetsResource extends Resource
             $endpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**
@@ -151,7 +153,7 @@ class AssetsResource extends Resource
         );
 
         /** @var Asset */
-        return $this->mapToEntity($response->json('data', $response->json()));
+        return $this->mapToEntity($this->decodeJsonData($response, $endpoint));
     }
 
     /**

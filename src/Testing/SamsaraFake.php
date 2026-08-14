@@ -4,6 +4,7 @@ namespace Samsara\Testing;
 
 use Samsara\Samsara;
 use PHPUnit\Framework\Assert;
+use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\Factory as HttpFactory;
 
 /**
@@ -60,14 +61,9 @@ class SamsaraFake extends Samsara
      */
     public function assertRequested(string $endpoint): static
     {
-        $found = false;
-
-        foreach ($this->getRecordedRequests() as $request) {
-            if (str_contains($request->url(), $endpoint)) {
-                $found = true;
-                break;
-            }
-        }
+        $found = collect($this->getRecordedRequests())->contains(
+            fn (Request $request): bool => $this->requestMatchesEndpoint($request, $endpoint),
+        );
 
         Assert::assertTrue(
             $found,
@@ -84,26 +80,20 @@ class SamsaraFake extends Samsara
      */
     public function assertRequestedWithParams(string $endpoint, array $params): static
     {
-        $found = false;
+        $found = collect($this->getRecordedRequests())->contains(
+            function (Request $request) use ($endpoint, $params): bool {
+                if (! $this->requestMatchesEndpoint($request, $endpoint)) {
+                    return false;
+                }
 
-        foreach ($this->getRecordedRequests() as $request) {
-            if (str_contains($request->url(), $endpoint)) {
                 $requestData = $request->data();
-                $allParamsMatch = true;
 
-                foreach ($params as $key => $value) {
-                    if (! isset($requestData[$key]) || $requestData[$key] !== $value) {
-                        $allParamsMatch = false;
-                        break;
-                    }
-                }
-
-                if ($allParamsMatch) {
-                    $found = true;
-                    break;
-                }
-            }
-        }
+                return collect($params)->every(
+                    fn (mixed $value, string $key): bool => array_key_exists($key, $requestData)
+                        && $requestData[$key] === $value,
+                );
+            },
+        );
 
         Assert::assertTrue(
             $found,
@@ -130,11 +120,10 @@ class SamsaraFake extends Samsara
      */
     public function fakeResponse(string $endpoint, array $data, int $status = 200): static
     {
-        $this->responses[$endpoint] = ['data' => $data, 'status' => $status];
-
-        // Reset the HTTP factory and set up new fakes
-        $this->fakeHttp = new HttpFactory;
-        $this->setupFake();
+        $this->responses[$this->normalizeEndpoint($endpoint)] = [
+            'data'   => $data,
+            'status' => $status,
+        ];
 
         return $this;
     }
@@ -185,22 +174,47 @@ class SamsaraFake extends Samsara
      */
     protected function setupFake(): void
     {
-        $callbacks = [];
-
-        foreach ($this->responses as $endpoint => $response) {
-            $callbacks['*'.$endpoint.'*'] = $this->fakeHttp->response(
-                ['data' => $response['data']],
-                $response['status']
-            );
-        }
-
-        // Default fallback response
-        if (empty($callbacks)) {
-            $callbacks['*'] = $this->fakeHttp->response(['data' => []], 200);
-        }
-
-        $this->fakeHttp->fake($callbacks);
+        $this->fakeHttp
+            ->preventStrayRequests()
+            ->fake(fn (Request $request): mixed => $this->responseForRequest($request));
 
         $this->setHttpFactory($this->fakeHttp);
+    }
+
+    /**
+     * Normalize an endpoint to an exact request path.
+     */
+    private function normalizeEndpoint(string $endpoint): string
+    {
+        $path = parse_url($endpoint, PHP_URL_PATH);
+
+        return '/'.ltrim(is_string($path) ? $path : $endpoint, '/');
+    }
+
+    /**
+     * Determine whether a request targets the exact endpoint path.
+     */
+    private function requestMatchesEndpoint(Request $request, string $endpoint): bool
+    {
+        return parse_url($request->url(), PHP_URL_PATH) === $this->normalizeEndpoint($endpoint);
+    }
+
+    /**
+     * Resolve the staged response for one exact request path.
+     */
+    private function responseForRequest(Request $request): mixed
+    {
+        $path = parse_url($request->url(), PHP_URL_PATH);
+
+        if (! is_string($path) || ! array_key_exists($path, $this->responses)) {
+            return null;
+        }
+
+        $response = $this->responses[$path];
+
+        return $this->fakeHttp->response(
+            ['data' => $response['data']],
+            $response['status'],
+        );
     }
 }

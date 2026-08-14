@@ -11,6 +11,8 @@ use Samsara\Data\EntityCollection;
  * @property-read string|null $id Equipment ID
  * @property-read string|null $name Equipment name
  * @property-read array<int, array{latitude: float, longitude: float, time: string, heading?: float, speed?: float}>|null $locations Location readings
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class EquipmentLocationSeries extends Entity
 {

@@ -32,6 +32,8 @@ No `info.license` or `info.termsOfService` field is present in the downloaded co
 
 The SDK package's MIT license does not apply to Samsara's contract. Keep the snapshot unmodified, preserve this provenance notice, and confirm applicable authorization before committing or otherwise publishing the snapshot.
 
+Composer and Git release archives exclude `contracts/` and the historical root `samsara.json`. These files are repository-only maintenance inputs and are not part of the distributable SDK package.
+
 ## Verification performed
 
 JSON parsing passed:

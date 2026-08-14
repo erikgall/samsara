@@ -136,8 +136,8 @@ class RoutesResourceTest extends TestCase
         try {
             $resource->all();
             $this->fail('Routes all() cannot supply required startTime and endTime.');
-        } catch (UnsupportedOperationException) {
-            $this->assertTrue(true);
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('all', $exception->getContext()['operation'] ?? null);
         }
 
         $this->http->assertNothingSent();

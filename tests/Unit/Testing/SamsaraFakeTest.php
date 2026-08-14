@@ -3,6 +3,7 @@
 namespace Samsara\Tests\Unit\Testing;
 
 use Samsara\Samsara;
+use RuntimeException;
 use Samsara\Tests\TestCase;
 use Samsara\Testing\SamsaraFake;
 use PHPUnit\Framework\Attributes\Test;
@@ -32,6 +33,17 @@ class SamsaraFakeTest extends TestCase
         $fake->drivers()->all();
 
         $fake->assertRequested('/fleet/drivers');
+    }
+
+    #[Test]
+    public function it_can_assert_requested_with_params(): void
+    {
+        $fake = SamsaraFake::create();
+
+        $fake->fakeDrivers([['id' => 'driver-1']]);
+        $fake->drivers()->query()->where('tagIds', 'tag-1')->get();
+
+        $fake->assertRequestedWithParams('/fleet/drivers', ['tagIds' => 'tag-1']);
     }
 
     #[Test]
@@ -146,6 +158,42 @@ class SamsaraFakeTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_assert_a_suffix_from_a_different_endpoint(): void
+    {
+        $fake = SamsaraFake::create();
+        $fake->fakeResponse('/v1/fleet/assets', [['id' => 'asset-1']]);
+        $fake->legacy()->fleetAssets([]);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $fake->assertRequested('/assets');
+    }
+
+    #[Test]
+    public function it_does_not_assert_params_for_a_suffix_from_a_different_endpoint(): void
+    {
+        $fake = SamsaraFake::create();
+        $fake->fakeResponse('/v1/fleet/assets', [['id' => 'asset-1']]);
+        $fake->legacy()->fleetAssets(['groupId' => 123]);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $fake->assertRequestedWithParams('/assets', ['groupId' => 123]);
+    }
+
+    #[Test]
+    public function it_does_not_match_a_suffix_from_a_different_endpoint(): void
+    {
+        $fake = SamsaraFake::create();
+        $fake->fakeResponse('/assets', [['id' => 'asset-1']]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('without a matching fake');
+
+        $fake->legacy()->fleetAssets([]);
+    }
+
+    #[Test]
     public function it_fails_when_asserting_endpoint_not_requested(): void
     {
         $fake = SamsaraFake::create();
@@ -172,6 +220,44 @@ class SamsaraFakeTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_overlapping_endpoint_fakes_isolated(): void
+    {
+        $fake = SamsaraFake::create();
+
+        $fake->fakeVehicles([['id' => 'vehicle-1', 'name' => 'Vehicle list']]);
+        $fake->fakeVehicleStats([['id' => 'vehicle-1', 'name' => 'Vehicle stats']]);
+
+        $vehicles = $fake->vehicles()->all();
+        $stats = $fake->vehicleStats()->current()->get();
+
+        $this->assertSame('Vehicle list', $vehicles->first()->name);
+        $this->assertSame('Vehicle stats', $stats->first()->name);
+    }
+
+    #[Test]
+    public function it_preserves_recorded_requests_when_a_later_response_is_staged(): void
+    {
+        $fake = SamsaraFake::create();
+        $fake->fakeDrivers([['id' => 'driver-1']]);
+        $fake->drivers()->all();
+
+        $fake->fakeVehicles([['id' => 'vehicle-1']]);
+
+        $this->assertCount(1, $fake->getRecordedRequests());
+    }
+
+    #[Test]
+    public function it_prevents_stray_requests_without_any_staged_response(): void
+    {
+        $fake = SamsaraFake::create();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('without a matching fake');
+
+        $fake->drivers()->all();
+    }
+
+    #[Test]
     public function it_records_requests(): void
     {
         $fake = SamsaraFake::create();
@@ -185,5 +271,55 @@ class SamsaraFakeTest extends TestCase
         $requests = $fake->getRecordedRequests();
 
         $this->assertCount(2, $requests);
+    }
+
+    #[Test]
+    public function it_rejects_a_requested_params_mismatch(): void
+    {
+        $fake = SamsaraFake::create();
+
+        $fake->fakeDrivers([['id' => 'driver-1']]);
+        $fake->drivers()->query()->where('tagIds', 'tag-1')->get();
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('with params {"tagIds":"tag-2"} but it was not made');
+
+        $fake->assertRequestedWithParams('/fleet/drivers', ['tagIds' => 'tag-2']);
+    }
+
+    #[Test]
+    public function it_rejects_unfaked_requests(): void
+    {
+        $fake = SamsaraFake::create();
+        $fake->fakeDrivers([['id' => 'driver-1']]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('without a matching fake');
+
+        $fake->vehicles()->all();
+    }
+
+    #[Test]
+    public function it_requires_an_exact_fake_for_a_driver_item_path(): void
+    {
+        $fake = SamsaraFake::create();
+        $fake->fakeDrivers([['id' => 'driver-1']]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('without a matching fake');
+
+        $fake->drivers()->find('driver-1');
+    }
+
+    #[Test]
+    public function it_requires_an_exact_fake_for_vehicle_stats_history(): void
+    {
+        $fake = SamsaraFake::create();
+        $fake->fakeVehicleStats([]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('without a matching fake');
+
+        $fake->vehicleStats()->history()->get();
     }
 }

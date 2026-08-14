@@ -9,6 +9,7 @@ permalink: /getting-started
 # Getting Started
 
 {: .warning }
+
 > This page describes a fresh install. Existing v1.1.0 applications must complete the [v2 upgrade guide](upgrade-guide-v2.html) before changing the Composer constraint.
 
 - [Introduction](#introduction)
@@ -16,9 +17,9 @@ permalink: /getting-started
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Basic Usage](#basic-usage)
-  - [Using the Facade](#using-the-facade)
-  - [Using Dependency Injection](#using-dependency-injection)
-  - [Creating a Fresh Instance](#creating-a-fresh-instance)
+    - [Using the Facade](#using-the-facade)
+    - [Using Dependency Injection](#using-dependency-injection)
+    - [Creating a Fresh Instance](#creating-a-fresh-instance)
 - [Querying Records](#querying-records)
 - [Error Handling](#error-handling)
 - [Testing](#testing)
@@ -79,7 +80,7 @@ See [configuration.md](configuration.html) for the full list of options and [res
 
 ### Using the Facade
 
-The `Samsara` facade resolves the singleton client registered by the service provider. Each resource accessor returns a resource object you can call directly or compose with the query builder.
+The `Samsara` facade resolves the lifecycle-scoped client registered by the service provider. Each resource accessor returns a resource object you can call directly or compose with the query builder.
 
 ```php
 use Samsara\Facades\Samsara;
@@ -98,7 +99,7 @@ The `vehicleStats()` accessor returns a resource, not a builder. Chain through `
 
 ### Using Dependency Injection
 
-You may inject the `Samsara\Samsara` client directly. Laravel resolves it from the container as a singleton:
+You may inject the `Samsara\Samsara` client directly. Laravel resolves one client per application lifecycle, including an HTTP request or queue/Octane scope:
 
 ```php
 use Samsara\Samsara;
@@ -118,7 +119,7 @@ class FleetController extends Controller
 
 ### Creating a Fresh Instance
 
-For ad-hoc clients — for example, multi-tenant applications that hold a token per tenant — call `Samsara::make()`:
+For ad-hoc clients—for example, multi-tenant applications that hold a token per tenant—call `Samsara::make()`. The fresh client inherits the package's configured region and request settings:
 
 ```php
 use Samsara\Samsara;
@@ -132,8 +133,9 @@ You may also pass per-instance config overrides:
 
 ```php
 $samsara = Samsara::make('your-api-token', [
+    'region'   => 'eu',
     'timeout'  => 60,
-    'retry'    => 5,
+    'attempts' => 5,
     'per_page' => 50,
 ]);
 ```

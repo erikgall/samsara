@@ -86,7 +86,6 @@ class InvalidSignatureExceptionTest extends TestCase
         $this->assertInstanceOf(InvalidSignatureException::class, $exception);
         $this->assertStringContainsString('signature', strtolower($exception->getMessage()));
         $this->assertSame([
-            'expected' => 'v1=expected',
             'received' => 'v1=received',
         ], $exception->getContext());
     }

@@ -154,8 +154,8 @@ class VehicleStatsResourceTest extends TestCase
         try {
             $resource->all();
             $this->fail('Vehicle stats all() cannot supply required types.');
-        } catch (UnsupportedOperationException) {
-            $this->assertTrue(true);
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('all', $exception->getContext()['operation'] ?? null);
         }
 
         $this->http->assertNothingSent();

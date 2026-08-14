@@ -2,6 +2,7 @@
 title: Resources
 nav_order: 8
 has_children: true
+parent: ""
 description: Reference for every resource exposed by the Samsara facade.
 permalink: /resources/
 ---

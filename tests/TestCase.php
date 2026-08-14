@@ -22,7 +22,7 @@ abstract class TestCase extends BaseTestCase
         $app['config']->set('samsara.api_key', 'test-api-key');
         $app['config']->set('samsara.region', 'us');
         $app['config']->set('samsara.timeout', 30);
-        $app['config']->set('samsara.retry', 3);
+        $app['config']->set('samsara.attempts', 3);
         $app['config']->set('samsara.per_page', 100);
     }
 

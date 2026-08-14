@@ -2,8 +2,14 @@
 
 namespace Samsara;
 
+use Throwable;
+use Illuminate\Support\Arr;
+use InvalidArgumentException;
+use Illuminate\Container\Container;
 use Samsara\Resources\Beta\BetaResource;
 use Illuminate\Http\Client\PendingRequest;
+use Samsara\Data\Organization\Organization;
+use Illuminate\Http\Client\RequestException;
 use Samsara\Resources\Fleet\DriversResource;
 use Samsara\Resources\Legacy\LegacyResource;
 use Samsara\Resources\Fleet\TrailersResource;
@@ -13,6 +19,7 @@ use Samsara\Resources\Additional\IftaResource;
 use Samsara\Resources\Dispatch\RoutesResource;
 use Samsara\Resources\Fleet\EquipmentResource;
 use Samsara\Resources\Preview\PreviewResource;
+use Illuminate\Http\Client\ConnectionException;
 use Samsara\Resources\Additional\FormsResource;
 use Samsara\Resources\Telematics\TripsResource;
 use Samsara\Resources\Additional\AlertsResource;
@@ -39,6 +46,7 @@ use Samsara\Resources\Additional\CameraMediaResource;
 use Samsara\Resources\Additional\RouteEventsResource;
 use Samsara\Resources\Telematics\VehicleStatsResource;
 use Samsara\Resources\Additional\FuelAndEnergyResource;
+use Samsara\Resources\Organization\OrganizationResource;
 use Samsara\Resources\Telematics\VehicleLocationsResource;
 use Samsara\Resources\Additional\TrailerAssignmentsResource;
 use Samsara\Resources\Integrations\LiveSharingLinksResource;
@@ -105,12 +113,26 @@ class Samsara
      *
      * @param  string|null  $token  The API token
      * @param  array<string, mixed>  $config  Configuration options
+     * @param  HttpFactory|null  $http  Optional HTTP factory for framework integration and testing
      */
-    public function __construct(?string $token = null, array $config = [])
-    {
+    public function __construct(
+        ?string $token = null,
+        array $config = [],
+        ?HttpFactory $http = null,
+    ) {
+        if ((int) ($config['attempts'] ?? 3) < 1) {
+            throw new InvalidArgumentException('Samsara request attempts must be at least 1.');
+        }
+
         $this->token = $token;
         $this->config = $config;
-        $this->http = new HttpFactory;
+        $this->http = $http ?? new HttpFactory;
+
+        match ($config['region'] ?? 'us') {
+            'eu'    => $this->useEuEndpoint(),
+            'ca'    => $this->useCanadaEndpoint(),
+            default => $this,
+        };
     }
 
     /**
@@ -178,7 +200,11 @@ class Samsara
             ->acceptJson()
             ->asJson()
             ->timeout($this->getConfig('timeout', 30))
-            ->retry($this->getConfig('retry', 3), 100);
+            ->retry(
+                $this->getConfig('attempts', 3),
+                fn (int $attempt, mixed $exception): int => $this->retryDelayMilliseconds($exception),
+                fn (Throwable $exception): bool          => $this->shouldRetry($exception),
+            );
 
         if ($this->token !== null) {
             $request->withToken($this->token);
@@ -376,6 +402,17 @@ class Samsara
     {
         /** @var MaintenanceResource */
         return $this->resource(MaintenanceResource::class);
+    }
+
+    /**
+     * Get the organization associated with the current token.
+     */
+    public function me(): Organization
+    {
+        /** @var OrganizationResource $resource */
+        $resource = $this->resource(OrganizationResource::class);
+
+        return $resource->current();
     }
 
     /**
@@ -588,15 +625,29 @@ class Samsara
     }
 
     /**
-     * Set the API token.
+     * Create an isolated client without an API token.
+     */
+    public function withoutToken(): static
+    {
+        $client = clone $this;
+        $client->token = null;
+        $client->resources = [];
+
+        return $client;
+    }
+
+    /**
+     * Create an isolated client with the API token.
      *
      * @param  string  $token  The API token
      */
     public function withToken(string $token): static
     {
-        $this->token = $token;
+        $client = clone $this;
+        $client->token = $token;
+        $client->resources = [];
 
-        return $this;
+        return $client;
     }
 
     /**
@@ -616,8 +667,27 @@ class Samsara
      */
     public static function make(?string $token = null, array $config = []): static
     {
+        $container = Container::getInstance();
+        $defaults = [];
+        $http = null;
+
+        if ($container->bound('config')) {
+            $packageConfig = (array) $container->make('config')->get('samsara', []);
+            $defaults = Arr::only($packageConfig, [
+                'region',
+                'timeout',
+                'attempts',
+                'retry_after_max_seconds',
+                'per_page',
+            ]);
+        }
+
+        if ($container->bound(HttpFactory::class)) {
+            $http = $container->make(HttpFactory::class);
+        }
+
         /** @phpstan-ignore new.static */
-        return new static($token, $config);
+        return new static($token, array_replace($defaults, $config), $http);
     }
 
     /**
@@ -636,5 +706,81 @@ class Samsara
 
         /** @phpstan-ignore return.type */
         return $this->resources[$class];
+    }
+
+    /**
+     * Determine whether a rate-limit delay is safe to honor synchronously.
+     */
+    private function retryAfterIsWithinCeiling(RequestException $exception): bool
+    {
+        $retryAfter = $this->retryAfterSeconds($exception);
+
+        if ($retryAfter === null) {
+            return true;
+        }
+
+        return $retryAfter <= (int) $this->getConfig('retry_after_max_seconds', 30);
+    }
+
+    /**
+     * Parse a Retry-After header into seconds.
+     */
+    private function retryAfterSeconds(RequestException $exception): ?int
+    {
+        $retryAfter = $exception->response->header('Retry-After');
+
+        if ($retryAfter === null) {
+            return null;
+        }
+
+        $retryAfter = trim($retryAfter);
+
+        if (ctype_digit($retryAfter)) {
+            return (int) $retryAfter;
+        }
+
+        $retryAt = strtotime($retryAfter);
+
+        return $retryAt === false ? null : max(0, $retryAt - time());
+    }
+
+    /**
+     * Calculate the delay before a retry attempt.
+     */
+    private function retryDelayMilliseconds(mixed $exception): int
+    {
+        if (! $exception instanceof RequestException || $exception->response->status() !== 429) {
+            return 100;
+        }
+
+        $retryAfter = $this->retryAfterSeconds($exception);
+
+        if ($retryAfter === null) {
+            return 100;
+        }
+
+        return $retryAfter * 1000;
+    }
+
+    /**
+     * Retry only transport failures and statuses that are safe to retry.
+     */
+    private function shouldRetry(Throwable $exception): bool
+    {
+        if ($exception instanceof ConnectionException) {
+            return true;
+        }
+
+        if (! $exception instanceof RequestException) {
+            return false;
+        }
+
+        $status = $exception->response->status();
+
+        return match (true) {
+            $status === 429                 => $this->retryAfterIsWithinCeiling($exception),
+            $status === 408, $status >= 500 => true,
+            default                         => false,
+        };
     }
 }

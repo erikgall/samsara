@@ -62,12 +62,6 @@ callouts:
     title: Warning
     color: red
 
-# Collections for organizing content
-collections:
-  resources:
-    permalink: "/:collection/:path/"
-    output: true
-
 # Build settings
 markdown: kramdown
 kramdown:
@@ -102,7 +96,6 @@ defaults:
       layout: "default"
   - scope:
       path: "resources"
-      type: "pages"
     values:
       layout: "default"
       parent: "Resources"

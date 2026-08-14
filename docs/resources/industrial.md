@@ -13,6 +13,7 @@ permalink: /resources/industrial
 - [Updating Records](#updating-records)
 - [Deleting Records](#deleting-records)
 - [Data Inputs and Data Points](#data-inputs-and-data-points)
+- [Legacy Machines and Vision Cameras](#legacy-machines-and-vision-cameras)
 - [Filtering](#filtering)
 - [Properties](#properties)
 - [Related Resources](#related-resources)
@@ -102,6 +103,17 @@ $history = Samsara::industrial()
 | `dataPointsHistory()` | `/industrial/data-inputs/data-points/history` | Reading history over an explicit `between()` window. |
 
 The three data-point builders omit the configured implicit page size because their official cursor contracts do not declare `limit`.
+
+## Legacy Machines and Vision Cameras
+
+Two typed helpers expose the pinned legacy endpoints without changing the raw `legacy()` methods:
+
+```php
+$machines = Samsara::industrial()->machines();
+$cameras = Samsara::industrial()->visionCameras();
+```
+
+`machines()` returns `EntityCollection<int, Machine>` from the `machines` envelope. `visionCameras()` returns `EntityCollection<int, VisionCamera>` from the endpoint's root JSON list.
 
 ## Filtering
 

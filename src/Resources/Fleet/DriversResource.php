@@ -63,7 +63,7 @@ class DriversResource extends Resource
             $endpoint
         );
 
-        return DriverAuthToken::make($response->json('data', []));
+        return DriverAuthToken::make($this->decodeJsonData($response, $endpoint, false));
     }
 
     /**
@@ -79,7 +79,7 @@ class DriversResource extends Resource
             $endpoint
         );
 
-        return DriverQrCode::make($response->json('data', []));
+        return DriverQrCode::make($this->decodeJsonData($response, $endpoint, false));
     }
 
     /**
@@ -142,7 +142,7 @@ class DriversResource extends Resource
         );
 
         /** @var array<int, array<string, mixed>> $data */
-        $data = $response->json('data', []);
+        $data = $this->decodeJsonList($response, $endpoint);
 
         return new EntityCollection(array_map(
             fn (array $item): DriverQrCode => DriverQrCode::make($item),
@@ -169,7 +169,7 @@ class DriversResource extends Resource
             $endpoint
         );
 
-        return DriverRemoteSignOutResult::make($response->json());
+        return DriverRemoteSignOutResult::make($this->decodeJsonArray($response, $endpoint));
     }
 
     /**

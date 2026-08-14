@@ -184,42 +184,50 @@ The state of a route or stop returned by the [Routes](resources/routes.html) res
 
 `Samsara\Enums\SafetyEventType`
 
-Identifies the kind of safety event returned by the [Safety Events](resources/safety-events.html) resource.
-
-> **Upstream status:** Current and legacy safety-event responses use `behaviorLabels`; the current schema does not define this package enum as the event-type wire contract.
+Represents the `SafetyEventBehaviorLabelType` values returned in the
+`behaviorLabels` field of [Safety Events](resources/safety-events.html). The
+historical PHP class name remains unchanged for compatibility. These values are
+not an `eventTypes` query filter; the API exposes no such parameter.
 
 | Case | Value | Description |
 |------|-------|-------------|
-| `CAMERA_OBSTRUCTION` | `cameraObstruction` | The camera was obstructed. |
-| `CELL_PHONE_USAGE` | `cellPhoneUsage` | The driver used a cell phone. |
-| `CRASH` | `crash` | A crash was detected. |
+| `GENERIC_TAILGATING` | `genericTailgating` | Generic tailgating. |
+| `GENERIC_DISTRACTION` | `genericDistraction` | Generic distraction. |
 | `DEFENSIVE_DRIVING` | `defensiveDriving` | A defensive-driving event. |
-| `DISTRACTED_DRIVING` | `distractedDriving` | The driver was distracted. |
-| `DRIVER_DETECTED` | `driverDetected` | A driver was detected in the cab. |
-| `DROWSY_DRIVING` | `drowsyDriving` | The driver appeared drowsy. |
-| `FOLLOWING_DISTANCE` | `followingDistance` | A following-distance event. |
-| `HARSH_ACCELERATION` | `harshAcceleration` | Harsh acceleration. |
-| `HARSH_BRAKING` | `harshBraking` | Harsh braking. |
-| `HARSH_TURN` | `harshTurn` | A harsh turn. |
-| `LANE_DEPARTURE` | `laneDeparture` | A lane-departure event. |
-| `MAX_SPEED` | `maxSpeed` | A maximum-speed event. |
-| `NEAR_COLLISION` | `nearCollision` | A near collision. |
-| `NO_DRIVER_DETECTED` | `noDriverDetected` | No driver was detected in the cab. |
 | `ROLLING_STOP` | `rollingStop` | A rolling stop. |
-| `SEATBELT` | `seatbelt` | A seatbelt event. |
-| `SMOKING` | `smoking` | The driver was smoking. |
+| `NEAR_COLLISION` | `nearCollison` | A near collision (upstream spelling). |
 | `SPEEDING` | `speeding` | A speeding event. |
-| `UNKNOWN` | `unknown` | An unclassified safety event. |
+| `OBSTRUCTED_CAMERA` | `obstructedCamera` | The camera was obstructed. |
+| `DID_NOT_YIELD` | `didNotYield` | The driver did not yield. |
+| `NO_SEATBELT` | `noSeatbelt` | A seatbelt was not detected. |
+| `MOBILE_USAGE` | `mobileUsage` | Mobile-device usage. |
+| `DROWSY` | `drowsy` | Drowsiness. |
+| `LANE_DEPARTURE` | `laneDeparture` | A lane-departure event. |
+| `FOLLOWING_DISTANCE_SEVERE` | `followingDistanceSevere` | Severe following distance. |
+| `FOLLOWING_DISTANCE_MODERATE` | `followingDistanceModerate` | Moderate following distance. |
+| `LATE_RESPONSE` | `lateResponse` | A late driver response. |
+| `ACCELERATION` | `acceleration` | Acceleration behavior. |
+| `BRAKING` | `braking` | Braking behavior. |
+| `HARSH_TURN` | `harshTurn` | A harsh turn. |
+| `CRASH` | `crash` | A crash was detected. |
+| `ROLLOVER_PROTECTION` | `rolloverProtection` | Rollover protection. |
+| `YAW_CONTROL` | `yawControl` | Yaw control. |
+| `RAN_RED_LIGHT` | `ranRedLight` | A red-light violation. |
+| `FORWARD_COLLISION_WARNING` | `forwardCollisionWarning` | A forward-collision warning. |
+| `EATING_DRINKING` | `eatingDrinking` | Eating or drinking. |
+| `SMOKING` | `smoking` | The driver was smoking. |
+| `FOLLOWING_DISTANCE` | `followingDistance` | A following-distance event. |
+| `EDGE_DISTRACTED_DRIVING` | `edgeDistractedDriving` | Edge-detected distracted driving. |
 
 ## VehicleStatType
 
 `Samsara\Enums\VehicleStatType`
 
-The 81 telemetry-channel values currently shipped by the package. This includes every value in the pinned 2026-08-10 contract plus retained legacy plural-unit EV spellings for backward compatibility.
+The 63 telemetry-channel values accepted by the `types` parameter on all three
+vehicle-stats endpoints in the pinned 2026-08-10 contract. The feed and history
+`decorations` parameters accept a narrower 49-value subset.
 
 > **Warning:** `Builder::types()` is typed as `array<string>|string` only. Do not pass enum cases to it directly — pass the wire string values shown below (for example `'gps'` or `'engineStates'`). See the [Query Builder](query-builder.html) reference for the canonical chaining pattern through `vehicleStats()->current()`, `history()`, `feed()`, `gps()`, `engineStates()`, `fuelPercents()`, or `odometer()`.
-
-New integrations should prefer the singular-unit EV values such as `evBatteryCurrentMilliAmp` and `evBatteryVoltageMilliVolt`. The older plural forms remain valid enum cases so existing consumers are not broken.
 
 | Case | Value | Description |
 |------|-------|-------------|
@@ -238,17 +246,12 @@ New integrations should prefer the singular-unit EV values such as `evBatteryCur
 | `ENGINE_STATES` | `engineStates` | Engine state samples. |
 | `EV_AVERAGE_BATTERY_TEMPERATURE_MILLI_CELSIUS` | `evAverageBatteryTemperatureMilliCelsius` | Average EV battery temperature, in milli-degrees Celsius. |
 | `EV_BATTERY_CURRENT_MILLI_AMP` | `evBatteryCurrentMilliAmp` | Current upstream EV battery-current spelling. |
-| `EV_BATTERY_CURRENT_MILLI_AMPS` | `evBatteryCurrentMilliAmps` | EV battery current, in milliamps. |
 | `EV_BATTERY_STATE_OF_HEALTH_MILLI_PERCENT` | `evBatteryStateOfHealthMilliPercent` | EV battery state of health, in milli-percent. |
-| `EV_BATTERY_TEMPERATURE_MILLIC` | `evBatteryTemperatureMilliC` | EV battery temperature, in milli-degrees Celsius. |
 | `EV_BATTERY_VOLTAGE_MILLI_VOLT` | `evBatteryVoltageMilliVolt` | Current upstream EV battery-voltage spelling. |
-| `EV_BATTERY_VOLTAGE_MILLI_VOLTS` | `evBatteryVoltageMilliVolts` | EV battery voltage, in millivolts. |
 | `EV_CHARGING_CURRENT_MILLI_AMP` | `evChargingCurrentMilliAmp` | Current upstream EV charging-current spelling. |
-| `EV_CHARGING_CURRENT_MILLI_AMPS` | `evChargingCurrentMilliAmps` | EV charging current, in milliamps. |
 | `EV_CHARGING_ENERGY_MICRO_WH` | `evChargingEnergyMicroWh` | EV charging energy, in micro-watt-hours. |
 | `EV_CHARGING_STATUS` | `evChargingStatus` | EV charging status. |
 | `EV_CHARGING_VOLTAGE_MILLI_VOLT` | `evChargingVoltageMilliVolt` | Current upstream EV charging-voltage spelling. |
-| `EV_CHARGING_VOLTAGE_MILLI_VOLTS` | `evChargingVoltageMilliVolts` | EV charging voltage, in millivolts. |
 | `EV_CONSUMED_ENERGY_MICRO_WH` | `evConsumedEnergyMicroWh` | EV consumed energy, in micro-watt-hours. |
 | `EV_DISTANCE_DRIVEN_METERS` | `evDistanceDrivenMeters` | EV distance driven, in meters. |
 | `EV_REGENERATED_ENERGY_MICRO_WH` | `evRegeneratedEnergyMicroWh` | EV regenerated energy, in micro-watt-hours. |
@@ -267,31 +270,18 @@ New integrations should prefer the singular-unit EV values such as `evBatteryCur
 | `SEATBELT_DRIVER` | `seatbeltDriver` | Driver seatbelt state. |
 | `SPREADER_ACTIVE` | `spreaderActive` | Spreader active flag. |
 | `SPREADER_AIR_TEMP` | `spreaderAirTemp` | Spreader air temperature. |
-| `SPREADER_AUGER_RUNNING` | `spreaderAugerRunning` | Spreader auger running flag. |
 | `SPREADER_BLAST_STATE` | `spreaderBlastState` | General spreader blast state. |
-| `SPREADER_BLOCK_HEIGHT` | `spreaderBlockHeight` | Spreader block height. |
-| `SPREADER_CONVEYOR_RUNNING` | `spreaderConveyorRunning` | Spreader conveyor running flag. |
-| `SPREADER_GRANULAR_BLAST_STATE` | `spreaderGranularBlastState` | Spreader granular blast state. |
 | `SPREADER_GRANULAR_NAME` | `spreaderGranularName` | Spreader granular material name. |
 | `SPREADER_GRANULAR_RATE` | `spreaderGranularRate` | Spreader granular rate. |
-| `SPREADER_HOPPER_PERCENT_FULL` | `spreaderHopperPercentFull` | Spreader hopper fill, in percent. |
-| `SPREADER_LEFT_SPINNER_RUNNING` | `spreaderLeftSpinnerRunning` | Spreader left-spinner running flag. |
-| `SPREADER_LIQUID_BLAST_STATE` | `spreaderLiquidBlastState` | Spreader liquid blast state. |
 | `SPREADER_LIQUID_NAME` | `spreaderLiquidName` | Spreader liquid material name. |
 | `SPREADER_LIQUID_RATE` | `spreaderLiquidRate` | Spreader liquid rate. |
-| `SPREADER_ON_GROUND` | `spreaderOnGround` | Spreader on-ground flag. |
 | `SPREADER_ON_STATE` | `spreaderOnState` | General spreader on/off state. |
 | `SPREADER_PLOW_STATUS` | `spreaderPlowStatus` | Spreader plow status. |
-| `SPREADER_PREWET_BLAST_STATE` | `spreaderPrewetBlastState` | Spreader pre-wet blast state. |
 | `SPREADER_PREWET_NAME` | `spreaderPrewetName` | Spreader pre-wet material name. |
 | `SPREADER_PREWET_RATE` | `spreaderPrewetRate` | Spreader pre-wet rate. |
-| `SPREADER_RIGHT_SPINNER_RUNNING` | `spreaderRightSpinnerRunning` | Spreader right-spinner running flag. |
 | `SPREADER_ROAD_TEMP` | `spreaderRoadTemp` | Spreader road temperature. |
-| `SPREADER_VIBRATOR_RUNNING` | `spreaderVibratorRunning` | Spreader vibrator running flag. |
-| `SPREADER_WORK_LIGHT` | `spreaderWorkLight` | Spreader work-light flag. |
 | `SYNTHETIC_ENGINE_SECONDS` | `syntheticEngineSeconds` | Synthetic cumulative engine seconds. |
 | `TELL_TALES` | `tellTales` | Dashboard tell-tale indicator states. |
-| `TIRE_PRESSURE_MILLI_PSIS` | `tirePressureMilliPsis` | Tire pressure, in milli-PSI. |
 
 ## WebhookEvent
 

@@ -8,7 +8,9 @@ declare(strict_types=1);
  * The checker never writes. It derives the official operation declarations and
  * lifecycle stages from the pinned OpenAPI document, derives inherited generic
  * operations from current PHP source, and verifies the inventory ledger and
- * provenance against both authorities.
+ * provenance against both authorities. It also derives the tracked package
+ * enum and DTO annotation catalogs from current source so their evidence
+ * cannot remain stale behind a matching source-tree digest.
  *
  * Usage:
  *   php scripts/check-samsara-contract-reconciliation.php
@@ -39,16 +41,18 @@ try {
     $package = deriveInventoryOperations($inventory, $official, $root, $errors);
     $capabilities = deriveInheritedCapabilities($root, $official['wire_keys'], $errors);
     $source = deriveSourceIdentity($root, $errors);
+    $declarations = derivePackageDeclarations($root, $errors);
 
     verifyRecordedSourceContext($inventory, $errors, $passes);
     checkSame('generated date', '2026-08-10', $inventory['generated_for_date'] ?? null, $errors, $passes);
 
     verifyOfficialSource($inventory, $contractPath, $official, $errors, $passes);
     verifySourceIdentity($inventory, $source, $errors, $passes);
-    verifyCounts($inventory, $official, $package, $capabilities, $errors, $passes);
+    verifyCounts($inventory, $official, $package, $capabilities, $declarations, $errors, $passes);
     verifyStages($inventory, $official, $package, $errors, $passes);
     verifyCapabilities($inventory, $package, $capabilities, $errors, $passes);
     verifyCoverage($inventory, $official, $package, $capabilities, $source, $errors, $passes);
+    verifyPackageDeclarations($inventory, $declarations, $errors, $passes);
 
     fwrite(STDOUT, "Derived official declarations: {$official['declaration_count']}\n");
     fwrite(STDOUT, 'Derived official unique wire operations: '.count($official['wire_keys'])."\n");
@@ -60,6 +64,8 @@ try {
     fwrite(STDOUT, "Derived inherited operations/phantoms: {$capabilities['effective_count']}/{$capabilities['phantom_count']}\n");
     fwrite(STDOUT, "Derived concrete resource capability overrides: {$capabilities['override_count']}/{$capabilities['resource_count']}\n");
     fwrite(STDOUT, "Derived src tree: {$source['file_count']} files, SHA-256 {$source['tree_sha256']}\n");
+    fwrite(STDOUT, "Derived package enums/cases: {$declarations['enum_count']}/{$declarations['enum_case_count']}\n");
+    fwrite(STDOUT, "Derived package data classes/properties: {$declarations['data_class_count']}/{$declarations['data_property_count']}\n");
 
     if ($errors !== []) {
         fwrite(STDERR, "\nRECONCILIATION FAILED (".count($errors)." issue(s)):\n");
@@ -550,6 +556,106 @@ function deriveSourceIdentity(string $root, array &$errors): array
     ];
 }
 
+/**
+ * @return array{
+ *   enums:list<array{class:string,source:string,cases:list<array{case:string,value:string,source:string}>}>,
+ *   data_classes:list<array{class:string,source:string,properties:list<array{name:string,php_type:string}>}>,
+ *   enum_count:int,enum_case_count:int,data_class_count:int,data_property_count:int
+ * }
+ */
+function derivePackageDeclarations(string $root, array &$errors): array
+{
+    $enums = [];
+    foreach (phpFilesUnder($root.'/src/Enums') as $path) {
+        $relative = substr($path, strlen($root) + 1);
+        $lines = file($path, FILE_IGNORE_NEW_LINES);
+        if ($lines === false) {
+            $errors[] = "Unreadable enum source: {$relative}.";
+
+            continue;
+        }
+
+        $class = null;
+        $cases = [];
+        foreach ($lines as $index => $line) {
+            if ($class === null && preg_match('/^\s*enum\s+(?<class>[A-Za-z_][A-Za-z0-9_]*)\b/', $line, $match)) {
+                $class = $match['class'];
+            }
+            if (preg_match('/^\s*case\s+(?<case>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*([\'"])(?<value>.*?)\2\s*;\s*$/', $line, $match)) {
+                $cases[] = [
+                    'case'   => $match['case'],
+                    'value'  => $match['value'],
+                    'source' => $relative.':'.($index + 1),
+                ];
+            }
+        }
+        if ($class === null) {
+            $errors[] = "Enum source has no declaration: {$relative}.";
+
+            continue;
+        }
+        $enums[] = ['class' => $class, 'source' => $relative, 'cases' => $cases];
+    }
+
+    $dataClasses = [];
+    foreach (phpFilesUnder($root.'/src/Data') as $path) {
+        $relative = substr($path, strlen($root) + 1);
+        $lines = file($path, FILE_IGNORE_NEW_LINES);
+        if ($lines === false) {
+            $errors[] = "Unreadable data-class source: {$relative}.";
+
+            continue;
+        }
+
+        $class = null;
+        $properties = [];
+        foreach ($lines as $line) {
+            if ($class === null && preg_match('/^\s*(?:(?:abstract|final)\s+)?class\s+(?<class>[A-Za-z_][A-Za-z0-9_]*)\b/', $line, $match)) {
+                $class = $match['class'];
+            }
+            if (preg_match('/@property-read\s+(?<type>.+?)\s+\$(?<name>[A-Za-z_][A-Za-z0-9_]*)(?:\s|$)/', $line, $match)) {
+                $properties[] = ['name' => $match['name'], 'php_type' => $match['type']];
+            }
+        }
+        if ($class === null) {
+            $errors[] = "Data-class source has no declaration: {$relative}.";
+
+            continue;
+        }
+        $dataClasses[] = ['class' => $class, 'source' => $relative, 'properties' => $properties];
+    }
+
+    return [
+        'enums'               => $enums,
+        'data_classes'        => $dataClasses,
+        'enum_count'          => count($enums),
+        'enum_case_count'     => array_sum(array_map(static fn (array $enum): int => count($enum['cases']), $enums)),
+        'data_class_count'    => count($dataClasses),
+        'data_property_count' => array_sum(array_map(static fn (array $class): int => count($class['properties']), $dataClasses)),
+    ];
+}
+
+/** @return list<string> */
+function phpFilesUnder(string $directory): array
+{
+    $files = [];
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS));
+    foreach ($iterator as $file) {
+        if ($file->isFile() && strtolower($file->getExtension()) === 'php') {
+            $files[] = $file->getPathname();
+        }
+    }
+    sort($files, SORT_STRING);
+
+    return $files;
+}
+
+function verifyPackageDeclarations(array $inventory, array $declarations, array &$errors, int &$passes): void
+{
+    checkSame('package enum catalog', $declarations['enums'], $inventory['package_enums'] ?? null, $errors, $passes);
+    checkSame('package data-class catalog', $declarations['data_classes'], $inventory['package_data_classes'] ?? null, $errors, $passes);
+}
+
 function verifyRecordedSourceContext(array $inventory, array &$errors, int &$passes): void
 {
     $worktree = $inventory['worktree'] ?? null;
@@ -605,7 +711,7 @@ function verifySourceIdentity(array $inventory, array $source, array &$errors, i
     checkSame('package src file count', $source['file_count'], $identity['source_file_count'] ?? $identity['files'] ?? null, $errors, $passes);
 }
 
-function verifyCounts(array $inventory, array $official, array $package, array $capabilities, array &$errors, int &$passes): void
+function verifyCounts(array $inventory, array $official, array $package, array $capabilities, array $declarations, array &$errors, int &$passes): void
 {
     $counts = $inventory['counts'] ?? [];
     $expected = [
@@ -620,6 +726,10 @@ function verifyCounts(array $inventory, array $official, array $package, array $
         'changed_operations'                              => $package['changed_count'],
         'unclassified_differences'                        => 0,
         'package_resources'                               => $capabilities['resource_count'],
+        'package_enums'                                   => $declarations['enum_count'],
+        'package_enum_cases'                              => $declarations['enum_case_count'],
+        'package_data_classes'                            => $declarations['data_class_count'],
+        'package_data_properties'                         => $declarations['data_property_count'],
     ];
     foreach ($expected as $field => $value) {
         checkSame("counts.{$field}", $value, $counts[$field] ?? null, $errors, $passes);

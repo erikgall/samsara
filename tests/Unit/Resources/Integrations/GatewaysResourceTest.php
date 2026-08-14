@@ -174,8 +174,8 @@ class GatewaysResourceTest extends TestCase
                     ? $resource->find('gateway-123')
                     : $resource->update('gateway-123', ['serial' => 'DEF456']);
                 $this->fail("Gateway {$operation} must fail before sending HTTP.");
-            } catch (UnsupportedOperationException) {
-                $this->assertTrue(true);
+            } catch (UnsupportedOperationException $exception) {
+                $this->assertSame($operation, $exception->getContext()['operation'] ?? null);
             }
         }
 

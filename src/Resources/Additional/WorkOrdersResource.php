@@ -29,6 +29,20 @@ class WorkOrdersResource extends Resource
     protected string $entity = WorkOrder::class;
 
     /**
+     * Delete a work order using its required query ID.
+     */
+    public function deleteWorkOrder(string $id): bool
+    {
+        $requestEndpoint = $this->endpoint.'?id='.rawurlencode($id);
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->delete($requestEndpoint),
+            $this->endpoint,
+        );
+
+        return $response->successful();
+    }
+
+    /**
      * Create a new query builder for this resource.
      */
     public function query(): Builder
@@ -61,6 +75,21 @@ class WorkOrdersResource extends Resource
     }
 
     /**
+     * Update a work order using the contract's collection-level PATCH operation.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function updateWorkOrder(array $data): WorkOrder
+    {
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($this->endpoint, $data),
+            $this->endpoint,
+        );
+
+        return WorkOrder::make($this->decodeJsonData($response, $this->endpoint, false));
+    }
+
+    /**
      * Upload an invoice scan.
      *
      * @param  array<string, mixed>  $data
@@ -74,7 +103,7 @@ class WorkOrdersResource extends Resource
             $endpoint
         );
 
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**

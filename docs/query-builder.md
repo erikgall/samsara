@@ -80,7 +80,7 @@ $drivers = Samsara::drivers()
 
 Dedicated list helpers serialize non-empty arrays as comma-separated values: `types()`, `expand()`, `withDecorations()`, `whereAttribute()`, `whereDriver()`, `whereParentTag()`, `whereTag()`, and `whereVehicle()`. Arbitrary arrays passed through `where()` retain Laravel's standard bracketed encoding.
 
-Endpoint helpers use `repeatQueryParameters()` when the official operation declares a form/`explode=true` array. Those values move into the URL as repeated RFC 3986 keys (`ids=a&ids=b`) while all other query values remain unchanged. The only Fleet/platform example is vehicle attribute filters; Safety/operations uses repeated keys for alert configuration IDs, incident configuration IDs, Camera Media lists, DVIR safety status, service-task IDs, work-order IDs, and work-order-stream status/asset/assignee lists. Call `repeatQueryParameters()` directly only when building a custom endpoint whose contract requires that encoding.
+Endpoint helpers use `repeatQueryParameters()` when the official operation declares a form/`explode=true` array. Those values move into the URL as repeated RFC 3986 keys (`ids=a&ids=b`). Top-level boolean query values serialize as the literal strings `true` and `false` rather than `1` and `0`. Fleet/platform repeated keys include vehicle-list and asset-list `attributes` plus asset-depreciation `assetIds`; Safety/operations uses repeated keys for alert configuration IDs, incident configuration IDs, Camera Media lists, DVIR safety status, service-task IDs, work-order IDs, and work-order-stream status/asset/assignee lists. Call `repeatQueryParameters()` directly only when building a custom endpoint whose contract requires that encoding.
 
 ## Modifiers
 
@@ -250,7 +250,7 @@ Samsara::vehicleStats()
     });
 ```
 
-All builder terminal methods (`get()`, `first()`, `paginate()`, `getWithPagination()`, and every request made by `lazy()`) use the same typed HTTP error boundary as supported generic resource operations and custom helpers. The exception context records the effective endpoint, including the query string used for repeated-key parameters.
+All builder terminal methods (`get()`, `first()`, `paginate()`, `getWithPagination()`, and every request made by `lazy()`) use the same typed HTTP error boundary as supported generic resource operations and custom helpers. The exception context records the logical endpoint path. Inspect the recorded HTTP request when you need the final encoded query string.
 
 Endpoint builders may also select an endpoint-specific result shape through `usingEntity()` or `mapUsing()`. That mapping persists across eager, paginated, and lazy execution, which is why snapshot and time-series endpoints can return distinct DTOs instead of reusing a resource-wide entity class.
 

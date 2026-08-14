@@ -10,6 +10,8 @@ use Samsara\Data\Entity;
  * @property-read string|null $id Vehicle ID
  * @property-read string|null $name Vehicle name
  * @property-read array<string, mixed>|null $location Current location
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class VehicleLocationResult extends Entity
 {

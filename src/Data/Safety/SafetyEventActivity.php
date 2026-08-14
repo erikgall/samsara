@@ -11,6 +11,8 @@ use Samsara\Data\Entity;
  * @property-read string|null $time
  * @property-read string|null $type
  * @property-read array<string, mixed>|null $safetyEvent
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class SafetyEventActivity extends Entity
 {

@@ -2,7 +2,7 @@
 title: Error Handling
 layout: default
 nav_order: 5
-description: "Exception handling and retry logic for the Samsara SDK"
+description: 'Exception handling and retry logic for the Samsara SDK'
 permalink: /error-handling
 ---
 
@@ -12,15 +12,15 @@ permalink: /error-handling
 - [Exception Hierarchy](#exception-hierarchy)
 - [Catching Exceptions](#catching-exceptions)
 - [Exception Reference](#exception-reference)
-  - [AuthenticationException](#authenticationexception)
-  - [AuthorizationException](#authorizationexception)
-  - [NotFoundException](#notfoundexception)
-  - [UnsupportedOperationException](#unsupportedoperationexception)
-  - [ValidationException](#validationexception)
-  - [RateLimitException](#ratelimitexception)
-  - [ServerException](#serverexception)
-  - [InvalidSignatureException](#invalidsignatureexception)
-  - [ConnectionException](#connectionexception)
+    - [AuthenticationException](#authenticationexception)
+    - [AuthorizationException](#authorizationexception)
+    - [NotFoundException](#notfoundexception)
+    - [UnsupportedOperationException](#unsupportedoperationexception)
+    - [ValidationException](#validationexception)
+    - [RateLimitException](#ratelimitexception)
+    - [ServerException](#serverexception)
+    - [InvalidSignatureException](#invalidsignatureexception)
+    - [ConnectionException](#connectionexception)
 - [Exception Context](#exception-context)
 - [Retry Logic](#retry-logic)
 - [Connection Errors](#connection-errors)
@@ -165,7 +165,10 @@ try {
 
 ### RateLimitException
 
-Thrown when Samsara returns a `429`. `getRetryAfter()` returns the integer parsed from the `Retry-After` header, or `null` when the API did not include one.
+Thrown when Samsara returns a `429`. `getRetryAfter()` returns an integer when
+the header uses the delta-seconds form, or `null` when the header is missing or
+uses an HTTP date. The client still honors either valid form before an automatic
+retry.
 
 ```php
 use Samsara\Exceptions\RateLimitException;
@@ -232,7 +235,7 @@ try {
     $context = $e->getContext();
     // [
     //     'status'   => 404,
-    //     'endpoint' => '/fleet/drivers?tagIds=tag-id',
+    //     'endpoint' => '/fleet/drivers',
     //     'body'     => [...],
     // ]
 }
@@ -242,11 +245,16 @@ Pass the context straight to your logger to capture the failed endpoint, status,
 
 ## Retry Logic
 
-The SDK retries transient HTTP failures automatically. Configure the retry count in `config/samsara.php`:
+The SDK retries transient HTTP failures automatically. Configure the maximum number of total request attempts in `config/samsara.php`:
 
 ```php
-'retry' => 3,
+'attempts'                => 3,
+'retry_after_max_seconds' => 30,
 ```
+
+The value includes the initial request: `1` makes one request without retries, while `3` permits up to two retries.
+
+The retry-after ceiling limits synchronous rate-limit waits. The SDK honors smaller delta-seconds and HTTP-date values. When Samsara asks for a longer delay, the SDK sends no retry and throws `RateLimitException` with the original delay so a queue or application scheduler can reschedule the work.
 
 For application-level retry with exponential backoff — for example, when a long-running job hits a rate limit — wrap the call in a small helper:
 

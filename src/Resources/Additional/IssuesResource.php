@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
@@ -34,6 +35,21 @@ class IssuesResource extends Resource
     {
         return $this->createBuilderWithEndpoint('/issues/stream')
             ->withoutDefaultPageSize();
+    }
+
+    /**
+     * Update an issue using the contract's collection-level PATCH operation.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function updateIssue(array $data): Entity
+    {
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->patch($this->endpoint, $data),
+            $this->endpoint,
+        );
+
+        return Entity::make($this->decodeJsonData($response, $this->endpoint, false));
     }
 
     /**

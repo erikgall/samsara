@@ -9,6 +9,8 @@ use Samsara\Data\Entity;
  *
  * @property-read int|null $driverId Driver ID
  * @property-read string|null $qrCodeLink Driver QR code URL
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class DriverQrCode extends Entity
 {

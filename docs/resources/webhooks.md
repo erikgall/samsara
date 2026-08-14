@@ -125,8 +125,10 @@ The simplest path is to apply `VerifyWebhookSignature` to your route. The middle
 use Samsara\Webhooks\VerifyWebhookSignature;
 
 Route::post('/webhooks/samsara', [SamsaraWebhookController::class, 'handle'])
-    ->middleware(VerifyWebhookSignature::class);
+    ->middleware('samsara.webhook');
 ```
+
+The service provider registers `samsara.webhook` as an alias for `VerifyWebhookSignature`. The class name remains valid, and the alias accepts optional Base64 secret and tolerance parameters when route-specific configuration is required.
 
 Set the secret in your `.env`:
 
@@ -187,15 +189,23 @@ if (! $verifier->isValid($payload, $signature, $timestamp)) {
 ```php
 $verifier = new WebhookSignatureVerifier(config('samsara.webhook_secret'));
 
-$payload = json_encode(['eventType' => 'VehicleCreated']);
+$payload = '{"eventType":"VehicleCreated"}';
 $timestamp = (string) time();
 $signature = $verifier->computeSignature($payload, $timestamp);
 
-$this->postJson('/webhooks/samsara', json_decode($payload, true), [
-    'X-Samsara-Signature' => $signature,
-    'X-Samsara-Timestamp' => $timestamp,
-]);
+$this->call(
+    'POST',
+    '/webhooks/samsara',
+    server: [
+        'CONTENT_TYPE' => 'application/json',
+        'HTTP_X_SAMSARA_SIGNATURE' => $signature,
+        'HTTP_X_SAMSARA_TIMESTAMP' => $timestamp,
+    ],
+    content: $payload,
+);
 ```
+
+Sign and send the exact same raw string. JSON decoding and re-encoding can change bytes and invalidate the signature.
 
 ### Signature Headers
 
@@ -206,7 +216,9 @@ $this->postJson('/webhooks/samsara', json_decode($payload, true), [
 
 ### Timestamp Tolerance
 
-`verifyFromRequest()` rejects requests older than 300 seconds (5 minutes) by default. Pass a custom tolerance as the fourth argument.
+`verifyFromRequest()` rejects requests older than 300 seconds (5 minutes) by default and rejects timestamps in the future. Pass a custom tolerance as the fourth argument.
+
+The time window does not prevent replay inside the accepted interval. Make handlers idempotent by recording a stable event identifier or another application-owned deduplication key before performing side effects.
 
 ```php
 // Middleware with a 10-minute tolerance

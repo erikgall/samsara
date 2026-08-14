@@ -14,7 +14,7 @@ The package requires PHP 8.2 or later and Laravel 12 or 13. Configuration lives 
 - `api_key` / `SAMSARA_API_KEY`
 - `region` / `SAMSARA_REGION`: `us`, `eu`, or `ca`
 - `timeout` / `SAMSARA_TIMEOUT`
-- `retry` / `SAMSARA_RETRY`
+- `attempts` / `SAMSARA_ATTEMPTS`
 - `per_page` / `SAMSARA_PER_PAGE`
 - `webhook_secret` / `SAMSARA_WEBHOOK_SECRET`
 
@@ -41,7 +41,7 @@ final class FleetService
 }
 ```
 
-Use `Samsara\Samsara::make($token, $overrides)` for an intentionally separate client, such as an application that stores a token per account. Do not mutate the shared singleton for per-account credentials.
+Use `Samsara\Samsara::make($token, $overrides)` for an intentionally separate client, such as an application that stores a token per account. It inherits package request settings and region unless overridden. `withToken()` also returns an isolated clone; retain its return value. Do not mutate shared credentials for per-account work.
 
 ## Select an Operation
 

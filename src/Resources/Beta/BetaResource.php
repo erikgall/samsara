@@ -43,7 +43,7 @@ class BetaResource extends Resource
             $endpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $endpoint);
     }
 
     /**
@@ -61,7 +61,7 @@ class BetaResource extends Resource
         );
 
         /** @var array<string, mixed> */
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $endpoint);
     }
 
     /**
@@ -96,7 +96,7 @@ class BetaResource extends Resource
             $errorEndpoint
         );
 
-        return $response->json();
+        return $this->decodeJsonArray($response, $errorEndpoint);
     }
 
     /**
@@ -220,7 +220,8 @@ class BetaResource extends Resource
     public function safetyScoresVehicles(): Builder
     {
         return $this->createBuilderWithEndpoint('/safety-scores/vehicles')
-            ->withoutDefaultPageSize();
+            ->withoutDefaultPageSize()
+            ->usingEntity(SafetyScore::class);
     }
 
     /**
@@ -287,7 +288,7 @@ class BetaResource extends Resource
         );
 
         /** @var array<string, mixed> */
-        return $response->json('data', $response->json());
+        return $this->decodeJsonData($response, $errorEndpoint);
     }
 
     /**

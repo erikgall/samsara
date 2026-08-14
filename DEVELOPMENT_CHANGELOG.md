@@ -4,6 +4,29 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 
 ## Unreleased
 
+### 2026-08-13 — v2 release-review validation and remediation
+
+#### Scope and dispositions
+
+- Validated every discrete claim in the v2 release review against current source, the pinned 2026-08-10 OpenAPI snapshot, repository history, and executable checks. The reviewer-facing validation log records each claim as valid, partial, refuted, historical-only, or intentionally deferred instead of treating the review as a patch list.
+- Fixed the confirmed existing-surface defects in fake isolation, successful-response decoding, Legacy request verbs, retry classification and `Retry-After`, query serialization, DTO/enum contracts, service-provider publication, release migrations, documentation navigation, packaging exclusions, and test quality.
+- Renamed the ambiguous public `retry` / `SAMSARA_RETRY` setting to `attempts` / `SAMSARA_ATTEMPTS`. The client continues to pass the configured integer to Laravel as the total attempt count, and focused tests prove `1` makes one request while `3` makes at most three.
+- Kept the official-only endpoint families and unreachable DTO endpoint wiring as additive roadmap work. The release headings remain Unreleased until the actual tag date, and the live 2026-08-13 Preview warranty additions remain a separate snapshot-refresh decision.
+
+#### Contract and release evidence
+
+- Expanded the final release ledger to 348 paths after the Round-2 fixes: 98 upgrade actions, 148 supporting-evidence paths, 33 additive/no-action paths, 68 documentation-only paths, and one internal-only path.
+- Rebuilt the operation ledger to 192 matched package wires, zero package-only wires, zero changed matched wires, and 180 official-only declarations / 178 unique wires. Six existing query-helper variants are recorded without double-counting their underlying operations.
+- Regenerated the package declaration catalogs from current source: 12 enums / 186 cases and 75 data classes / 741 annotated properties. Expanded the reconciliation checker so stale enum or DTO dumps now fail even when the source-tree digest is current; the checker passes 115 assertions.
+- Excluded the repository-only OpenAPI evidence (`contracts/` and root `samsara.json`) from both Composer and GitHub-generated source archives while retaining the pinned snapshot as the maintainer contract authority.
+
+#### Verification and independent review
+
+- `composer test` — passed: 1,645 tests / 4,855 assertions on PHP 8.4.23.
+- Focused Beta builder and facade-fake tests — passed: 46 tests / 86 assertions, including exact driver/vehicle score hydration and the `assertRequestedWithParams()` mismatch path.
+- Snapshot validation, all 15 standalone maintenance-validator cases, PHP syntax validation, JSON parsing, and the 115-assertion contract reconciliation — passed.
+- A bounded helper agent and a separate read-only Codex task independently audited the claim lanes and contract arithmetic. Cursor Grok 4.6 xhigh then reviewed the integrated tree read-only, found the stale enum/DTO catalogs, three stale `VehicleStatType` counts, and this missing development-ledger entry; those findings were independently reproduced and corrected before re-review.
+
 ### 2026-08-12 — Integrated repository-wide quality and developer-experience pass
 
 #### Scope and accounting
@@ -21,14 +44,14 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 #### Documentation, compatibility, and release proof
 
 - Updated the changelog, compact breaking record, entry-point upgrade guide, canonical v2 guide, configuration/query references, enum catalog, topical resource pages, contract inventory, and documentation coverage for the integrated result.
-- Expanded the machine-checked tag-to-worktree disposition from 257 to 338 paths: 91 upgrade actions, 143 supporting-evidence paths, 35 additive/no-action paths, 68 documentation-only paths, and one internal-only path. Present files carry a content SHA-256, deletions carry an explicit deleted state, and the check runs in the normal maintenance/CI gate, so edits to existing paths cannot bypass review. The frozen 239-path audited implementation baseline remains explicit.
+- Expanded the machine-checked tag-to-worktree disposition from 257 to 343 paths: 93 upgrade actions, 146 supporting-evidence paths, 35 additive/no-action paths, 68 documentation-only paths, and one internal-only path. Present files carry a content SHA-256, deletions carry an explicit deleted state, and the check runs in the normal maintenance/CI gate, so edits to existing paths cannot bypass review. The frozen 239-path audited implementation baseline remains explicit.
 - Added no intentional break beyond the staged-v2 migrations already recorded. `MIG-19` now calls out observable compatibility corrections: non-mutating dates, nullable inconsistent-cursor navigation, encoded reserved-character IDs, and normalized invalid webhook timestamps.
 
 #### Verification
 
 - `composer check` — passed: 1,632 tests / 4,801 assertions, PHPStan with no errors, Pint, 15 maintenance-validator tests, pinned-snapshot verification, and 109 contract-reconciliation assertions.
 - `vendor/bin/phpunit --fail-on-warning --fail-on-risky` — passed: 1,632 tests / 4,801 assertions.
-- `composer check:v2-upgrade-guide` — passed: all 338 release paths classified once with 91 linked upgrade actions.
+- `composer check:v2-upgrade-guide` — passed: all 343 release paths classified once with 93 linked upgrade actions.
 - Strict Composer validation, Prettier ownership check, all tracked JSON parsing, 810 local Markdown link/fragment checks, and `git diff --check` — passed.
 
 ### 2026-08-12 — Documentation quality and developer-experience lane
@@ -148,9 +171,9 @@ This ledger records detailed engineering work, evidence, assumptions, and deferr
 #### Final inventory
 
 - Official contract: 372 declarations, 370 unique wire operations, 241 stable, 123 beta, and 8 preview.
-- Package ledger: 195 operations; 187 match official wires and 8 are explicit legacy helpers absent from the pinned contract.
-- Official-only backlog: 185 declarations / 183 unique wires — 74 stable, 106 beta, and 5 preview.
-- Changed matched operations: 6, all classified as additive pagination-ergonomics gaps. No matched operation retains a classified wire, request-body, response-loss, or error-mapping break.
+- Package ledger: 192 operations; all 192 match official wires and no package-only operation remains.
+- Official-only backlog: 180 declarations / 178 unique wires — 69 stable, 106 beta, and 5 preview.
+- Changed matched operations: 0. The six direct paginated helpers retain their raw-envelope APIs and now also expose query builders for automatic cursor traversal.
 - Inherited public surface: 69 effective operations, 133 unsupported calls blocked locally, zero inherited phantom operations, and exact capability declarations on all 41 concrete resources.
 - Unclassified differences: zero.
 

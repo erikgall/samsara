@@ -11,23 +11,24 @@ permalink: /configuration
 - [Introduction](#introduction)
 - [Publishing the Configuration](#publishing-the-configuration)
 - [Configuration Options](#configuration-options)
-  - [API Key](#api-key)
-  - [Region](#region)
-  - [Timeout](#timeout)
-  - [Retry](#retry)
-  - [Per Page](#per-page)
-  - [Webhook Secret](#webhook-secret)
+    - [API Key](#api-key)
+    - [Region](#region)
+    - [Timeout](#timeout)
+    - [Request Attempts](#request-attempts)
+    - [Maximum Retry-After Delay](#maximum-retry-after-delay)
+    - [Per Page](#per-page)
+    - [Webhook Secret](#webhook-secret)
 - [Runtime Configuration](#runtime-configuration)
-  - [Switching Regions](#switching-regions)
-  - [Using a Custom Base URL](#using-a-custom-base-url)
-  - [Using a Different Token](#using-a-different-token)
-  - [Reading Configuration at Runtime](#reading-configuration-at-runtime)
-  - [Creating a Fresh Instance](#creating-a-fresh-instance)
+    - [Switching Regions](#switching-regions)
+    - [Using a Custom Base URL](#using-a-custom-base-url)
+    - [Using a Different Token](#using-a-different-token)
+    - [Reading Configuration at Runtime](#reading-configuration-at-runtime)
+    - [Creating a Fresh Instance](#creating-a-fresh-instance)
 - [Environment-Specific Configuration](#environment-specific-configuration)
 
 ## Introduction
 
-Samsara reads its configuration from `config/samsara.php`, which is merged into the published file when you run `vendor:publish`. The service provider passes `api_key`, `timeout`, `retry`, and `per_page` into the singleton client and applies the selected US, EU, or Canada base URL. The reference below covers every config key and the runtime overrides the client exposes for switching regions, swapping tokens, and inspecting the active configuration.
+Samsara reads its configuration from `config/samsara.php`, which is merged into the published file when you run `vendor:publish`. The service provider passes `api_key`, `timeout`, `attempts`, `retry_after_max_seconds`, and `per_page` into the lifecycle-scoped client and applies the selected US, EU, or Canada base URL. The reference below covers every config key and the runtime overrides the client exposes for switching regions, swapping tokens, and inspecting the active configuration.
 
 ## Publishing the Configuration
 
@@ -43,7 +44,7 @@ This creates `config/samsara.php` in your application. Edit it directly, or over
 
 ### API Key
 
-Your Samsara API token. The service provider resolves the singleton client with this token, and every request authenticates with `Authorization: Bearer <token>`.
+Your Samsara API token. The service provider resolves the lifecycle-scoped client with this token, and every request authenticates with `Authorization: Bearer <token>`.
 
 ```php
 // config/samsara.php
@@ -69,11 +70,11 @@ The Samsara API region your fleet lives in. Use `us`, `eu`, or `ca`. The default
 SAMSARA_REGION=eu
 ```
 
-| Region | API Endpoint |
-|--------|-------------|
-| `us` | `https://api.samsara.com` |
-| `eu` | `https://api.eu.samsara.com` |
-| `ca` | `https://api.ca.samsara.com` |
+| Region | API Endpoint                 |
+| ------ | ---------------------------- |
+| `us`   | `https://api.samsara.com`    |
+| `eu`   | `https://api.eu.samsara.com` |
+| `ca`   | `https://api.ca.samsara.com` |
 
 The same three endpoints are available at runtime through `useUsEndpoint()`, `useEuEndpoint()`, and `useCanadaEndpoint()`.
 
@@ -90,17 +91,30 @@ Request timeout in seconds. Increase this if you regularly query large time wind
 SAMSARA_TIMEOUT=60
 ```
 
-### Retry
+### Request Attempts
 
-By default, the SDK retries failed requests up to three times before throwing an exception. Set this to `0` to disable retries entirely — useful in tests or when you want to surface network failures immediately to your application's exception handler.
+This value is the maximum number of request attempts, including the initial request. The default of `3` allows up to two retries after the initial request. Set it to `1` to make a single request without retries — useful in tests or when you want to surface network failures immediately to your application's exception handler. Values below `1` are invalid and throw `InvalidArgumentException` when the client is constructed.
 
 ```php
 // config/samsara.php
-'retry' => env('SAMSARA_RETRY', 3),
+'attempts' => env('SAMSARA_ATTEMPTS', 3),
 ```
 
 ```env
-SAMSARA_RETRY=5
+SAMSARA_ATTEMPTS=5
+```
+
+### Maximum Retry-After Delay
+
+The default ceiling of 30 seconds is the largest `Retry-After` delay the SDK honors synchronously. A 429 response above this ceiling throws `RateLimitException` without another request so your application can reschedule the work. Smaller delta-seconds and HTTP-date values remain honored.
+
+```php
+// config/samsara.php
+'retry_after_max_seconds' => env('SAMSARA_RETRY_AFTER_MAX_SECONDS', 30),
+```
+
+```env
+SAMSARA_RETRY_AFTER_MAX_SECONDS=30
 ```
 
 ### Per Page
@@ -150,7 +164,7 @@ Samsara::useUsEndpoint();
 Samsara::useCanadaEndpoint();
 ```
 
-These methods mutate the singleton client. Pair them with `withToken()` if each region has a different token.
+These methods mutate the current scoped client. For tenant-specific credentials or regions, prefer an isolated `Samsara::make()` client.
 
 ### Using a Custom Base URL
 
@@ -166,15 +180,14 @@ Like the region helpers, this mutates the current client. `getBaseUrl()` returns
 
 ### Using a Different Token
 
-`withToken()` swaps the API token on the client. Subsequent calls authenticate with the new token until you swap it again or resolve a fresh instance:
+`withToken()` returns an isolated clone with an empty resource cache. It does not mutate the container's scoped client, so retain or chain the returned instance:
 
 ```php
-Samsara::withToken('different-api-token');
-
-$drivers = Samsara::drivers()->all();
+$tenantClient = Samsara::withToken('different-api-token');
+$drivers = $tenantClient->drivers()->all();
 ```
 
-You may also chain it for a single call. Because the singleton client is mutated, the new token persists for later calls in the same request lifecycle:
+You may also chain it for a single call:
 
 ```php
 $drivers = Samsara::withToken('different-api-token')
@@ -182,11 +195,13 @@ $drivers = Samsara::withToken('different-api-token')
     ->all();
 ```
 
+`withoutToken()` returns the same kind of isolated clone with no `Authorization` header. Laravel registers the default client as a scoped service, so Octane requests and queue-job lifecycles do not retain a previous lifecycle's instance.
+
 ### Reading Configuration at Runtime
 
 The client exposes three read accessors useful for diagnostics and conditional logic:
 
-- `Samsara::getConfig(string $key, mixed $default = null): mixed` — reads a single config value (`timeout`, `retry`, `per_page`) the client was constructed with.
+- `Samsara::getConfig(string $key, mixed $default = null): mixed` — reads a single config value (`timeout`, `attempts`, `retry_after_max_seconds`, `per_page`) the client was constructed with.
 - `Samsara::hasToken(): bool` — returns `true` if a token has been set, including via `withToken()`.
 - `Samsara::getBaseUrl(): string` — returns the active base URL, switching with `useUsEndpoint()`, `useEuEndpoint()`, and `useCanadaEndpoint()`.
 
@@ -201,35 +216,68 @@ $baseUrl = Samsara::getBaseUrl();
 
 ### Creating a Fresh Instance
 
-`Samsara::make()` returns a brand-new client. Use it when you need an isolated instance — for example, in a multi-tenant application where each tenant holds its own token:
+`Samsara::make()` returns a brand-new client. It inherits the configured package region and request settings unless an override is supplied. Use it when you need an isolated instance—for example, in a multi-tenant application where each tenant holds its own token:
 
 ```php
 use Samsara\Samsara;
 
 $samsara = Samsara::make('api-token', [
+    'region'   => 'eu',
     'timeout'  => 60,
-    'retry'    => 5,
+    'attempts' => 5,
+    'retry_after_max_seconds' => 30,
     'per_page' => 50,
 ]);
-
-$samsara->useEuEndpoint();
 
 $drivers = $samsara->drivers()->all();
 ```
 
-The fresh instance does not affect the singleton resolved by the `Samsara` facade.
+The fresh instance does not affect the scoped client resolved by the `Samsara` facade.
+
+### Multi-tenant Applications
+
+Bind the authenticated tenant's isolated client at middleware entry so downstream dependency injection and the facade resolve the same scoped object:
+
+```php
+use Closure;
+use Samsara\Samsara;
+
+public function handle($request, Closure $next)
+{
+    $tenant = $request->user()->tenant;
+
+    app()->instance(Samsara::class, Samsara::make(
+        $tenant->samsara_api_token,
+        ['region' => $tenant->samsara_region],
+    ));
+
+    return $next($request);
+}
+```
+
+For queue jobs, construct from credentials and region carried by or reloaded for that job. Never depend on credentials left by an earlier job:
+
+```php
+public function handle(): void
+{
+    $samsara = Samsara::make($this->apiToken, ['region' => $this->region]);
+    $samsara->drivers()->all();
+}
+```
+
+Container and `make()` clients use Laravel's shared HTTP factory when available. Standalone callers can pass a third constructor factory or use `setHttpFactory()` as an explicit test seam.
 
 ## Environment-Specific Configuration
 
 You may tune the SDK per environment by setting the env vars in the matching `.env` file.
 
-For local development, lower retries to surface failures fast:
+For local development, lower the attempt count to surface failures fast:
 
 ```env
 # .env.local
 SAMSARA_API_KEY=samsara_api_dev_token
 SAMSARA_TIMEOUT=60
-SAMSARA_RETRY=1
+SAMSARA_ATTEMPTS=1
 ```
 
 For production, keep the defaults or raise the timeout for slower networks:
@@ -238,7 +286,7 @@ For production, keep the defaults or raise the timeout for slower networks:
 # .env.production
 SAMSARA_API_KEY=samsara_api_prod_token
 SAMSARA_TIMEOUT=30
-SAMSARA_RETRY=3
+SAMSARA_ATTEMPTS=3
 ```
 
 For testing, replace the facade root and both container bindings with a fake client:

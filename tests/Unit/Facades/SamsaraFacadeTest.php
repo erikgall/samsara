@@ -44,7 +44,7 @@ class SamsaraFacadeTest extends TestCase
                     'api_key'  => 'test-token',
                     'region'   => 'us',
                     'timeout'  => 30,
-                    'retry'    => 0,
+                    'attempts' => 1,
                     'per_page' => 100,
                 ],
             ]));

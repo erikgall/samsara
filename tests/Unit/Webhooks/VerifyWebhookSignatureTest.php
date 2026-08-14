@@ -5,6 +5,8 @@ namespace Samsara\Tests\Unit\Webhooks;
 use Samsara\Tests\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Testing\TestResponse;
+use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Webhooks\VerifyWebhookSignature;
 use Samsara\Exceptions\InvalidSignatureException;
@@ -261,6 +263,63 @@ class VerifyWebhookSignatureTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_the_documented_route_middleware_alias(): void
+    {
+        $timestamp = (string) time();
+        $signature = $this->createValidSignature(self::TEST_BODY, $timestamp);
+        Route::post('/webhook-alias', fn (): Response => new Response('OK'))
+            ->middleware('samsara.webhook:'.self::TEST_SECRET.',600');
+
+        $response = $this->postRawWebhook('/webhook-alias', self::TEST_BODY, [
+            'X-Samsara-Signature' => $signature,
+            'X-Samsara-Timestamp' => $timestamp,
+        ]);
+
+        $response->assertOk()->assertSeeText('OK');
+    }
+
+    #[Test]
+    public function it_returns_unauthorized_for_a_forged_route_webhook(): void
+    {
+        Route::post('/webhook-forged', fn (): Response => new Response('OK'))
+            ->middleware(VerifyWebhookSignature::class);
+
+        $response = $this->postRawWebhook('/webhook-forged', self::TEST_BODY, [
+            'X-Samsara-Signature' => 'v1=deadbeef',
+            'X-Samsara-Timestamp' => (string) time(),
+        ]);
+
+        $response->assertUnauthorized();
+    }
+
+    #[Test]
+    public function it_returns_unauthorized_for_an_expired_route_webhook(): void
+    {
+        $timestamp = (string) (time() - 400);
+        $signature = $this->createValidSignature(self::TEST_BODY, $timestamp);
+        Route::post('/webhook-expired', fn (): Response => new Response('OK'))
+            ->middleware(VerifyWebhookSignature::class);
+
+        $response = $this->postRawWebhook('/webhook-expired', self::TEST_BODY, [
+            'X-Samsara-Signature' => $signature,
+            'X-Samsara-Timestamp' => $timestamp,
+        ]);
+
+        $response->assertUnauthorized();
+    }
+
+    #[Test]
+    public function it_returns_unauthorized_for_missing_route_webhook_headers(): void
+    {
+        Route::post('/webhook-missing', fn (): Response => new Response('OK'))
+            ->middleware(VerifyWebhookSignature::class);
+
+        $response = $this->postRawWebhook('/webhook-missing', self::TEST_BODY);
+
+        $response->assertUnauthorized();
+    }
+
+    #[Test]
     public function it_throws_when_webhook_secret_not_configured(): void
     {
         // Set config to null to simulate missing configuration
@@ -361,5 +420,24 @@ class VerifyWebhookSignatureTest extends TestCase
         $message = "v1:{$timestamp}:{$body}";
 
         return 'v1='.hash_hmac('sha256', $message, $decodedSecret);
+    }
+
+    /**
+     * @param  array<string, string>  $headers
+     */
+    private function postRawWebhook(string $uri, string $body, array $headers = []): TestResponse
+    {
+        $server = ['CONTENT_TYPE' => 'application/json'];
+
+        foreach ($headers as $name => $value) {
+            $server['HTTP_'.strtoupper(str_replace('-', '_', $name))] = $value;
+        }
+
+        return $this->call(
+            'POST',
+            $uri,
+            server: $server,
+            content: $body,
+        );
     }
 }

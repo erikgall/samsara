@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Exceptions\ServerException;
+use Samsara\Exceptions\SamsaraException;
 use Illuminate\Http\Client\PendingRequest;
 use Samsara\Exceptions\ValidationException;
 use Samsara\Query\Pagination\CursorPaginator;
@@ -91,7 +92,7 @@ class BuilderTest extends TestCase
                 'pagination' => ['endCursor' => null, 'hasNextPage' => false],
             ]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = (new Builder(new TestQueryResource($samsara)))
             ->withoutDefaultPageSize()
@@ -119,7 +120,7 @@ class BuilderTest extends TestCase
             'pagination' => ['endCursor' => null, 'hasNextPage' => false],
         ])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0, 'per_page' => 50]);
+        $samsara = new Samsara('test-token', ['attempts' => 1, 'per_page' => 50]);
         $samsara->setHttpFactory($http);
         $builder = new Builder(new TestQueryResource($samsara));
 
@@ -280,7 +281,7 @@ class BuilderTest extends TestCase
             'pagination' => ['endCursor' => null, 'hasNextPage' => false],
         ])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = (new Builder(new TestQueryResource($samsara)))
             ->withResponseCollectionKey('assets');
@@ -305,7 +306,7 @@ class BuilderTest extends TestCase
             ],
         ])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
 
         $items = (new Builder(new TestQueryResource($samsara)))
@@ -326,7 +327,7 @@ class BuilderTest extends TestCase
             'pagination' => ['endCursor' => null, 'hasNextPage' => false],
         ])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = (new Builder(new TestQueryResource($samsara), '/custom/mapped'))
             ->usingEntity(TestMappedEntity::class);
@@ -430,7 +431,7 @@ class BuilderTest extends TestCase
         $http = new \Illuminate\Http\Client\Factory;
         $http->fake(['*' => $http->response(['data' => [['id' => 'callback-1']]])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = (new Builder(new TestQueryResource($samsara), '/custom/callback'))
             ->mapUsing(fn (array $data) => TestMappedEntity::make([
@@ -647,7 +648,7 @@ class BuilderTest extends TestCase
                 'pagination' => ['endCursor' => null, 'hasNextPage' => false],
             ]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0, 'per_page' => 50]);
+        $samsara = new Samsara('test-token', ['attempts' => 1, 'per_page' => 50]);
         $samsara->setHttpFactory($http);
         $builder = (new Builder(new TestQueryResource($samsara)))
             ->withoutDefaultPageSize();
@@ -672,7 +673,7 @@ class BuilderTest extends TestCase
             '*' => $http->response(['message' => 'Invalid API token'], 401),
         ]);
 
-        $samsara = new Samsara('test-token', ['retry' => 1]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = new Builder(new TestQueryResource($samsara), '/custom/query');
 
@@ -693,7 +694,7 @@ class BuilderTest extends TestCase
             '*' => $http->response(['message' => 'Invalid API token'], 401),
         ]);
 
-        $samsara = new Samsara('test-token', ['retry' => 1]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = new Builder(new TestQueryResource($samsara));
 
@@ -708,7 +709,7 @@ class BuilderTest extends TestCase
 
     #[Test]
     #[DataProvider('queryValidationResponsePaths')]
-    public function it_maps_query_validation_responses_from_returned_and_post_retry_paths(
+    public function it_maps_query_validation_responses_without_retrying_them(
         int $status,
         int $attempts
     ): void {
@@ -720,7 +721,7 @@ class BuilderTest extends TestCase
         $http = new \Illuminate\Http\Client\Factory;
         $http->fake(['*' => $http->response($body, $status)]);
 
-        $samsara = new Samsara('test-token', ['retry' => $attempts]);
+        $samsara = new Samsara('test-token', ['attempts' => $attempts]);
         $samsara->setHttpFactory($http);
         $builder = new Builder(new TestQueryResource($samsara), '/custom/validation-query');
 
@@ -732,7 +733,7 @@ class BuilderTest extends TestCase
             $this->assertSame($body['errors'], $exception->getErrors());
             $this->assertSame($body, $exception->getContext()['body']);
             $this->assertSame('/custom/validation-query', $exception->getContext()['endpoint']);
-            $http->assertSentCount($attempts);
+            $http->assertSentCount(1);
         }
     }
 
@@ -744,7 +745,7 @@ class BuilderTest extends TestCase
             '*' => $http->response(['message' => 'Service unavailable'], 503),
         ]);
 
-        $samsara = new Samsara('test-token', ['retry' => 3]);
+        $samsara = new Samsara('test-token', ['attempts' => 3]);
         $samsara->setHttpFactory($http);
         $builder = new Builder(new TestQueryResource($samsara), '/custom/retry-query');
 
@@ -769,7 +770,7 @@ class BuilderTest extends TestCase
             ]),
         ]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0, 'per_page' => 50]);
+        $samsara = new Samsara('test-token', ['attempts' => 1, 'per_page' => 50]);
         $samsara->setHttpFactory($http);
         $builder = (new Builder(new TestQueryResource($samsara)))->where('limit', 17);
 
@@ -804,7 +805,7 @@ class BuilderTest extends TestCase
             'pagination' => ['endCursor' => null, 'hasNextPage' => false],
         ])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0, 'per_page' => 50]);
+        $samsara = new Samsara('test-token', ['attempts' => 1, 'per_page' => 50]);
         $samsara->setHttpFactory($http);
         $builder = new Builder(new TestQueryResource($samsara));
 
@@ -831,6 +832,30 @@ class BuilderTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('invalidCollectionResponses')]
+    public function it_rejects_non_list_collection_responses(string $terminal, string $body): void
+    {
+        $http = new \Illuminate\Http\Client\Factory;
+        $http->preventStrayRequests();
+        $http->fake([
+            '*' => $http->response($body, 200, ['Content-Type' => 'application/json']),
+        ]);
+
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
+        $samsara->setHttpFactory($http);
+        $builder = new Builder(new TestQueryResource($samsara));
+
+        $this->expectException(SamsaraException::class);
+        $this->expectExceptionMessage('Expected response data to be a JSON list');
+
+        match ($terminal) {
+            'get'      => $builder->get(),
+            'paginate' => $builder->paginate(),
+            'lazy'     => $builder->lazy()->all(),
+        };
+    }
+
+    #[Test]
     public function it_restarts_lazy_pagination_without_mutating_the_original_builder(): void
     {
         $http = new \Illuminate\Http\Client\Factory;
@@ -852,7 +877,7 @@ class BuilderTest extends TestCase
                 'pagination' => ['endCursor' => null, 'hasNextPage' => false],
             ]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = (new Builder(new TestQueryResource($samsara)))
             ->withoutDefaultPageSize();
@@ -885,7 +910,7 @@ class BuilderTest extends TestCase
                 'pagination' => ['endCursor' => null, 'hasNextPage' => false],
             ]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = (new Builder(new TestQueryResource($samsara), '/custom/mapped-pages'))
             ->usingEntity(TestMappedEntity::class);
@@ -925,7 +950,7 @@ class BuilderTest extends TestCase
         $http = new \Illuminate\Http\Client\Factory;
         $http->fake(['*' => $http->response(['data' => []])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = new Builder(new TestQueryResource($samsara));
         $builder->repeatQueryParameters('states')
@@ -951,7 +976,7 @@ class BuilderTest extends TestCase
         $http = new \Illuminate\Http\Client\Factory;
         $http->fake(['*' => $http->response(['data' => []])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = new Builder(new TestQueryResource($samsara));
         $builder->types(['gps', 'obdOdometerMeters'])
@@ -994,7 +1019,7 @@ class BuilderTest extends TestCase
             'pagination' => ['endCursor' => '', 'hasNextPage' => true],
         ])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
         $builder = (new Builder(new TestQueryResource($samsara)))
             ->withoutDefaultPageSize();
@@ -1035,7 +1060,7 @@ class BuilderTest extends TestCase
             'pagination' => ['endCursor' => null, 'hasNextPage' => false],
         ])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0, 'per_page' => 50]);
+        $samsara = new Samsara('test-token', ['attempts' => 1, 'per_page' => 50]);
         $samsara->setHttpFactory($http);
 
         (new Builder(new TestQueryResource($samsara)))->paginate();
@@ -1049,7 +1074,7 @@ class BuilderTest extends TestCase
         $http = new \Illuminate\Http\Client\Factory;
         $http->fake(['*' => $http->response(['data' => [['id' => 'default-1']]])]);
 
-        $samsara = new Samsara('test-token', ['retry' => 0]);
+        $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
 
         $result = (new Builder(new TestQueryResource($samsara)))->get();
@@ -1079,6 +1104,20 @@ class BuilderTest extends TestCase
             'paginate' => ['paginate', 12],
             'lazy'     => ['lazy', 13],
             'where'    => ['where', 14],
+        ];
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function invalidCollectionResponses(): array
+    {
+        return [
+            'get null data'      => ['get', '{"data":null}'],
+            'get object data'    => ['get', '{"data":{"id":"entity-1"}}'],
+            'get scalar data'    => ['get', '{"data":"entity-1"}'],
+            'paginate null data' => ['paginate', '{"data":null}'],
+            'lazy null data'     => ['lazy', '{"data":null}'],
         ];
     }
 
@@ -1135,7 +1174,7 @@ class BuilderTest extends TestCase
     {
         return [
             'returned legacy 422 response' => [422, 1],
-            'post-retry 400 exception'     => [400, 2],
+            'returned 400 response'        => [400, 2],
         ];
     }
 }

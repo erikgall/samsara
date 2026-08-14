@@ -22,7 +22,7 @@ permalink: /resources/maintenance
 
 The `Samsara::maintenance()` resource exposes Driver Vehicle Inspection Reports (DVIRs) and the defects logged against them. DVIR builders return `Dvir`; the defects builder returns `Defect`.
 
-`dvirs()` targets `/dvirs/stream`, `defects()` targets `/defects/stream`, and `createDvir()` posts to `/fleet/dvirs`. All use the shared typed error boundary. No generic CRUD operation is supported by this multi-endpoint resource.
+`dvirs()` targets `/dvirs/stream`, `defects()` targets `/defects/stream`, and `createDvir()` posts to `/fleet/dvirs`. Dedicated item and mutation methods own their distinct contract paths. No inherited generic CRUD operation is supported by this multi-endpoint resource.
 
 ## Retrieving Records
 
@@ -54,6 +54,13 @@ Samsara::maintenance()
 
 `dvirs()` and `query()` both return a fresh `Builder` rooted at `/dvirs/stream`; use whichever reads better in context.
 
+Use the direct item helpers when you already have an ID:
+
+```php
+$dvir = Samsara::maintenance()->findDvir('dvir-id');
+$defect = Samsara::maintenance()->findDefect('defect-id');
+```
+
 ## Creating Records
 
 `createDvir()` posts to `/fleet/dvirs` and returns a `Dvir`.
@@ -73,7 +80,19 @@ The current create operation requires `authorId`, `safetyStatus`, and `type`; on
 
 ## Updating Records
 
-Generic `update()` is unsupported. The current `PATCH /fleet/dvirs/{id}` operation is an official-only additive operation deferred from this SDK surface.
+```php
+$dvir = Samsara::maintenance()->resolveDvir('dvir-id', [
+    'authorId' => 'mechanic-user-id',
+    'isResolved' => true,
+]);
+
+$defect = Samsara::maintenance()->updateDefect('defect-id', [
+    'isResolved' => true,
+    'mechanicNotes' => 'Replaced the damaged component.',
+]);
+```
+
+Generic `update()` remains unsupported because the resource spans separate DVIR and defect paths.
 
 ## Deleting Records
 
@@ -94,6 +113,8 @@ $defects = Samsara::maintenance()
 ```
 
 Each row is a typed `Defect`. `isResolved()` uses the boolean response field; `isSafe()` and `isUnsafe()` match the documented `defectSafetyStatus` values exactly.
+
+`defectTypes()` returns a no-implicit-limit builder of typed `DefectType` rows from `/defect-types`.
 
 | Property | Type | Description |
 |----------|------|-------------|

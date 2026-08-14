@@ -43,15 +43,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Retry Attempts
+    | Request Attempts
     |--------------------------------------------------------------------------
     |
-    | The number of times to retry a failed request before giving up.
-    | Set to 0 to disable retries.
+    | The maximum number of request attempts, including the initial request.
+    | Values below 1 are invalid.
+    | Set to 1 to make a single request without retries.
     |
     */
 
-    'retry' => env('SAMSARA_RETRY', 3),
+    'attempts' => env('SAMSARA_ATTEMPTS', 3),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Maximum Retry-After Delay
+    |--------------------------------------------------------------------------
+    |
+    | The largest Retry-After delay the client will honor synchronously. A 429
+    | response above this ceiling is surfaced immediately so callers can
+    | reschedule work instead of blocking a request or worker indefinitely.
+    |
+    */
+
+    'retry_after_max_seconds' => env('SAMSARA_RETRY_AFTER_MAX_SECONDS', 30),
 
     /*
     |--------------------------------------------------------------------------

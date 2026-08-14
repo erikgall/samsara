@@ -7,6 +7,7 @@ permalink: /
 ---
 
 # Samsara SDK for Laravel
+
 {: .fs-9 }
 
 A Laravel SDK for the Samsara Fleet Management API.
@@ -29,6 +30,7 @@ A Laravel SDK for the Samsara Fleet Management API.
 Samsara is a Laravel SDK for the Samsara Fleet Management API. You reach for it when you need to read or mutate fleet data — drivers, vehicles, telematics, hours of service, safety events — from a Laravel application without hand-rolling HTTP calls. The SDK exposes resources through a `Samsara` facade, returns typed entities, and provides a fluent query builder for filtering, paginating, and streaming results.
 
 {: .warning }
+
 > Upgrading an existing application to version 2 requires code changes. Complete the [v1.1.0 to v2.0.0 guide](upgrade-guide-v2.html) before changing the package constraint.
 
 ## Installation
@@ -55,7 +57,7 @@ Then add your API token to `.env`:
 SAMSARA_API_KEY=your-api-token-here
 ```
 
-Set `SAMSARA_REGION=eu` for EU customers or `SAMSARA_REGION=ca` for Canada. See [configuration.md](configuration.html) for every option, including timeout, retry, the active `per_page` default, and the webhook secret.
+Set `SAMSARA_REGION=eu` for EU customers or `SAMSARA_REGION=ca` for Canada. See [configuration.md](configuration.html) for every option, including timeout, request attempts, the active `per_page` default, and the webhook secret.
 
 ## Your First Query
 

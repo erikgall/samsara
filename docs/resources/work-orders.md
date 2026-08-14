@@ -22,7 +22,7 @@ permalink: /resources/work-orders
 
 Work orders track the maintenance lifecycle for a vehicle or asset — what needs servicing, who is doing the work, and what tasks (oil change, tire rotation, brake inspection) the order covers. Use `query()` to filter the collection, `stream()` for back-fill across long windows, and `serviceTasks()` for the catalog of available tasks.
 
-The resource owns generic `all` and `create`. Generic `find`, `update`, and `delete` are rejected because the current API uses collection-style identifiers that those generic signatures do not model. `query()`, `stream()`, `serviceTasks()`, and `uploadInvoiceScan()` implement the current read and upload paths.
+The resource owns generic `all` and `create`. Generic `find`, `update`, and `delete` remain rejected because the current API uses collection-style identifiers that those generic signatures do not model. Use `updateWorkOrder()` and `deleteWorkOrder()` for the contract-backed collection operations.
 
 ## Retrieving Records
 
@@ -53,11 +53,22 @@ $workOrder = Samsara::workOrders()->create([
 
 ## Updating Records
 
-The SDK does not yet expose the collection-style update operation. Generic `update()` throws locally.
+```php
+$workOrder = Samsara::workOrders()->updateWorkOrder([
+    'id' => 'work-order-id',
+    'status' => 'Completed',
+]);
+```
+
+The required work-order ID belongs in the PATCH body. Generic `update()` still throws locally rather than emitting a fabricated item path.
 
 ## Deleting Records
 
-The SDK does not yet expose the collection-style delete operation. Generic `delete()` throws locally.
+```php
+Samsara::workOrders()->deleteWorkOrder('work-order-id');
+```
+
+`deleteWorkOrder()` sends the ID as the required collection query parameter and returns `true` after a successful 204 response.
 
 ## Filtering
 

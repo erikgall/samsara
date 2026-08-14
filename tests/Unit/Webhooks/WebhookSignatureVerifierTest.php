@@ -194,7 +194,7 @@ class WebhookSignatureVerifierTest extends TestCase
     public function it_throws_exception_for_empty_secret(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid Base64-encoded webhook secret provided.');
+        $this->expectExceptionMessage('SAMSARA_WEBHOOK_SECRET');
 
         new WebhookSignatureVerifier('');
     }
@@ -203,7 +203,7 @@ class WebhookSignatureVerifierTest extends TestCase
     public function it_throws_exception_for_invalid_base64_secret(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid Base64-encoded webhook secret provided.');
+        $this->expectExceptionMessage('SAMSARA_WEBHOOK_SECRET');
 
         // Invalid base64 with illegal characters in strict mode
         new WebhookSignatureVerifier('!!!not-valid-base64!!!');
@@ -230,6 +230,8 @@ class WebhookSignatureVerifierTest extends TestCase
     #[Test]
     public function verify_does_not_throw_for_valid_signature(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
 
         // Compute valid signature
@@ -237,15 +239,14 @@ class WebhookSignatureVerifierTest extends TestCase
         $message = 'v1:'.self::TEST_TIMESTAMP.':'.self::TEST_BODY;
         $validSignature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
 
-        // Should not throw
         $verifier->verify(self::TEST_BODY, $validSignature, self::TEST_TIMESTAMP);
-
-        $this->assertTrue(true); // Assertion to confirm we got here
     }
 
     #[Test]
     public function verify_from_request_accepts_custom_tolerance(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
 
         // Compute valid signature for somewhat old timestamp
@@ -254,10 +255,20 @@ class WebhookSignatureVerifierTest extends TestCase
         $message = 'v1:'.$oldTimestamp.':'.self::TEST_BODY;
         $validSignature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
 
-        // Should not throw with 500 second tolerance
         $verifier->verifyFromRequest(self::TEST_BODY, $validSignature, $oldTimestamp, 500);
+    }
 
-        $this->assertTrue(true); // Assertion to confirm we got here
+    #[Test]
+    public function verify_from_request_rejects_a_future_timestamp(): void
+    {
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+        $futureTimestamp = (string) (time() + 60);
+        $signature = $verifier->computeSignature(self::TEST_BODY, $futureTimestamp);
+
+        $this->expectException(InvalidSignatureException::class);
+        $this->expectExceptionMessage('future');
+
+        $verifier->verifyFromRequest(self::TEST_BODY, $signature, $futureTimestamp);
     }
 
     #[Test]
@@ -337,6 +348,8 @@ class WebhookSignatureVerifierTest extends TestCase
     #[Test]
     public function verify_from_request_validates_signature_and_timestamp(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
 
         // Compute valid signature
@@ -345,10 +358,7 @@ class WebhookSignatureVerifierTest extends TestCase
         $message = 'v1:'.$timestamp.':'.self::TEST_BODY;
         $validSignature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
 
-        // Should not throw with current timestamp
         $verifier->verifyFromRequest(self::TEST_BODY, $validSignature, $timestamp);
-
-        $this->assertTrue(true); // Assertion to confirm we got here
     }
 
     #[Test]

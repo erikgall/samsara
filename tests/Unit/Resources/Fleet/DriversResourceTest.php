@@ -10,6 +10,7 @@ use Illuminate\Http\Client\Request;
 use Samsara\Data\Driver\DriverQrCode;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Driver\DriverAuthToken;
+use Samsara\Exceptions\SamsaraException;
 use Samsara\Resources\Fleet\DriversResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Data\Driver\DriverRemoteSignOutResult;
@@ -364,6 +365,30 @@ class DriversResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_hydrate_auth_token_from_the_whole_payload_when_data_is_missing(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['token' => 'wrong-level-token']),
+        ]);
+
+        $token = (new DriversResource($this->samsara))->createAuthToken([]);
+
+        $this->assertNull($token->token);
+    }
+
+    #[Test]
+    public function it_does_not_hydrate_qr_code_from_the_whole_payload_when_data_is_missing(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['qrCodeLink' => 'https://wrong-level.test/qr']),
+        ]);
+
+        $qrCode = (new DriversResource($this->samsara))->createQrCode([]);
+
+        $this->assertFalse($qrCode->hasQrCode());
+    }
+
+    #[Test]
     public function it_encodes_external_id_parts_as_one_path_segment(): void
     {
         $this->http->fake([
@@ -391,6 +416,35 @@ class DriversResourceTest extends TestCase
         $resource = new DriversResource($this->samsara);
 
         $this->assertSame(Driver::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_rejects_non_list_qr_code_data(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => ['driverId' => 494123],
+            ]),
+        ]);
+
+        $this->expectException(SamsaraException::class);
+        $this->expectExceptionMessage('Expected response data to be a JSON list');
+
+        (new DriversResource($this->samsara))->getQrCodes('494123');
+    }
+
+    #[Test]
+    public function it_returns_no_qr_codes_when_data_is_missing(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'pagination' => ['hasNextPage' => false],
+            ]),
+        ]);
+
+        $qrCodes = (new DriversResource($this->samsara))->getQrCodes('494123');
+
+        $this->assertCount(0, $qrCodes);
     }
 
     #[Test]

@@ -9,6 +9,8 @@ use Illuminate\Http\Client\RequestException;
 
 /**
  * Execute SDK requests across Laravel's returned and thrown response paths.
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 final class RequestExecutor
 {

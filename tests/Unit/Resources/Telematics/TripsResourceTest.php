@@ -70,8 +70,8 @@ class TripsResourceTest extends TestCase
         try {
             $resource->all();
             $this->fail('Trips all() cannot supply the required startTime and ids query.');
-        } catch (UnsupportedOperationException) {
-            $this->assertTrue(true);
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame('all', $exception->getContext()['operation'] ?? null);
         }
 
         $this->http->assertNothingSent();
@@ -137,7 +137,7 @@ class TripsResourceTest extends TestCase
         $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
             && parse_url($request->url(), PHP_URL_PATH) === '/trips/stream'
             && $request->data() === [
-                'includeAsset'     => true,
+                'includeAsset'     => 'true',
                 'completionStatus' => 'all',
                 'startTime'        => '2026-08-10T14:00:00Z',
                 'endTime'          => '2026-08-10T15:00:00Z',
@@ -148,7 +148,7 @@ class TripsResourceTest extends TestCase
         $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
             && parse_url($request->url(), PHP_URL_PATH) === '/trips/stream'
             && $request->data() === [
-                'includeAsset'     => true,
+                'includeAsset'     => 'true',
                 'completionStatus' => 'all',
                 'startTime'        => '2026-08-10T14:00:00Z',
                 'endTime'          => '2026-08-10T15:00:00Z',

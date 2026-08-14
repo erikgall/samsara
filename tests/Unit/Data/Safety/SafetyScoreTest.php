@@ -221,4 +221,18 @@ class SafetyScoreTest extends TestCase
         $this->assertSame(0, $score->getBehaviorCount('unknown'));
         $this->assertSame(0, (new SafetyScore)->getBehaviorCount('braking'));
     }
+
+    #[Test]
+    public function it_uses_the_vehicle_score_for_vehicle_payloads(): void
+    {
+        $score = new SafetyScore([
+            'vehicleId'    => 'vehicle-123',
+            'vehicleScore' => 87,
+        ]);
+
+        $this->assertSame(87, $score->getScore());
+        $this->assertTrue($score->isExcellent());
+        $this->assertFalse($score->isGood());
+        $this->assertFalse($score->needsImprovement());
+    }
 }

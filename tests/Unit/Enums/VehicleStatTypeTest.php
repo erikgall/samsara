@@ -126,6 +126,9 @@ class VehicleStatTypeTest extends TestCase
             VehicleStatType::cases()
         );
 
-        $this->assertSame([], array_values(array_diff($currentValues, $enumValues)));
+        sort($currentValues);
+        sort($enumValues);
+
+        $this->assertSame($currentValues, $enumValues);
     }
 }
