@@ -31,6 +31,7 @@ class DriversResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -57,14 +58,6 @@ class DriversResourceTest extends TestCase
             && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers/123'
             && $request->data() === ['driverActivationStatus' => 'active']
         );
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new DriversResource($this->samsara);
-
-        $this->assertInstanceOf(DriversResource::class, $resource);
     }
 
     #[Test]
@@ -210,6 +203,8 @@ class DriversResourceTest extends TestCase
             && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers'
             && $request->data() === ['driverActivationStatus' => 'active']
         );
+        $this->assertInstanceOf(Driver::class, $drivers->first());
+        $this->assertTrue($drivers->first()->isActive());
     }
 
     #[Test]
@@ -232,6 +227,8 @@ class DriversResourceTest extends TestCase
             && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers'
             && $request->data() === ['driverActivationStatus' => 'deactivated']
         );
+        $this->assertInstanceOf(Driver::class, $drivers->first());
+        $this->assertTrue($drivers->first()->isDeactivated());
     }
 
     #[Test]
@@ -277,27 +274,6 @@ class DriversResourceTest extends TestCase
         $this->assertInstanceOf(Driver::class, $driver);
         $this->assertSame('123', $driver->id);
         $this->assertSame('John Smith', $driver->name);
-    }
-
-    #[Test]
-    public function it_can_get_all_drivers(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    ['id' => '1', 'name' => 'John Smith'],
-                    ['id' => '2', 'name' => 'Jane Doe'],
-                ],
-            ]),
-        ]);
-
-        $resource = new DriversResource($this->samsara);
-        $drivers = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $drivers);
-        $this->assertCount(2, $drivers);
-        $this->assertInstanceOf(Driver::class, $drivers->first());
-        $this->assertSame('John Smith', $drivers->first()->name);
     }
 
     #[Test]
@@ -419,6 +395,27 @@ class DriversResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_queries_drivers(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [
+                    ['id' => '1', 'name' => 'John Smith'],
+                    ['id' => '2', 'name' => 'Jane Doe'],
+                ],
+            ]),
+        ]);
+
+        $resource = new DriversResource($this->samsara);
+        $drivers = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $drivers);
+        $this->assertCount(2, $drivers);
+        $this->assertInstanceOf(Driver::class, $drivers->first());
+        $this->assertSame('John Smith', $drivers->first()->name);
+    }
+
+    #[Test]
     public function it_rejects_non_list_qr_code_data(): void
     {
         $this->http->fake([
@@ -427,10 +424,18 @@ class DriversResourceTest extends TestCase
             ]),
         ]);
 
-        $this->expectException(SamsaraException::class);
-        $this->expectExceptionMessage('Expected response data to be a JSON list');
-
-        (new DriversResource($this->samsara))->getQrCodes('494123');
+        try {
+            (new DriversResource($this->samsara))->getQrCodes('494123');
+            $this->fail('Expected invalid collection data to be rejected.');
+        } catch (SamsaraException $exception) {
+            $this->assertSame(SamsaraException::class, $exception::class);
+            $this->assertSame(200, $exception->getCode());
+            $this->assertSame([
+                'status'   => 200,
+                'endpoint' => '/drivers/qr-codes',
+                'body'     => '{"data":{"driverId":494123}}',
+            ], $exception->getContext());
+        }
     }
 
     #[Test]

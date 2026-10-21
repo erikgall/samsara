@@ -45,13 +45,14 @@ class OwnedGenericOperationContractTest extends TestCase
      */
     #[Test]
     #[DataProvider('genericOperations')]
-    public function it_sends_each_supported_generic_operation_to_the_exact_contract_endpoint(
+    public function it_sends_supported_operations_to_the_exact_contract_endpoint(
         string $resourceClass,
         string $entityClass,
         string $endpoint,
         string $operation
     ): void {
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $samsara = new Samsara('test-token');
         $samsara->setHttpFactory($http);
 
@@ -61,19 +62,23 @@ class OwnedGenericOperationContractTest extends TestCase
 
         $resource = new $resourceClass($samsara);
         $result = match ($operation) {
-            'all'    => $resource->all(),
+            'query'  => $resource->query()->get(),
             'find'   => $resource->find('entity-id'),
             'create' => $resource->create(['name' => 'Contract entity']),
             'update' => $resource->update('entity-id', ['name' => 'Updated entity']),
             'delete' => $resource->delete('entity-id'),
         };
 
-        if ($operation === 'all') {
+        if ($operation === 'query') {
             $this->assertInstanceOf(EntityCollection::class, $result);
             $this->assertInstanceOf($entityClass, $result->first());
-        } elseif ($operation === 'delete') {
+        }
+
+        if ($operation === 'delete') {
             $this->assertTrue($result);
-        } else {
+        }
+
+        if (! in_array($operation, ['query', 'delete'], true)) {
             $this->assertInstanceOf($entityClass, $result);
         }
 
@@ -115,19 +120,19 @@ class OwnedGenericOperationContractTest extends TestCase
     public static function resources(): array
     {
         return [
-            'addresses'         => [AddressesResource::class, Address::class, '/addresses', ['all', 'find', 'create', 'update', 'delete']],
+            'addresses'         => [AddressesResource::class, Address::class, '/addresses', ['query', 'find', 'create', 'update', 'delete']],
             'routes'            => [RoutesResource::class, Route::class, '/fleet/routes', ['find', 'create', 'update', 'delete']],
-            'drivers'           => [DriversResource::class, Driver::class, '/fleet/drivers', ['all', 'find', 'create', 'update']],
-            'equipment'         => [EquipmentResource::class, Equipment::class, '/fleet/equipment', ['all', 'find']],
-            'trailers'          => [TrailersResource::class, Trailer::class, '/fleet/trailers', ['all', 'find', 'create', 'update', 'delete']],
-            'vehicles'          => [VehiclesResource::class, Vehicle::class, '/fleet/vehicles', ['all', 'find', 'update']],
-            'gateways'          => [GatewaysResource::class, Gateway::class, '/gateways', ['all', 'create', 'delete']],
-            'live shares'       => [LiveSharingLinksResource::class, LiveShare::class, '/live-shares', ['all', 'create', 'update', 'delete']],
-            'webhooks'          => [WebhooksResource::class, Webhook::class, '/webhooks', ['all', 'find', 'create', 'update', 'delete']],
-            'contacts'          => [ContactsResource::class, Contact::class, '/contacts', ['all', 'find', 'create', 'update', 'delete']],
-            'tags'              => [TagsResource::class, Tag::class, '/tags', ['all', 'find', 'create', 'update', 'delete']],
-            'users'             => [UsersResource::class, User::class, '/users', ['all', 'find', 'create', 'update', 'delete']],
-            'vehicle locations' => [VehicleLocationsResource::class, VehicleLocationResult::class, '/fleet/vehicles/locations', ['all']],
+            'drivers'           => [DriversResource::class, Driver::class, '/fleet/drivers', ['query', 'find', 'create', 'update']],
+            'equipment'         => [EquipmentResource::class, Equipment::class, '/fleet/equipment', ['query', 'find']],
+            'trailers'          => [TrailersResource::class, Trailer::class, '/fleet/trailers', ['query', 'find', 'create', 'update', 'delete']],
+            'vehicles'          => [VehiclesResource::class, Vehicle::class, '/fleet/vehicles', ['query', 'find', 'update']],
+            'gateways'          => [GatewaysResource::class, Gateway::class, '/gateways', ['query', 'create', 'delete']],
+            'live shares'       => [LiveSharingLinksResource::class, LiveShare::class, '/live-shares', ['query', 'create', 'update', 'delete']],
+            'webhooks'          => [WebhooksResource::class, Webhook::class, '/webhooks', ['query', 'find', 'create', 'update', 'delete']],
+            'contacts'          => [ContactsResource::class, Contact::class, '/contacts', ['query', 'find', 'create', 'update', 'delete']],
+            'tags'              => [TagsResource::class, Tag::class, '/tags', ['query', 'find', 'create', 'update', 'delete']],
+            'users'             => [UsersResource::class, User::class, '/users', ['query', 'find', 'create', 'update', 'delete']],
+            'vehicle locations' => [VehicleLocationsResource::class, VehicleLocationResult::class, '/fleet/vehicles/locations', ['query']],
         ];
     }
 
@@ -147,7 +152,7 @@ class OwnedGenericOperationContractTest extends TestCase
         }
 
         return match ($operation) {
-            'all'    => ['GET', $endpoint, [], []],
+            'query'  => ['GET', $endpoint, [], []],
             'find'   => ['GET', "{$endpoint}/entity-id", [], []],
             'create' => ['POST', $endpoint, [], ['name' => 'Contract entity']],
             'update' => ['PATCH', "{$endpoint}/entity-id", [], ['name' => 'Updated entity']],
@@ -179,11 +184,11 @@ class OwnedGenericOperationContractTest extends TestCase
             ];
         }
 
-        $data = $operation === 'all'
+        $data = $operation === 'query'
             ? [['id' => 'entity-id']]
             : ['id' => 'entity-id'];
 
-        if ($resourceClass === WebhooksResource::class && $operation !== 'all') {
+        if ($resourceClass === WebhooksResource::class && $operation !== 'query') {
             return $data;
         }
 

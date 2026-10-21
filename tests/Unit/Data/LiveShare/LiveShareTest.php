@@ -2,8 +2,8 @@
 
 namespace Samsara\Tests\Unit\Data\LiveShare;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
+use Illuminate\Support\Carbon;
 use Samsara\Data\LiveShare\LiveShare;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -14,33 +14,18 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class LiveShareTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
+    protected function setUp(): void
     {
-        $liveShare = new LiveShare([
-            'id'             => '12345',
-            'name'           => 'Fleet Live View',
-            'liveSharingUrl' => 'https://cloud.samsara.com/live/abc123',
-            'expiresAtTime'  => '2999-04-15T00:00:00Z',
-            'type'           => 'assetsLocation',
-        ]);
+        parent::setUp();
 
-        $this->assertSame('12345', $liveShare->id);
-        $this->assertSame('Fleet Live View', $liveShare->name);
-        $this->assertSame('https://cloud.samsara.com/live/abc123', $liveShare->liveSharingUrl);
-        $this->assertSame('2999-04-15T00:00:00Z', $liveShare->expiresAtTime);
-        $this->assertSame('assetsLocation', $liveShare->type);
+        Carbon::setTestNow('2024-01-15T10:30:00Z');
     }
 
-    #[Test]
-    public function it_can_be_created_with_make(): void
+    protected function tearDown(): void
     {
-        $liveShare = LiveShare::make([
-            'id' => '12345',
-        ]);
+        Carbon::setTestNow();
 
-        $this->assertInstanceOf(LiveShare::class, $liveShare);
-        $this->assertSame('12345', $liveShare->getId());
+        parent::tearDown();
     }
 
     #[Test]
@@ -59,20 +44,6 @@ class LiveShareTest extends TestCase
 
         $this->assertTrue($liveShare->isExpired());
         $this->assertFalse($liveShare->isActive());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'             => '12345',
-            'name'           => 'Fleet Live View',
-            'liveSharingUrl' => 'https://cloud.samsara.com/live/abc123',
-        ];
-
-        $liveShare = new LiveShare($data);
-
-        $this->assertSame($data, $liveShare->toArray());
     }
 
     #[Test]
@@ -112,10 +83,13 @@ class LiveShareTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
+    public function it_checks_expiration_at_the_current_instant(): void
     {
-        $liveShare = new LiveShare;
-
-        $this->assertInstanceOf(Entity::class, $liveShare);
+        $this->assertTrue((new LiveShare(['expiresAtTime' => '2024-01-15T10:29:59Z']))->isExpired());
+        $this->assertTrue((new LiveShare(['expiresAtTime' => '2024-01-15T10:30:00Z']))->isExpired());
+        $this->assertTrue((new LiveShare(['expiresAtTime' => '2024-01-15T05:30:00-05:00']))->isExpired());
+        $this->assertFalse((new LiveShare(['expiresAtTime' => '2024-01-15T10:30:00.001Z']))->isExpired());
+        $this->assertFalse((new LiveShare)->isExpired());
+        $this->assertFalse((new LiveShare(['expiresAtTime' => null]))->isExpired());
     }
 }

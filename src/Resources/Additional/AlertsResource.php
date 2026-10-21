@@ -6,6 +6,7 @@ use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Alert\AlertIncident;
 use Samsara\Data\Alert\AlertConfiguration;
+use Samsara\Resources\Concerns\CreatesEntities;
 
 /**
  * Alerts resource for the Samsara API.
@@ -13,9 +14,14 @@ use Samsara\Data\Alert\AlertConfiguration;
  * Provides access to alert configuration and incident endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<AlertConfiguration>
  */
 class AlertsResource extends Resource
 {
+    /** @use CreatesEntities<AlertConfiguration> */
+    use CreatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -30,6 +36,8 @@ class AlertsResource extends Resource
 
     /**
      * Get a query builder for alert configurations.
+     *
+     * @return Builder<AlertConfiguration>
      */
     public function configurations(): Builder
     {
@@ -48,7 +56,6 @@ class AlertsResource extends Resource
             $this->endpoint
         );
 
-        /** @var AlertConfiguration */
         return $this->mapToEntity($this->decodeJsonData($response, $this->endpoint));
     }
 
@@ -69,10 +76,12 @@ class AlertsResource extends Resource
 
     /**
      * Get a query builder for alert incidents.
+     *
+     * @return Builder<AlertIncident>
      */
     public function incidents(): Builder
     {
-        return $this->createBuilderWithEndpoint('/alerts/incidents/stream')
+        return $this->newQuery('/alerts/incidents/stream')
             ->withoutDefaultPageSize()
             ->repeatQueryParameters('configurationIds')
             ->usingEntity(AlertIncident::class);
@@ -80,10 +89,12 @@ class AlertsResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<AlertConfiguration>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
+        return $this->newQuery()
             ->withoutDefaultPageSize()
             ->repeatQueryParameters('ids');
     }
@@ -101,15 +112,6 @@ class AlertsResource extends Resource
             $this->endpoint
         );
 
-        /** @var AlertConfiguration */
         return $this->mapToEntity($this->decodeJsonData($response, $this->endpoint));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'create'];
     }
 }

@@ -12,7 +12,6 @@ use Samsara\Data\Maintenance\WorkOrder;
 use Samsara\Data\Maintenance\ServiceTask;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Additional\WorkOrdersResource;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the WorkOrdersResource class.
@@ -30,6 +29,7 @@ class WorkOrdersResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -50,46 +50,6 @@ class WorkOrdersResourceTest extends TestCase
         $result = $resource->create(['assetId' => 'asset-1']);
 
         $this->assertInstanceOf(WorkOrder::class, $result);
-    }
-
-    #[Test]
-    public function it_can_delete_work_order(): void
-    {
-        $resource = new WorkOrdersResource($this->samsara);
-
-        $this->expectException(UnsupportedOperationException::class);
-
-        $resource->delete('wo-123');
-    }
-
-    #[Test]
-    public function it_can_find_work_order(): void
-    {
-        $resource = new WorkOrdersResource($this->samsara);
-
-        $this->expectException(UnsupportedOperationException::class);
-
-        $resource->find('wo-123');
-    }
-
-    #[Test]
-    public function it_can_get_all_work_orders(): void
-    {
-        $this->http->fake([
-            '*/maintenance/work-orders' => $this->http->response([
-                'data' => [
-                    ['id' => 'wo-1'],
-                    ['id' => 'wo-2'],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new WorkOrdersResource($this->samsara);
-
-        $result = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
     }
 
     #[Test]
@@ -120,16 +80,6 @@ class WorkOrdersResourceTest extends TestCase
         $builder = $resource->stream();
 
         $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_update_work_order(): void
-    {
-        $resource = new WorkOrdersResource($this->samsara);
-
-        $this->expectException(UnsupportedOperationException::class);
-
-        $resource->update('wo-123', ['status' => 'completed']);
     }
 
     #[Test]
@@ -171,11 +121,50 @@ class WorkOrdersResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_expose_delete_work_order(): void
+    {
+        $this->assertFalse(method_exists(WorkOrdersResource::class, 'delete'));
+    }
+
+    #[Test]
+    public function it_does_not_expose_find_work_order(): void
+    {
+        $this->assertFalse(method_exists(WorkOrdersResource::class, 'find'));
+    }
+
+    #[Test]
+    public function it_does_not_expose_update_work_order(): void
+    {
+        $this->assertFalse(method_exists(WorkOrdersResource::class, 'update'));
+    }
+
+    #[Test]
     public function it_has_correct_endpoint(): void
     {
         $resource = new WorkOrdersResource($this->samsara);
 
         $this->assertSame('/maintenance/work-orders', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_queries_work_orders(): void
+    {
+        $this->http->fake([
+            '*/maintenance/work-orders' => $this->http->response([
+                'data' => [
+                    ['id' => 'wo-1'],
+                    ['id' => 'wo-2'],
+                ],
+            ], 200),
+        ]);
+
+        $resource = new WorkOrdersResource($this->samsara);
+
+        $result = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $result);
+        $this->assertCount(2, $result);
+        $this->assertInstanceOf(WorkOrder::class, $result->first());
     }
 
     #[Test]

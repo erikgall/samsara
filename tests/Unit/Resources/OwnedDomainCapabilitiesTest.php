@@ -2,120 +2,83 @@
 
 namespace Samsara\Tests\Unit\Resources;
 
-use ReflectionClass;
-use Samsara\Samsara;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
-use Samsara\Resources\Fleet\DriversResource;
-use Samsara\Resources\Fleet\TrailersResource;
-use Samsara\Resources\Fleet\VehiclesResource;
+use Samsara\Contracts\ResourceInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Samsara\Resources\Dispatch\RoutesResource;
-use Samsara\Resources\Fleet\EquipmentResource;
-use Samsara\Resources\Telematics\TripsResource;
-use Samsara\Resources\Organization\TagsResource;
-use Samsara\Resources\Dispatch\AddressesResource;
-use Samsara\Resources\Organization\UsersResource;
-use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Resources\Integrations\GatewaysResource;
-use Samsara\Resources\Integrations\WebhooksResource;
-use Samsara\Resources\Organization\ContactsResource;
-use Samsara\Exceptions\UnsupportedOperationException;
-use Samsara\Resources\Telematics\VehicleStatsResource;
-use Samsara\Resources\Telematics\VehicleLocationsResource;
-use Samsara\Resources\Integrations\LiveSharingLinksResource;
 
+/**
+ * @author Erik Galloway <erik@erikgall.com>
+ */
 class OwnedDomainCapabilitiesTest extends TestCase
 {
     /**
      * @param  class-string  $resourceClass
-     * @param  array<int, string>  $expectedOperations
+     * @param  list<string>  $operations
      */
     #[Test]
     #[DataProvider('resourceCapabilities')]
-    public function it_declares_only_contract_supported_inherited_operations(
-        string $resourceClass,
-        array $expectedOperations
-    ): void {
-        $method = (new ReflectionClass($resourceClass))->getMethod('supportedGenericOperations');
-        $resource = new $resourceClass(new Samsara('test-token'));
-
-        $this->assertSame($resourceClass, $method->getDeclaringClass()->getName());
-        $this->assertSame($expectedOperations, $method->invoke($resource));
-    }
-
-    /**
-     * @param  class-string  $resourceClass
-     */
-    #[Test]
-    #[DataProvider('unsupportedGenericOperations')]
-    public function it_rejects_each_unsupported_inherited_operation_before_http(
-        string $resourceClass,
-        string $operation
-    ): void {
-        $http = new HttpFactory;
-        $samsara = new Samsara('test-token');
-        $samsara->setHttpFactory($http);
-        $http->fake();
-        $resource = new $resourceClass($samsara);
-
-        try {
-            match ($operation) {
-                'all'    => $resource->all(),
-                'find'   => $resource->find('entity-id'),
-                'create' => $resource->create(['name' => 'Unsupported']),
-                'update' => $resource->update('entity-id', ['name' => 'Unsupported']),
-                'delete' => $resource->delete('entity-id'),
-            };
-            $this->fail("Expected {$resourceClass}::{$operation} to be rejected.");
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame($resourceClass, $exception->getContext()['resource']);
-            $this->assertSame($operation, $exception->getContext()['operation']);
-            $this->assertStringStartsWith($resource->getEndpoint(), $exception->getContext()['endpoint']);
+    public function it_declares_only_supported_generic_operations(string $resourceClass, array $operations): void
+    {
+        foreach (['all', 'find', 'create', 'update', 'delete'] as $operation) {
+            $this->assertSame(in_array($operation, $operations, true), method_exists($resourceClass, $operation), $resourceClass.'::'.$operation);
         }
+    }
 
-        $http->assertNothingSent();
+    #[Test]
+    public function it_removes_the_partial_resource_interface(): void
+    {
+        $this->assertFalse(interface_exists(ResourceInterface::class));
     }
 
     /**
-     * @return array<string, array{class-string, array<int, string>}>
+     * @return array<string, array{class-string, list<string>}>
      */
     public static function resourceCapabilities(): array
     {
         return [
-            'addresses'         => [AddressesResource::class, ['all', 'find', 'create', 'update', 'delete']],
-            'routes'            => [RoutesResource::class, ['find', 'create', 'update', 'delete']],
-            'drivers'           => [DriversResource::class, ['all', 'find', 'create', 'update']],
-            'equipment'         => [EquipmentResource::class, ['all', 'find']],
-            'trailers'          => [TrailersResource::class, ['all', 'find', 'create', 'update', 'delete']],
-            'vehicles'          => [VehiclesResource::class, ['all', 'find', 'update']],
-            'gateways'          => [GatewaysResource::class, ['all', 'create', 'delete']],
-            'live shares'       => [LiveSharingLinksResource::class, ['all', 'create', 'update', 'delete']],
-            'webhooks'          => [WebhooksResource::class, ['all', 'find', 'create', 'update', 'delete']],
-            'contacts'          => [ContactsResource::class, ['all', 'find', 'create', 'update', 'delete']],
-            'tags'              => [TagsResource::class, ['all', 'find', 'create', 'update', 'delete']],
-            'users'             => [UsersResource::class, ['all', 'find', 'create', 'update', 'delete']],
-            'trips'             => [TripsResource::class, []],
-            'vehicle locations' => [VehicleLocationsResource::class, ['all']],
-            'vehicle stats'     => [VehicleStatsResource::class, []],
+            'AlertsResource'                     => [\Samsara\Resources\Additional\AlertsResource::class, ['create']],
+            'CameraMediaResource'                => [\Samsara\Resources\Additional\CameraMediaResource::class, []],
+            'CarrierProposedAssignmentsResource' => [\Samsara\Resources\Additional\CarrierProposedAssignmentsResource::class, ['create', 'delete']],
+            'DriverTrailerAssignmentsResource'   => [\Samsara\Resources\Additional\DriverTrailerAssignmentsResource::class, ['create']],
+            'DriverVehicleAssignmentsResource'   => [\Samsara\Resources\Additional\DriverVehicleAssignmentsResource::class, ['create']],
+            'FormsResource'                      => [\Samsara\Resources\Additional\FormsResource::class, ['create']],
+            'FuelAndEnergyResource'              => [\Samsara\Resources\Additional\FuelAndEnergyResource::class, []],
+            'HubsResource'                       => [\Samsara\Resources\Additional\HubsResource::class, []],
+            'IdlingResource'                     => [\Samsara\Resources\Additional\IdlingResource::class, []],
+            'IftaResource'                       => [\Samsara\Resources\Additional\IftaResource::class, []],
+            'IssuesResource'                     => [\Samsara\Resources\Additional\IssuesResource::class, ['create']],
+            'RouteEventsResource'                => [\Samsara\Resources\Additional\RouteEventsResource::class, []],
+            'SettingsResource'                   => [\Samsara\Resources\Additional\SettingsResource::class, []],
+            'SpeedingResource'                   => [\Samsara\Resources\Additional\SpeedingResource::class, []],
+            'TachographResource'                 => [\Samsara\Resources\Additional\TachographResource::class, []],
+            'TrailerAssignmentsResource'         => [\Samsara\Resources\Additional\TrailerAssignmentsResource::class, []],
+            'WorkOrdersResource'                 => [\Samsara\Resources\Additional\WorkOrdersResource::class, ['create']],
+            'BetaResource'                       => [\Samsara\Resources\Beta\BetaResource::class, []],
+            'AddressesResource'                  => [\Samsara\Resources\Dispatch\AddressesResource::class, ['find', 'create', 'update', 'delete']],
+            'RoutesResource'                     => [\Samsara\Resources\Dispatch\RoutesResource::class, ['find', 'create', 'update', 'delete']],
+            'DriversResource'                    => [\Samsara\Resources\Fleet\DriversResource::class, ['find', 'create', 'update']],
+            'EquipmentResource'                  => [\Samsara\Resources\Fleet\EquipmentResource::class, ['find']],
+            'TrailersResource'                   => [\Samsara\Resources\Fleet\TrailersResource::class, ['find', 'create', 'update', 'delete']],
+            'VehiclesResource'                   => [\Samsara\Resources\Fleet\VehiclesResource::class, ['find', 'update']],
+            'AssetsResource'                     => [\Samsara\Resources\Industrial\AssetsResource::class, ['create', 'update', 'delete']],
+            'IndustrialResource'                 => [\Samsara\Resources\Industrial\IndustrialResource::class, ['create', 'update', 'delete']],
+            'SensorsResource'                    => [\Samsara\Resources\Industrial\SensorsResource::class, []],
+            'GatewaysResource'                   => [\Samsara\Resources\Integrations\GatewaysResource::class, ['create', 'delete']],
+            'LiveSharingLinksResource'           => [\Samsara\Resources\Integrations\LiveSharingLinksResource::class, ['create', 'update', 'delete']],
+            'WebhooksResource'                   => [\Samsara\Resources\Integrations\WebhooksResource::class, ['find', 'create', 'update', 'delete']],
+            'LegacyResource'                     => [\Samsara\Resources\Legacy\LegacyResource::class, []],
+            'ContactsResource'                   => [\Samsara\Resources\Organization\ContactsResource::class, ['find', 'create', 'update', 'delete']],
+            'OrganizationResource'               => [\Samsara\Resources\Organization\OrganizationResource::class, []],
+            'TagsResource'                       => [\Samsara\Resources\Organization\TagsResource::class, ['find', 'create', 'update', 'delete']],
+            'UsersResource'                      => [\Samsara\Resources\Organization\UsersResource::class, ['find', 'create', 'update', 'delete']],
+            'PreviewResource'                    => [\Samsara\Resources\Preview\PreviewResource::class, []],
+            'HoursOfServiceResource'             => [\Samsara\Resources\Safety\HoursOfServiceResource::class, []],
+            'MaintenanceResource'                => [\Samsara\Resources\Safety\MaintenanceResource::class, []],
+            'SafetyEventsResource'               => [\Samsara\Resources\Safety\SafetyEventsResource::class, []],
+            'TripsResource'                      => [\Samsara\Resources\Telematics\TripsResource::class, []],
+            'VehicleLocationsResource'           => [\Samsara\Resources\Telematics\VehicleLocationsResource::class, []],
+            'VehicleStatsResource'               => [\Samsara\Resources\Telematics\VehicleStatsResource::class, []],
         ];
-    }
-
-    /**
-     * @return array<string, array{class-string, string}>
-     */
-    public static function unsupportedGenericOperations(): array
-    {
-        $cases = [];
-
-        foreach (self::resourceCapabilities() as $resourceName => [$resourceClass, $supportedOperations]) {
-            foreach (['all', 'find', 'create', 'update', 'delete'] as $operation) {
-                if (! in_array($operation, $supportedOperations, true)) {
-                    $cases["{$resourceName} {$operation}"] = [$resourceClass, $operation];
-                }
-            }
-        }
-
-        return $cases;
     }
 }

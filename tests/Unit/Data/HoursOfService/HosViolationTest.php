@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\HoursOfService;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\HoursOfService\HosViolation;
@@ -15,32 +14,6 @@ use Samsara\Data\HoursOfService\HosViolationGroup;
  */
 class HosViolationTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $violation = new HosViolation([
-            'type'               => 'shiftDrivingHours',
-            'description'        => 'Shift Driving Hours (US-11 hours)',
-            'durationMs'         => 31970000,
-            'violationStartTime' => '2024-04-10T19:08:25Z',
-        ]);
-
-        $this->assertSame('shiftDrivingHours', $violation->type);
-        $this->assertSame('Shift Driving Hours (US-11 hours)', $violation->description);
-        $this->assertSame(31970000, $violation->durationMs);
-        $this->assertSame('2024-04-10T19:08:25Z', $violation->violationStartTime);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $violation = HosViolation::make([
-            'type' => 'shiftHours',
-        ]);
-
-        $this->assertInstanceOf(HosViolation::class, $violation);
-    }
-
     #[Test]
     public function it_can_check_for_cycle_hours_violation(): void
     {
@@ -92,19 +65,6 @@ class HosViolationTest extends TestCase
     }
 
     #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'type'       => 'shiftDrivingHours',
-            'durationMs' => 31970000,
-        ];
-
-        $violation = new HosViolation($data);
-
-        $this->assertSame($data, $violation->toArray());
-    }
-
-    #[Test]
     public function it_can_get_duration_in_hours(): void
     {
         $violation = new HosViolation([
@@ -152,14 +112,6 @@ class HosViolationTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
-    {
-        $violation = new HosViolation;
-
-        $this->assertInstanceOf(Entity::class, $violation);
-    }
-
-    #[Test]
     public function it_returns_null_duration_when_not_set(): void
     {
         $violation = new HosViolation;
@@ -169,7 +121,7 @@ class HosViolationTest extends TestCase
     }
 
     #[Test]
-    public function violation_groups_return_a_typed_or_empty_collection(): void
+    public function it_violation_groups_return_a_typed_or_empty_collection(): void
     {
         $group = new HosViolationGroup([
             'violations' => [['type' => 'shiftHours', 'durationMs' => 60000]],

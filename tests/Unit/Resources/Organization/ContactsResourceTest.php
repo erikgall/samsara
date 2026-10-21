@@ -27,16 +27,9 @@ class ContactsResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new ContactsResource($this->samsara);
-
-        $this->assertInstanceOf(ContactsResource::class, $resource);
     }
 
     #[Test]
@@ -98,7 +91,23 @@ class ContactsResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_all_contacts(): void
+    public function it_has_correct_endpoint(): void
+    {
+        $resource = new ContactsResource($this->samsara);
+
+        $this->assertSame('/contacts', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_has_correct_entity_class(): void
+    {
+        $resource = new ContactsResource($this->samsara);
+
+        $this->assertSame(Contact::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_queries_contacts(): void
     {
         $this->http->fake([
             '*' => $this->http->response([
@@ -116,27 +125,11 @@ class ContactsResourceTest extends TestCase
         ]);
 
         $resource = new ContactsResource($this->samsara);
-        $contacts = $resource->all();
+        $contacts = $resource->query()->get();
 
         $this->assertInstanceOf(EntityCollection::class, $contacts);
         $this->assertCount(2, $contacts);
         $this->assertInstanceOf(Contact::class, $contacts->first());
-    }
-
-    #[Test]
-    public function it_has_correct_endpoint(): void
-    {
-        $resource = new ContactsResource($this->samsara);
-
-        $this->assertSame('/contacts', $resource->getEndpoint());
-    }
-
-    #[Test]
-    public function it_has_correct_entity_class(): void
-    {
-        $resource = new ContactsResource($this->samsara);
-
-        $this->assertSame(Contact::class, $resource->getEntityClass());
     }
 
     #[Test]

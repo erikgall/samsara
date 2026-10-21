@@ -35,12 +35,13 @@ class CurrentContractBResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
 
     #[Test]
-    public function builders_without_an_official_limit_opt_out_of_the_default_page_size(): void
+    public function it_builders_without_an_official_limit_opt_out_of_the_default_page_size(): void
     {
         $this->http->fake([
             '*' => $this->http->response([
@@ -67,7 +68,7 @@ class CurrentContractBResourceTest extends TestCase
         ];
 
         foreach ($builders as $builder) {
-            $builder->getWithPagination();
+            $builder->paginate();
         }
 
         $this->http->assertNotSent(fn (Request $request): bool => array_key_exists('limit', $request->data()));
@@ -75,7 +76,7 @@ class CurrentContractBResourceTest extends TestCase
     }
 
     #[Test]
-    public function carrier_proposed_assignments_expose_the_official_cursor_page(): void
+    public function it_carrier_proposed_assignments_expose_the_official_cursor_page(): void
     {
         $this->http->fake([
             '*' => $this->http->response([
@@ -87,10 +88,10 @@ class CurrentContractBResourceTest extends TestCase
         $page = (new CarrierProposedAssignmentsResource($this->samsara))
             ->query()
             ->whereDriver(['driver-1', 'driver-2'])
-            ->getWithPagination();
+            ->paginate();
 
         $this->assertInstanceOf(CursorPaginator::class, $page);
-        $this->assertSame('cursor-1', $page->cursor()->getEndCursor());
+        $this->assertSame('cursor-1', $page->cursor()->endCursor);
         $this->assertTrue($page->hasMorePages());
         $this->assertRequest('GET', '/fleet/carrier-proposed-assignments', [
             'driverIds' => 'driver-1,driver-2',
@@ -99,7 +100,7 @@ class CurrentContractBResourceTest extends TestCase
     }
 
     #[Test]
-    public function carrier_proposed_assignments_keep_only_the_three_exact_generic_shapes(): void
+    public function it_carrier_proposed_assignments_support_query_create_and_delete(): void
     {
         $resource = new CarrierProposedAssignmentsResource($this->samsara);
         $this->http->fake([
@@ -108,7 +109,7 @@ class CurrentContractBResourceTest extends TestCase
                 'pagination' => ['hasNextPage' => false],
             ]),
         ]);
-        $all = $resource->all();
+        $all = $resource->query()->get();
         $this->assertSame(Entity::class, $all->first()::class);
         $this->assertRequest('GET', '/fleet/carrier-proposed-assignments');
 
@@ -126,7 +127,7 @@ class CurrentContractBResourceTest extends TestCase
     }
 
     #[Test]
-    public function driver_trailer_assignments_require_a_filtered_builder_but_keep_generic_create(): void
+    public function it_driver_trailer_assignments_require_a_filtered_builder_but_keep_generic_create(): void
     {
         $resource = new DriverTrailerAssignmentsResource($this->samsara);
         $this->http->fake([
@@ -150,7 +151,7 @@ class CurrentContractBResourceTest extends TestCase
     }
 
     #[Test]
-    public function driver_vehicle_assignments_require_filter_by_but_keep_generic_create(): void
+    public function it_driver_vehicle_assignments_require_filter_by_but_keep_generic_create(): void
     {
         $resource = new DriverVehicleAssignmentsResource($this->samsara);
         $this->http->fake([
@@ -178,7 +179,7 @@ class CurrentContractBResourceTest extends TestCase
     }
 
     #[Test]
-    public function fuel_and_energy_methods_use_the_current_paths_and_report_shapes(): void
+    public function it_fuel_and_energy_methods_use_the_current_paths_and_report_shapes(): void
     {
         $resource = new FuelAndEnergyResource($this->samsara);
         $purchase = [
@@ -259,7 +260,7 @@ class CurrentContractBResourceTest extends TestCase
     }
 
     #[Test]
-    public function idling_issues_and_speeding_use_filtered_current_builders(): void
+    public function it_idling_issues_and_speeding_use_filtered_current_builders(): void
     {
         $this->http->fake([
             '*' => $this->http->response([
@@ -320,7 +321,7 @@ class CurrentContractBResourceTest extends TestCase
     }
 
     #[Test]
-    public function ifta_methods_use_detail_jobs_and_current_report_paths(): void
+    public function it_ifta_methods_use_detail_jobs_and_current_report_paths(): void
     {
         $resource = new IftaResource($this->samsara);
         $detail = [
@@ -370,7 +371,7 @@ class CurrentContractBResourceTest extends TestCase
     }
 
     #[Test]
-    public function issues_keep_the_current_generic_create_shape(): void
+    public function it_issues_keep_the_current_generic_create_shape(): void
     {
         $payload = [
             'asset' => ['id' => 'asset-1'],
@@ -385,7 +386,7 @@ class CurrentContractBResourceTest extends TestCase
     }
 
     #[Test]
-    public function tachograph_builders_use_the_current_fleet_driver_and_vehicle_paths(): void
+    public function it_tachograph_builders_use_the_current_fleet_driver_and_vehicle_paths(): void
     {
         $resource = new TachographResource($this->samsara);
         $cases = [
@@ -414,7 +415,7 @@ class CurrentContractBResourceTest extends TestCase
     }
 
     #[Test]
-    public function trailer_assignment_lookup_returns_the_unwrapped_trailer_shape(): void
+    public function it_trailer_assignment_lookup_returns_the_unwrapped_trailer_shape(): void
     {
         $this->http->fake([
             '*' => $this->http->response([
@@ -454,6 +455,7 @@ class CurrentContractBResourceTest extends TestCase
     private function resetHttp(): void
     {
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara->setHttpFactory($this->http);
     }
 }

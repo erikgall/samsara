@@ -10,7 +10,6 @@ use Illuminate\Http\Client\Request;
 use Samsara\Data\LiveShare\LiveShare;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 use Samsara\Resources\Integrations\LiveSharingLinksResource;
 
 /**
@@ -29,6 +28,7 @@ class LiveSharingLinksResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -98,57 +98,6 @@ class LiveSharingLinksResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_find_a_live_share(): void
-    {
-        $resource = new LiveSharingLinksResource($this->samsara);
-
-        try {
-            $resource->find('share-123');
-            $this->fail('Live sharing links do not support an item GET.');
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame('find', $exception->getContext()['operation'] ?? null);
-        }
-
-        $this->http->assertNothingSent();
-    }
-
-    #[Test]
-    public function it_can_get_all_live_shares(): void
-    {
-        $this->http->fake([
-            '*/live-shares' => $this->http->response([
-                'data' => [
-                    [
-                        'id'             => 'share-1',
-                        'name'           => 'Share 1',
-                        'type'           => 'assetsLocation',
-                        'liveSharingUrl' => 'https://cloud.samsara.com/live/share-1',
-                    ],
-                    [
-                        'id'             => 'share-2',
-                        'name'           => 'Share 2',
-                        'type'           => 'assetsLocation',
-                        'liveSharingUrl' => 'https://cloud.samsara.com/live/share-2',
-                    ],
-                ],
-                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
-            ], 200),
-        ]);
-
-        $resource = new LiveSharingLinksResource($this->samsara);
-
-        $result = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
-        $this->assertInstanceOf(LiveShare::class, $result->first());
-        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
-            && parse_url($request->url(), PHP_URL_PATH) === '/live-shares'
-            && $request->data() === []
-        );
-    }
-
-    #[Test]
     public function it_can_update_a_live_share(): void
     {
         $this->http->fake([
@@ -205,6 +154,42 @@ class LiveSharingLinksResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_queries_live_shares(): void
+    {
+        $this->http->fake([
+            '*/live-shares' => $this->http->response([
+                'data' => [
+                    [
+                        'id'             => 'share-1',
+                        'name'           => 'Share 1',
+                        'type'           => 'assetsLocation',
+                        'liveSharingUrl' => 'https://cloud.samsara.com/live/share-1',
+                    ],
+                    [
+                        'id'             => 'share-2',
+                        'name'           => 'Share 2',
+                        'type'           => 'assetsLocation',
+                        'liveSharingUrl' => 'https://cloud.samsara.com/live/share-2',
+                    ],
+                ],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ], 200),
+        ]);
+
+        $resource = new LiveSharingLinksResource($this->samsara);
+
+        $result = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $result);
+        $this->assertCount(2, $result);
+        $this->assertInstanceOf(LiveShare::class, $result->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/live-shares'
+            && $request->data() === []
+        );
+    }
+
+    #[Test]
     public function it_terminal_executes_filtered_live_share_query(): void
     {
         $this->http->fake([
@@ -243,7 +228,7 @@ class HydrationAwareLiveSharingLinksResource extends LiveSharingLinksResource
 {
     public bool $mappedUpdateResponse = false;
 
-    protected function mapToEntity(array $data): object
+    protected function mapToEntity(array $data): LiveShare
     {
         $this->mappedUpdateResponse = true;
 

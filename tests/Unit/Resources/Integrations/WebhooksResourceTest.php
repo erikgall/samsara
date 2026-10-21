@@ -28,6 +28,7 @@ class WebhooksResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -118,44 +119,6 @@ class WebhooksResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_all_webhooks(): void
-    {
-        $this->http->fake([
-            '*/webhooks' => $this->http->response([
-                'data' => [
-                    [
-                        'id'        => 'webhook-1',
-                        'name'      => 'Webhook 1',
-                        'url'       => 'https://example.com/webhook-1',
-                        'secretKey' => 'secret-1',
-                        'version'   => '2021-06-09',
-                    ],
-                    [
-                        'id'        => 'webhook-2',
-                        'name'      => 'Webhook 2',
-                        'url'       => 'https://example.com/webhook-2',
-                        'secretKey' => 'secret-2',
-                        'version'   => '2021-06-09',
-                    ],
-                ],
-                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
-            ], 200),
-        ]);
-
-        $resource = new WebhooksResource($this->samsara);
-
-        $result = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
-        $this->assertInstanceOf(Webhook::class, $result->first());
-        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
-            && parse_url($request->url(), PHP_URL_PATH) === '/webhooks'
-            && $request->data() === []
-        );
-    }
-
-    #[Test]
     public function it_can_update_a_webhook(): void
     {
         $this->http->fake([
@@ -194,6 +157,44 @@ class WebhooksResourceTest extends TestCase
         $resource = new WebhooksResource($this->samsara);
 
         $this->assertSame(Webhook::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_queries_webhooks(): void
+    {
+        $this->http->fake([
+            '*/webhooks' => $this->http->response([
+                'data' => [
+                    [
+                        'id'        => 'webhook-1',
+                        'name'      => 'Webhook 1',
+                        'url'       => 'https://example.com/webhook-1',
+                        'secretKey' => 'secret-1',
+                        'version'   => '2021-06-09',
+                    ],
+                    [
+                        'id'        => 'webhook-2',
+                        'name'      => 'Webhook 2',
+                        'url'       => 'https://example.com/webhook-2',
+                        'secretKey' => 'secret-2',
+                        'version'   => '2021-06-09',
+                    ],
+                ],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ], 200),
+        ]);
+
+        $resource = new WebhooksResource($this->samsara);
+
+        $result = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $result);
+        $this->assertCount(2, $result);
+        $this->assertInstanceOf(Webhook::class, $result->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/webhooks'
+            && $request->data() === []
+        );
     }
 
     #[Test]

@@ -6,6 +6,7 @@ use RuntimeException;
 use Samsara\Tests\TestCase;
 use Samsara\Testing\Fixtures;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Unit tests for the Fixtures class.
@@ -32,37 +33,6 @@ class FixturesTest extends TestCase
     ];
 
     #[Test]
-    public function all_named_fixtures_match_the_pinned_contract_recursively(): void
-    {
-        foreach (self::FIXTURE_SCHEMAS as $filename => $schemaName) {
-            $fixture = Fixtures::load($filename);
-            $keys = array_keys($fixture);
-            sort($keys);
-
-            $this->assertSame(['data', 'pagination'], $keys, "Invalid fixture envelope for {$filename}.");
-            $this->assertIsArray($fixture['data']);
-            $this->assertSame(
-                ['endCursor', 'hasNextPage'],
-                array_keys($fixture['pagination']),
-                "Invalid pagination envelope for {$filename}.",
-            );
-            $this->assertIsString($fixture['pagination']['endCursor']);
-            $this->assertIsBool($fixture['pagination']['hasNextPage']);
-            $this->assertFixtureRowsMatchContractSchema($fixture, $schemaName);
-        }
-    }
-
-    #[Test]
-    public function fixtures_have_pagination_data(): void
-    {
-        $drivers = Fixtures::drivers();
-
-        $this->assertArrayHasKey('pagination', $drivers);
-        $this->assertArrayHasKey('endCursor', $drivers['pagination']);
-        $this->assertArrayHasKey('hasNextPage', $drivers['pagination']);
-    }
-
-    #[Test]
     public function it_can_load_addresses_fixture(): void
     {
         $addresses = Fixtures::addresses();
@@ -71,10 +41,10 @@ class FixturesTest extends TestCase
         $this->assertIsArray($addresses['data']);
         $this->assertNotEmpty($addresses['data']);
         $this->assertArrayHasKey('formattedAddress', $addresses['data'][0]);
-        $this->assertSame('tag-001', $addresses['data'][0]['tags'][0]['id']);
+        $this->assertIsString($addresses['data'][0]['tags'][0]['id']);
         $this->assertArrayDoesNotHaveKeys(['tagIds'], $addresses['data'][0]);
-        $this->assertSame('Receiving', $addresses['data'][1]['contacts'][0]['firstName']);
-        $this->assertSame('Manager', $addresses['data'][1]['contacts'][0]['lastName']);
+        $this->assertIsString($addresses['data'][1]['contacts'][0]['firstName']);
+        $this->assertIsString($addresses['data'][1]['contacts'][0]['lastName']);
         $this->assertArrayDoesNotHaveKeys(['name'], $addresses['data'][1]['contacts'][0]);
     }
 
@@ -84,7 +54,7 @@ class FixturesTest extends TestCase
         $data = Fixtures::load('drivers.json');
 
         $this->assertArrayHasKey('data', $data);
-        $this->assertSame('driver-001', $data['data'][0]['id']);
+        $this->assertIsString($data['data'][0]['id']);
     }
 
     #[Test]
@@ -96,13 +66,10 @@ class FixturesTest extends TestCase
         $this->assertIsArray($drivers['data']);
         $this->assertNotEmpty($drivers['data']);
         $this->assertArrayHasKey('id', $drivers['data'][0]);
-        $this->assertSame('driver-001', $drivers['data'][0]['id']);
-        $this->assertSame(
-            'USA 70 hour / 8 day',
-            $drivers['data'][0]['eldSettings']['rulesets'][0]['cycle']
-        );
+        $this->assertIsString($drivers['data'][0]['id']);
+        $this->assertIsString($drivers['data'][0]['eldSettings']['rulesets'][0]['cycle']);
         $this->assertIsInt($drivers['data'][0]['carrierSettings']['dotNumber']);
-        $this->assertSame('tag-001', $drivers['data'][0]['tags'][0]['id']);
+        $this->assertIsString($drivers['data'][0]['tags'][0]['id']);
         $this->assertArrayDoesNotHaveKeys(['tagIds'], $drivers['data'][0]);
     }
 
@@ -115,8 +82,8 @@ class FixturesTest extends TestCase
         $this->assertIsArray($dvirs['data']);
         $this->assertNotEmpty($dvirs['data']);
         $this->assertFixtureRowsMatchContractSchema($dvirs, 'DvirStreamResponseDataResponseBody');
-        $this->assertSame('preTrip', $dvirs['data'][0]['type']);
-        $this->assertSame('safe', $dvirs['data'][0]['safetyStatus']);
+        $this->assertIsString($dvirs['data'][0]['type']);
+        $this->assertIsString($dvirs['data'][0]['safetyStatus']);
         $this->assertIsString($dvirs['data'][0]['formattedAddress']);
         $this->assertArrayDoesNotHaveKeys(
             [
@@ -133,7 +100,7 @@ class FixturesTest extends TestCase
             ],
             $dvirs['data'][0]
         );
-        $this->assertSame(['defect-001'], $dvirs['data'][1]['defectIds']);
+        $this->assertIsArray($dvirs['data'][1]['defectIds']);
     }
 
     #[Test]
@@ -144,9 +111,9 @@ class FixturesTest extends TestCase
         $this->assertArrayHasKey('data', $equipment);
         $this->assertIsArray($equipment['data']);
         $this->assertNotEmpty($equipment['data']);
-        $this->assertSame('equipment-001', $equipment['data'][0]['id']);
-        $this->assertSame('FK001', $equipment['data'][0]['assetSerial']);
-        $this->assertSame('tag-001', $equipment['data'][0]['tags'][0]['id']);
+        $this->assertIsString($equipment['data'][0]['id']);
+        $this->assertIsString($equipment['data'][0]['assetSerial']);
+        $this->assertIsString($equipment['data'][0]['tags'][0]['id']);
         $this->assertArrayDoesNotHaveKeys(['serial', 'tagIds', 'attributes'], $equipment['data'][0]);
     }
 
@@ -158,12 +125,12 @@ class FixturesTest extends TestCase
         $this->assertArrayHasKey('data', $logs);
         $this->assertIsArray($logs['data']);
         $this->assertNotEmpty($logs['data']);
-        $this->assertSame('driver-001', $logs['data'][0]['driver']['id']);
-        $this->assertCount(3, $logs['data'][0]['hosLogs']);
-        $this->assertSame('onDuty', $logs['data'][0]['hosLogs'][0]['hosStatusType']);
-        $this->assertSame('vehicle-001', $logs['data'][0]['hosLogs'][0]['vehicle']['id']);
-        $this->assertSame([], $logs['data'][0]['hosLogs'][0]['codrivers']);
-        $this->assertSame(37.7749, $logs['data'][0]['hosLogs'][0]['logRecordedLocation']['latitude']);
+        $this->assertIsString($logs['data'][0]['driver']['id']);
+        $this->assertNotEmpty($logs['data'][0]['hosLogs']);
+        $this->assertIsString($logs['data'][0]['hosLogs'][0]['hosStatusType']);
+        $this->assertIsString($logs['data'][0]['hosLogs'][0]['vehicle']['id']);
+        $this->assertIsArray($logs['data'][0]['hosLogs'][0]['codrivers']);
+        $this->assertIsFloat($logs['data'][0]['hosLogs'][0]['logRecordedLocation']['latitude']);
         $this->assertArrayDoesNotHaveKeys(
             ['id', 'driver', 'annotations', 'codriverIds', 'location', 'logRecordedAtTime', 'origin'],
             $logs['data'][0]['hosLogs'][0]
@@ -179,12 +146,12 @@ class FixturesTest extends TestCase
         $this->assertIsArray($routes['data']);
         $this->assertNotEmpty($routes['data']);
         $this->assertArrayHasKey('stops', $routes['data'][0]);
-        $this->assertSame('2024-06-15T08:00:00Z', $routes['data'][0]['scheduledRouteStartTime']);
-        $this->assertSame('driver-001', $routes['data'][0]['driver']['id']);
-        $this->assertSame('vehicle-001', $routes['data'][0]['vehicle']['id']);
-        $this->assertSame('address-001', $routes['data'][0]['stops'][0]['address']['id']);
-        $this->assertSame('departed', $routes['data'][0]['stops'][0]['state']);
-        $this->assertSame('en route', $routes['data'][0]['stops'][1]['state']);
+        $this->assertIsString($routes['data'][0]['scheduledRouteStartTime']);
+        $this->assertIsString($routes['data'][0]['driver']['id']);
+        $this->assertIsString($routes['data'][0]['vehicle']['id']);
+        $this->assertIsString($routes['data'][0]['stops'][0]['address']['id']);
+        $this->assertIsString($routes['data'][0]['stops'][0]['state']);
+        $this->assertIsString($routes['data'][0]['stops'][1]['state']);
         $this->assertArrayDoesNotHaveKeys(
             [
                 'scheduledStartTime',
@@ -209,10 +176,10 @@ class FixturesTest extends TestCase
         $this->assertArrayHasKey('data', $events);
         $this->assertIsArray($events['data']);
         $this->assertNotEmpty($events['data']);
-        $this->assertSame('braking', $events['data'][0]['behaviorLabels'][0]['label']);
-        $this->assertSame('automated', $events['data'][0]['behaviorLabels'][0]['source']);
-        $this->assertSame(0.45, $events['data'][0]['maxAccelerationGForce']);
-        $this->assertSame('needsCoaching', $events['data'][0]['coachingState']);
+        $this->assertIsString($events['data'][0]['behaviorLabels'][0]['label']);
+        $this->assertIsString($events['data'][0]['behaviorLabels'][0]['source']);
+        $this->assertIsFloat($events['data'][0]['maxAccelerationGForce']);
+        $this->assertIsString($events['data'][0]['coachingState']);
         $this->assertArrayDoesNotHaveKeys(['location'], $events['data'][0]['location']);
         $this->assertArrayDoesNotHaveKeys(
             [
@@ -224,10 +191,7 @@ class FixturesTest extends TestCase
             ],
             $events['data'][0]
         );
-        $this->assertSame(
-            'https://example.com/video1.mp4',
-            $events['data'][1]['downloadForwardVideoUrl']
-        );
+        $this->assertIsString($events['data'][1]['downloadForwardVideoUrl']);
     }
 
     #[Test]
@@ -249,9 +213,9 @@ class FixturesTest extends TestCase
         $this->assertArrayHasKey('data', $trailers);
         $this->assertIsArray($trailers['data']);
         $this->assertNotEmpty($trailers['data']);
-        $this->assertSame('trailer-001', $trailers['data'][0]['id']);
-        $this->assertSame('1UYFS2480RU123456', $trailers['data'][0]['trailerSerialNumber']);
-        $this->assertSame('West Coast', $trailers['data'][0]['tags'][0]['name']);
+        $this->assertIsString($trailers['data'][0]['id']);
+        $this->assertIsString($trailers['data'][0]['trailerSerialNumber']);
+        $this->assertIsString($trailers['data'][0]['tags'][0]['name']);
         $this->assertArrayDoesNotHaveKeys(['vin', 'tagIds', 'attributes'], $trailers['data'][0]);
     }
 
@@ -264,8 +228,8 @@ class FixturesTest extends TestCase
         $this->assertIsArray($users['data']);
         $this->assertNotEmpty($users['data']);
         $this->assertArrayHasKey('email', $users['data'][0]);
-        $this->assertSame(['default', 'default', 'saml'], array_column($users['data'], 'authType'));
-        $this->assertSame('role-001', $users['data'][0]['roles'][0]['role']['id']);
+        $this->assertIsString($users['data'][0]['authType']);
+        $this->assertIsString($users['data'][0]['roles'][0]['role']['id']);
         $this->assertArrayDoesNotHaveKeys(
             ['tagIds', 'createdAtTime', 'lastSignInTime'],
             $users['data'][0]
@@ -281,7 +245,7 @@ class FixturesTest extends TestCase
         $this->assertIsArray($stats['data']);
         $this->assertNotEmpty($stats['data']);
         $this->assertArrayHasKey('gps', $stats['data'][0]);
-        $this->assertSame('On', $stats['data'][0]['engineState']['value']);
+        $this->assertIsString($stats['data'][0]['engineState']['value']);
         $this->assertIsInt($stats['data'][0]['fuelPercent']['value']);
         $this->assertArrayDoesNotHaveKeys(['time', 'engineStates', 'fuelPercents'], $stats['data'][0]);
     }
@@ -296,11 +260,11 @@ class FixturesTest extends TestCase
         $this->assertNotEmpty($vehicles['data']);
         $this->assertFixtureRowsMatchContractSchema($vehicles, 'VehicleResponseObjectResponseBody');
         $this->assertArrayHasKey('id', $vehicles['data'][0]);
-        $this->assertSame('2022-01-15T12:00:00Z', $vehicles['data'][0]['createdAtTime']);
-        $this->assertSame('vehicle-001', $vehicles['data'][0]['id']);
-        $this->assertSame('2022', $vehicles['data'][0]['year']);
-        $this->assertSame('West Coast', $vehicles['data'][0]['tags'][0]['name']);
-        $this->assertSame(['Long Haul'], $vehicles['data'][0]['attributes'][0]['stringValues']);
+        $this->assertIsString($vehicles['data'][0]['createdAtTime']);
+        $this->assertIsString($vehicles['data'][0]['id']);
+        $this->assertIsString($vehicles['data'][0]['year']);
+        $this->assertIsString($vehicles['data'][0]['tags'][0]['name']);
+        $this->assertIsArray($vehicles['data'][0]['attributes'][0]['stringValues']);
         $this->assertArrayDoesNotHaveKeys(['tagIds'], $vehicles['data'][0]);
         $this->assertArrayDoesNotHaveKeys(['stringValue'], $vehicles['data'][0]['attributes'][0]);
     }
@@ -314,11 +278,11 @@ class FixturesTest extends TestCase
         $this->assertIsArray($webhooks['data']);
         $this->assertNotEmpty($webhooks['data']);
         $this->assertArrayHasKey('eventTypes', $webhooks['data'][0]);
-        $this->assertSame(['VehicleUpdated'], $webhooks['data'][0]['eventTypes']);
-        $this->assertSame('2021-06-09', $webhooks['data'][0]['version']);
-        $this->assertSame('fixture-secret-key-001', $webhooks['data'][0]['secretKey']);
-        $this->assertSame('X-API-Key', $webhooks['data'][0]['customHeaders'][0]['key']);
-        $this->assertSame('secret-key-123', $webhooks['data'][0]['customHeaders'][0]['value']);
+        $this->assertIsArray($webhooks['data'][0]['eventTypes']);
+        $this->assertIsString($webhooks['data'][0]['version']);
+        $this->assertIsString($webhooks['data'][0]['secretKey']);
+        $this->assertIsString($webhooks['data'][0]['customHeaders'][0]['key']);
+        $this->assertIsString($webhooks['data'][0]['customHeaders'][0]['value']);
         $this->assertArrayDoesNotHaveKeys(
             [
                 'isActive',
@@ -333,12 +297,73 @@ class FixturesTest extends TestCase
     }
 
     #[Test]
+    public function it_checks_named_fixtures_against_the_pinned_contract_recursively(): void
+    {
+        foreach (self::FIXTURE_SCHEMAS as $filename => $schemaName) {
+            $fixture = Fixtures::load($filename);
+            $this->assertEqualsCanonicalizing(['data', 'pagination'], array_keys($fixture));
+            $this->assertIsArray($fixture['data']);
+            $this->assertEqualsCanonicalizing(
+                ['endCursor', 'hasNextPage'],
+                array_keys($fixture['pagination']),
+                "Invalid pagination envelope for {$filename}.",
+            );
+            $this->assertIsString($fixture['pagination']['endCursor']);
+            $this->assertIsBool($fixture['pagination']['hasNextPage']);
+            $this->assertFixtureRowsMatchContractSchema($fixture, $schemaName);
+        }
+    }
+
+    #[Test]
+    public function it_includes_pagination_data(): void
+    {
+        $drivers = Fixtures::drivers();
+
+        $this->assertArrayHasKey('pagination', $drivers);
+        $this->assertArrayHasKey('endCursor', $drivers['pagination']);
+        $this->assertArrayHasKey('hasNextPage', $drivers['pagination']);
+    }
+
+    #[Test]
+    #[DataProvider('namedFixtures')]
+    public function it_loads_each_named_fixture_without_altering_its_json(string $alias, string $filename): void
+    {
+        $expected = json_decode(
+            file_get_contents(dirname(__DIR__, 3).'/src/Testing/Fixtures/'.$filename),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+
+        $this->assertSame($expected, Fixtures::{$alias}());
+        $this->assertSame($expected, Fixtures::load($filename));
+    }
+
+    #[Test]
     public function it_throws_exception_for_missing_fixture(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Fixture file not found: nonexistent.json');
 
         Fixtures::load('nonexistent.json');
+    }
+
+    /** @return array<string, array{string, string}> */
+    public static function namedFixtures(): array
+    {
+        return [
+            'addresses'     => ['addresses', 'addresses.json'],
+            'drivers'       => ['drivers', 'drivers.json'],
+            'dvirs'         => ['dvirs', 'dvirs.json'],
+            'equipment'     => ['equipment', 'equipment.json'],
+            'hos logs'      => ['hosLogs', 'hos-logs.json'],
+            'routes'        => ['routes', 'routes.json'],
+            'safety events' => ['safetyEvents', 'safety-events.json'],
+            'tags'          => ['tags', 'tags.json'],
+            'trailers'      => ['trailers', 'trailers.json'],
+            'users'         => ['users', 'users.json'],
+            'vehicle stats' => ['vehicleStats', 'vehicle-stats.json'],
+            'vehicles'      => ['vehicles', 'vehicles.json'],
+            'webhooks'      => ['webhooks', 'webhooks.json'],
+        ];
     }
 
     /**

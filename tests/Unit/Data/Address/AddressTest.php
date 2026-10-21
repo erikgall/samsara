@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Address;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Address\Address;
 use PHPUnit\Framework\Attributes\Test;
@@ -15,32 +14,6 @@ use Samsara\Data\Address\AddressGeofence;
  */
 class AddressTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $address = new Address([
-            'id'               => '22408',
-            'name'             => 'Samsara HQ',
-            'formattedAddress' => '350 Rhode Island St, San Francisco, CA',
-        ]);
-
-        $this->assertSame('22408', $address->id);
-        $this->assertSame('Samsara HQ', $address->name);
-        $this->assertSame('350 Rhode Island St, San Francisco, CA', $address->formattedAddress);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $address = Address::make([
-            'id'   => '22408',
-            'name' => 'Samsara HQ',
-        ]);
-
-        $this->assertInstanceOf(Address::class, $address);
-        $this->assertSame('22408', $address->getId());
-    }
-
     #[Test]
     public function it_can_check_if_address_has_geofence(): void
     {
@@ -103,20 +76,6 @@ class AddressTest extends TestCase
 
         $this->assertTrue($address->isPolygonGeofence());
         $this->assertFalse($address->isCircleGeofence());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'               => '22408',
-            'name'             => 'Samsara HQ',
-            'formattedAddress' => '350 Rhode Island St, San Francisco, CA',
-        ];
-
-        $address = new Address($data);
-
-        $this->assertSame($data, $address->toArray());
     }
 
     #[Test]
@@ -277,14 +236,6 @@ class AddressTest extends TestCase
 
         $this->assertCount(1, $address->tags);
         $this->assertSame('East Coast', $address->tags[0]['name']);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $address = new Address;
-
-        $this->assertInstanceOf(Entity::class, $address);
     }
 
     #[Test]

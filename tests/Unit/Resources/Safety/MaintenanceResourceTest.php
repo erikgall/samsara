@@ -12,7 +12,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Maintenance\DefectType;
 use Samsara\Resources\Safety\MaintenanceResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the MaintenanceResource.
@@ -30,16 +29,9 @@ class MaintenanceResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new MaintenanceResource($this->samsara);
-
-        $this->assertInstanceOf(MaintenanceResource::class, $resource);
     }
 
     #[Test]
@@ -176,24 +168,6 @@ class MaintenanceResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_rejects_the_unsupported_generic_all_operation_before_http(): void
-    {
-        $this->http->fake();
-
-        $resource = new MaintenanceResource($this->samsara);
-
-        try {
-            $resource->all();
-            $this->fail('Expected the generic all operation to be rejected.');
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame('all', $exception->getContext()['operation']);
-            $this->assertSame(MaintenanceResource::class, $exception->getContext()['resource']);
-        }
-
-        $this->http->assertNothingSent();
-    }
-
-    #[Test]
     public function it_resolves_a_dvir_at_the_fleet_item_endpoint(): void
     {
         $this->http->fake([
@@ -249,7 +223,7 @@ class HydrationAwareMaintenanceResource extends MaintenanceResource
 {
     public bool $mappedCreateResponse = false;
 
-    protected function mapToEntity(array $data): object
+    protected function mapToEntity(array $data): Dvir
     {
         $this->mappedCreateResponse = true;
 

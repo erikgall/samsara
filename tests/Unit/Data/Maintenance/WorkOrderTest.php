@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Maintenance;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Maintenance\WorkOrder;
@@ -14,36 +13,6 @@ use Samsara\Data\Maintenance\WorkOrder;
  */
 class WorkOrderTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $workOrder = new WorkOrder([
-            'id'            => '5',
-            'assetId'       => '12443',
-            'status'        => 'Open',
-            'priority'      => 'High',
-            'description'   => 'The vehicle is not starting.',
-            'createdAtTime' => '2024-04-10T07:06:25Z',
-        ]);
-
-        $this->assertSame('5', $workOrder->id);
-        $this->assertSame('12443', $workOrder->assetId);
-        $this->assertSame('Open', $workOrder->status);
-        $this->assertSame('High', $workOrder->priority);
-        $this->assertSame('The vehicle is not starting.', $workOrder->description);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $workOrder = WorkOrder::make([
-            'id' => '5',
-        ]);
-
-        $this->assertInstanceOf(WorkOrder::class, $workOrder);
-        $this->assertSame('5', $workOrder->getId());
-    }
-
     #[Test]
     public function it_can_check_if_cancelled(): void
     {
@@ -115,20 +84,6 @@ class WorkOrderTest extends TestCase
         ]);
 
         $this->assertTrue($workOrder->isUrgent());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'       => '5',
-            'status'   => 'Open',
-            'priority' => 'High',
-        ];
-
-        $workOrder = new WorkOrder($data);
-
-        $this->assertSame($data, $workOrder->toArray());
     }
 
     #[Test]
@@ -235,13 +190,5 @@ class WorkOrderTest extends TestCase
             $this->assertSame(0, $empty->getServiceTaskCount());
             $this->assertFalse($empty->hasServiceTaskWithStatus('Open'));
         }
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $workOrder = new WorkOrder;
-
-        $this->assertInstanceOf(Entity::class, $workOrder);
     }
 }

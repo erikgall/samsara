@@ -12,6 +12,8 @@ use Samsara\Resources\Resource;
  * These endpoints may change significantly or be removed.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class PreviewResource extends Resource
 {
@@ -71,13 +73,5 @@ class PreviewResource extends Resource
         );
 
         return $response->successful();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

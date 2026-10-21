@@ -27,16 +27,9 @@ class TagsResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new TagsResource($this->samsara);
-
-        $this->assertInstanceOf(TagsResource::class, $resource);
     }
 
     #[Test]
@@ -93,7 +86,23 @@ class TagsResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_all_tags(): void
+    public function it_has_correct_endpoint(): void
+    {
+        $resource = new TagsResource($this->samsara);
+
+        $this->assertSame('/tags', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_has_correct_entity_class(): void
+    {
+        $resource = new TagsResource($this->samsara);
+
+        $this->assertSame(Tag::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_queries_tags(): void
     {
         $this->http->fake([
             '*' => $this->http->response([
@@ -111,27 +120,11 @@ class TagsResourceTest extends TestCase
         ]);
 
         $resource = new TagsResource($this->samsara);
-        $tags = $resource->all();
+        $tags = $resource->query()->get();
 
         $this->assertInstanceOf(EntityCollection::class, $tags);
         $this->assertCount(2, $tags);
         $this->assertInstanceOf(Tag::class, $tags->first());
-    }
-
-    #[Test]
-    public function it_has_correct_endpoint(): void
-    {
-        $resource = new TagsResource($this->samsara);
-
-        $this->assertSame('/tags', $resource->getEndpoint());
-    }
-
-    #[Test]
-    public function it_has_correct_entity_class(): void
-    {
-        $resource = new TagsResource($this->samsara);
-
-        $this->assertSame(Tag::class, $resource->getEntityClass());
     }
 
     #[Test]

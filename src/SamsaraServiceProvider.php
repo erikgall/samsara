@@ -5,6 +5,7 @@ namespace Samsara;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Samsara\Webhooks\VerifyWebhookSignature;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Client\Factory as HttpFactory;
 
 /**
@@ -43,14 +44,15 @@ class SamsaraServiceProvider extends ServiceProvider
             'samsara'
         );
 
-        $this->app->scoped(Samsara::class, function ($app) {
-            $config = $app['config']['samsara'];
+        $this->app->scoped(Samsara::class, function (Application $app): Samsara {
+            $config = $app->make('config')->get('samsara');
 
             return new Samsara(
                 $config['api_key'] ?? null,
                 [
                     'timeout'                 => $config['timeout'] ?? 30,
                     'attempts'                => $config['attempts'] ?? 3,
+                    'retry_writes'            => $config['retry_writes'] ?? false,
                     'retry_after_max_seconds' => $config['retry_after_max_seconds'] ?? 30,
                     'per_page'                => $config['per_page'] ?? 100,
                     'region'                  => $config['region'] ?? 'us',

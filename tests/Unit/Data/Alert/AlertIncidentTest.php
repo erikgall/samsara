@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Alert;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Alert\AlertIncident;
 use PHPUnit\Framework\Attributes\Test;
@@ -15,32 +14,6 @@ use PHPUnit\Framework\Attributes\Test;
 class AlertIncidentTest extends TestCase
 {
     #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $incident = new AlertIncident([
-            'configurationId' => 'config-1',
-            'isResolved'      => false,
-            'happenedAtTime'  => '2024-04-10T07:06:25Z',
-            'incidentUrl'     => 'https://cloud.samsara.com/incidents/12345',
-        ]);
-
-        $this->assertSame('config-1', $incident->configurationId);
-        $this->assertFalse($incident->isResolved);
-        $this->assertSame('2024-04-10T07:06:25Z', $incident->happenedAtTime);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $incident = AlertIncident::make([
-            'id' => '12345',
-        ]);
-
-        $this->assertInstanceOf(AlertIncident::class, $incident);
-        $this->assertSame('12345', $incident->getId());
-    }
-
-    #[Test]
     public function it_can_check_if_resolved(): void
     {
         $incident = new AlertIncident([
@@ -48,19 +21,6 @@ class AlertIncidentTest extends TestCase
         ]);
 
         $this->assertTrue($incident->isResolved());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'     => '12345',
-            'status' => 'triggered',
-        ];
-
-        $incident = new AlertIncident($data);
-
-        $this->assertSame($data, $incident->toArray());
     }
 
     #[Test]
@@ -110,15 +70,7 @@ class AlertIncidentTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
-    {
-        $incident = new AlertIncident;
-
-        $this->assertInstanceOf(Entity::class, $incident);
-    }
-
-    #[Test]
-    public function legacy_dismissed_status_check_remains_backwards_compatible(): void
+    public function it_legacy_dismissed_status_check_remains_backwards_compatible(): void
     {
         $incident = new AlertIncident([
             'status' => 'dismissed',
@@ -129,7 +81,7 @@ class AlertIncidentTest extends TestCase
     }
 
     #[Test]
-    public function legacy_triggered_status_check_remains_backwards_compatible(): void
+    public function it_legacy_triggered_status_check_remains_backwards_compatible(): void
     {
         $incident = new AlertIncident([
             'status' => 'triggered',

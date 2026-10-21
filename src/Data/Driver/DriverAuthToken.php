@@ -3,6 +3,7 @@
 namespace Samsara\Data\Driver;
 
 use Samsara\Data\Entity;
+use Illuminate\Support\Carbon;
 
 /**
  * Driver authentication token result.
@@ -25,6 +26,6 @@ class DriverAuthToken extends Entity
             return false;
         }
 
-        return $expirationTime <= (int) floor(microtime(true) * 1000);
+        return $expirationTime <= (int) floor(Carbon::now()->getPreciseTimestamp() / 1000);
     }
 }

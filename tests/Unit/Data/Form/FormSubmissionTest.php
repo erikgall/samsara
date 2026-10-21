@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Form;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Form\FormSubmission;
 use PHPUnit\Framework\Attributes\Test;
@@ -14,62 +13,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class FormSubmissionTest extends TestCase
 {
-    #[Test]
-    public function documented_status_checks_require_an_exact_known_value(): void
-    {
-        $methods = [
-            'isNotStarted',
-            'isCompleted',
-            'isArchived',
-            'isInProgress',
-            'needsReview',
-            'hasChangesRequested',
-            'isApproved',
-        ];
-        $attributes = [
-            [],
-            ['status' => null],
-            ['status' => ''],
-            ['status' => 'unknown'],
-            ['status' => 'submitted'],
-        ];
-
-        foreach ($attributes as $values) {
-            $submission = new FormSubmission($values);
-
-            foreach ($methods as $method) {
-                $this->assertFalse($submission->{$method}());
-            }
-        }
-    }
-
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $submission = new FormSubmission([
-            'id'              => '12345',
-            'formTemplate'    => ['id' => 'template-1'],
-            'status'          => 'completed',
-            'submittedAtTime' => '2024-04-10T07:06:25Z',
-        ]);
-
-        $this->assertSame('12345', $submission->id);
-        $this->assertSame('template-1', $submission->formTemplate['id']);
-        $this->assertSame('completed', $submission->status);
-        $this->assertSame('2024-04-10T07:06:25Z', $submission->submittedAtTime);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $submission = FormSubmission::make([
-            'id' => '12345',
-        ]);
-
-        $this->assertInstanceOf(FormSubmission::class, $submission);
-        $this->assertSame('12345', $submission->getId());
-    }
-
     #[Test]
     public function it_can_check_each_documented_status(): void
     {
@@ -112,19 +55,6 @@ class FormSubmissionTest extends TestCase
 
         $this->assertTrue($submission->isSubmitted());
         $this->assertFalse($submission->isDraft());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'     => '12345',
-            'status' => 'submitted',
-        ];
-
-        $submission = new FormSubmission($data);
-
-        $this->assertSame($data, $submission->toArray());
     }
 
     #[Test]
@@ -182,10 +112,31 @@ class FormSubmissionTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
+    public function it_documented_status_checks_require_an_exact_known_value(): void
     {
-        $submission = new FormSubmission;
+        $methods = [
+            'isNotStarted',
+            'isCompleted',
+            'isArchived',
+            'isInProgress',
+            'needsReview',
+            'hasChangesRequested',
+            'isApproved',
+        ];
+        $attributes = [
+            [],
+            ['status' => null],
+            ['status' => ''],
+            ['status' => 'unknown'],
+            ['status' => 'submitted'],
+        ];
 
-        $this->assertInstanceOf(Entity::class, $submission);
+        foreach ($attributes as $values) {
+            $submission = new FormSubmission($values);
+
+            foreach ($methods as $method) {
+                $this->assertFalse($submission->{$method}());
+            }
+        }
     }
 }

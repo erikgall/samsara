@@ -12,6 +12,8 @@ use Samsara\Resources\Resource;
  * These endpoints are maintained for backwards compatibility but may be removed.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class LegacyResource extends Resource
 {
@@ -174,14 +176,6 @@ class LegacyResource extends Resource
     public function visionCameras(array $data): array
     {
         return $this->getLegacy('/v1/industrial/vision/cameras', $data);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 
     /**

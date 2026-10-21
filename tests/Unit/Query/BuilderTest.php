@@ -9,6 +9,8 @@ use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Resources\Resource;
 use Samsara\Data\EntityCollection;
+use Samsara\Enums\VehicleStatType;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\Attributes\Test;
@@ -19,6 +21,7 @@ use Samsara\Exceptions\ValidationException;
 use Samsara\Query\Pagination\CursorPaginator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Samsara\Exceptions\AuthenticationException;
+use Illuminate\Http\Client\Factory as HttpFactory;
 
 /**
  * Unit tests for the Query Builder class.
@@ -30,7 +33,20 @@ class BuilderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Http::preventStrayRequests();
         Http::fake();
+    }
+
+    #[Test]
+    public function it_applies_filters_conditionally(): void
+    {
+        $builder = new Builder(new TestQueryResource(new Samsara('test-token')));
+
+        $builder->when(null, fn (Builder $query): Builder => $query->whereTag('unused'));
+        $this->assertArrayNotHasKey('tagIds', $builder->buildQuery());
+
+        $builder->when('t1', fn (Builder $query, string $tag): Builder => $query->whereTag($tag));
+        $this->assertSame('t1', $builder->buildQuery()['tagIds']);
     }
 
     #[Test]
@@ -81,7 +97,8 @@ class BuilderTest extends TestCase
     #[DataProvider('pageSizeDisabledMultiPageTerminals')]
     public function it_can_customize_the_cursor_request_parameter(string $terminal): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fakeSequence()
             ->push([
                 'data'       => [],
@@ -114,7 +131,8 @@ class BuilderTest extends TestCase
     #[DataProvider('pageSizeDisabledTerminals')]
     public function it_can_disable_the_implicit_default_page_size(string $terminal): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response([
             'data'       => [],
             'pagination' => ['endCursor' => null, 'hasNextPage' => false],
@@ -129,9 +147,9 @@ class BuilderTest extends TestCase
         $this->assertSame($builder, $result);
 
         match ($terminal) {
-            'getWithPagination' => $builder->getWithPagination(),
-            'paginate'          => $builder->paginate(),
-            'lazy'              => $builder->lazy()->all(),
+            'first'    => $builder->first(),
+            'paginate' => $builder->paginate(),
+            'lazy'     => $builder->lazy()->all(),
         };
 
         $http->assertSentCount(1);
@@ -275,7 +293,8 @@ class BuilderTest extends TestCase
     #[DataProvider('mappingTerminals')]
     public function it_can_read_a_custom_response_collection_key(string $terminal): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response([
             'assets'     => [['id' => 'asset-1']],
             'pagination' => ['endCursor' => null, 'hasNextPage' => false],
@@ -299,7 +318,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_can_read_a_nested_response_collection_key(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response([
             'data' => [
                 'media' => [['id' => 'media-1']],
@@ -321,7 +341,8 @@ class BuilderTest extends TestCase
     #[DataProvider('mappingTerminals')]
     public function it_can_select_an_entity_mapper_for_a_specific_endpoint(string $terminal): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response([
             'data'       => [['id' => 'mapped-1']],
             'pagination' => ['endCursor' => null, 'hasNextPage' => false],
@@ -428,7 +449,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_can_use_a_response_mapper_callback_for_a_specific_endpoint(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => [['id' => 'callback-1']]])]);
 
         $samsara = new Samsara('test-token', ['attempts' => 1]);
@@ -462,7 +484,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_executes_first_and_returns_single_entity(): void
     {
-        $fakeHttp = new \Illuminate\Http\Client\Factory;
+        $fakeHttp = new HttpFactory;
+        $fakeHttp->preventStrayRequests();
         $fakeHttp->fake([
             '*' => $fakeHttp->response([
                 'data' => [
@@ -481,12 +504,14 @@ class BuilderTest extends TestCase
 
         $this->assertInstanceOf(Entity::class, $result);
         $this->assertSame('1', $result->getId());
+        $fakeHttp->assertSent(fn (Request $request): bool => $request->data() === ['limit' => 1]);
     }
 
     #[Test]
     public function it_executes_get_and_returns_entity_collection(): void
     {
-        $fakeHttp = new \Illuminate\Http\Client\Factory;
+        $fakeHttp = new HttpFactory;
+        $fakeHttp->preventStrayRequests();
         $fakeHttp->fake([
             '*' => $fakeHttp->response([
                 'data' => [
@@ -510,7 +535,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_executes_get_with_custom_endpoint(): void
     {
-        $fakeHttp = new \Illuminate\Http\Client\Factory;
+        $fakeHttp = new HttpFactory;
+        $fakeHttp->preventStrayRequests();
         $fakeHttp->fake([
             'samsara.com/custom/endpoint*' => $fakeHttp->response([
                 'data' => [
@@ -535,37 +561,10 @@ class BuilderTest extends TestCase
     }
 
     #[Test]
-    public function it_executes_get_with_pagination_with_custom_endpoint(): void
-    {
-        $fakeHttp = new \Illuminate\Http\Client\Factory;
-        $fakeHttp->fake([
-            'samsara.com/custom/paginated*' => $fakeHttp->response([
-                'data' => [
-                    ['id' => '1', 'name' => 'Paginated'],
-                ],
-                'pagination' => [
-                    'endCursor'   => 'cursor-abc',
-                    'hasNextPage' => false,
-                ],
-            ], 200),
-            '*' => $fakeHttp->response(['data' => []], 200),
-        ]);
-
-        $samsara = new Samsara('test-token');
-        $samsara->setHttpFactory($fakeHttp);
-        $resource = new TestQueryResource($samsara);
-        $builder = new Builder($resource, '/custom/paginated');
-
-        $result = $builder->getWithPagination();
-
-        $this->assertInstanceOf(CursorPaginator::class, $result);
-        $this->assertCount(1, $result);
-    }
-
-    #[Test]
     public function it_executes_lazy_with_custom_endpoint(): void
     {
-        $fakeHttp = new \Illuminate\Http\Client\Factory;
+        $fakeHttp = new HttpFactory;
+        $fakeHttp->preventStrayRequests();
         $fakeHttp->fake([
             'samsara.com/custom/lazy*' => $fakeHttp->response([
                 'data' => [
@@ -590,6 +589,42 @@ class BuilderTest extends TestCase
         $items = $result->all();
         $this->assertCount(1, $items);
         $this->assertSame('1', $items[0]->getId());
+    }
+
+    #[Test]
+    public function it_executes_paginate_with_custom_endpoint(): void
+    {
+        $fakeHttp = new HttpFactory;
+        $fakeHttp->preventStrayRequests();
+        $fakeHttp->fake([
+            'samsara.com/custom/paginated*' => $fakeHttp->response([
+                'data' => [
+                    ['id' => '1', 'name' => 'Paginated'],
+                ],
+                'pagination' => [
+                    'endCursor'   => 'cursor-abc',
+                    'hasNextPage' => false,
+                ],
+            ], 200),
+            '*' => $fakeHttp->response(['data' => []], 200),
+        ]);
+
+        $samsara = new Samsara('test-token');
+        $samsara->setHttpFactory($fakeHttp);
+        $resource = new TestQueryResource($samsara);
+        $builder = new Builder($resource, '/custom/paginated');
+
+        $result = $builder->paginate();
+
+        $this->assertInstanceOf(CursorPaginator::class, $result);
+        $this->assertCount(1, $result);
+    }
+
+    #[Test]
+    public function it_exposes_only_the_paginate_terminal_and_no_query_builder_interface(): void
+    {
+        $this->assertFalse(method_exists(Builder::class, 'getWithPagination'));
+        $this->assertFalse(interface_exists(\Samsara\Contracts\QueryBuilderInterface::class));
     }
 
     #[Test]
@@ -634,10 +669,38 @@ class BuilderTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('lazyShortCircuitTerminals')]
+    public function it_hydrates_only_consumed_lazy_items(string $terminal): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response([
+            'data'       => [['id' => 'first'], ['id' => 'second']],
+            'pagination' => ['endCursor' => 'next', 'hasNextPage' => true],
+        ])]);
+        $client = new Samsara('test-token', ['attempts' => 1], $http);
+        $mappedIds = [];
+        $items = $client->vehicles()->query()->mapUsing(function (array $attributes) use (&$mappedIds): Entity {
+            $mappedIds[] = $attributes['id'];
+
+            return Entity::make($attributes);
+        })->lazy();
+
+        match ($terminal) {
+            'take' => $items->take(1)->all(),
+            'each' => $items->each(fn (Entity $entity): bool => false),
+        };
+
+        $this->assertSame(['first'], $mappedIds);
+        $http->assertSentCount(1);
+    }
+
+    #[Test]
     #[DataProvider('pageSizeDisabledMultiPageTerminals')]
     public function it_keeps_the_implicit_page_size_disabled_on_subsequent_pages(string $terminal): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fakeSequence()
             ->push([
                 'data'       => [],
@@ -668,7 +731,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_maps_query_error_context_to_the_custom_endpoint(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake([
             '*' => $http->response(['message' => 'Invalid API token'], 401),
         ]);
@@ -689,7 +753,8 @@ class BuilderTest extends TestCase
     #[DataProvider('errorMappingTerminals')]
     public function it_maps_query_error_responses_to_typed_exceptions(string $terminal): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake([
             '*' => $http->response(['message' => 'Invalid API token'], 401),
         ]);
@@ -718,7 +783,8 @@ class BuilderTest extends TestCase
             'requestId' => 'req-query-123',
             'errors'    => ['after' => ['The cursor is invalid.']],
         ];
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response($body, $status)]);
 
         $samsara = new Samsara('test-token', ['attempts' => $attempts]);
@@ -740,7 +806,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_maps_the_final_error_after_configured_retries(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake([
             '*' => $http->response(['message' => 'Service unavailable'], 503),
         ]);
@@ -762,7 +829,8 @@ class BuilderTest extends TestCase
     #[DataProvider('paginatedTerminals')]
     public function it_preserves_a_custom_limit_filter_when_no_explicit_page_size_is_given(string $terminal): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake([
             '*' => $http->response([
                 'data'       => [],
@@ -799,7 +867,8 @@ class BuilderTest extends TestCase
         string $selector,
         int $expectedLimit
     ): void {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response([
             'data'       => [],
             'pagination' => ['endCursor' => null, 'hasNextPage' => false],
@@ -813,7 +882,7 @@ class BuilderTest extends TestCase
             'limit' => $builder
                 ->limit($expectedLimit)
                 ->withoutDefaultPageSize()
-                ->getWithPagination(),
+                ->paginate(),
             'paginate' => $builder
                 ->withoutDefaultPageSize()
                 ->paginate($expectedLimit),
@@ -835,7 +904,7 @@ class BuilderTest extends TestCase
     #[DataProvider('invalidCollectionResponses')]
     public function it_rejects_non_list_collection_responses(string $terminal, string $body): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
         $http->preventStrayRequests();
         $http->fake([
             '*' => $http->response($body, 200, ['Content-Type' => 'application/json']),
@@ -845,20 +914,30 @@ class BuilderTest extends TestCase
         $samsara->setHttpFactory($http);
         $builder = new Builder(new TestQueryResource($samsara));
 
-        $this->expectException(SamsaraException::class);
-        $this->expectExceptionMessage('Expected response data to be a JSON list');
-
-        match ($terminal) {
-            'get'      => $builder->get(),
-            'paginate' => $builder->paginate(),
-            'lazy'     => $builder->lazy()->all(),
-        };
+        try {
+            match ($terminal) {
+                'get'      => $builder->get(),
+                'paginate' => $builder->paginate(),
+                'lazy'     => $builder->lazy()->all(),
+            };
+            $this->fail('Expected an invalid collection response to be rejected.');
+        } catch (SamsaraException $exception) {
+            $this->assertSame(SamsaraException::class, $exception::class);
+            $this->assertSame(200, $exception->getCode());
+            $this->assertSame([
+                'status'   => 200,
+                'endpoint' => '/test-query-endpoint',
+                'body'     => $body,
+            ], $exception->getContext());
+            $http->assertSentCount(1);
+        }
     }
 
     #[Test]
     public function it_restarts_lazy_pagination_without_mutating_the_original_builder(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fakeSequence()
             ->push([
                 'data'       => [['id' => 'page-1']],
@@ -899,7 +978,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_retains_the_selected_entity_mapper_on_the_next_page(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fakeSequence()
             ->push([
                 'data'       => [['id' => 'mapped-1']],
@@ -927,7 +1007,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_returns_null_when_first_has_no_results(): void
     {
-        $fakeHttp = new \Illuminate\Http\Client\Factory;
+        $fakeHttp = new HttpFactory;
+        $fakeHttp->preventStrayRequests();
         $fakeHttp->fake([
             '*' => $fakeHttp->response([
                 'data' => [],
@@ -945,9 +1026,27 @@ class BuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_the_first_alert_configuration_without_an_unsupported_limit(): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response(['data' => [['id' => 'alert-1'], ['id' => 'alert-2']]])]);
+        $client = new Samsara('test-token', ['attempts' => 1], $http);
+
+        $alert = $client->alerts()->configurations()->first();
+
+        $this->assertSame('alert-1', $alert?->getId());
+        $http->assertSentCount(1);
+        $http->assertSent(fn (Request $request): bool => parse_url($request->url(), PHP_URL_PATH) === '/alerts/configurations'
+            && ! array_key_exists('limit', $request->data())
+        );
+    }
+
+    #[Test]
     public function it_serializes_declared_explode_true_lists_as_repeated_query_keys(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => []])]);
 
         $samsara = new Samsara('test-token', ['attempts' => 1]);
@@ -973,7 +1072,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_serializes_only_dedicated_list_helpers_in_the_outbound_query(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => []])]);
 
         $samsara = new Samsara('test-token', ['attempts' => 1]);
@@ -991,7 +1091,7 @@ class BuilderTest extends TestCase
             ->get();
 
         $http->assertSent(function ($request) {
-            $this->assertSame([
+            $expected = [
                 'attributeValueIds' => 'attribute-1,attribute-2',
                 'driverIds'         => 'driver-1,driver-2',
                 'parentTagIds'      => 'parent-1,parent-2',
@@ -1001,7 +1101,11 @@ class BuilderTest extends TestCase
                 'types'             => 'gps,obdOdometerMeters',
                 'expand'            => 'route,vehicle',
                 'decorations'       => 'speed,address',
-            ], $request->data());
+            ];
+            $actual = $request->data();
+            ksort($expected);
+            ksort($actual);
+            $this->assertSame($expected, $actual);
             $this->assertStringContainsString('types=gps%2CobdOdometerMeters', $request->url());
             $this->assertStringContainsString('decorations=speed%2Caddress', $request->url());
             $this->assertStringContainsString('customArray%5B0%5D=one', $request->url());
@@ -1011,9 +1115,28 @@ class BuilderTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('statTypeInputs')]
+    public function it_serializes_stat_type_enums_like_strings(
+        array|string|VehicleStatType $types,
+        string $expected,
+    ): void {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response(['data' => []])]);
+        $client = new Samsara('test-token', ['attempts' => 1], $http);
+
+        $client->vehicleStats()->feed()->types($types)->withDecorations($types)->get();
+
+        $http->assertSentCount(1);
+        $http->assertSent(fn (Request $request): bool => $request->data() === ['types' => $expected, 'decorations' => $expected]
+        );
+    }
+
+    #[Test]
     public function it_stops_lazy_pagination_when_the_next_cursor_is_empty(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response([
             'data'       => [['id' => 'only-page']],
             'pagination' => ['endCursor' => '', 'hasNextPage' => true],
@@ -1054,7 +1177,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_uses_the_implicit_default_page_size_unless_disabled(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response([
             'data'       => [],
             'pagination' => ['endCursor' => null, 'hasNextPage' => false],
@@ -1071,7 +1195,8 @@ class BuilderTest extends TestCase
     #[Test]
     public function it_uses_the_resource_entity_mapper_by_default(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => [['id' => 'default-1']]])]);
 
         $samsara = new Samsara('test-token', ['attempts' => 1]);
@@ -1124,6 +1249,14 @@ class BuilderTest extends TestCase
     /**
      * @return array<string, array{string}>
      */
+    public static function lazyShortCircuitTerminals(): array
+    {
+        return ['take' => ['take'], 'each' => ['each']];
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
     public static function mappingTerminals(): array
     {
         return [
@@ -1150,9 +1283,9 @@ class BuilderTest extends TestCase
     public static function pageSizeDisabledTerminals(): array
     {
         return [
-            'getWithPagination' => ['getWithPagination'],
-            'paginate'          => ['paginate'],
-            'lazy'              => ['lazy'],
+            'first'    => ['first'],
+            'paginate' => ['paginate'],
+            'lazy'     => ['lazy'],
         ];
     }
 
@@ -1177,10 +1310,24 @@ class BuilderTest extends TestCase
             'returned 400 response'        => [400, 2],
         ];
     }
+
+    /**
+     * @return array<string, array{VehicleStatType|array<VehicleStatType|string>|string, string}>
+     */
+    public static function statTypeInputs(): array
+    {
+        return [
+            'enum'       => [VehicleStatType::GPS, 'gps'],
+            'mixed list' => [[VehicleStatType::GPS, 'engineStates'], 'gps,engineStates'],
+            'string'     => ['gps', 'gps'],
+        ];
+    }
 }
 
 /**
  * Test resource for Builder tests.
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class TestQueryResource extends Resource
 {
@@ -1194,4 +1341,7 @@ class TestQueryResource extends Resource
     }
 }
 
+/**
+ * @author Erik Galloway <erik@erikgall.com>
+ */
 class TestMappedEntity extends Entity {}

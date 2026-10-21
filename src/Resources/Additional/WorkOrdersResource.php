@@ -6,6 +6,7 @@ use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Maintenance\WorkOrder;
 use Samsara\Data\Maintenance\ServiceTask;
+use Samsara\Resources\Concerns\CreatesEntities;
 
 /**
  * WorkOrders resource for the Samsara API.
@@ -13,9 +14,14 @@ use Samsara\Data\Maintenance\ServiceTask;
  * Provides access to maintenance work order endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<WorkOrder>
  */
 class WorkOrdersResource extends Resource
 {
+    /** @use CreatesEntities<WorkOrder> */
+    use CreatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -44,20 +50,24 @@ class WorkOrdersResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<WorkOrder>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
+        return $this->newQuery()
             ->withoutDefaultPageSize()
             ->repeatQueryParameters('ids');
     }
 
     /**
      * Get all service tasks.
+     *
+     * @return Builder<ServiceTask>
      */
     public function serviceTasks(): Builder
     {
-        return $this->createBuilderWithEndpoint('/maintenance/service-tasks')
+        return $this->newQuery('/maintenance/service-tasks')
             ->withoutDefaultPageSize()
             ->repeatQueryParameters('ids')
             ->usingEntity(ServiceTask::class);
@@ -65,10 +75,12 @@ class WorkOrdersResource extends Resource
 
     /**
      * Get a query builder for work orders stream.
+     *
+     * @return Builder<WorkOrder>
      */
     public function stream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/maintenance/work-orders/stream')
+        return $this->newQuery('/maintenance/work-orders/stream')
             ->withoutDefaultPageSize()
             ->repeatQueryParameters('workOrderStatuses', 'assetIds', 'assignedUserIds')
             ->usingEntity(WorkOrder::class);
@@ -104,13 +116,5 @@ class WorkOrdersResource extends Resource
         );
 
         return $this->decodeJsonData($response, $endpoint);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'create'];
     }
 }

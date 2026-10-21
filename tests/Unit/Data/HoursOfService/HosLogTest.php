@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\HoursOfService;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Enums\DutyStatus;
 use PHPUnit\Framework\Attributes\Test;
@@ -17,65 +16,6 @@ use Samsara\Data\HoursOfService\HosClocksForDriver;
  */
 class HosLogTest extends TestCase
 {
-    #[Test]
-    public function clocks_for_a_driver_expose_current_status_and_violation_hours(): void
-    {
-        $clocks = new HosClocksForDriver([
-            'currentDutyStatus' => ['hosStatusType' => 'sleeperBed'],
-            'violations'        => [
-                'cycleViolationDurationMs'        => 3600000,
-                'shiftDrivingViolationDurationMs' => 0,
-            ],
-        ]);
-
-        $this->assertSame(DutyStatus::SLEEPER_BERTH, $clocks->getCurrentDutyStatus());
-        $this->assertSame(1.0, $clocks->getCycleViolationHours());
-        $this->assertSame(0.0, $clocks->getShiftDrivingViolationHours());
-        $this->assertNull((new HosClocksForDriver)->getCurrentDutyStatus());
-        $this->assertSame([], (new HosClocksForDriver(['clocks' => 'invalid']))->getClocks()->toArray());
-        $this->assertNull((new HosClocksForDriver(['violations' => null]))->getCycleViolationHours());
-        $this->assertNull((new HosClocksForDriver(['currentDutyStatus' => ['hosStatusType' => 'unknown']]))->getCurrentDutyStatus());
-    }
-
-    #[Test]
-    public function grouped_logs_return_a_typed_or_empty_collection(): void
-    {
-        $group = new HosLogsForDriver([
-            'hosLogs' => [['hosStatusType' => 'driving', 'logStartTime' => '2026-08-12T12:00:00Z']],
-        ]);
-
-        $this->assertInstanceOf(HosLog::class, $group->getLogs()->first());
-        $this->assertTrue((new HosLogsForDriver(['hosLogs' => null]))->getLogs()->isEmpty());
-        $this->assertTrue((new HosLogsForDriver(['hosLogs' => 'invalid']))->getLogs()->isEmpty());
-    }
-
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $log = new HosLog([
-            'hosStatusType' => 'driving',
-            'logStartTime'  => '2024-04-10T08:00:00Z',
-            'logEndTime'    => '2024-04-10T12:00:00Z',
-            'remark'        => 'Morning route',
-        ]);
-
-        $this->assertSame('driving', $log->hosStatusType);
-        $this->assertSame('2024-04-10T08:00:00Z', $log->logStartTime);
-        $this->assertSame('2024-04-10T12:00:00Z', $log->logEndTime);
-        $this->assertSame('Morning route', $log->remark);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $log = HosLog::make([
-            'hosStatusType' => 'offDuty',
-            'logStartTime'  => '2024-04-10T08:00:00Z',
-        ]);
-
-        $this->assertInstanceOf(HosLog::class, $log);
-    }
-
     #[Test]
     public function it_can_check_if_driving(): void
     {
@@ -145,19 +85,6 @@ class HosLogTest extends TestCase
     }
 
     #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'hosStatusType' => 'driving',
-            'logStartTime'  => '2024-04-10T08:00:00Z',
-        ];
-
-        $log = new HosLog($data);
-
-        $this->assertSame($data, $log->toArray());
-    }
-
-    #[Test]
     public function it_can_get_duty_status_enum(): void
     {
         $log = new HosLog([
@@ -212,11 +139,35 @@ class HosLogTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
+    public function it_clocks_for_a_driver_expose_current_status_and_violation_hours(): void
     {
-        $log = new HosLog;
+        $clocks = new HosClocksForDriver([
+            'currentDutyStatus' => ['hosStatusType' => 'sleeperBed'],
+            'violations'        => [
+                'cycleViolationDurationMs'        => 3600000,
+                'shiftDrivingViolationDurationMs' => 0,
+            ],
+        ]);
 
-        $this->assertInstanceOf(Entity::class, $log);
+        $this->assertSame(DutyStatus::SLEEPER_BERTH, $clocks->getCurrentDutyStatus());
+        $this->assertSame(1.0, $clocks->getCycleViolationHours());
+        $this->assertSame(0.0, $clocks->getShiftDrivingViolationHours());
+        $this->assertNull((new HosClocksForDriver)->getCurrentDutyStatus());
+        $this->assertSame([], (new HosClocksForDriver(['clocks' => 'invalid']))->getClocks()->toArray());
+        $this->assertNull((new HosClocksForDriver(['violations' => null]))->getCycleViolationHours());
+        $this->assertNull((new HosClocksForDriver(['currentDutyStatus' => ['hosStatusType' => 'unknown']]))->getCurrentDutyStatus());
+    }
+
+    #[Test]
+    public function it_grouped_logs_return_a_typed_or_empty_collection(): void
+    {
+        $group = new HosLogsForDriver([
+            'hosLogs' => [['hosStatusType' => 'driving', 'logStartTime' => '2026-08-12T12:00:00Z']],
+        ]);
+
+        $this->assertInstanceOf(HosLog::class, $group->getLogs()->first());
+        $this->assertTrue((new HosLogsForDriver(['hosLogs' => null]))->getLogs()->isEmpty());
+        $this->assertTrue((new HosLogsForDriver(['hosLogs' => 'invalid']))->getLogs()->isEmpty());
     }
 
     #[Test]
@@ -230,7 +181,24 @@ class HosLogTest extends TestCase
     #[Test]
     public function it_returns_null_for_an_unknown_duty_status(): void
     {
-        $this->assertNull((new HosLog(['hosStatusType' => 'unknown']))->getDutyStatus());
-        $this->assertNull((new HosLog(['hosStatusType' => '']))->getDutyStatus());
+        foreach (['unknown', '', null] as $status) {
+            $attributes = ['hosStatusType' => $status];
+            $log = HosLog::make($attributes);
+
+            $this->assertNull($log->getDutyStatus());
+            $this->assertFalse($log->isDriving());
+            $this->assertFalse($log->isOffDuty());
+            $this->assertFalse($log->isOnDuty());
+            $this->assertFalse($log->isSleeperBerth());
+            $this->assertFalse($log->isPersonalConveyance());
+            $this->assertFalse($log->isYardMove());
+            $this->assertSame($attributes, $log->toArray());
+
+            $clockAttributes = ['currentDutyStatus' => $attributes];
+            $clocks = HosClocksForDriver::make($clockAttributes);
+
+            $this->assertNull($clocks->getCurrentDutyStatus());
+            $this->assertSame($clockAttributes, $clocks->toArray());
+        }
     }
 }

@@ -9,6 +9,8 @@ use Illuminate\Http\JsonResponse;
  * Exception thrown when webhook signature verification fails.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @phpstan-consistent-constructor
  */
 class InvalidSignatureException extends SamsaraException
 {
@@ -37,7 +39,7 @@ class InvalidSignatureException extends SamsaraException
      */
     public static function expiredTimestamp(int $tolerance, int $age): static
     {
-        return static::make(
+        return new static(
             "Webhook signature verification failed: timestamp expired (age: {$age}s, tolerance: {$tolerance}s).",
             401,
             null,
@@ -53,7 +55,7 @@ class InvalidSignatureException extends SamsaraException
      */
     public static function futureTimestamp(int $seconds): static
     {
-        return static::make(
+        return new static(
             "Webhook signature verification failed: timestamp is {$seconds}s in the future.",
             401,
             null,
@@ -69,7 +71,7 @@ class InvalidSignatureException extends SamsaraException
      */
     public static function invalidSignature(string $expected, string $received): static
     {
-        return static::make(
+        return new static(
             'Webhook signature verification failed: signature mismatch.',
             401,
             null,
@@ -84,7 +86,7 @@ class InvalidSignatureException extends SamsaraException
      */
     public static function invalidTimestamp(string $timestamp): static
     {
-        return static::make(
+        return new static(
             'Webhook signature verification failed: invalid X-Samsara-Timestamp header.',
             401,
             null,
@@ -97,9 +99,11 @@ class InvalidSignatureException extends SamsaraException
      */
     public static function missingSignature(): static
     {
-        return static::make(
+        return new static(
             'Webhook signature verification failed: missing X-Samsara-Signature header.',
-            401
+            401,
+            null,
+            ['header' => 'X-Samsara-Signature']
         );
     }
 
@@ -108,9 +112,11 @@ class InvalidSignatureException extends SamsaraException
      */
     public static function missingTimestamp(): static
     {
-        return static::make(
+        return new static(
             'Webhook signature verification failed: missing X-Samsara-Timestamp header.',
-            401
+            401,
+            null,
+            ['header' => 'X-Samsara-Timestamp']
         );
     }
 
@@ -119,7 +125,7 @@ class InvalidSignatureException extends SamsaraException
      */
     public static function missingWebhookSecret(): static
     {
-        return static::make(
+        return new static(
             'Webhook secret not configured. Set SAMSARA_WEBHOOK_SECRET in your .env file.',
             500
         );

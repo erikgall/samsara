@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\User;
 
-use Samsara\Data\Entity;
 use Samsara\Data\User\User;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
@@ -14,45 +13,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class UserTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $user = new User([
-            'id'    => '12345',
-            'name'  => 'John Smith',
-            'email' => 'john@example.com',
-        ]);
-
-        $this->assertSame('12345', $user->id);
-        $this->assertSame('John Smith', $user->name);
-        $this->assertSame('john@example.com', $user->email);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $user = User::make([
-            'id' => '12345',
-        ]);
-
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertSame('12345', $user->getId());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'    => '12345',
-            'name'  => 'John Smith',
-            'email' => 'john@example.com',
-        ];
-
-        $user = new User($data);
-
-        $this->assertSame($data, $user->toArray());
-    }
-
     #[Test]
     public function it_can_get_display_name(): void
     {
@@ -75,14 +35,6 @@ class UserTest extends TestCase
 
         $this->assertCount(2, $user->roles);
         $this->assertSame('Fleet Manager', $user->roles[0]['role']['name']);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $user = new User;
-
-        $this->assertInstanceOf(Entity::class, $user);
     }
 
     #[Test]

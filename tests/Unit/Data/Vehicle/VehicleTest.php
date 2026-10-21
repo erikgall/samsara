@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Vehicle;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Vehicle\Gateway;
 use Samsara\Data\Vehicle\Vehicle;
@@ -17,36 +16,6 @@ use Samsara\Data\Vehicle\StaticAssignedDriver;
 class VehicleTest extends TestCase
 {
     #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $vehicle = new Vehicle([
-            'id'    => '112',
-            'name'  => 'Truck A7',
-            'vin'   => '1FUJA6BD31LJ09646',
-            'make'  => 'Ford',
-            'model' => 'F150',
-        ]);
-
-        $this->assertSame('112', $vehicle->id);
-        $this->assertSame('Truck A7', $vehicle->name);
-        $this->assertSame('1FUJA6BD31LJ09646', $vehicle->vin);
-        $this->assertSame('Ford', $vehicle->make);
-        $this->assertSame('F150', $vehicle->model);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $vehicle = Vehicle::make([
-            'id'   => '112',
-            'name' => 'Truck A7',
-        ]);
-
-        $this->assertInstanceOf(Vehicle::class, $vehicle);
-        $this->assertSame('112', $vehicle->getId());
-    }
-
-    #[Test]
     public function it_can_check_if_has_static_assigned_driver(): void
     {
         $vehicle = new Vehicle([
@@ -56,20 +25,6 @@ class VehicleTest extends TestCase
         ]);
 
         $this->assertTrue($vehicle->hasStaticAssignedDriver());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'   => '112',
-            'name' => 'Truck A7',
-            'vin'  => '1FUJA6BD31LJ09646',
-        ];
-
-        $vehicle = new Vehicle($data);
-
-        $this->assertSame($data, $vehicle->toArray());
     }
 
     #[Test]
@@ -339,14 +294,6 @@ class VehicleTest extends TestCase
         foreach ([new Vehicle, new Vehicle(['gateway' => null]), new Vehicle(['gateway' => []]), new Vehicle(['gateway' => 'invalid'])] as $vehicle) {
             $this->assertFalse($vehicle->hasGateway());
         }
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $vehicle = new Vehicle;
-
-        $this->assertInstanceOf(Entity::class, $vehicle);
     }
 
     #[Test]

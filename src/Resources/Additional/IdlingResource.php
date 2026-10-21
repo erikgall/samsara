@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
@@ -11,6 +12,8 @@ use Samsara\Resources\Resource;
  * Provides access to vehicle idling events endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class IdlingResource extends Resource
 {
@@ -21,17 +24,11 @@ class IdlingResource extends Resource
 
     /**
      * Get a query builder for idling events.
+     *
+     * @return Builder<Entity>
      */
     public function events(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
+        return $this->newQuery();
     }
 }

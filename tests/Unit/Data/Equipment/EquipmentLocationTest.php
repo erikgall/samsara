@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Equipment;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Equipment\EquipmentLocation;
@@ -81,23 +80,7 @@ class EquipmentLocationTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
-    {
-        $location = new EquipmentLocation([]);
-
-        $this->assertInstanceOf(Entity::class, $location);
-    }
-
-    #[Test]
-    public function it_returns_null_for_missing_speed_conversion(): void
-    {
-        $location = new EquipmentLocation([]);
-
-        $this->assertNull($location->getSpeedKilometersPerHour());
-    }
-
-    #[Test]
-    public function location_results_and_series_return_typed_locations(): void
+    public function it_location_results_and_series_return_typed_locations(): void
     {
         $result = new EquipmentLocationResult([
             'location' => ['latitude' => 37.7749, 'longitude' => -122.4194, 'time' => '2026-08-12T12:00:00Z'],
@@ -113,5 +96,13 @@ class EquipmentLocationTest extends TestCase
         $this->assertNull((new EquipmentLocationResult(['location' => null]))->getLocation());
         $this->assertTrue((new EquipmentLocationSeries(['locations' => null]))->getLocations()->isEmpty());
         $this->assertTrue((new EquipmentLocationSeries(['locations' => 'invalid']))->getLocations()->isEmpty());
+    }
+
+    #[Test]
+    public function it_returns_null_for_missing_speed_conversion(): void
+    {
+        $location = new EquipmentLocation([]);
+
+        $this->assertNull($location->getSpeedKilometersPerHour());
     }
 }

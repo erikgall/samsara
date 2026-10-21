@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Asset;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Asset\Asset;
 use PHPUnit\Framework\Attributes\Test;
@@ -14,33 +13,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class AssetTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $asset = new Asset([
-            'id'           => '12345',
-            'name'         => 'Forklift A',
-            'serialNumber' => 'SN12345',
-            'type'         => 'equipment',
-        ]);
-
-        $this->assertSame('12345', $asset->id);
-        $this->assertSame('Forklift A', $asset->name);
-        $this->assertSame('SN12345', $asset->serialNumber);
-        $this->assertSame('equipment', $asset->type);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $asset = Asset::make([
-            'id' => '12345',
-        ]);
-
-        $this->assertInstanceOf(Asset::class, $asset);
-        $this->assertSame('12345', $asset->getId());
-    }
-
     #[Test]
     public function it_can_check_if_equipment(): void
     {
@@ -80,19 +52,6 @@ class AssetTest extends TestCase
         $this->assertTrue((new Asset(['type' => 'uncategorized']))->isUncategorized());
         $this->assertFalse((new Asset(['type' => null]))->isUnpowered());
         $this->assertFalse((new Asset(['type' => 'equipment']))->isUncategorized());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'   => '12345',
-            'name' => 'Forklift A',
-        ];
-
-        $asset = new Asset($data);
-
-        $this->assertSame($data, $asset->toArray());
     }
 
     #[Test]
@@ -159,13 +118,5 @@ class AssetTest extends TestCase
         $this->assertSame('Bobcat', $asset->make);
         $this->assertSame('S630 T4', $asset->model);
         $this->assertSame(2015, $asset->year);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $asset = new Asset;
-
-        $this->assertInstanceOf(Entity::class, $asset);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
@@ -11,6 +12,8 @@ use Samsara\Resources\Resource;
  * Provides access to tachograph data endpoints for EU compliance.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class TachographResource extends Resource
 {
@@ -21,36 +24,34 @@ class TachographResource extends Resource
 
     /**
      * Get a query builder for driver activity history.
+     *
+     * @return Builder<Entity>
      */
     public function driverActivityHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/drivers/tachograph-activity/history')
+        return $this->newQuery('/fleet/drivers/tachograph-activity/history')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get a query builder for driver files history.
+     *
+     * @return Builder<Entity>
      */
     public function driverFilesHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/drivers/tachograph-files/history')
+        return $this->newQuery('/fleet/drivers/tachograph-files/history')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get a query builder for vehicle files history.
+     *
+     * @return Builder<Entity>
      */
     public function vehicleFilesHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/tachograph-files/history')
+        return $this->newQuery('/fleet/vehicles/tachograph-files/history')
             ->withoutDefaultPageSize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

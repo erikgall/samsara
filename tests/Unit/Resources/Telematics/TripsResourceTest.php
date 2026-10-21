@@ -10,7 +10,6 @@ use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Telematics\TripsResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the TripsResource.
@@ -28,16 +27,9 @@ class TripsResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new TripsResource($this->samsara);
-
-        $this->assertInstanceOf(TripsResource::class, $resource);
     }
 
     #[Test]
@@ -60,21 +52,6 @@ class TripsResourceTest extends TestCase
         $this->assertInstanceOf(Builder::class, $query);
         $queryParams = $query->buildQuery();
         $this->assertSame('inProgress', $queryParams['completionStatus'] ?? null);
-    }
-
-    #[Test]
-    public function it_can_get_all_trips(): void
-    {
-        $resource = new TripsResource($this->samsara);
-
-        try {
-            $resource->all();
-            $this->fail('Trips all() cannot supply the required startTime and ids query.');
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame('all', $exception->getContext()['operation'] ?? null);
-        }
-
-        $this->http->assertNothingSent();
     }
 
     #[Test]

@@ -6,13 +6,13 @@ use Closure;
 use Samsara\Samsara;
 use Samsara\Data\Entity;
 use Samsara\Query\Builder;
+use Samsara\Http\RetryAfter;
 use Samsara\Http\QueryString;
 use Samsara\Http\RequestExecutor;
 use Samsara\Http\ResponseDecoder;
 use Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Response;
 use Samsara\Exceptions\ServerException;
-use Samsara\Contracts\ResourceInterface;
 use Samsara\Exceptions\SamsaraException;
 use Samsara\Exceptions\NotFoundException;
 use Illuminate\Http\Client\PendingRequest;
@@ -20,14 +20,15 @@ use Samsara\Exceptions\RateLimitException;
 use Samsara\Exceptions\ValidationException;
 use Samsara\Exceptions\AuthorizationException;
 use Samsara\Exceptions\AuthenticationException;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Base resource class for API endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @template TEntity of Entity = Entity
  */
-abstract class Resource implements ResourceInterface
+abstract class Resource
 {
     /**
      * The API endpoint for this resource.
@@ -37,7 +38,7 @@ abstract class Resource implements ResourceInterface
     /**
      * The entity class for this resource.
      *
-     * @var class-string<Entity>
+     * @var class-string<TEntity>
      */
     protected string $entity = Entity::class;
 
@@ -65,103 +66,11 @@ abstract class Resource implements ResourceInterface
     }
 
     /**
-     * Get all entities from this resource.
-     *
-     * @return EntityCollection<int, Entity>
-     *
-     * @throws AuthenticationException
-     * @throws AuthorizationException
-     * @throws RateLimitException
-     * @throws ServerException
-     * @throws SamsaraException
-     * @throws UnsupportedOperationException
-     */
-    public function all(): EntityCollection
-    {
-        $this->ensureGenericOperationIsSupported('all', $this->endpoint);
-
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->get($this->endpoint),
-            $this->endpoint
-        );
-
-        $data = $this->decodeJsonList($response, $this->endpoint);
-
-        return $this->mapToEntities($data);
-    }
-
-    /**
      * Get the HTTP client.
      */
     public function client(): PendingRequest
     {
         return $this->samsara->client();
-    }
-
-    /**
-     * Create a new entity.
-     *
-     * @param  array<string, mixed>  $data
-     *
-     * @throws AuthenticationException
-     * @throws AuthorizationException
-     * @throws ValidationException
-     * @throws RateLimitException
-     * @throws ServerException
-     * @throws SamsaraException
-     * @throws UnsupportedOperationException
-     */
-    public function create(array $data): object
-    {
-        $this->ensureGenericOperationIsSupported('create', $this->endpoint);
-
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->post($this->endpoint, $data),
-            $this->endpoint
-        );
-
-        $responseData = $this->decodeJsonData($response, $this->endpoint);
-
-        return $this->mapToEntity($responseData);
-    }
-
-    /**
-     * Delete an entity.
-     *
-     * @throws AuthenticationException
-     * @throws AuthorizationException
-     * @throws NotFoundException
-     * @throws RateLimitException
-     * @throws ServerException
-     * @throws SamsaraException
-     * @throws UnsupportedOperationException
-     */
-    public function delete(string $id): bool
-    {
-        $endpoint = $this->endpoint.'/'.$this->encodePathSegment($id);
-        $this->ensureGenericOperationIsSupported('delete', $endpoint);
-
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->delete($endpoint),
-            $endpoint
-        );
-
-        return $response->successful();
-    }
-
-    /**
-     * Find an entity by ID.
-     *
-     * @throws AuthenticationException
-     * @throws AuthorizationException
-     * @throws RateLimitException
-     * @throws ServerException
-     * @throws SamsaraException
-     * @throws UnsupportedOperationException
-     */
-    public function find(string $id): ?object
-    {
-        return $this->findByEncodedPathSegment($this->encodePathSegment($id));
     }
 
     /**
@@ -183,7 +92,7 @@ abstract class Resource implements ResourceInterface
     /**
      * Get the entity class for this resource.
      *
-     * @return class-string<Entity>
+     * @return class-string<TEntity>
      */
     public function getEntityClass(): string
     {
@@ -196,46 +105,6 @@ abstract class Resource implements ResourceInterface
     public function throwIfError(Response $response): void
     {
         $this->handleError($response);
-    }
-
-    /**
-     * Update an entity.
-     *
-     * @param  array<string, mixed>  $data
-     *
-     * @throws AuthenticationException
-     * @throws AuthorizationException
-     * @throws NotFoundException
-     * @throws ValidationException
-     * @throws RateLimitException
-     * @throws ServerException
-     * @throws SamsaraException
-     * @throws UnsupportedOperationException
-     */
-    public function update(string $id, array $data): object
-    {
-        $endpoint = $this->endpoint.'/'.$this->encodePathSegment($id);
-        $this->ensureGenericOperationIsSupported('update', $endpoint);
-
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->patch($endpoint, $data),
-            $endpoint
-        );
-
-        $responseData = $this->decodeJsonData($response, $endpoint);
-
-        return $this->mapToEntity($responseData);
-    }
-
-    /**
-     * Create a query builder for an endpoint.
-     *
-     * Subclasses may override this factory to customize builder creation while
-     * retaining each resource method's endpoint-specific configuration.
-     */
-    protected function createBuilderWithEndpoint(string $endpoint): Builder
-    {
-        return new Builder($this, $endpoint);
     }
 
     /**
@@ -272,6 +141,14 @@ abstract class Resource implements ResourceInterface
         string $collectionKey = 'data',
     ): array {
         return $this->responseDecoder()->decodeList($response, $endpoint, $collectionKey);
+    }
+
+    /**
+     * Encode an ID as exactly one URL path segment.
+     */
+    protected function encodePathSegment(string $id): string
+    {
+        return rawurlencode($id);
     }
 
     /**
@@ -320,11 +197,12 @@ abstract class Resource implements ResourceInterface
 
     /**
      * Find an entity using an already encoded single path segment.
+     *
+     * @return TEntity|null
      */
-    final protected function findByEncodedPathSegment(string $id): ?object
+    final protected function findByEncodedPathSegment(string $id): ?Entity
     {
         $endpoint = $this->endpoint.'/'.$id;
-        $this->ensureGenericOperationIsSupported('find', $endpoint);
 
         $response = $this->executeSdkRequest(
             fn () => $this->client()->get($endpoint),
@@ -380,9 +258,9 @@ abstract class Resource implements ResourceInterface
             ),
             429 => throw new RateLimitException(
                 $message,
-                $this->retryAfterSeconds($response),
+                RetryAfter::seconds($response->header('Retry-After')),
                 null,
-                $context
+                $context + ['retry_after_header' => $response->header('Retry-After')]
             ),
             default => $status >= 500
                 ? throw new ServerException($message, $status, null, $context)
@@ -394,13 +272,12 @@ abstract class Resource implements ResourceInterface
      * Map response data to an entity collection.
      *
      * @param  array<int, array<string, mixed>>  $data
-     * @return EntityCollection<int, Entity>
+     * @return EntityCollection<int, TEntity>
      */
     protected function mapToEntities(array $data): EntityCollection
     {
-        /** @var array<int, Entity> $entities */
         $entities = array_map(
-            fn (array $item) => $this->mapToEntity($item),
+            fn (array $item): Entity => $this->mapToEntity($item),
             $data
         );
 
@@ -411,8 +288,9 @@ abstract class Resource implements ResourceInterface
      * Map response data to an entity.
      *
      * @param  array<string, mixed>  $data
+     * @return TEntity
      */
-    protected function mapToEntity(array $data): object
+    protected function mapToEntity(array $data): Entity
     {
         $entityClass = $this->entity;
 
@@ -420,44 +298,17 @@ abstract class Resource implements ResourceInterface
     }
 
     /**
-     * Get the inherited generic operations supported by this resource.
+     * Create a query builder for an endpoint.
      *
-     * @return array<int, string>
+     * Subclasses may override this factory to customize builder creation while
+     * retaining each resource method's endpoint-specific configuration.
+     *
+     * @return Builder<TEntity>
      */
-    protected function supportedGenericOperations(): array
+    protected function newQuery(?string $endpoint = null): Builder
     {
-        return ['all', 'find', 'create', 'update', 'delete'];
-    }
-
-    /**
-     * Encode an ID as exactly one URL path segment.
-     */
-    private function encodePathSegment(string $id): string
-    {
-        return rawurlencode($id);
-    }
-
-    /**
-     * Stop unsupported inherited operations before they reach the HTTP client.
-     */
-    private function ensureGenericOperationIsSupported(string $operation, string $endpoint): void
-    {
-        if (in_array($operation, $this->supportedGenericOperations(), true)) {
-            return;
-        }
-
-        $resource = static::class;
-
-        throw new UnsupportedOperationException(
-            "Generic operation [{$operation}] is not supported by resource [{$resource}].",
-            0,
-            null,
-            [
-                'resource'  => $resource,
-                'operation' => $operation,
-                'endpoint'  => $endpoint,
-            ]
-        );
+        return (new Builder($this, $endpoint ?? $this->endpoint))
+            ->usingEntity($this->getEntityClass());
     }
 
     /**
@@ -466,17 +317,5 @@ abstract class Resource implements ResourceInterface
     private function responseDecoder(): ResponseDecoder
     {
         return $this->responseDecoder ??= new ResponseDecoder;
-    }
-
-    /**
-     * Read a delta-seconds Retry-After value for the public exception API.
-     */
-    private function retryAfterSeconds(Response $response): ?int
-    {
-        $retryAfter = $response->header('Retry-After');
-
-        return $retryAfter !== null && ctype_digit($retryAfter)
-            ? (int) $retryAfter
-            : null;
     }
 }

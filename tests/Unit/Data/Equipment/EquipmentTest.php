@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Equipment;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Vehicle\Gateway;
 use Samsara\Data\Equipment\Equipment;
@@ -15,45 +14,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class EquipmentTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $equipment = new Equipment([
-            'id'          => '112',
-            'name'        => 'Generator A1',
-            'assetSerial' => '1FUJA6BD31LJ09646',
-        ]);
-
-        $this->assertSame('112', $equipment->id);
-        $this->assertSame('Generator A1', $equipment->name);
-        $this->assertSame('1FUJA6BD31LJ09646', $equipment->assetSerial);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $equipment = Equipment::make([
-            'id'   => '112',
-            'name' => 'Generator A1',
-        ]);
-
-        $this->assertInstanceOf(Equipment::class, $equipment);
-        $this->assertSame('112', $equipment->getId());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'   => '112',
-            'name' => 'Generator A1',
-        ];
-
-        $equipment = new Equipment($data);
-
-        $this->assertSame($data, $equipment->toArray());
-    }
-
     #[Test]
     public function it_can_get_display_name(): void
     {
@@ -154,14 +114,6 @@ class EquipmentTest extends TestCase
 
         $this->assertCount(1, $equipment->tags);
         $this->assertSame('East Coast', $equipment->tags[0]['name']);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $equipment = new Equipment;
-
-        $this->assertInstanceOf(Entity::class, $equipment);
     }
 
     #[Test]

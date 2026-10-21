@@ -28,59 +28,9 @@ class HoursOfServiceResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new HoursOfServiceResource($this->samsara);
-
-        $this->assertInstanceOf(HoursOfServiceResource::class, $resource);
-    }
-
-    #[Test]
-    public function it_can_get_all_logs(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    [
-                        'driver' => [
-                            'id'   => 'driver-1',
-                            'name' => 'John Doe',
-                        ],
-                        'hosLogs' => [
-                            [
-                                'id'     => 'log-1',
-                                'status' => 'onDuty',
-                            ],
-                        ],
-                    ],
-                    [
-                        'driver' => [
-                            'id'   => 'driver-2',
-                            'name' => 'Jane Doe',
-                        ],
-                        'hosLogs' => [
-                            [
-                                'id'     => 'log-2',
-                                'status' => 'offDuty',
-                            ],
-                        ],
-                    ],
-                ],
-            ]),
-        ]);
-
-        $resource = new HoursOfServiceResource($this->samsara);
-        $logs = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $logs);
-        $this->assertCount(2, $logs);
-        $this->assertInstanceOf(HosLogsForDriver::class, $logs->first());
-        $this->assertInstanceOf(HosLog::class, $logs->first()->getLogs()->first());
     }
 
     #[Test]
@@ -142,5 +92,48 @@ class HoursOfServiceResourceTest extends TestCase
         $resource = new HoursOfServiceResource($this->samsara);
 
         $this->assertSame(HosLogsForDriver::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_queries_logs(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [
+                    [
+                        'driver' => [
+                            'id'   => 'driver-1',
+                            'name' => 'John Doe',
+                        ],
+                        'hosLogs' => [
+                            [
+                                'id'     => 'log-1',
+                                'status' => 'onDuty',
+                            ],
+                        ],
+                    ],
+                    [
+                        'driver' => [
+                            'id'   => 'driver-2',
+                            'name' => 'Jane Doe',
+                        ],
+                        'hosLogs' => [
+                            [
+                                'id'     => 'log-2',
+                                'status' => 'offDuty',
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $resource = new HoursOfServiceResource($this->samsara);
+        $logs = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $logs);
+        $this->assertCount(2, $logs);
+        $this->assertInstanceOf(HosLogsForDriver::class, $logs->first());
+        $this->assertInstanceOf(HosLog::class, $logs->first()->getLogs()->first());
     }
 }

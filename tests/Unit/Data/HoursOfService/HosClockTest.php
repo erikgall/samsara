@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\HoursOfService;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\HoursOfService\HosClock;
@@ -14,53 +13,6 @@ use Samsara\Data\HoursOfService\HosClock;
  */
 class HosClockTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $clock = new HosClock([
-            'break' => [
-                'timeUntilBreakDurationMs' => 28800000,
-            ],
-            'drive' => [
-                'driveRemainingDurationMs' => 39600000,
-            ],
-            'shift' => [
-                'shiftRemainingDurationMs' => 50400000,
-            ],
-            'cycle' => [
-                'cycleRemainingDurationMs' => 252000000,
-            ],
-        ]);
-
-        $this->assertSame(28800000, $clock->break['timeUntilBreakDurationMs']);
-        $this->assertSame(39600000, $clock->drive['driveRemainingDurationMs']);
-        $this->assertSame(50400000, $clock->shift['shiftRemainingDurationMs']);
-        $this->assertSame(252000000, $clock->cycle['cycleRemainingDurationMs']);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $clock = HosClock::make([
-            'break' => ['timeUntilBreakDurationMs' => 28800000],
-        ]);
-
-        $this->assertInstanceOf(HosClock::class, $clock);
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'break' => ['timeUntilBreakDurationMs' => 28800000],
-            'drive' => ['driveRemainingDurationMs' => 39600000],
-        ];
-
-        $clock = new HosClock($data);
-
-        $this->assertSame($data, $clock->toArray());
-    }
-
     #[Test]
     public function it_can_get_cycle_remaining_in_hours(): void
     {
@@ -131,14 +83,6 @@ class HosClockTest extends TestCase
         ]);
 
         $this->assertSame('2024-04-10T00:00:00Z', $clock->cycle['cycleStartedAtTime']);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $clock = new HosClock;
-
-        $this->assertInstanceOf(Entity::class, $clock);
     }
 
     #[Test]

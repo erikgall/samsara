@@ -8,6 +8,9 @@ use Samsara\Resources\Resource;
 use Samsara\Data\EntityCollection;
 use Samsara\Data\Driver\DriverQrCode;
 use Samsara\Data\Driver\DriverAuthToken;
+use Samsara\Resources\Concerns\FindsEntities;
+use Samsara\Resources\Concerns\CreatesEntities;
+use Samsara\Resources\Concerns\UpdatesEntities;
 use Samsara\Data\Driver\DriverRemoteSignOutResult;
 
 /**
@@ -16,9 +19,20 @@ use Samsara\Data\Driver\DriverRemoteSignOutResult;
  * Provides access to driver-related endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Driver>
  */
 class DriversResource extends Resource
 {
+    /** @use CreatesEntities<Driver> */
+    use CreatesEntities;
+
+    /** @use FindsEntities<Driver> */
+    use FindsEntities;
+
+    /** @use UpdatesEntities<Driver> */
+    use UpdatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -36,12 +50,13 @@ class DriversResource extends Resource
      */
     public function activate(string $id): Driver
     {
-        /** @var Driver */
         return $this->update($id, ['driverActivationStatus' => 'active']);
     }
 
     /**
      * Get a query builder filtered for active drivers.
+     *
+     * @return Builder<Driver>
      */
     public function active(): Builder
     {
@@ -87,12 +102,13 @@ class DriversResource extends Resource
      */
     public function deactivate(string $id): Driver
     {
-        /** @var Driver */
         return $this->update($id, ['driverActivationStatus' => 'deactivated']);
     }
 
     /**
      * Get a query builder filtered for deactivated drivers.
+     *
+     * @return Builder<Driver>
      */
     public function deactivated(): Builder
     {
@@ -121,7 +137,6 @@ class DriversResource extends Resource
      */
     public function findByExternalId(string $key, string $value): ?Driver
     {
-        /** @var Driver */
         return $this->findByEncodedPathSegment(rawurlencode($key).':'.rawurlencode($value));
     }
 
@@ -141,7 +156,6 @@ class DriversResource extends Resource
             $endpoint
         );
 
-        /** @var array<int, array<string, mixed>> $data */
         $data = $this->decodeJsonList($response, $endpoint);
 
         return new EntityCollection(array_map(
@@ -152,10 +166,12 @@ class DriversResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Driver>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
+        return $this->newQuery();
     }
 
     /**
@@ -170,15 +186,5 @@ class DriversResource extends Resource
         );
 
         return DriverRemoteSignOutResult::make($this->decodeJsonArray($response, $endpoint));
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'find', 'create', 'update'];
     }
 }

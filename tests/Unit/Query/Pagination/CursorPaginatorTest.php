@@ -8,6 +8,7 @@ use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
 use Samsara\Resources\Resource;
 use Samsara\Data\EntityCollection;
+use Illuminate\Http\Client\Request;
 use Samsara\Query\Pagination\Cursor;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\PendingRequest;
@@ -33,44 +34,6 @@ class CursorPaginatorTest extends TestCase
         $paginator = new CursorPaginator($items, $cursor, $builder);
 
         $this->assertInstanceOf(CursorPaginator::class, $paginator);
-    }
-
-    #[Test]
-    public function it_can_get_next_page(): void
-    {
-        $fakeHttp = new HttpFactory;
-        $fakeHttp->fake([
-            '*' => $fakeHttp->response([
-                'data' => [
-                    ['id' => '3', 'name' => 'Third'],
-                    ['id' => '4', 'name' => 'Fourth'],
-                ],
-                'pagination' => [
-                    'endCursor'   => 'cursor-page-2',
-                    'hasNextPage' => false,
-                ],
-            ], 200),
-        ]);
-
-        $samsara = new Samsara('test-token');
-        $samsara->setHttpFactory($fakeHttp);
-        $resource = new TestPaginatorResource($samsara);
-        $builder = new Builder($resource);
-
-        $items = new EntityCollection([
-            Entity::make(['id' => '1']),
-            Entity::make(['id' => '2']),
-        ]);
-        $cursor = new Cursor('cursor-page-1', true);
-
-        $paginator = new CursorPaginator($items, $cursor, $builder);
-
-        $nextPage = $paginator->nextPage();
-
-        $this->assertInstanceOf(CursorPaginator::class, $nextPage);
-        $this->assertCount(2, $nextPage->items());
-        $this->assertSame('3', $nextPage->items()->first()->getId());
-        $this->assertFalse($nextPage->hasMorePages());
     }
 
     #[Test]
@@ -120,6 +83,45 @@ class CursorPaginatorTest extends TestCase
 
         $this->assertSame(['tagIds' => 'a', 'limit' => 2, 'after' => 'initial'], $builder->buildQuery());
         $http->assertSentCount(2);
+    }
+
+    #[Test]
+    public function it_fetches_the_next_page_through_paginate(): void
+    {
+        $fakeHttp = new HttpFactory;
+        $fakeHttp->preventStrayRequests();
+        $fakeHttp->fake([
+            '*' => $fakeHttp->response([
+                'data' => [
+                    ['id' => '3', 'name' => 'Third'],
+                    ['id' => '4', 'name' => 'Fourth'],
+                ],
+                'pagination' => [
+                    'endCursor'   => 'cursor-page-2',
+                    'hasNextPage' => false,
+                ],
+            ], 200),
+        ]);
+
+        $samsara = new Samsara('test-token');
+        $samsara->setHttpFactory($fakeHttp);
+        $resource = new TestPaginatorResource($samsara);
+        $builder = new Builder($resource);
+
+        $items = new EntityCollection([
+            Entity::make(['id' => '1']),
+            Entity::make(['id' => '2']),
+        ]);
+        $cursor = new Cursor('cursor-page-1', true);
+
+        $paginator = new CursorPaginator($items, $cursor, $builder);
+
+        $nextPage = $paginator->nextPage();
+
+        $this->assertInstanceOf(CursorPaginator::class, $nextPage);
+        $this->assertCount(2, $nextPage->items());
+        $this->assertSame('3', $nextPage->items()->first()->getId());
+        $this->assertFalse($nextPage->hasMorePages());
     }
 
     #[Test]
@@ -175,11 +177,14 @@ class CursorPaginatorTest extends TestCase
         $nextPage = $originalPage->nextPage();
 
         $this->assertSame('a-2', $nextPage?->items()->first()?->getId());
-        $this->assertSame([
-            'https://api.samsara.com/fleet/vehicles?tagIds=a&limit=2',
-            'https://api.samsara.com/fleet/vehicles?tagIds=b&limit=50',
-            'https://api.samsara.com/fleet/vehicles?tagIds=a&limit=2&after=cursor-a',
-        ], $http->recorded()->map(fn ($record) => $record[0]->url())->all());
+        $requests = $http->recorded()->map(fn (array $record): Request => $record[0]);
+        $this->assertSame(array_fill(0, 3, '/fleet/vehicles'), $requests
+            ->map(fn (Request $request): string => parse_url($request->url(), PHP_URL_PATH))->all());
+        $this->assertEquals([
+            ['tagIds' => 'a', 'limit' => 2],
+            ['tagIds' => 'b', 'limit' => 50],
+            ['tagIds' => 'a', 'limit' => 2, 'after' => 'cursor-a'],
+        ], $requests->map(fn (Request $request): array => $request->data())->all());
     }
 
     #[Test]
@@ -274,6 +279,8 @@ class CursorPaginatorTest extends TestCase
 
 /**
  * Test resource for CursorPaginator tests.
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class TestPaginatorResource extends Resource
 {

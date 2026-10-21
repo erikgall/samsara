@@ -5,4 +5,6 @@ parameters:
     level: 8
     paths:
         - src
+        - tests/Unit/Query/BuilderInference.php
+        - tests/Unit/Resources/ResourceInference.php
     treatPhpDocTypesAsCertain: false

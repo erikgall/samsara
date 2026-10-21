@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
@@ -11,6 +12,8 @@ use Samsara\Resources\Resource;
  * Provides access to IFTA (International Fuel Tax Agreement) reporting endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class IftaResource extends Resource
 {
@@ -82,19 +85,13 @@ class IftaResource extends Resource
 
     /**
      * Get a query builder for IFTA vehicle reports.
+     *
+     * @return Builder<Entity>
      */
     public function vehicleReportQuery(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/reports/ifta/vehicle')
+        return $this->newQuery('/fleet/reports/ifta/vehicle')
             ->withoutDefaultPageSize()
             ->withResponseCollectionKey('data.vehicleReports');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

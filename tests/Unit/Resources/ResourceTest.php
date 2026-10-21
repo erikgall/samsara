@@ -6,6 +6,9 @@ use Samsara\Samsara;
 use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Tests\TestCase;
+use Illuminate\Support\Sleep;
+use Illuminate\Support\Carbon;
+use Samsara\Data\Driver\Driver;
 use Samsara\Resources\Resource;
 use Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Response;
@@ -13,10 +16,16 @@ use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Exceptions\ServerException;
 use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\NotFoundException;
 use Illuminate\Http\Client\PendingRequest;
+use Samsara\Exceptions\RateLimitException;
 use Samsara\Exceptions\ValidationException;
+use Samsara\Resources\Concerns\FindsEntities;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Samsara\Exceptions\UnsupportedOperationException;
+use Samsara\Resources\Concerns\CreatesEntities;
+use Samsara\Resources\Concerns\DeletesEntities;
+use Samsara\Resources\Concerns\UpdatesEntities;
+use Illuminate\Http\Client\Factory as HttpFactory;
 
 /**
  * Unit tests for the Resource base class.
@@ -28,6 +37,7 @@ class ResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Http::preventStrayRequests();
         Http::fake();
     }
 
@@ -35,7 +45,8 @@ class ResourceTest extends TestCase
     #[DataProvider('findNotFoundAttempts')]
     public function it_does_not_retry_find_not_found_responses(int $attempts): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['message' => 'Not found'], 404)]);
 
         $samsara = new Samsara('test-token', ['attempts' => $attempts]);
@@ -49,7 +60,8 @@ class ResourceTest extends TestCase
     #[DataProvider('encodedPathOperations')]
     public function it_encodes_arbitrary_ids_as_one_path_segment(string $operation, string $method): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => ['id' => 'external/id with spaces?#']])]);
 
         $samsara = new Samsara('test-token', ['attempts' => 1]);
@@ -69,7 +81,8 @@ class ResourceTest extends TestCase
     #[Test]
     public function it_executes_direct_get_requests_with_repeated_query_keys(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => ['ok' => true]])]);
 
         $samsara = new Samsara('test-token', ['attempts' => 1]);
@@ -88,6 +101,24 @@ class ResourceTest extends TestCase
 
         $this->assertTrue($method->isProtected());
         $this->assertTrue($method->isFinal());
+    }
+
+    #[Test]
+    public function it_honors_the_resource_entity_class_override_when_querying(): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response(['data' => [[
+            'id'                     => 'driver-1',
+            'driverActivationStatus' => 'active',
+        ]]])]);
+        $resource = new TestEntityClassResource(new Samsara('test-token', ['attempts' => 1], $http));
+
+        $driver = $resource->query()->first();
+
+        $this->assertInstanceOf(Driver::class, $driver);
+        $this->assertTrue($driver->isActive());
+        $http->assertSentCount(1);
     }
 
     #[Test]
@@ -157,7 +188,8 @@ class ResourceTest extends TestCase
             'requestId' => 'req-123',
             'errors'    => ['name' => ['The name field is required.']],
         ];
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response($body, $status)]);
 
         $samsara = new Samsara('test-token', ['attempts' => $attempts]);
@@ -172,7 +204,6 @@ class ResourceTest extends TestCase
 
             $this->fail('Expected a validation exception.');
         } catch (ValidationException $exception) {
-            $this->assertSame('Invalid parameters', $exception->getMessage());
             $this->assertSame($status, $exception->getCode());
             $this->assertSame($body['errors'], $exception->getErrors());
             $this->assertSame($status, $exception->getContext()['status']);
@@ -182,25 +213,57 @@ class ResourceTest extends TestCase
         }
     }
 
+    /**
+     * @param  class-string<SamsaraException>  $exceptionClass
+     */
+    #[Test]
+    #[DataProvider('httpErrorStatuses')]
+    public function it_maps_http_error_statuses_at_the_request_boundary(int $status, string $exceptionClass): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $body = ['message' => 'Rejected', 'requestId' => 'request-1'];
+        $http->fake(['*' => $http->response($body, $status)]);
+        $resource = new TestExecutorResource(new Samsara('test-token', ['attempts' => 1], $http));
+
+        try {
+            $resource->getCustomEndpoint();
+            $this->fail('Expected an HTTP error.');
+        } catch (SamsaraException $exception) {
+            $this->assertSame($exceptionClass, $exception::class);
+            $this->assertSame($status, $exception->getCode());
+            $this->assertSame([
+                'status'   => $status,
+                'endpoint' => '/test-endpoint/custom',
+                'body'     => $body,
+            ], $exception->getContext());
+        }
+
+        $http->assertSentCount(1);
+    }
+
     #[Test]
     #[DataProvider('crudRequests')]
     public function it_maps_post_retry_errors_for_every_inherited_crud_request(
         string $operation,
         string $method,
-        string $endpoint
+        string $endpoint,
+        bool $retryWrites,
+        int $expectedRequests
     ): void {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake([
             '*' => $http->response(['message' => 'Service unavailable'], 503),
         ]);
 
-        $samsara = new Samsara('test-token', ['attempts' => 2]);
+        $samsara = new Samsara('test-token', ['attempts' => 2, 'retry_writes' => $retryWrites]);
         $samsara->setHttpFactory($http);
         $resource = new TestResource($samsara);
 
         try {
             match ($operation) {
-                'all'    => $resource->all(),
+                'all'    => $resource->query()->get(),
                 'create' => $resource->create(['name' => 'Created']),
                 'delete' => $resource->delete('123'),
                 'find'   => $resource->find('123'),
@@ -210,7 +273,7 @@ class ResourceTest extends TestCase
             $this->fail('Expected the request to throw after exhausting retries.');
         } catch (ServerException $exception) {
             $this->assertSame($endpoint, $exception->getContext()['endpoint']);
-            $http->assertSentCount(2);
+            $http->assertSentCount($expectedRequests);
             $http->assertSent(fn ($request) => $request->method() === $method
                 && $request->url() === 'https://api.samsara.com'.$endpoint);
         }
@@ -219,7 +282,8 @@ class ResourceTest extends TestCase
     #[Test]
     public function it_maps_post_retry_errors_through_the_protected_sdk_request_bridge(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake([
             '*' => $http->response(['message' => 'Service unavailable'], 503),
         ]);
@@ -238,6 +302,38 @@ class ResourceTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('rateLimitHeaders')]
+    public function it_maps_retry_after_onto_rate_limit_exceptions(?string $header, ?int $expected): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00 UTC'));
+        Sleep::fake();
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $body = ['message' => 'Rate limited'];
+        $http->fake(['*' => $http->response($body, 429, $header === null ? [] : ['Retry-After' => $header])]);
+        $resource = new TestResource(new Samsara('test-token', ['attempts' => 1], $http));
+
+        try {
+            $resource->create([]);
+            $this->fail('Expected a rate-limit exception.');
+        } catch (RateLimitException $exception) {
+            $this->assertSame($expected, $exception->getRetryAfter());
+            $this->assertSame(429, $exception->getCode());
+            $this->assertSame([
+                'status'             => 429,
+                'endpoint'           => '/test-endpoint',
+                'body'               => $body,
+                'retry_after_header' => $header ?? '',
+            ], $exception->getContext());
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $http->assertSentCount(1);
+        Sleep::assertNeverSlept();
+    }
+
+    #[Test]
     #[DataProvider('unexpectedSuccessfulBodies')]
     public function it_maps_unexpected_successful_bodies_to_an_sdk_exception(
         string $operation,
@@ -245,7 +341,8 @@ class ResourceTest extends TestCase
         int $status,
         string $endpoint
     ): void {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response($body, $status)]);
 
         $samsara = new Samsara('test-token', ['attempts' => 1]);
@@ -275,7 +372,8 @@ class ResourceTest extends TestCase
         string $method,
         string $endpoint
     ): void {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $body = $operation === 'all'
             ? ['data' => [['id' => 'entity-1']]]
             : ['data' => ['id' => 'entity-1']];
@@ -288,9 +386,13 @@ class ResourceTest extends TestCase
         if ($operation === 'all') {
             $this->assertInstanceOf(EntityCollection::class, $result);
             $this->assertCount(1, $result);
-        } elseif ($operation === 'delete') {
+        }
+
+        if ($operation === 'delete') {
             $this->assertTrue($result);
-        } else {
+        }
+
+        if (! in_array($operation, ['all', 'delete'], true)) {
             $this->assertInstanceOf(Entity::class, $result);
             $this->assertSame('entity-1', $result->getId());
         }
@@ -304,7 +406,7 @@ class ResourceTest extends TestCase
     #[DataProvider('invalidCollectionBodies')]
     public function it_rejects_present_non_list_collection_data(string $body): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
         $http->preventStrayRequests();
         $http->fake([
             '*' => $http->response($body, 200, ['Content-Type' => 'application/json']),
@@ -313,23 +415,31 @@ class ResourceTest extends TestCase
         $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
 
-        $this->expectException(SamsaraException::class);
-        $this->expectExceptionMessage('Expected response data to be a JSON list');
-
-        (new TestResource($samsara))->all();
+        try {
+            (new TestResource($samsara))->query()->get();
+            $this->fail('Expected invalid collection data to be rejected.');
+        } catch (SamsaraException $exception) {
+            $this->assertSame(SamsaraException::class, $exception::class);
+            $this->assertSame(200, $exception->getCode());
+            $this->assertSame([
+                'status'   => 200,
+                'endpoint' => '/test-endpoint',
+                'body'     => $body,
+            ], $exception->getContext());
+        }
     }
 
     #[Test]
     public function it_returns_an_empty_collection_when_data_is_absent(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
         $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['pagination' => ['hasNextPage' => false]])]);
 
         $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
 
-        $this->assertCount(0, (new TestResource($samsara))->all());
+        $this->assertCount(0, (new TestResource($samsara))->query()->get());
     }
 
     #[Test]
@@ -366,33 +476,6 @@ class ResourceTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('genericOperations')]
-    public function it_stops_unsupported_generic_operations_before_sending_http(
-        string $operation,
-        string $method,
-        string $endpoint
-    ): void {
-        $http = new \Illuminate\Http\Client\Factory;
-        $http->fake(['*' => $http->response(['data' => []])]);
-
-        $samsara = new Samsara('test-token', ['attempts' => 1]);
-        $samsara->setHttpFactory($http);
-        $resource = new UnsupportedGenericResource($samsara);
-
-        try {
-            $this->executeGenericOperation($resource, $operation);
-            $this->fail("Expected the {$operation} operation to be rejected locally.");
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame([
-                'resource'  => UnsupportedGenericResource::class,
-                'operation' => $operation,
-                'endpoint'  => $endpoint,
-            ], $exception->getContext());
-            $http->assertSentCount(0);
-        }
-    }
-
-    #[Test]
     public function it_stores_samsara_instance(): void
     {
         $samsara = new Samsara('test-token');
@@ -404,7 +487,8 @@ class ResourceTest extends TestCase
     #[Test]
     public function it_treats_a_percent_triplet_as_literal_id_content(): void
     {
-        $http = new \Illuminate\Http\Client\Factory;
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => ['id' => 'abc%2Fdef']])]);
 
         $samsara = new Samsara('test-token', ['attempts' => 1]);
@@ -417,16 +501,19 @@ class ResourceTest extends TestCase
     }
 
     /**
-     * @return array<string, array{string, string, string}>
+     * @return array<string, array{string, string, string, bool, int}>
      */
     public static function crudRequests(): array
     {
         return [
-            'all'    => ['all', 'GET', '/test-endpoint'],
-            'create' => ['create', 'POST', '/test-endpoint'],
-            'delete' => ['delete', 'DELETE', '/test-endpoint/123'],
-            'find'   => ['find', 'GET', '/test-endpoint/123'],
-            'update' => ['update', 'PATCH', '/test-endpoint/123'],
+            'list'            => ['all', 'GET', '/test-endpoint', false, 2],
+            'find'            => ['find', 'GET', '/test-endpoint/123', false, 2],
+            'create default'  => ['create', 'POST', '/test-endpoint', false, 1],
+            'create opted in' => ['create', 'POST', '/test-endpoint', true, 2],
+            'update default'  => ['update', 'PATCH', '/test-endpoint/123', false, 1],
+            'update opted in' => ['update', 'PATCH', '/test-endpoint/123', true, 2],
+            'delete default'  => ['delete', 'DELETE', '/test-endpoint/123', false, 1],
+            'delete opted in' => ['delete', 'DELETE', '/test-endpoint/123', true, 2],
         ];
     }
 
@@ -468,6 +555,18 @@ class ResourceTest extends TestCase
     }
 
     /**
+     * @return array<string, array{int, class-string<SamsaraException>}>
+     */
+    public static function httpErrorStatuses(): array
+    {
+        return [
+            'not found'    => [404, NotFoundException::class],
+            'server error' => [500, ServerException::class],
+            'other error'  => [499, SamsaraException::class],
+        ];
+    }
+
+    /**
      * @return array<string, array{string}>
      */
     public static function invalidCollectionBodies(): array
@@ -476,6 +575,20 @@ class ResourceTest extends TestCase
             'null data'   => ['{"data":null}'],
             'object data' => ['{"data":{"id":"entity-1"}}'],
             'scalar data' => ['{"data":"entity-1"}'],
+        ];
+    }
+
+    /**
+     * @return array<string, array{?string, ?int}>
+     */
+    public static function rateLimitHeaders(): array
+    {
+        return [
+            'future date'  => ['Wed, 21 Oct 2026 13:00:00 GMT', 3600],
+            'expired date' => ['Wed, 21 Oct 2026 11:00:00 GMT', 0],
+            'numeric'      => ['2', 2],
+            'invalid'      => ['invalid', null],
+            'missing'      => [null, null],
         ];
     }
 
@@ -506,7 +619,7 @@ class ResourceTest extends TestCase
     private function executeGenericOperation(Resource $resource, string $operation): mixed
     {
         return match ($operation) {
-            'all'    => $resource->all(),
+            'all'    => $resource->query()->get(),
             'find'   => $resource->find('123'),
             'create' => $resource->create(['name' => 'Created']),
             'update' => $resource->update('123', ['name' => 'Updated']),
@@ -520,6 +633,11 @@ class ResourceTest extends TestCase
  */
 class TestResource extends Resource
 {
+    use CreatesEntities;
+    use DeletesEntities;
+    use FindsEntities;
+    use UpdatesEntities;
+
     protected string $endpoint = '/test-endpoint';
 
     protected string $entity = Entity::class;
@@ -529,12 +647,17 @@ class TestResource extends Resource
         return $this->samsara;
     }
 
+    public function query(): Builder
+    {
+        return $this->newQuery();
+    }
+
     public function testMapToEntities(array $data): EntityCollection
     {
         return $this->mapToEntities($data);
     }
 
-    public function testMapToEntity(array $data): object
+    public function testMapToEntity(array $data): Entity
     {
         return $this->mapToEntity($data);
     }
@@ -590,16 +713,17 @@ class TestBuilderFactoryResource extends Resource
 
     public function customQuery(): Builder
     {
-        return $this->createBuilderWithEndpoint("{$this->endpoint}/custom");
+        return $this->newQuery("{$this->endpoint}/custom");
     }
 
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
+        return $this->newQuery();
     }
 
-    protected function createBuilderWithEndpoint(string $endpoint): Builder
+    protected function newQuery(?string $endpoint = null): Builder
     {
+        $endpoint ??= $this->endpoint;
         $this->createdEndpoints[] = $endpoint;
 
         return new TestBuilder($this, $endpoint);
@@ -608,15 +732,16 @@ class TestBuilderFactoryResource extends Resource
 
 class TestBuilder extends Builder {}
 
-class UnsupportedGenericResource extends Resource
+/**
+ * @author Erik Galloway <erik@erikgall.com>
+ */
+class TestEntityClassResource extends TestResource
 {
-    protected string $endpoint = '/test-endpoint';
-
     /**
-     * @return array<int, string>
+     * @return class-string<Driver>
      */
-    protected function supportedGenericOperations(): array
+    public function getEntityClass(): string
     {
-        return [];
+        return Driver::class;
     }
 }

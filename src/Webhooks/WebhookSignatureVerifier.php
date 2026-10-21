@@ -2,6 +2,7 @@
 
 namespace Samsara\Webhooks;
 
+use Illuminate\Support\Carbon;
 use Samsara\Exceptions\InvalidSignatureException;
 
 /**
@@ -123,7 +124,7 @@ class WebhookSignatureVerifier
             throw InvalidSignatureException::invalidTimestamp($timestamp);
         }
 
-        $timestampAge = time() - $timestampValue;
+        $timestampAge = Carbon::now()->getTimestamp() - $timestampValue;
 
         if ($timestampAge < 0) {
             throw InvalidSignatureException::futureTimestamp(-$timestampAge);

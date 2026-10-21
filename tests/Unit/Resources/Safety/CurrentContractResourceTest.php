@@ -36,12 +36,13 @@ class CurrentContractResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
 
     #[Test]
-    public function cursor_endpoints_without_limit_do_not_receive_an_automatic_page_size(): void
+    public function it_cursor_endpoints_without_limit_do_not_receive_an_automatic_page_size(): void
     {
         $this->http->fake([
             '*' => $this->http->response([
@@ -59,7 +60,7 @@ class CurrentContractResourceTest extends TestCase
         ];
 
         foreach ($resources as $builder) {
-            $builder->getWithPagination();
+            $builder->paginate();
         }
 
         $this->http->assertNotSent(fn (Request $request): bool => array_key_exists('limit', $request->data()));

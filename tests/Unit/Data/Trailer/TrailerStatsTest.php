@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Trailer;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Trailer\TrailerStats;
@@ -211,14 +210,6 @@ class TrailerStatsTest extends TestCase
         ]);
 
         $this->assertSame(-20000, $stats->getReeferSetPointTemperatureMilliCZone1());
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $stats = new TrailerStats([]);
-
-        $this->assertInstanceOf(Entity::class, $stats);
     }
 
     #[Test]

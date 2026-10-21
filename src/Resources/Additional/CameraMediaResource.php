@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
@@ -11,6 +12,8 @@ use Samsara\Resources\Resource;
  * Provides access to camera media retrieval endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class CameraMediaResource extends Resource
 {
@@ -54,10 +57,12 @@ class CameraMediaResource extends Resource
 
     /**
      * Get a query builder for camera media.
+     *
+     * @return Builder<Entity>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
+        return $this->newQuery()
             ->withoutDefaultPageSize()
             ->withResponseCollectionKey('data.media')
             ->repeatQueryParameters('inputs', 'mediaTypes', 'triggerReasons');
@@ -78,13 +83,5 @@ class CameraMediaResource extends Resource
         );
 
         return $this->decodeJsonData($response, $endpoint);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

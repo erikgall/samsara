@@ -14,6 +14,8 @@ use Samsara\Data\Maintenance\DefectType;
  * Provides access to DVIRs and defects endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Dvir>
  */
 class MaintenanceResource extends Resource
 {
@@ -42,31 +44,36 @@ class MaintenanceResource extends Resource
             $endpoint
         );
 
-        /** @var Dvir */
         return $this->mapToEntity($this->decodeJsonData($response, $endpoint, false));
     }
 
     /**
      * Get a query builder for defects.
+     *
+     * @return Builder<Defect>
      */
     public function defects(): Builder
     {
-        return $this->createBuilderWithEndpoint('/defects/stream')
+        return $this->newQuery('/defects/stream')
             ->usingEntity(Defect::class);
     }
 
     /**
      * Get a query builder for defect types.
+     *
+     * @return Builder<DefectType>
      */
     public function defectTypes(): Builder
     {
-        return $this->createBuilderWithEndpoint('/defect-types')
+        return $this->newQuery('/defect-types')
             ->withoutDefaultPageSize()
             ->usingEntity(DefectType::class);
     }
 
     /**
      * Get a query builder for DVIRs.
+     *
+     * @return Builder<Dvir>
      */
     public function dvirs(): Builder
     {
@@ -101,10 +108,12 @@ class MaintenanceResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Dvir>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
+        return $this->newQuery()
             ->repeatQueryParameters('safetyStatus');
     }
 
@@ -138,13 +147,5 @@ class MaintenanceResource extends Resource
         );
 
         return Defect::make($this->decodeJsonData($response, $endpoint, false));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

@@ -26,6 +26,7 @@ class CarrierProposedAssignmentsResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -68,7 +69,15 @@ class CarrierProposedAssignmentsResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_all_assignments(): void
+    public function it_has_correct_endpoint(): void
+    {
+        $resource = new CarrierProposedAssignmentsResource($this->samsara);
+
+        $this->assertSame('/fleet/carrier-proposed-assignments', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_queries_assignments(): void
     {
         $this->http->fake([
             '*/fleet/carrier-proposed-assignments' => $this->http->response([
@@ -81,17 +90,9 @@ class CarrierProposedAssignmentsResourceTest extends TestCase
 
         $resource = new CarrierProposedAssignmentsResource($this->samsara);
 
-        $result = $resource->all();
+        $result = $resource->query()->get();
 
         $this->assertInstanceOf(EntityCollection::class, $result);
         $this->assertCount(2, $result);
-    }
-
-    #[Test]
-    public function it_has_correct_endpoint(): void
-    {
-        $resource = new CarrierProposedAssignmentsResource($this->samsara);
-
-        $this->assertSame('/fleet/carrier-proposed-assignments', $resource->getEndpoint());
     }
 }

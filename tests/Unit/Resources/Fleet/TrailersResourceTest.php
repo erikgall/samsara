@@ -27,16 +27,9 @@ class TrailersResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new TrailersResource($this->samsara);
-
-        $this->assertInstanceOf(TrailersResource::class, $resource);
     }
 
     #[Test]
@@ -115,27 +108,6 @@ class TrailersResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_all_trailers(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    ['id' => '1', 'name' => 'Trailer 001'],
-                    ['id' => '2', 'name' => 'Trailer 002'],
-                ],
-            ]),
-        ]);
-
-        $resource = new TrailersResource($this->samsara);
-        $trailers = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $trailers);
-        $this->assertCount(2, $trailers);
-        $this->assertInstanceOf(Trailer::class, $trailers->first());
-        $this->assertSame('Trailer 001', $trailers->first()->name);
-    }
-
-    #[Test]
     public function it_can_update_trailer(): void
     {
         $this->http->fake([
@@ -182,6 +154,27 @@ class TrailersResourceTest extends TestCase
         $resource = new TrailersResource($this->samsara);
 
         $this->assertSame(Trailer::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_queries_trailers(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [
+                    ['id' => '1', 'name' => 'Trailer 001'],
+                    ['id' => '2', 'name' => 'Trailer 002'],
+                ],
+            ]),
+        ]);
+
+        $resource = new TrailersResource($this->samsara);
+        $trailers = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $trailers);
+        $this->assertCount(2, $trailers);
+        $this->assertInstanceOf(Trailer::class, $trailers->first());
+        $this->assertSame('Trailer 001', $trailers->first()->name);
     }
 
     #[Test]

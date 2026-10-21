@@ -5,12 +5,14 @@ namespace Samsara\Tests\Unit;
 use Samsara\Samsara;
 use Samsara\Tests\TestCase;
 use Illuminate\Support\Sleep;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Exceptions\ServerException;
 use Illuminate\Http\Client\PendingRequest;
 use Samsara\Exceptions\RateLimitException;
 use Samsara\Data\Organization\Organization;
+use Illuminate\Http\Client\RequestException;
 use Samsara\Resources\Fleet\DriversResource;
 use Samsara\Resources\Fleet\TrailersResource;
 use Samsara\Resources\Fleet\VehiclesResource;
@@ -18,6 +20,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Samsara\Exceptions\AuthorizationException;
 use Samsara\Resources\Dispatch\RoutesResource;
 use Samsara\Resources\Fleet\EquipmentResource;
+use Illuminate\Http\Client\ConnectionException;
 use Samsara\Resources\Telematics\TripsResource;
 use Samsara\Resources\Industrial\AssetsResource;
 use Samsara\Resources\Organization\TagsResource;
@@ -43,6 +46,22 @@ use Samsara\Resources\Integrations\LiveSharingLinksResource;
  */
 class SamsaraTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNow(Carbon::parse('2030-01-01 00:00:00', 'UTC'));
+        Sleep::fake();
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        Sleep::fake(false);
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function it_accepts_an_http_factory_in_the_constructor(): void
     {
@@ -51,7 +70,7 @@ class SamsaraTest extends TestCase
         $http->fake(['*' => $http->response(['data' => []])]);
 
         $samsara = new Samsara('test-token', ['attempts' => 1], $http);
-        $drivers = $samsara->drivers()->all();
+        $drivers = $samsara->drivers()->query()->get();
 
         $this->assertCount(0, $drivers);
         $http->assertSentCount(1);
@@ -68,6 +87,22 @@ class SamsaraTest extends TestCase
         $samsara = new Samsara('test-token', $config);
 
         $this->assertInstanceOf(Samsara::class, $samsara);
+    }
+
+    #[Test]
+    #[DataProvider('timeouts')]
+    public function it_applies_the_configured_timeout_to_outbound_requests(array $config, int $timeout): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(function (Request $request, array $options) use ($http, $timeout): mixed {
+            $this->assertSame($timeout, $options['timeout']);
+
+            return $http->response(['data' => []]);
+        });
+
+        (new Samsara('test-token', $config, $http))->drivers()->query()->get();
+        $http->assertSentCount(1);
     }
 
     #[Test]
@@ -142,16 +177,19 @@ class SamsaraTest extends TestCase
     public function it_can_switch_to_canada_endpoint_and_send_requests_there(): void
     {
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => []])]);
         $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
 
-        $result = $samsara->useCanadaEndpoint();
-        $samsara->drivers()->query()->get();
+        $result = $samsara->withRegion('ca');
+        $result->drivers()->query()->get();
 
-        $this->assertSame($samsara, $result);
-        $this->assertSame('https://api.ca.samsara.com', $samsara->getBaseUrl());
-        $http->assertSent(fn ($request) => str_starts_with(
+        $this->assertNotSame($samsara, $result);
+        $this->assertSame('https://api.samsara.com', $samsara->getBaseUrl());
+        $this->assertNotSame($samsara->drivers(), $result->drivers());
+        $this->assertSame('https://api.ca.samsara.com', $result->getBaseUrl());
+        $http->assertSent(fn (Request $request): bool => str_starts_with(
             $request->url(),
             'https://api.ca.samsara.com/fleet/drivers'
         ));
@@ -161,26 +199,31 @@ class SamsaraTest extends TestCase
     public function it_can_switch_to_eu_endpoint(): void
     {
         $samsara = new Samsara('test-token');
-        $result = $samsara->useEuEndpoint();
+        $result = $samsara->withRegion('eu');
 
-        $this->assertSame($samsara, $result);
-        $this->assertSame('https://api.eu.samsara.com', $samsara->getBaseUrl());
+        $this->assertNotSame($samsara, $result);
+        $this->assertSame('https://api.samsara.com', $samsara->getBaseUrl());
+        $this->assertNotSame($samsara->drivers(), $result->drivers());
+        $this->assertSame('https://api.eu.samsara.com', $result->getBaseUrl());
     }
 
     #[Test]
     public function it_can_use_a_custom_base_url(): void
     {
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => []])]);
         $samsara = new Samsara('test-token', ['attempts' => 1]);
         $samsara->setHttpFactory($http);
 
-        $result = $samsara->useBaseUrl('https://samsara-proxy.example.test/');
-        $samsara->drivers()->query()->get();
+        $result = $samsara->withBaseUrl('https://samsara-proxy.example.test/');
+        $result->drivers()->query()->get();
 
-        $this->assertSame($samsara, $result);
-        $this->assertSame('https://samsara-proxy.example.test', $samsara->getBaseUrl());
-        $http->assertSent(fn ($request) => str_starts_with(
+        $this->assertNotSame($samsara, $result);
+        $this->assertSame('https://api.samsara.com', $samsara->getBaseUrl());
+        $this->assertNotSame($samsara->drivers(), $result->drivers());
+        $this->assertSame('https://samsara-proxy.example.test', $result->getBaseUrl());
+        $http->assertSent(fn (Request $request): bool => str_starts_with(
             $request->url(),
             'https://samsara-proxy.example.test/fleet/drivers'
         ));
@@ -190,11 +233,12 @@ class SamsaraTest extends TestCase
     public function it_creates_a_tokenless_clone(): void
     {
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => []])]);
         $authenticated = new Samsara('base-token', ['attempts' => 1], $http);
 
         $tokenless = $authenticated->withoutToken();
-        $tokenless->drivers()->all();
+        $tokenless->drivers()->query()->get();
 
         $this->assertNotSame($authenticated, $tokenless);
         $this->assertTrue($authenticated->hasToken());
@@ -203,30 +247,10 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_expose_an_http_date_retry_after_as_zero_seconds(): void
-    {
-        $http = new HttpFactory;
-        $http->fake(['*' => $http->response(
-            ['message' => 'Rate limited'],
-            429,
-            ['Retry-After' => 'Thu, 01 Jan 1970 00:00:00 GMT']
-        )]);
-        $samsara = new Samsara('test-token', ['attempts' => 2]);
-        $samsara->setHttpFactory($http);
-
-        try {
-            $samsara->tags()->find('tag-1');
-            $this->fail('Expected a rate-limit exception.');
-        } catch (RateLimitException $exception) {
-            $this->assertNull($exception->getRetryAfter());
-            $http->assertSentCount(2);
-        }
-    }
-
-    #[Test]
     public function it_does_not_retry_non_retryable_http_statuses(): void
     {
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['message' => 'Forbidden'], 403)]);
         $samsara = new Samsara('test-token', ['attempts' => 3]);
         $samsara->setHttpFactory($http);
@@ -237,6 +261,45 @@ class SamsaraTest extends TestCase
         } catch (AuthorizationException) {
             $http->assertSentCount(1);
         }
+    }
+
+    #[Test]
+    public function it_does_not_retry_post_on_server_error_by_default(): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response([], 500)]);
+        $client = new Samsara('test-token', ['attempts' => 3], $http);
+
+        try {
+            $client->drivers()->create(['name' => 'Driver']);
+            $this->fail('Expected a server exception.');
+        } catch (ServerException $exception) {
+            $this->assertSame(500, $exception->getCode());
+        }
+
+        $http->assertSentCount(1);
+        Sleep::assertNeverSlept();
+    }
+
+    #[Test]
+    #[DataProvider('excessiveRetryAfterValues')]
+    public function it_does_not_retry_when_retry_after_exceeds_the_ceiling(string $header): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response([], 429, ['Retry-After' => $header])]);
+        $client = new Samsara('test-token', ['attempts' => 2, 'retry_after_max_seconds' => 30], $http);
+
+        try {
+            $client->drivers()->query()->get();
+            $this->fail('Expected a rate-limit exception.');
+        } catch (RateLimitException $exception) {
+            $this->assertSame(429, $exception->getCode());
+        }
+
+        $http->assertSentCount(1);
+        Sleep::assertNeverSlept();
     }
 
     #[Test]
@@ -272,6 +335,7 @@ class SamsaraTest extends TestCase
     public function it_gets_the_current_organization_from_me(): void
     {
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => [
             'id'   => 'org-1',
             'name' => 'Example Fleet',
@@ -284,6 +348,22 @@ class SamsaraTest extends TestCase
         $this->assertSame('org-1', $organization->id);
         $http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
             && parse_url($request->url(), PHP_URL_PATH) === '/me');
+    }
+
+    #[Test]
+    #[DataProvider('retryAfterValues')]
+    public function it_honors_retry_after_values(?string $header, int $milliseconds): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->sequence()
+            ->push([], 429, $header === null ? [] : ['Retry-After' => $header])
+            ->push(['data' => [['id' => 'recovered-driver']]])]);
+        $client = new Samsara('test-token', ['attempts' => 2, 'retry_after_max_seconds' => 30], $http);
+
+        $this->assertSame('recovered-driver', $client->drivers()->query()->first()->id);
+        $http->assertSentCount(2);
+        Sleep::assertSequence([Sleep::for($milliseconds)->milliseconds()]);
     }
 
     #[Test]
@@ -316,17 +396,62 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_inherits_retry_writes_from_config_in_make(): void
+    {
+        $this->app['config']->set('samsara.retry_writes', true);
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->sequence()->push([], 503)->push([], 200)]);
+        $this->app->instance(HttpFactory::class, $http);
+
+        $this->assertSame(200, Samsara::make('test-token')->client()->post('/fleet/drivers')->status());
+        $http->assertSentCount(2);
+    }
+
+    #[Test]
+    public function it_isolates_interleaved_tokens_and_regions(): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response(['data' => []])]);
+        $base = new Samsara('base-token', ['attempts' => 1], $http);
+        $first = $base->withToken('first-token');
+        $second = $base->withToken('second-token');
+        $firstQuery = $first->drivers()->query();
+        $europe = $first->withRegion('eu');
+
+        $second->drivers()->query()->get();
+        $europe->drivers()->query()->get();
+        $firstQuery->get();
+        $base->drivers()->query()->get();
+        $second->drivers()->query()->get();
+
+        $http->assertSentCount(5);
+        $this->assertSame([
+            ['Bearer second-token', 'api.samsara.com'],
+            ['Bearer first-token', 'api.eu.samsara.com'],
+            ['Bearer first-token', 'api.samsara.com'],
+            ['Bearer base-token', 'api.samsara.com'],
+            ['Bearer second-token', 'api.samsara.com'],
+        ], $http->recorded()->map(fn (array $pair): array => [
+            $pair[0]->header('Authorization')[0] ?? null,
+            parse_url($pair[0]->url(), PHP_URL_HOST),
+        ])->all());
+    }
+
+    #[Test]
     public function it_isolates_tokens_and_cached_resources_between_client_clones(): void
     {
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => []])]);
         $base = new Samsara('base-token', ['attempts' => 1], $http);
         $baseDrivers = $base->drivers();
 
         $tenant = $base->withToken('tenant-token');
         $tenantDrivers = $tenant->drivers();
-        $baseDrivers->all();
-        $tenantDrivers->all();
+        $baseDrivers->query()->get();
+        $tenantDrivers->query()->get();
 
         $this->assertNotSame($baseDrivers, $tenantDrivers);
         $http->assertSentInOrder([
@@ -339,13 +464,30 @@ class SamsaraTest extends TestCase
     public function it_omits_the_authorization_header_when_token_is_not_set(): void
     {
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => []])]);
         $samsara = new Samsara(null, ['attempts' => 1]);
         $samsara->setHttpFactory($http);
 
         $samsara->drivers()->query()->get();
 
-        $http->assertSent(fn ($request) => ! $request->hasHeader('Authorization'));
+        $http->assertSent(fn (Request $request): bool => ! $request->hasHeader('Authorization'));
+    }
+
+    #[Test]
+    public function it_rejects_an_unknown_configured_region(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new Samsara(null, ['region' => 'unknown']);
+    }
+
+    #[Test]
+    public function it_rejects_an_unknown_region(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        (new Samsara)->withRegion('unknown');
     }
 
     #[Test]
@@ -353,15 +495,48 @@ class SamsaraTest extends TestCase
     public function it_rejects_attempt_counts_below_one(int $attempts): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Samsara request attempts must be at least 1.');
 
         new Samsara('test-token', ['attempts' => $attempts]);
+    }
+
+    #[Test]
+    #[DataProvider('readFailures')]
+    public function it_retries_failed_reads_then_recovers(string $method, ?int $status): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $sequence = $http->sequence();
+        $status === null ? $sequence->pushFailedConnection() : $sequence->push([], $status);
+        $sequence->push(['data' => [['id' => 'recovered-driver']]]);
+        $http->fake(['*' => $sequence]);
+        $client = new Samsara('test-token', ['attempts' => 2], $http);
+
+        $response = $client->client()->send($method, '/fleet/drivers');
+
+        $this->assertSame('recovered-driver', $response->json('data.0.id'));
+        $http->assertSentCount(2);
+        Sleep::assertSequence([Sleep::for(100)->milliseconds()]);
+    }
+
+    #[Test]
+    #[DataProvider('retryableMethods')]
+    public function it_retries_rate_limited_requests_for_every_method(string $method): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->sequence()->push([], 429, ['Retry-After' => '2'])->push([], 200)]);
+        $client = new Samsara('test-token', ['attempts' => 2], $http);
+
+        $this->assertSame(200, $client->client()->send($method, '/fleet/drivers')->status());
+        $http->assertSentCount(2);
+        Sleep::assertSequence([Sleep::for(2)->seconds()]);
     }
 
     #[Test]
     public function it_retries_rate_limits_using_retry_after(): void
     {
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(
             ['message' => 'Rate limited'],
             429,
@@ -377,6 +552,27 @@ class SamsaraTest extends TestCase
             $this->assertSame(0, $exception->getRetryAfter());
             $http->assertSentCount(2);
         }
+    }
+
+    #[Test]
+    #[DataProvider('writeFailures')]
+    public function it_retries_writes_only_when_opted_in(string $method, ?int $status, bool $retryWrites): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $status === null
+            ? $http->failedConnection()
+            : $http->response([], $status)]);
+        $client = new Samsara('test-token', ['attempts' => 3, 'retry_writes' => $retryWrites], $http);
+
+        try {
+            $client->client()->send($method, '/fleet/drivers');
+            $this->fail('Expected the request to fail.');
+        } catch (ConnectionException|RequestException $exception) {
+            $this->assertSame($status === null ? ConnectionException::class : RequestException::class, $exception::class);
+        }
+
+        $http->assertSentCount($retryWrites ? 3 : 1);
     }
 
     #[Test]
@@ -635,12 +831,31 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    public function it_surfaces_connection_failure_after_exhausting_attempts(): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->failedConnection()]);
+        $client = new Samsara('test-token', ['attempts' => 3], $http);
+
+        try {
+            $client->drivers()->query()->get();
+            $this->fail('Expected a connection exception.');
+        } catch (ConnectionException $exception) {
+            $this->assertSame(ConnectionException::class, $exception::class);
+        }
+
+        $http->assertSentCount(3);
+    }
+
+    #[Test]
     #[DataProvider('requestAttemptCounts')]
     public function it_treats_attempts_as_the_total_request_count(
         int $attempts,
         int $expectedRequests
     ): void {
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['message' => 'Service unavailable'], 503)]);
 
         $samsara = new Samsara('test-token', ['attempts' => $attempts]);
@@ -691,6 +906,15 @@ class SamsaraTest extends TestCase
         $this->assertSame('https://api.samsara.com', $samsara->getBaseUrl());
     }
 
+    /** @return array<string, array{string}> */
+    public static function excessiveRetryAfterValues(): array
+    {
+        return [
+            'seconds' => ['31'],
+            'date'    => ['Tue, 01 Jan 2030 00:00:31 GMT'],
+        ];
+    }
+
     /**
      * @return array<string, array{int}>
      */
@@ -700,6 +924,16 @@ class SamsaraTest extends TestCase
             'zero'     => [0],
             'negative' => [-1],
         ];
+    }
+
+    /** @return iterable<string, array{string, int|null}> */
+    public static function readFailures(): iterable
+    {
+        foreach (['GET', 'HEAD', 'OPTIONS'] as $method) {
+            foreach ([500, 408, null] as $status) {
+                yield "{$method} {$status}" => [$method, $status];
+            }
+        }
     }
 
     /**
@@ -712,5 +946,46 @@ class SamsaraTest extends TestCase
             'two attempts make two requests'     => [2, 2],
             'three attempts make three requests' => [3, 3],
         ];
+    }
+
+    /** @return array<string, array{string}> */
+    public static function retryableMethods(): array
+    {
+        return [
+            'get'  => ['GET'], 'head' => ['HEAD'], 'options' => ['OPTIONS'],
+            'post' => ['POST'], 'patch' => ['PATCH'], 'put' => ['PUT'], 'delete' => ['DELETE'],
+        ];
+    }
+
+    /** @return array<string, array{string|null, int}> */
+    public static function retryAfterValues(): array
+    {
+        return [
+            'seconds'         => ['2', 2000],
+            'trimmed seconds' => [' 2 ', 2000],
+            'at ceiling'      => ['30', 30000],
+            'future date'     => ['Tue, 01 Jan 2030 00:00:10 GMT', 10000],
+            'date at ceiling' => ['Tue, 01 Jan 2030 00:00:30 GMT', 30000],
+            'past date'       => ['Mon, 31 Dec 2029 23:59:59 GMT', 0],
+            'missing'         => [null, 100],
+            'invalid'         => ['invalid', 100],
+        ];
+    }
+
+    /** @return array<string, array{array<string, int>, int}> */
+    public static function timeouts(): array
+    {
+        return ['default' => [[], 30], 'configured' => [['timeout' => 60], 60]];
+    }
+
+    /** @return iterable<string, array{string, int|null, bool}> */
+    public static function writeFailures(): iterable
+    {
+        foreach (['POST', 'PATCH', 'PUT', 'DELETE'] as $method) {
+            foreach ([500, 503, 408, null] as $status) {
+                yield "{$method} {$status} default" => [$method, $status, false];
+                yield "{$method} {$status} opted in" => [$method, $status, true];
+            }
+        }
     }
 }

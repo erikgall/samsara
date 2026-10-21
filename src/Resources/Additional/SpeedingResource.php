@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
@@ -11,6 +12,8 @@ use Samsara\Resources\Resource;
  * Provides access to speeding interval stream endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class SpeedingResource extends Resource
 {
@@ -21,17 +24,11 @@ class SpeedingResource extends Resource
 
     /**
      * Get a query builder for speeding intervals stream.
+     *
+     * @return Builder<Entity>
      */
     public function intervalsStream(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)->withoutDefaultPageSize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
+        return $this->newQuery()->withoutDefaultPageSize();
     }
 }

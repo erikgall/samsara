@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Maintenance;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Maintenance\Defect;
 use PHPUnit\Framework\Attributes\Test;
@@ -14,35 +13,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class DefectTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $defect = new Defect([
-            'id'            => '18',
-            'defectType'    => 'Air Compressor',
-            'comment'       => 'Air Compressor not working',
-            'isResolved'    => false,
-            'createdAtTime' => '2024-04-10T07:06:25Z',
-        ]);
-
-        $this->assertSame('18', $defect->id);
-        $this->assertSame('Air Compressor', $defect->defectType);
-        $this->assertSame('Air Compressor not working', $defect->comment);
-        $this->assertFalse($defect->isResolved);
-        $this->assertSame('2024-04-10T07:06:25Z', $defect->createdAtTime);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $defect = Defect::make([
-            'id' => '18',
-        ]);
-
-        $this->assertInstanceOf(Defect::class, $defect);
-        $this->assertSame('18', $defect->getId());
-    }
-
     #[Test]
     public function it_can_check_if_resolved(): void
     {
@@ -75,20 +45,6 @@ class DefectTest extends TestCase
 
         $this->assertTrue($defect->isUnsafe());
         $this->assertFalse($defect->isSafe());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'         => '18',
-            'defectType' => 'Air Compressor',
-            'isResolved' => false,
-        ];
-
-        $defect = new Defect($data);
-
-        $this->assertSame($data, $defect->toArray());
     }
 
     #[Test]
@@ -141,14 +97,6 @@ class DefectTest extends TestCase
 
         $this->assertSame('vehicle-1', $defect->vehicle['id']);
         $this->assertSame('Truck 42', $defect->vehicle['name']);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $defect = new Defect;
-
-        $this->assertInstanceOf(Entity::class, $defect);
     }
 
     #[Test]

@@ -4,10 +4,11 @@ namespace Samsara\Tests\Unit;
 
 use Samsara\Samsara;
 use Samsara\Tests\TestCase;
+use Illuminate\Http\Client\Request;
 use Samsara\SamsaraServiceProvider;
-use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Support\ServiceProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Contracts\Support\DeferrableProvider;
 
@@ -19,22 +20,11 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 class SamsaraServiceProviderTest extends TestCase
 {
     #[Test]
-    public function it_configures_api_key_from_config(): void
-    {
-        $this->app['config']->set('samsara.api_key', 'my-test-token');
-
-        // Get a fresh instance
-        $this->app->forgetInstance(Samsara::class);
-        $samsara = $this->app->make(Samsara::class);
-
-        $this->assertTrue($samsara->hasToken());
-    }
-
-    #[Test]
     public function it_passes_config_to_samsara_instance(): void
     {
         $this->app['config']->set('samsara.timeout', 60);
         $this->app['config']->set('samsara.attempts', 5);
+        $this->app['config']->set('samsara.retry_writes', true);
         $this->app['config']->set('samsara.retry_after_max_seconds', 45);
         $this->app['config']->set('samsara.per_page', 50);
 
@@ -44,6 +34,7 @@ class SamsaraServiceProviderTest extends TestCase
 
         $this->assertSame(60, $samsara->getConfig('timeout'));
         $this->assertSame(5, $samsara->getConfig('attempts'));
+        $this->assertTrue($samsara->getConfig('retry_writes'));
         $this->assertSame(45, $samsara->getConfig('retry_after_max_seconds'));
         $this->assertSame(50, $samsara->getConfig('per_page'));
     }
@@ -103,6 +94,23 @@ class SamsaraServiceProviderTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('configuredTokens')]
+    public function it_sends_the_configured_api_key_as_bearer_token(?string $token, array $headers): void
+    {
+        $this->app['config']->set('samsara.api_key', $token);
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response(['data' => []])]);
+        $this->app->instance(HttpFactory::class, $http);
+        $this->app->forgetInstance(Samsara::class);
+
+        $this->app->make(Samsara::class)->drivers()->query()->get();
+
+        $http->assertSentCount(1);
+        $http->assertSent(fn (Request $request): bool => $request->header('Authorization') === $headers);
+    }
+
+    #[Test]
     public function it_uses_canada_endpoint_when_region_is_ca(): void
     {
         $this->app['config']->set('samsara.region', 'ca');
@@ -110,13 +118,14 @@ class SamsaraServiceProviderTest extends TestCase
         $this->app->forgetInstance(Samsara::class);
 
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => []])]);
         $samsara = $this->app->make(Samsara::class);
         $samsara->setHttpFactory($http);
         $samsara->drivers()->query()->get();
 
         $this->assertSame('https://api.ca.samsara.com', $samsara->getBaseUrl());
-        $http->assertSent(fn ($request) => str_starts_with(
+        $http->assertSent(fn (Request $request): bool => str_starts_with(
             $request->url(),
             'https://api.ca.samsara.com/fleet/drivers'
         ));
@@ -130,6 +139,7 @@ class SamsaraServiceProviderTest extends TestCase
         $this->app->forgetInstance(Samsara::class);
 
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake([
             '*' => $http->response([
                 'data'       => [],
@@ -141,7 +151,7 @@ class SamsaraServiceProviderTest extends TestCase
         $samsara->setHttpFactory($http);
         $samsara->drivers()->query()->lazy()->all();
 
-        $http->assertSent(fn ($request) => ($request->data()['limit'] ?? null) === 50);
+        $http->assertSent(fn (Request $request): bool => ($request->data()['limit'] ?? null) === 50);
     }
 
     #[Test]
@@ -152,6 +162,7 @@ class SamsaraServiceProviderTest extends TestCase
         $this->app->forgetInstance(Samsara::class);
 
         $http = new HttpFactory;
+        $http->preventStrayRequests();
         $http->fake([
             '*' => $http->response([
                 'data'       => [],
@@ -163,7 +174,7 @@ class SamsaraServiceProviderTest extends TestCase
         $samsara->setHttpFactory($http);
         $samsara->drivers()->query()->paginate();
 
-        $http->assertSent(fn ($request) => ($request->data()['limit'] ?? null) === 50);
+        $http->assertSent(fn (Request $request): bool => ($request->data()['limit'] ?? null) === 50);
     }
 
     #[Test]
@@ -181,14 +192,15 @@ class SamsaraServiceProviderTest extends TestCase
     #[Test]
     public function it_uses_the_laravel_http_factory_for_the_registered_client(): void
     {
-        Http::preventStrayRequests();
-        Http::fake(['*' => Http::response(['data' => []])]);
+        $http = $this->app->make(HttpFactory::class);
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response(['data' => []])]);
 
         $this->app->forgetInstance(Samsara::class);
         $samsara = $this->app->make(Samsara::class);
 
-        $this->assertCount(0, $samsara->drivers()->all());
-        Http::assertSentCount(1);
+        $this->assertCount(0, $samsara->drivers()->query()->get());
+        $http->assertSentCount(1);
     }
 
     #[Test]
@@ -201,5 +213,14 @@ class SamsaraServiceProviderTest extends TestCase
         $samsara = $this->app->make(Samsara::class);
 
         $this->assertSame('https://api.samsara.com', $samsara->getBaseUrl());
+    }
+
+    /** @return array<string, array{string|null, list<string>}> */
+    public static function configuredTokens(): array
+    {
+        return [
+            'configured' => ['my-test-token', ['Bearer my-test-token']],
+            'absent'     => [null, []],
+        ];
     }
 }

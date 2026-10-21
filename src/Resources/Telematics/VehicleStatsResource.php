@@ -13,6 +13,8 @@ use Samsara\Data\Vehicle\VehicleStatsSeries;
  * Provides access to vehicle telemetry and stats endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<VehicleStats>
  */
 class VehicleStatsResource extends Resource
 {
@@ -30,6 +32,8 @@ class VehicleStatsResource extends Resource
 
     /**
      * Get a query builder for current vehicle stats.
+     *
+     * @return Builder<VehicleStats>
      */
     public function current(): Builder
     {
@@ -38,6 +42,8 @@ class VehicleStatsResource extends Resource
 
     /**
      * Get a query builder for engine states stats.
+     *
+     * @return Builder<VehicleStats>
      */
     public function engineStates(): Builder
     {
@@ -46,16 +52,20 @@ class VehicleStatsResource extends Resource
 
     /**
      * Get a query builder for vehicle stats feed.
+     *
+     * @return Builder<VehicleStatsSeries>
      */
     public function feed(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/stats/feed')
+        return $this->newQuery('/fleet/vehicles/stats/feed')
             ->withoutDefaultPageSize()
             ->usingEntity(VehicleStatsSeries::class);
     }
 
     /**
      * Get a query builder for fuel percents stats.
+     *
+     * @return Builder<VehicleStats>
      */
     public function fuelPercents(): Builder
     {
@@ -64,6 +74,8 @@ class VehicleStatsResource extends Resource
 
     /**
      * Get a query builder for GPS stats.
+     *
+     * @return Builder<VehicleStats>
      */
     public function gps(): Builder
     {
@@ -72,16 +84,20 @@ class VehicleStatsResource extends Resource
 
     /**
      * Get a query builder for vehicle stats history.
+     *
+     * @return Builder<VehicleStatsSeries>
      */
     public function history(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/stats/history')
+        return $this->newQuery('/fleet/vehicles/stats/history')
             ->withoutDefaultPageSize()
             ->usingEntity(VehicleStatsSeries::class);
     }
 
     /**
      * Get a query builder for odometer stats.
+     *
+     * @return Builder<VehicleStats>
      */
     public function odometer(): Builder
     {
@@ -90,21 +106,12 @@ class VehicleStatsResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<VehicleStats>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
-            ->withoutDefaultPageSize()
-            ->usingEntity(VehicleStats::class);
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
+        return $this->newQuery()
+            ->withoutDefaultPageSize();
     }
 }

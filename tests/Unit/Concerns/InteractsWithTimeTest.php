@@ -2,9 +2,11 @@
 
 namespace Samsara\Tests\Unit\Concerns;
 
-use Carbon\Carbon;
+use DateTime;
+use DateTimeZone;
 use DateTimeImmutable;
 use Samsara\Tests\TestCase;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Concerns\InteractsWithTime;
 
@@ -15,40 +17,6 @@ use Samsara\Concerns\InteractsWithTime;
  */
 class InteractsWithTimeTest extends TestCase
 {
-    #[Test]
-    public function it_converts_from_unix_milliseconds(): void
-    {
-        $class = new TimeTestClass;
-        // 2024-01-15 14:30:00 UTC in milliseconds
-        $milliseconds = 1705329000000;
-
-        $result = $class->testFromUnixMilliseconds($milliseconds);
-
-        $this->assertInstanceOf(Carbon::class, $result);
-        $this->assertSame('2024-01-15 14:30:00', $result->utc()->format('Y-m-d H:i:s'));
-    }
-
-    #[Test]
-    public function it_converts_to_unix_milliseconds_from_carbon(): void
-    {
-        $class = new TimeTestClass;
-        $carbon = Carbon::parse('2024-01-15 14:30:00', 'UTC');
-
-        $result = $class->testToUnixMilliseconds($carbon);
-
-        $this->assertSame(1705329000000, $result);
-    }
-
-    #[Test]
-    public function it_converts_to_unix_milliseconds_from_string(): void
-    {
-        $class = new TimeTestClass;
-
-        $result = $class->testToUnixMilliseconds('2024-01-15T14:30:00Z');
-
-        $this->assertSame(1705329000000, $result);
-    }
-
     #[Test]
     public function it_converts_to_utc_string(): void
     {
@@ -90,7 +58,7 @@ class InteractsWithTimeTest extends TestCase
     {
         $class = new TimeTestClass;
         // 2024-01-15 06:30:00 PST = 2024-01-15 14:30:00 UTC
-        $datetime = new DateTimeImmutable('2024-01-15 06:30:00', new \DateTimeZone('America/Los_Angeles'));
+        $datetime = new DateTimeImmutable('2024-01-15 06:30:00', new DateTimeZone('America/Los_Angeles'));
 
         $result = $class->testFormatTime($datetime);
 
@@ -101,7 +69,7 @@ class InteractsWithTimeTest extends TestCase
     public function it_formats_datetime_immutable_to_utc_with_z_suffix(): void
     {
         $class = new TimeTestClass;
-        $datetime = new DateTimeImmutable('2024-01-15 14:30:00', new \DateTimeZone('UTC'));
+        $datetime = new DateTimeImmutable('2024-01-15 14:30:00', new DateTimeZone('UTC'));
 
         $result = $class->testFormatTime($datetime);
 
@@ -109,37 +77,33 @@ class InteractsWithTimeTest extends TestCase
     }
 
     #[Test]
-    public function it_parses_datetime_immutable_to_carbon(): void
+    public function it_formats_the_laravel_clock_as_rfc3339_in_utc(): void
     {
-        $class = new TimeTestClass;
-        $datetime = new DateTimeImmutable('2024-01-15 14:30:00', new \DateTimeZone('UTC'));
+        Carbon::setTestNow(Carbon::parse('2024-06-15T10:30:45.123456-05:00'));
 
-        $result = $class->testParseTime($datetime);
-
-        $this->assertInstanceOf(Carbon::class, $result);
-        $this->assertSame('2024-01-15 14:30:00', $result->format('Y-m-d H:i:s'));
+        try {
+            $this->assertSame('2024-06-15T15:30:45Z', (new TimeTestClass)->testFormatTime(Carbon::now()));
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     #[Test]
-    public function it_parses_string_to_carbon(): void
+    public function it_preserves_mutable_datetime_inputs_when_converting_fractional_timezone_offsets(): void
     {
-        $class = new TimeTestClass;
+        $time = new DateTime('2024-06-15 10:30:45.123456', new DateTimeZone('Asia/Kolkata'));
 
-        $result = $class->testParseTime('2024-01-15T14:30:00Z');
-
-        $this->assertInstanceOf(Carbon::class, $result);
-        $this->assertSame('2024-01-15 14:30:00', $result->format('Y-m-d H:i:s'));
+        $this->assertSame('2024-06-15T05:00:45Z', (new TimeTestClass)->testFormatTime($time));
+        $this->assertSame('2024-06-15T10:30:45.123456+05:30', $time->format('Y-m-d\TH:i:s.uP'));
+        $this->assertSame('Asia/Kolkata', $time->getTimezone()->getName());
     }
 
     #[Test]
-    public function it_returns_carbon_as_is(): void
+    public function it_preserves_rfc3339_strings_with_fractional_seconds_and_offsets(): void
     {
-        $class = new TimeTestClass;
-        $carbon = Carbon::parse('2024-01-15 14:30:00');
+        $timestamp = '2024-06-15T10:30:45.123456+05:30';
 
-        $result = $class->testParseTime($carbon);
-
-        $this->assertSame($carbon, $result);
+        $this->assertSame($timestamp, (new TimeTestClass)->testFormatTime($timestamp));
     }
 
     #[Test]
@@ -156,6 +120,8 @@ class InteractsWithTimeTest extends TestCase
 
 /**
  * Test class for InteractsWithTime trait.
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
 class TimeTestClass
 {
@@ -164,21 +130,6 @@ class TimeTestClass
     public function testFormatTime(\DateTimeInterface|string $time): string
     {
         return $this->formatTime($time);
-    }
-
-    public function testFromUnixMilliseconds(int $milliseconds): Carbon
-    {
-        return $this->fromUnixMilliseconds($milliseconds);
-    }
-
-    public function testParseTime(\DateTimeInterface|string $time): Carbon
-    {
-        return $this->parseTime($time);
-    }
-
-    public function testToUnixMilliseconds(\DateTimeInterface|string $time): int
-    {
-        return $this->toUnixMilliseconds($time);
     }
 
     public function testToUtcString(\DateTimeInterface $time): string

@@ -27,16 +27,9 @@ class UsersResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new UsersResource($this->samsara);
-
-        $this->assertInstanceOf(UsersResource::class, $resource);
     }
 
     #[Test]
@@ -96,32 +89,6 @@ class UsersResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_all_users(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    [
-                        'id'   => 'user-1',
-                        'name' => 'John Doe',
-                    ],
-                    [
-                        'id'   => 'user-2',
-                        'name' => 'Jane Doe',
-                    ],
-                ],
-            ]),
-        ]);
-
-        $resource = new UsersResource($this->samsara);
-        $users = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $users);
-        $this->assertCount(2, $users);
-        $this->assertInstanceOf(User::class, $users->first());
-    }
-
-    #[Test]
     public function it_can_update_user(): void
     {
         $this->http->fake([
@@ -154,6 +121,32 @@ class UsersResourceTest extends TestCase
         $resource = new UsersResource($this->samsara);
 
         $this->assertSame(User::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_queries_users(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [
+                    [
+                        'id'   => 'user-1',
+                        'name' => 'John Doe',
+                    ],
+                    [
+                        'id'   => 'user-2',
+                        'name' => 'Jane Doe',
+                    ],
+                ],
+            ]),
+        ]);
+
+        $resource = new UsersResource($this->samsara);
+        $users = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $users);
+        $this->assertCount(2, $users);
+        $this->assertInstanceOf(User::class, $users->first());
     }
 
     #[Test]

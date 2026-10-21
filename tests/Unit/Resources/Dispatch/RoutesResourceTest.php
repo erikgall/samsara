@@ -11,7 +11,6 @@ use Samsara\Data\Route\RouteAuditLog;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Dispatch\RoutesResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the RoutesResource.
@@ -29,16 +28,9 @@ class RoutesResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new RoutesResource($this->samsara);
-
-        $this->assertInstanceOf(RoutesResource::class, $resource);
     }
 
     #[Test]
@@ -126,21 +118,6 @@ class RoutesResourceTest extends TestCase
             && parse_url($request->url(), PHP_URL_PATH) === '/fleet/routes/route-1'
             && $request->data() === []
         );
-    }
-
-    #[Test]
-    public function it_can_get_all_routes(): void
-    {
-        $resource = new RoutesResource($this->samsara);
-
-        try {
-            $resource->all();
-            $this->fail('Routes all() cannot supply required startTime and endTime.');
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame('all', $exception->getContext()['operation'] ?? null);
-        }
-
-        $this->http->assertNothingSent();
     }
 
     #[Test]

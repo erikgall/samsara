@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Vehicle;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Enums\EngineState;
 use Samsara\Data\Vehicle\GpsLocation;
@@ -16,29 +15,6 @@ use Samsara\Data\Vehicle\VehicleStats;
  */
 class VehicleStatsTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $stats = new VehicleStats([
-            'id'   => '112',
-            'name' => 'Truck A7',
-        ]);
-
-        $this->assertSame('112', $stats->id);
-        $this->assertSame('Truck A7', $stats->name);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $stats = VehicleStats::make([
-            'id' => '112',
-        ]);
-
-        $this->assertInstanceOf(VehicleStats::class, $stats);
-        $this->assertSame('112', $stats->getId());
-    }
-
     #[Test]
     public function it_can_check_if_engine_is_idle(): void
     {
@@ -73,19 +49,6 @@ class VehicleStatsTest extends TestCase
         ]);
 
         $this->assertTrue($stats->isEngineOn());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'   => '112',
-            'name' => 'Truck A7',
-        ];
-
-        $stats = new VehicleStats($data);
-
-        $this->assertSame($data, $stats->toArray());
     }
 
     #[Test]
@@ -269,14 +232,6 @@ class VehicleStatsTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
-    {
-        $stats = new VehicleStats;
-
-        $this->assertInstanceOf(Entity::class, $stats);
-    }
-
-    #[Test]
     public function it_gets_an_exact_string_external_id(): void
     {
         $stats = new VehicleStats([
@@ -299,6 +254,21 @@ class VehicleStatsTest extends TestCase
         $stats = new VehicleStats;
 
         $this->assertNull($stats->getEngineState());
+    }
+
+    #[Test]
+    public function it_returns_null_for_an_unknown_engine_state(): void
+    {
+        foreach (['unknown', '', null] as $state) {
+            $attributes = ['engineState' => ['value' => $state, 'time' => '2026-08-10T12:00:00Z']];
+            $stats = VehicleStats::make($attributes);
+
+            $this->assertNull($stats->getEngineState());
+            $this->assertFalse($stats->isEngineOn());
+            $this->assertFalse($stats->isEngineOff());
+            $this->assertFalse($stats->isEngineIdle());
+            $this->assertSame($attributes, $stats->toArray());
+        }
     }
 
     #[Test]

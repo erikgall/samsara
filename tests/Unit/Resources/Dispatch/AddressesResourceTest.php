@@ -27,16 +27,9 @@ class AddressesResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new AddressesResource($this->samsara);
-
-        $this->assertInstanceOf(AddressesResource::class, $resource);
     }
 
     #[Test]
@@ -103,32 +96,6 @@ class AddressesResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_all_addresses(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    [
-                        'id'   => 'addr-1',
-                        'name' => 'Warehouse A',
-                    ],
-                    [
-                        'id'   => 'addr-2',
-                        'name' => 'Warehouse B',
-                    ],
-                ],
-            ]),
-        ]);
-
-        $resource = new AddressesResource($this->samsara);
-        $addresses = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $addresses);
-        $this->assertCount(2, $addresses);
-        $this->assertInstanceOf(Address::class, $addresses->first());
-    }
-
-    #[Test]
     public function it_can_update_address(): void
     {
         $this->http->fake([
@@ -161,6 +128,32 @@ class AddressesResourceTest extends TestCase
         $resource = new AddressesResource($this->samsara);
 
         $this->assertSame(Address::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_queries_addresses(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [
+                    [
+                        'id'   => 'addr-1',
+                        'name' => 'Warehouse A',
+                    ],
+                    [
+                        'id'   => 'addr-2',
+                        'name' => 'Warehouse B',
+                    ],
+                ],
+            ]),
+        ]);
+
+        $resource = new AddressesResource($this->samsara);
+        $addresses = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $addresses);
+        $this->assertCount(2, $addresses);
+        $this->assertInstanceOf(Address::class, $addresses->first());
     }
 
     #[Test]

@@ -15,6 +15,8 @@ use Samsara\Data\Trailer\TrailerStats;
  * These endpoints may change without notice.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class BetaResource extends Resource
 {
@@ -101,172 +103,210 @@ class BetaResource extends Resource
 
     /**
      * Get detections stream.
+     *
+     * @return Builder<Entity>
      */
     public function detectionsStream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/detections/stream')
+        return $this->newQuery('/detections/stream')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get devices.
+     *
+     * @return Builder<Entity>
      */
     public function devices(): Builder
     {
-        return $this->createBuilderWithEndpoint('/devices');
+        return $this->newQuery('/devices');
     }
 
     /**
      * Get HOS ELD events.
+     *
+     * @return Builder<Entity>
      */
     public function hosEldEvents(): Builder
     {
-        return $this->createBuilderWithEndpoint('/beta/fleet/hos/drivers/eld-events')
+        return $this->newQuery('/beta/fleet/hos/drivers/eld-events')
             ->limit(25);
     }
 
     /**
      * Get industrial jobs.
+     *
+     * @return Builder<Entity>
      */
     public function industrialJobs(): Builder
     {
-        return $this->createBuilderWithEndpoint('/beta/industrial/jobs')
+        return $this->newQuery('/beta/industrial/jobs')
             ->withoutDefaultPageSize()
             ->repeatQueryParameters('industrialAssetIds', 'fleetDeviceIds');
     }
 
     /**
      * Get qualification records.
+     *
+     * @return Builder<Entity>
      */
     public function qualificationsRecords(): Builder
     {
-        return $this->createBuilderWithEndpoint('/qualification-records')
+        return $this->newQuery('/qualification-records')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get qualification types.
+     *
+     * @return Builder<Entity>
      */
     public function qualificationsTypes(): Builder
     {
-        return $this->createBuilderWithEndpoint('/qualification-types')
+        return $this->newQuery('/qualification-types')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get readings definitions.
+     *
+     * @return Builder<Entity>
      */
     public function readingsDefinitions(): Builder
     {
-        return $this->createBuilderWithEndpoint('/readings/definitions')
+        return $this->newQuery('/readings/definitions')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get readings history.
+     *
+     * @return Builder<Entity>
      */
     public function readingsHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/readings/history')
+        return $this->newQuery('/readings/history')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get latest readings.
+     *
+     * @return Builder<Entity>
      */
     public function readingsLatest(): Builder
     {
-        return $this->createBuilderWithEndpoint('/readings/latest')
+        return $this->newQuery('/readings/latest')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get reports configs.
+     *
+     * @return Builder<Entity>
      */
     public function reportsConfigs(): Builder
     {
-        return $this->createBuilderWithEndpoint('/reports/configs');
+        return $this->newQuery('/reports/configs');
     }
 
     /**
      * Get reports datasets.
+     *
+     * @return Builder<Entity>
      */
     public function reportsDatasets(): Builder
     {
-        return $this->createBuilderWithEndpoint('/reports/datasets');
+        return $this->newQuery('/reports/datasets');
     }
 
     /**
      * Get reports runs.
+     *
+     * @return Builder<Entity>
      */
     public function reportsRuns(): Builder
     {
-        return $this->createBuilderWithEndpoint('/reports/runs');
+        return $this->newQuery('/reports/runs');
     }
 
     /**
      * Get safety scores for drivers.
+     *
+     * @return Builder<SafetyScore>
      */
     public function safetyScoresDrivers(): Builder
     {
-        return $this->createBuilderWithEndpoint('/safety-scores/drivers')
+        return $this->newQuery('/safety-scores/drivers')
             ->withoutDefaultPageSize()
             ->usingEntity(SafetyScore::class);
     }
 
     /**
      * Get safety scores for vehicles.
+     *
+     * @return Builder<SafetyScore>
      */
     public function safetyScoresVehicles(): Builder
     {
-        return $this->createBuilderWithEndpoint('/safety-scores/vehicles')
+        return $this->newQuery('/safety-scores/vehicles')
             ->withoutDefaultPageSize()
             ->usingEntity(SafetyScore::class);
     }
 
     /**
      * Get trailer stats current.
+     *
+     * @return Builder<TrailerStats>
      */
     public function trailerStatsCurrent(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/trailers/stats')
+        return $this->newQuery('/fleet/trailers/stats')
             ->withoutDefaultPageSize()
             ->usingEntity(TrailerStats::class);
     }
 
     /**
      * Get trailer stats feed.
+     *
+     * @return Builder<Entity>
      */
     public function trailerStatsFeed(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/trailers/stats/feed')
+        return $this->newQuery('/fleet/trailers/stats/feed')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get trailer stats history.
+     *
+     * @return Builder<Entity>
      */
     public function trailerStatsHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/trailers/stats/history')
+        return $this->newQuery('/fleet/trailers/stats/history')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get training assignments.
+     *
+     * @return Builder<Entity>
      */
     public function trainingAssignments(): Builder
     {
-        return $this->createBuilderWithEndpoint('/training-assignments/stream')
+        return $this->newQuery('/training-assignments/stream')
             ->withoutDefaultPageSize();
     }
 
     /**
      * Get training courses.
+     *
+     * @return Builder<Entity>
      */
     public function trainingCourses(): Builder
     {
-        return $this->createBuilderWithEndpoint('/training-courses')
+        return $this->newQuery('/training-courses')
             ->withoutDefaultPageSize();
     }
 
@@ -293,18 +333,12 @@ class BetaResource extends Resource
 
     /**
      * Get vehicle immobilizer stream.
+     *
+     * @return Builder<Entity>
      */
     public function vehicleImmobilizerStream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/immobilizer/stream')
+        return $this->newQuery('/fleet/vehicles/immobilizer/stream')
             ->withoutDefaultPageSize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

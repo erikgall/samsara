@@ -3,6 +3,8 @@
 namespace Samsara\Query;
 
 use Closure;
+use Generator;
+use BackedEnum;
 use DateTimeInterface;
 use Samsara\Data\Entity;
 use Samsara\Http\QueryString;
@@ -10,10 +12,12 @@ use Samsara\Resources\Resource;
 use Samsara\Http\RequestExecutor;
 use Samsara\Http\ResponseDecoder;
 use Samsara\Data\EntityCollection;
+use Samsara\Enums\VehicleStatType;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\LazyCollection;
 use Samsara\Concerns\InteractsWithTime;
-use Samsara\Contracts\QueryBuilderInterface;
+use Samsara\Exceptions\SamsaraException;
+use Illuminate\Support\Traits\Conditionable;
 
 /**
  * Query builder for API requests.
@@ -22,9 +26,12 @@ use Samsara\Contracts\QueryBuilderInterface;
  * filtering, pagination, and time range options.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @template TEntity of Entity = Entity
  */
-class Builder implements QueryBuilderInterface
+class Builder
 {
+    use Conditionable;
     use InteractsWithTime;
 
     /**
@@ -40,7 +47,7 @@ class Builder implements QueryBuilderInterface
     /**
      * The decorations to include.
      *
-     * @var array<string>
+     * @var array<VehicleStatType|string>
      */
     protected array $decorations = [];
 
@@ -93,14 +100,14 @@ class Builder implements QueryBuilderInterface
     /**
      * The endpoint-specific response mapper.
      *
-     * @var (Closure(array<string, mixed>): Entity)|null
+     * @var (Closure(array<string, mixed>): TEntity)|null
      */
     protected ?Closure $responseMapper = null;
 
     /**
      * The stat types to fetch.
      *
-     * @var array<string>
+     * @var array<VehicleStatType|string>
      */
     protected array $types = [];
 
@@ -205,18 +212,22 @@ class Builder implements QueryBuilderInterface
 
     /**
      * Get the first result.
+     *
+     * @return TEntity|null
      */
-    public function first(): ?object
+    public function first(): ?Entity
     {
-        $results = $this->limit(1)->get();
+        if ($this->defaultPageSizeEnabled) {
+            $this->limit(1);
+        }
 
-        return $results->first();
+        return $this->get()->first();
     }
 
     /**
      * Execute the query and get results.
      *
-     * @return EntityCollection<int, \Samsara\Data\Entity>
+     * @return EntityCollection<int, TEntity>
      */
     public function get(): EntityCollection
     {
@@ -240,31 +251,9 @@ class Builder implements QueryBuilderInterface
     }
 
     /**
-     * Execute the query and get results with pagination information.
-     */
-    public function getWithPagination(): Pagination\CursorPaginator
-    {
-        $this->applyDefaultPerPage();
-
-        $response = $this->executeRequest();
-
-        $data = $this->responseDecoder()->decodeList(
-            $response,
-            $this->getEndpoint(),
-            $this->responseCollectionKey,
-        );
-        $pagination = $response->json('pagination', []);
-
-        $items = $this->mapToEntities($data);
-        $cursor = Pagination\Cursor::fromResponse($pagination);
-
-        return new Pagination\CursorPaginator($items, $cursor, $this);
-    }
-
-    /**
      * Get results as a lazy collection.
      *
-     * @return LazyCollection<int, \Samsara\Data\Entity>
+     * @return LazyCollection<int, TEntity>
      */
     public function lazy(?int $chunkSize = null): LazyCollection
     {
@@ -275,8 +264,10 @@ class Builder implements QueryBuilderInterface
 
         $template->applyDefaultPerPage();
 
-        return LazyCollection::make(function () use ($template) {
+        return LazyCollection::make(function () use ($template): Generator {
             $builder = clone $template;
+            $initialCursor = $builder->buildQuery()[$builder->cursorParameter] ?? null;
+            $seen = is_string($initialCursor) ? [$initialCursor] : [];
             $cursor = null;
 
             do {
@@ -285,22 +276,31 @@ class Builder implements QueryBuilderInterface
                 }
 
                 $response = $builder->executeRequest();
-
                 $data = $builder->responseDecoder()->decodeList(
                     $response,
                     $builder->getEndpoint(),
                     $builder->responseCollectionKey,
                 );
-                $pagination = $response->json('pagination', []);
+                $pagination = Pagination\Cursor::fromResponse($response->json('pagination', []));
+                $cursor = $pagination->hasNextPage ? $pagination->endCursor : null;
+
+                if ($cursor === '') {
+                    $cursor = null;
+                }
+
+                if ($cursor !== null && in_array($cursor, $seen, true)) {
+                    throw new SamsaraException('Pagination cursor did not advance.', context: [
+                        'endpoint' => $builder->getEndpoint(),
+                        'cursor'   => $cursor,
+                    ]);
+                }
+
+                if ($cursor !== null) {
+                    $seen[] = $cursor;
+                }
 
                 foreach ($data as $item) {
                     yield $builder->mapToEntity($item);
-                }
-
-                $cursor = $pagination['endCursor'] ?? null;
-                $hasNext = $pagination['hasNextPage'] ?? false;
-                if (! $hasNext || $cursor === '') {
-                    $cursor = null;
                 }
             } while ($cursor !== null);
         });
@@ -319,11 +319,20 @@ class Builder implements QueryBuilderInterface
     /**
      * Map endpoint response items with a custom callback.
      *
-     * @param  callable(array<string, mixed>): Entity  $mapper
+     * @template TMapped of Entity
+     *
+     * @param  callable(array<string, mixed>): TMapped  $mapper
+     * @return static<TMapped>
+     *
+     * @phpstan-return $this
+     *
+     * @phpstan-this-out static<TMapped>
      */
     public function mapUsing(callable $mapper): static
     {
-        $this->responseMapper = Closure::fromCallable($mapper);
+        /** @var Closure(array<string, mixed>): TEntity $responseMapper */
+        $responseMapper = Closure::fromCallable($mapper);
+        $this->responseMapper = $responseMapper;
 
         return $this;
     }
@@ -332,6 +341,7 @@ class Builder implements QueryBuilderInterface
      * Paginate the query results.
      *
      * @param  int|null  $perPage  The number of items per page
+     * @return Pagination\CursorPaginator<TEntity>
      */
     public function paginate(?int $perPage = null): Pagination\CursorPaginator
     {
@@ -339,7 +349,28 @@ class Builder implements QueryBuilderInterface
             $this->limit($perPage);
         }
 
-        return $this->getWithPagination();
+        $this->applyDefaultPerPage();
+
+        $response = $this->executeRequest();
+
+        $data = $this->responseDecoder()->decodeList(
+            $response,
+            $this->getEndpoint(),
+            $this->responseCollectionKey,
+        );
+        $pagination = $response->json('pagination', []);
+
+        $items = $this->mapToEntities($data);
+        $cursor = Pagination\Cursor::fromResponse($pagination);
+
+        $initialCursor = $this->buildQuery()[$this->cursorParameter] ?? null;
+
+        return new Pagination\CursorPaginator(
+            $items,
+            $cursor,
+            $this,
+            is_string($initialCursor) ? [$initialCursor] : [],
+        );
     }
 
     /**
@@ -376,9 +407,9 @@ class Builder implements QueryBuilderInterface
     /**
      * Set the stat types to fetch.
      *
-     * @param  array<string>|string  $types
+     * @param  VehicleStatType|array<VehicleStatType|string>|string  $types
      */
-    public function types(array|string $types): static
+    public function types(array|string|VehicleStatType $types): static
     {
         $this->types = is_array($types) ? $types : [$types];
 
@@ -398,7 +429,12 @@ class Builder implements QueryBuilderInterface
     /**
      * Map endpoint response items into the selected entity class.
      *
-     * @param  class-string<Entity>  $entityClass
+     * @template TMapped of Entity
+     *
+     * @param  class-string<TMapped>  $entityClass
+     * @return static<TMapped>
+     *
+     * @phpstan-this-out static<TMapped>
      */
     public function usingEntity(string $entityClass): static
     {
@@ -490,9 +526,9 @@ class Builder implements QueryBuilderInterface
     /**
      * Set the decorations to include.
      *
-     * @param  array<string>|string  $decorations
+     * @param  VehicleStatType|array<VehicleStatType|string>|string  $decorations
      */
-    public function withDecorations(array|string $decorations): static
+    public function withDecorations(array|string|VehicleStatType $decorations): static
     {
         $this->decorations = is_array($decorations) ? $decorations : [$decorations];
 
@@ -523,13 +559,12 @@ class Builder implements QueryBuilderInterface
      * Map data to entity collection.
      *
      * @param  array<int, array<string, mixed>>  $data
-     * @return EntityCollection<int, \Samsara\Data\Entity>
+     * @return EntityCollection<int, TEntity>
      */
     protected function mapToEntities(array $data): EntityCollection
     {
-        /** @var array<int, \Samsara\Data\Entity> $entities */
         $entities = array_map(
-            fn (array $item) => $this->mapToEntity($item),
+            fn (array $item): Entity => $this->mapToEntity($item),
             $data
         );
 
@@ -540,13 +575,15 @@ class Builder implements QueryBuilderInterface
      * Map data to a single entity.
      *
      * @param  array<string, mixed>  $data
+     * @return TEntity
      */
-    protected function mapToEntity(array $data): object
+    protected function mapToEntity(array $data): Entity
     {
         if ($this->responseMapper !== null) {
             return ($this->responseMapper)($data);
         }
 
+        /** @var class-string<TEntity> $entityClass */
         $entityClass = $this->resource->getEntityClass();
 
         return $entityClass::make($data);
@@ -598,13 +635,18 @@ class Builder implements QueryBuilderInterface
     /**
      * Serialize a dedicated list parameter for form/explode=false query encoding.
      *
-     * @param  array<string>|string  $values
+     * @param  array<BackedEnum|string>|string  $values
      * @return array<string>|string
      */
     private function serializeList(array|string $values): array|string
     {
-        return is_array($values) && $values !== []
-            ? implode(',', $values)
-            : $values;
+        if (! is_array($values) || $values === []) {
+            return $values;
+        }
+
+        return implode(',', array_map(
+            fn (string|BackedEnum $value): string|int => $value instanceof BackedEnum ? $value->value : $value,
+            $values,
+        ));
     }
 }

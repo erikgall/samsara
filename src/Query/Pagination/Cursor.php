@@ -11,42 +11,15 @@ use Illuminate\Contracts\Support\Arrayable;
  *
  * @implements Arrayable<string, mixed>
  */
-class Cursor implements Arrayable
+final class Cursor implements Arrayable
 {
-    /**
-     * The cursor value for the next page.
-     */
-    protected ?string $endCursor;
-
-    /**
-     * Whether there is a next page.
-     */
-    protected bool $hasNextPage;
-
     /**
      * Create a new cursor instance.
      */
-    public function __construct(?string $endCursor, bool $hasNextPage)
-    {
-        $this->endCursor = $endCursor;
-        $this->hasNextPage = $hasNextPage;
-    }
-
-    /**
-     * Get the end cursor value.
-     */
-    public function getEndCursor(): ?string
-    {
-        return $this->endCursor;
-    }
-
-    /**
-     * Check if there is a next page.
-     */
-    public function hasNextPage(): bool
-    {
-        return $this->hasNextPage;
-    }
+    public function __construct(
+        public readonly ?string $endCursor,
+        public readonly bool $hasNextPage,
+    ) {}
 
     /**
      * Convert the cursor to an array.
@@ -68,8 +41,7 @@ class Cursor implements Arrayable
      */
     public static function fromResponse(array $data): static
     {
-        /** @phpstan-ignore new.static */
-        return new static(
+        return new self(
             $data['endCursor'] ?? null,
             $data['hasNextPage'] ?? false
         );

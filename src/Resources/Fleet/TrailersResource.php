@@ -5,6 +5,10 @@ namespace Samsara\Resources\Fleet;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Trailer\Trailer;
+use Samsara\Resources\Concerns\FindsEntities;
+use Samsara\Resources\Concerns\CreatesEntities;
+use Samsara\Resources\Concerns\DeletesEntities;
+use Samsara\Resources\Concerns\UpdatesEntities;
 
 /**
  * Trailers resource for the Samsara API.
@@ -12,9 +16,23 @@ use Samsara\Data\Trailer\Trailer;
  * Provides access to trailer-related endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Trailer>
  */
 class TrailersResource extends Resource
 {
+    /** @use CreatesEntities<Trailer> */
+    use CreatesEntities;
+
+    /** @use DeletesEntities<Trailer> */
+    use DeletesEntities;
+
+    /** @use FindsEntities<Trailer> */
+    use FindsEntities;
+
+    /** @use UpdatesEntities<Trailer> */
+    use UpdatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -35,25 +53,16 @@ class TrailersResource extends Resource
      */
     public function findByExternalId(string $key, string $value): ?Trailer
     {
-        /** @var Trailer|null */
         return $this->findByEncodedPathSegment(rawurlencode($key).':'.rawurlencode($value));
     }
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Trailer>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'find', 'create', 'update', 'delete'];
+        return $this->newQuery();
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Equipment;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Enums\EngineState;
 use PHPUnit\Framework\Attributes\Test;
@@ -201,24 +200,24 @@ class EquipmentStatsTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
-    {
-        $stats = new EquipmentStats([]);
-
-        $this->assertInstanceOf(Entity::class, $stats);
-    }
-
-    #[Test]
     public function it_returns_null_for_invalid_engine_state(): void
     {
-        $stats = new EquipmentStats([
-            'gatewayEngineState' => [
-                'value' => 'Unknown',
-                'time'  => '2025-01-17T10:00:00Z',
-            ],
-        ]);
+        foreach (['unknown', '', null] as $state) {
+            $attributes = [
+                'gatewayEngineState' => ['value' => $state],
+                'obdEngineState'     => ['value' => $state],
+            ];
+            $stats = EquipmentStats::make($attributes);
 
-        $this->assertNull($stats->getGatewayEngineState());
+            $this->assertNull($stats->getGatewayEngineState());
+            $this->assertNull($stats->getObdEngineState());
+            $this->assertFalse($stats->isGatewayEngineOn());
+            $this->assertFalse($stats->isGatewayEngineOff());
+            $this->assertFalse($stats->isObdEngineOn());
+            $this->assertFalse($stats->isObdEngineOff());
+            $this->assertFalse($stats->isObdEngineIdle());
+            $this->assertSame($attributes, $stats->toArray());
+        }
     }
 
     #[Test]
@@ -244,7 +243,7 @@ class EquipmentStatsTest extends TestCase
     }
 
     #[Test]
-    public function stat_series_expose_every_non_deprecated_scalar_series(): void
+    public function it_stat_series_expose_every_non_deprecated_scalar_series(): void
     {
         $methods = [
             'engineRpm'                  => 'getEngineRpmReadings',
@@ -271,7 +270,7 @@ class EquipmentStatsTest extends TestCase
     }
 
     #[Test]
-    public function stat_series_expose_typed_gps_readings(): void
+    public function it_stat_series_expose_typed_gps_readings(): void
     {
         $series = new EquipmentStatsSeries([
             'gps' => [[
@@ -285,7 +284,7 @@ class EquipmentStatsTest extends TestCase
     }
 
     #[Test]
-    public function stat_series_return_empty_collections_for_invalid_inputs(): void
+    public function it_stat_series_return_empty_collections_for_invalid_inputs(): void
     {
         foreach ([null, 'invalid', []] as $readings) {
             $series = new EquipmentStatsSeries(['gatewayEngineStates' => $readings]);

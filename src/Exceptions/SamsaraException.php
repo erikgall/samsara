@@ -58,22 +58,4 @@ class SamsaraException extends Exception
 
         return $this;
     }
-
-    /**
-     * Create a new exception instance.
-     *
-     * @param  string  $message  The exception message
-     * @param  int  $code  The exception code
-     * @param  Throwable|null  $previous  The previous exception
-     * @param  array<string, mixed>  $context  Additional context
-     */
-    public static function make(
-        string $message = '',
-        int $code = 0,
-        ?Throwable $previous = null,
-        array $context = []
-    ): static {
-        /** @phpstan-ignore new.static */
-        return new static($message, $code, $previous, $context);
-    }
 }

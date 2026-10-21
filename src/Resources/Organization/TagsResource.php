@@ -5,6 +5,10 @@ namespace Samsara\Resources\Organization;
 use Samsara\Data\Tag\Tag;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
+use Samsara\Resources\Concerns\FindsEntities;
+use Samsara\Resources\Concerns\CreatesEntities;
+use Samsara\Resources\Concerns\DeletesEntities;
+use Samsara\Resources\Concerns\UpdatesEntities;
 
 /**
  * Tags resource for the Samsara API.
@@ -12,9 +16,23 @@ use Samsara\Resources\Resource;
  * Provides access to tag management endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Tag>
  */
 class TagsResource extends Resource
 {
+    /** @use CreatesEntities<Tag> */
+    use CreatesEntities;
+
+    /** @use DeletesEntities<Tag> */
+    use DeletesEntities;
+
+    /** @use FindsEntities<Tag> */
+    use FindsEntities;
+
+    /** @use UpdatesEntities<Tag> */
+    use UpdatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -29,19 +47,11 @@ class TagsResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Tag>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'find', 'create', 'update', 'delete'];
+        return $this->newQuery();
     }
 }

@@ -56,6 +56,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Retry Writes
+    |--------------------------------------------------------------------------
+    |
+    | Retry write requests after connection failures, timeouts, or server errors.
+    | Enabling this may repeat writes that the API has already accepted. Rate
+    | limits are retried for every method within the Retry-After ceiling.
+    |
+    */
+
+    'retry_writes' => env('SAMSARA_RETRY_WRITES', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Maximum Retry-After Delay
     |--------------------------------------------------------------------------
     |

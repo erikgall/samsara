@@ -5,6 +5,8 @@ namespace Samsara\Resources\Fleet;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Vehicle\Vehicle;
+use Samsara\Resources\Concerns\FindsEntities;
+use Samsara\Resources\Concerns\UpdatesEntities;
 
 /**
  * Vehicles resource for the Samsara API.
@@ -16,9 +18,17 @@ use Samsara\Data\Vehicle\Vehicle;
  * Vehicles cannot be deleted; they can only be marked as retired via the update method.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Vehicle>
  */
 class VehiclesResource extends Resource
 {
+    /** @use FindsEntities<Vehicle> */
+    use FindsEntities;
+
+    /** @use UpdatesEntities<Vehicle> */
+    use UpdatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -39,26 +49,17 @@ class VehiclesResource extends Resource
      */
     public function findByExternalId(string $key, string $value): ?Vehicle
     {
-        /** @var Vehicle|null */
         return $this->findByEncodedPathSegment(rawurlencode($key).':'.rawurlencode($value));
     }
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Vehicle>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
+        return $this->newQuery()
             ->repeatQueryParameters('attributes');
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'find', 'update'];
     }
 }

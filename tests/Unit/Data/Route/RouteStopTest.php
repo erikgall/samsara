@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Route;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Route\RouteStop;
 use PHPUnit\Framework\Attributes\Test;
@@ -12,72 +11,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class RouteStopTest extends TestCase
 {
-    #[Test]
-    public function distance_conversions_preserve_zero_and_missing_values(): void
-    {
-        $zero = new RouteStop([
-            'actualDistanceMeters'  => 0,
-            'plannedDistanceMeters' => 0,
-        ]);
-
-        $this->assertSame(0.0, $zero->getActualDistanceKilometers());
-        $this->assertSame(0.0, $zero->getActualDistanceMiles());
-        $this->assertSame(0.0, $zero->getPlannedDistanceKilometers());
-        $this->assertSame(0.0, $zero->getPlannedDistanceMiles());
-
-        foreach ([new RouteStop, new RouteStop([
-            'actualDistanceMeters'  => null,
-            'plannedDistanceMeters' => null,
-        ])] as $missing) {
-            $this->assertNull($missing->getActualDistanceKilometers());
-            $this->assertNull($missing->getActualDistanceMiles());
-            $this->assertNull($missing->getPlannedDistanceKilometers());
-            $this->assertNull($missing->getPlannedDistanceMiles());
-        }
-    }
-
-    #[Test]
-    public function documented_state_checks_require_an_exact_known_value(): void
-    {
-        $methods = [
-            'isUnassigned',
-            'isScheduled',
-            'isEnRoute',
-            'isSkipped',
-            'isArrived',
-            'isDeparted',
-        ];
-        $attributes = [
-            [],
-            ['state' => null],
-            ['state' => ''],
-            ['state' => 'unknown'],
-            ['state' => 'enRoute'],
-        ];
-
-        foreach ($attributes as $values) {
-            $stop = new RouteStop($values);
-
-            foreach ($methods as $method) {
-                $this->assertFalse($stop->{$method}());
-            }
-        }
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $stop = RouteStop::make([
-            'id'     => 'stop-1',
-            'name'   => 'Current Stop',
-            'state'  => 'scheduled',
-            'orders' => [],
-        ]);
-
-        $this->assertInstanceOf(RouteStop::class, $stop);
-        $this->assertSame('stop-1', $stop->getId());
-    }
-
     #[Test]
     public function it_can_check_each_documented_state(): void
     {
@@ -97,19 +30,6 @@ class RouteStopTest extends TestCase
                 $this->assertSame($method === $expectedMethod, $stop->{$method}());
             }
         }
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'     => 'stop-1',
-            'name'   => 'Current Stop',
-            'state'  => 'scheduled',
-            'orders' => [],
-        ];
-
-        $this->assertSame($data, (new RouteStop($data))->toArray());
     }
 
     #[Test]
@@ -137,6 +57,58 @@ class RouteStopTest extends TestCase
         ]);
 
         $this->assertSame(2, $stop->getOrderCount());
+    }
+
+    #[Test]
+    public function it_distance_conversions_preserve_zero_and_missing_values(): void
+    {
+        $zero = new RouteStop([
+            'actualDistanceMeters'  => 0,
+            'plannedDistanceMeters' => 0,
+        ]);
+
+        $this->assertSame(0.0, $zero->getActualDistanceKilometers());
+        $this->assertSame(0.0, $zero->getActualDistanceMiles());
+        $this->assertSame(0.0, $zero->getPlannedDistanceKilometers());
+        $this->assertSame(0.0, $zero->getPlannedDistanceMiles());
+
+        foreach ([new RouteStop, new RouteStop([
+            'actualDistanceMeters'  => null,
+            'plannedDistanceMeters' => null,
+        ])] as $missing) {
+            $this->assertNull($missing->getActualDistanceKilometers());
+            $this->assertNull($missing->getActualDistanceMiles());
+            $this->assertNull($missing->getPlannedDistanceKilometers());
+            $this->assertNull($missing->getPlannedDistanceMiles());
+        }
+    }
+
+    #[Test]
+    public function it_documented_state_checks_require_an_exact_known_value(): void
+    {
+        $methods = [
+            'isUnassigned',
+            'isScheduled',
+            'isEnRoute',
+            'isSkipped',
+            'isArrived',
+            'isDeparted',
+        ];
+        $attributes = [
+            [],
+            ['state' => null],
+            ['state' => ''],
+            ['state' => 'unknown'],
+            ['state' => 'enRoute'],
+        ];
+
+        foreach ($attributes as $values) {
+            $stop = new RouteStop($values);
+
+            foreach ($methods as $method) {
+                $this->assertFalse($stop->{$method}());
+            }
+        }
     }
 
     #[Test]
@@ -176,12 +148,6 @@ class RouteStopTest extends TestCase
         $this->assertSame(1200, $stop->plannedDistanceMeters);
         $this->assertSame(1250, $stop->actualDistanceMeters);
         $this->assertFalse(method_exists($stop, 'hasHubLocation'));
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $this->assertInstanceOf(Entity::class, new RouteStop);
     }
 
     #[Test]

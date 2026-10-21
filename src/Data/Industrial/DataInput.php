@@ -30,6 +30,31 @@ use Samsara\Data\Entity;
 class DataInput extends Entity
 {
     /**
+     * Hydrate the point envelopes used by current industrial data endpoints.
+     *
+     * @param  iterable<string, mixed>  $attributes
+     */
+    public function __construct(mixed $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        foreach (['fftSpectraPoint', 'j1939D1StatusPoint', 'locationPoint', 'numberPoint', 'stringPoint'] as $key) {
+            if (is_array($this->attributes[$key] ?? null)) {
+                $this->attributes[$key] = DataPoint::make($this->attributes[$key]);
+            }
+        }
+
+        foreach (['fftSpectraPoints', 'j1939D1StatusPoints', 'locationPoints', 'numberPoints', 'stringPoints'] as $key) {
+            if (is_array($this->attributes[$key] ?? null)) {
+                $this->attributes[$key] = array_map(
+                    static fn (mixed $point): mixed => is_array($point) ? DataPoint::make($point) : $point,
+                    $this->attributes[$key]
+                );
+            }
+        }
+    }
+
+    /**
      * Check whether this response contains any data points.
      */
     public function hasDataPoints(): bool
@@ -52,29 +77,29 @@ class DataInput extends Entity
     }
 
     /**
-     * Hydrate the point envelopes used by current industrial data endpoints.
+     * Export point envelopes without retaining mutable point objects.
+     *
+     * @return array<string, mixed>
      */
-    public static function make(mixed $attributes = []): static
+    public function toArray(): array
     {
-        if (! is_array($attributes)) {
-            return parent::make($attributes);
-        }
+        $attributes = parent::toArray();
 
         foreach (['fftSpectraPoint', 'j1939D1StatusPoint', 'locationPoint', 'numberPoint', 'stringPoint'] as $key) {
-            if (is_array($attributes[$key] ?? null)) {
-                $attributes[$key] = DataPoint::make($attributes[$key]);
+            if (($attributes[$key] ?? null) instanceof DataPoint) {
+                $attributes[$key] = $attributes[$key]->toArray();
             }
         }
 
         foreach (['fftSpectraPoints', 'j1939D1StatusPoints', 'locationPoints', 'numberPoints', 'stringPoints'] as $key) {
             if (is_array($attributes[$key] ?? null)) {
                 $attributes[$key] = array_map(
-                    static fn (mixed $point): mixed => is_array($point) ? DataPoint::make($point) : $point,
+                    static fn (mixed $point): mixed => $point instanceof DataPoint ? $point->toArray() : $point,
                     $attributes[$key]
                 );
             }
         }
 
-        return parent::make($attributes);
+        return $attributes;
     }
 }

@@ -13,6 +13,8 @@ use Samsara\Data\Vehicle\VehicleLocationSeries;
  * Provides access to vehicle location endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<VehicleLocationResult>
  */
 class VehicleLocationsResource extends Resource
 {
@@ -30,6 +32,8 @@ class VehicleLocationsResource extends Resource
 
     /**
      * Get a query builder for current vehicle locations.
+     *
+     * @return Builder<VehicleLocationResult>
      */
     public function current(): Builder
     {
@@ -38,41 +42,36 @@ class VehicleLocationsResource extends Resource
 
     /**
      * Get a query builder for vehicle locations feed.
+     *
+     * @return Builder<VehicleLocationSeries>
      */
     public function feed(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/locations/feed')
+        return $this->newQuery('/fleet/vehicles/locations/feed')
             ->withoutDefaultPageSize()
             ->usingEntity(VehicleLocationSeries::class);
     }
 
     /**
      * Get a query builder for vehicle locations history.
+     *
+     * @return Builder<VehicleLocationSeries>
      */
     public function history(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/vehicles/locations/history')
+        return $this->newQuery('/fleet/vehicles/locations/history')
             ->withoutDefaultPageSize()
             ->usingEntity(VehicleLocationSeries::class);
     }
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<VehicleLocationResult>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
-            ->withoutDefaultPageSize()
-            ->usingEntity(VehicleLocationResult::class);
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all'];
+        return $this->newQuery()
+            ->withoutDefaultPageSize();
     }
 }

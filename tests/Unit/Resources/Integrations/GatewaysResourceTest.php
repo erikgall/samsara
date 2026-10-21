@@ -11,7 +11,6 @@ use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Integrations\GatewaysResource;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the GatewaysResource class.
@@ -29,6 +28,7 @@ class GatewaysResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -74,31 +74,6 @@ class GatewaysResourceTest extends TestCase
         $this->assertTrue($result);
         $this->http->assertSent(fn (Request $request): bool => $request->method() === 'DELETE'
             && parse_url($request->url(), PHP_URL_PATH) === '/gateways/gateway-123'
-            && $request->data() === []
-        );
-    }
-
-    #[Test]
-    public function it_can_get_all_gateways(): void
-    {
-        $this->http->fake([
-            '*/gateways' => $this->http->response([
-                'data' => [
-                    ['id' => 'gateway-1', 'serial' => 'ABC123'],
-                    ['id' => 'gateway-2', 'serial' => 'DEF456'],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new GatewaysResource($this->samsara);
-
-        $result = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
-        $this->assertInstanceOf(Gateway::class, $result->first());
-        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
-            && parse_url($request->url(), PHP_URL_PATH) === '/gateways'
             && $request->data() === []
         );
     }
@@ -164,21 +139,27 @@ class GatewaysResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_rejects_unsupported_item_lookup_and_update_without_http(): void
+    public function it_queries_gateways(): void
     {
+        $this->http->fake([
+            '*/gateways' => $this->http->response([
+                'data' => [
+                    ['id' => 'gateway-1', 'serial' => 'ABC123'],
+                    ['id' => 'gateway-2', 'serial' => 'DEF456'],
+                ],
+            ], 200),
+        ]);
+
         $resource = new GatewaysResource($this->samsara);
 
-        foreach (['find', 'update'] as $operation) {
-            try {
-                $operation === 'find'
-                    ? $resource->find('gateway-123')
-                    : $resource->update('gateway-123', ['serial' => 'DEF456']);
-                $this->fail("Gateway {$operation} must fail before sending HTTP.");
-            } catch (UnsupportedOperationException $exception) {
-                $this->assertSame($operation, $exception->getContext()['operation'] ?? null);
-            }
-        }
+        $result = $resource->query()->get();
 
-        $this->http->assertNothingSent();
+        $this->assertInstanceOf(EntityCollection::class, $result);
+        $this->assertCount(2, $result);
+        $this->assertInstanceOf(Gateway::class, $result->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/gateways'
+            && $request->data() === []
+        );
     }
 }

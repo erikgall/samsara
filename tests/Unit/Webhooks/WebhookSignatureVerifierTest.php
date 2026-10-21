@@ -3,7 +3,9 @@
 namespace Samsara\Tests\Unit\Webhooks;
 
 use Samsara\Tests\TestCase;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Samsara\Webhooks\WebhookSignatureVerifier;
 use Samsara\Exceptions\InvalidSignatureException;
 
@@ -28,6 +30,56 @@ class WebhookSignatureVerifierTest extends TestCase
      * A known timestamp for testing.
      */
     private const TEST_TIMESTAMP = '1640000000';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNow(Carbon::createFromTimestamp(self::TEST_TIMESTAMP));
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+
+        parent::tearDown();
+    }
+
+    #[Test]
+    public function it_accepts_a_timestamp_exactly_at_tolerance(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+        $timestamp = (string) (Carbon::now()->getTimestamp() - 300);
+        $signature = $verifier->computeSignature(self::TEST_BODY, $timestamp);
+
+        $verifier->verifyFromRequest(self::TEST_BODY, $signature, $timestamp);
+    }
+
+    #[Test]
+    public function it_accepts_custom_tolerance(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+        $timestamp = (string) (Carbon::now()->getTimestamp() - 400);
+        $signature = $verifier->computeSignature(self::TEST_BODY, $timestamp);
+
+        $verifier->verifyFromRequest(self::TEST_BODY, $signature, $timestamp, 500);
+    }
+
+    #[Test]
+    public function it_accepts_the_current_timestamp_with_zero_tolerance(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+        $timestamp = (string) Carbon::now()->getTimestamp();
+        $signature = $verifier->computeSignature(self::TEST_BODY, $timestamp);
+
+        $verifier->verifyFromRequest(self::TEST_BODY, $signature, $timestamp, 0);
+    }
 
     #[Test]
     public function it_can_be_created_with_static_make_method(): void
@@ -133,6 +185,97 @@ class WebhookSignatureVerifierTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('missingHeaderValues')]
+    public function it_rejects_a_missing_signature(?string $signature): void
+    {
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+
+        try {
+            $verifier->verifyFromRequest(self::TEST_BODY, $signature, self::TEST_TIMESTAMP);
+            $this->fail('Expected a missing signature exception.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['header' => 'X-Samsara-Signature'], $exception->getContext());
+        }
+    }
+
+    #[Test]
+    #[DataProvider('missingHeaderValues')]
+    public function it_rejects_a_missing_timestamp(?string $timestamp): void
+    {
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+
+        try {
+            $verifier->verifyFromRequest(self::TEST_BODY, 'v1=signature', $timestamp);
+            $this->fail('Expected a missing timestamp exception.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['header' => 'X-Samsara-Timestamp'], $exception->getContext());
+        }
+    }
+
+    #[Test]
+    public function it_rejects_a_timestamp_one_second_in_the_future(): void
+    {
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+        $timestamp = (string) (Carbon::now()->getTimestamp() + 1);
+        $signature = $verifier->computeSignature(self::TEST_BODY, $timestamp);
+
+        try {
+            $verifier->verifyFromRequest(self::TEST_BODY, $signature, $timestamp);
+            $this->fail('Expected a future timestamp exception.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['seconds_in_future' => 1], $exception->getContext());
+        }
+    }
+
+    #[Test]
+    public function it_rejects_a_timestamp_one_second_past_tolerance(): void
+    {
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+        $timestamp = (string) (Carbon::now()->getTimestamp() - 301);
+        $signature = $verifier->computeSignature(self::TEST_BODY, $timestamp);
+
+        try {
+            $verifier->verifyFromRequest(self::TEST_BODY, $signature, $timestamp);
+            $this->fail('Expected an expired timestamp exception.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['tolerance' => 300, 'age' => 301], $exception->getContext());
+        }
+    }
+
+    #[Test]
+    public function it_rejects_an_invalid_signature_after_timestamp_check(): void
+    {
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+        $timestamp = (string) Carbon::now()->getTimestamp();
+
+        try {
+            $verifier->verifyFromRequest(self::TEST_BODY, 'v1=invalidsignature', $timestamp);
+            $this->fail('Expected an invalid signature exception.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['received' => 'v1=invalidsignature'], $exception->getContext());
+        }
+    }
+
+    #[Test]
+    public function it_rejects_an_invalid_timestamp_format(): void
+    {
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+
+        try {
+            $verifier->verifyFromRequest(self::TEST_BODY, 'v1=signature', 'not-a-timestamp');
+            $this->fail('Expected an invalid timestamp exception.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['timestamp' => 'not-a-timestamp'], $exception->getContext());
+        }
+    }
+
+    #[Test]
     public function it_returns_false_for_invalid_signature(): void
     {
         $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
@@ -194,7 +337,6 @@ class WebhookSignatureVerifierTest extends TestCase
     public function it_throws_exception_for_empty_secret(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('SAMSARA_WEBHOOK_SECRET');
 
         new WebhookSignatureVerifier('');
     }
@@ -203,10 +345,23 @@ class WebhookSignatureVerifierTest extends TestCase
     public function it_throws_exception_for_invalid_base64_secret(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('SAMSARA_WEBHOOK_SECRET');
 
         // Invalid base64 with illegal characters in strict mode
         new WebhookSignatureVerifier('!!!not-valid-base64!!!');
+    }
+
+    #[Test]
+    public function it_throws_for_an_invalid_signature(): void
+    {
+        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+
+        try {
+            $verifier->verify(self::TEST_BODY, 'v1=invalidsignature', self::TEST_TIMESTAMP);
+            $this->fail('Expected an invalid signature exception.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['received' => 'v1=invalidsignature'], $exception->getContext());
+        }
     }
 
     #[Test]
@@ -228,146 +383,21 @@ class WebhookSignatureVerifierTest extends TestCase
     }
 
     #[Test]
-    public function verify_does_not_throw_for_valid_signature(): void
+    public function it_verifies_a_valid_signature(): void
     {
         $this->expectNotToPerformAssertions();
 
         $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
+        $signature = $verifier->computeSignature(self::TEST_BODY, self::TEST_TIMESTAMP);
 
-        // Compute valid signature
-        $decodedSecret = base64_decode(self::TEST_SECRET);
-        $message = 'v1:'.self::TEST_TIMESTAMP.':'.self::TEST_BODY;
-        $validSignature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
-
-        $verifier->verify(self::TEST_BODY, $validSignature, self::TEST_TIMESTAMP);
+        $verifier->verify(self::TEST_BODY, $signature, self::TEST_TIMESTAMP);
     }
 
-    #[Test]
-    public function verify_from_request_accepts_custom_tolerance(): void
+    /**
+     * @return array<string, array{string|null}>
+     */
+    public static function missingHeaderValues(): array
     {
-        $this->expectNotToPerformAssertions();
-
-        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
-
-        // Compute valid signature for somewhat old timestamp
-        $oldTimestamp = (string) (time() - 400); // 400 seconds ago
-        $decodedSecret = base64_decode(self::TEST_SECRET);
-        $message = 'v1:'.$oldTimestamp.':'.self::TEST_BODY;
-        $validSignature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
-
-        $verifier->verifyFromRequest(self::TEST_BODY, $validSignature, $oldTimestamp, 500);
-    }
-
-    #[Test]
-    public function verify_from_request_rejects_a_future_timestamp(): void
-    {
-        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
-        $futureTimestamp = (string) (time() + 60);
-        $signature = $verifier->computeSignature(self::TEST_BODY, $futureTimestamp);
-
-        $this->expectException(InvalidSignatureException::class);
-        $this->expectExceptionMessage('future');
-
-        $verifier->verifyFromRequest(self::TEST_BODY, $signature, $futureTimestamp);
-    }
-
-    #[Test]
-    public function verify_from_request_throws_for_expired_timestamp(): void
-    {
-        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
-
-        // Compute valid signature for old timestamp
-        $oldTimestamp = (string) (time() - 400); // 400 seconds ago (beyond default 300s tolerance)
-        $decodedSecret = base64_decode(self::TEST_SECRET);
-        $message = 'v1:'.$oldTimestamp.':'.self::TEST_BODY;
-        $validSignature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
-
-        $this->expectException(InvalidSignatureException::class);
-        $this->expectExceptionMessage('expired');
-
-        $verifier->verifyFromRequest(self::TEST_BODY, $validSignature, $oldTimestamp);
-    }
-
-    #[Test]
-    public function verify_from_request_throws_for_invalid_signature_after_timestamp_check(): void
-    {
-        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
-
-        $timestamp = (string) time();
-
-        $this->expectException(InvalidSignatureException::class);
-        $this->expectExceptionMessage('signature mismatch');
-
-        $verifier->verifyFromRequest(self::TEST_BODY, 'v1=invalidsignature', $timestamp);
-    }
-
-    #[Test]
-    public function verify_from_request_throws_for_invalid_timestamp_format(): void
-    {
-        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
-
-        try {
-            $verifier->verifyFromRequest(
-                self::TEST_BODY,
-                'v1=signature',
-                'not-a-timestamp'
-            );
-            $this->fail('Expected an invalid timestamp exception.');
-        } catch (InvalidSignatureException $exception) {
-            $this->assertSame(401, $exception->getCode());
-            $this->assertStringContainsString('invalid X-Samsara-Timestamp', $exception->getMessage());
-            $this->assertSame(
-                ['timestamp' => 'not-a-timestamp'],
-                $exception->getContext()
-            );
-        }
-    }
-
-    #[Test]
-    public function verify_from_request_throws_for_missing_signature(): void
-    {
-        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
-
-        $this->expectException(InvalidSignatureException::class);
-        $this->expectExceptionMessage('missing X-Samsara-Signature');
-
-        $verifier->verifyFromRequest(self::TEST_BODY, null, self::TEST_TIMESTAMP);
-    }
-
-    #[Test]
-    public function verify_from_request_throws_for_missing_timestamp(): void
-    {
-        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
-
-        $this->expectException(InvalidSignatureException::class);
-        $this->expectExceptionMessage('missing X-Samsara-Timestamp');
-
-        $verifier->verifyFromRequest(self::TEST_BODY, 'v1=signature', null);
-    }
-
-    #[Test]
-    public function verify_from_request_validates_signature_and_timestamp(): void
-    {
-        $this->expectNotToPerformAssertions();
-
-        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
-
-        // Compute valid signature
-        $decodedSecret = base64_decode(self::TEST_SECRET);
-        $timestamp = (string) time(); // Current timestamp
-        $message = 'v1:'.$timestamp.':'.self::TEST_BODY;
-        $validSignature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
-
-        $verifier->verifyFromRequest(self::TEST_BODY, $validSignature, $timestamp);
-    }
-
-    #[Test]
-    public function verify_throws_for_invalid_signature(): void
-    {
-        $verifier = new WebhookSignatureVerifier(self::TEST_SECRET);
-
-        $this->expectException(InvalidSignatureException::class);
-
-        $verifier->verify(self::TEST_BODY, 'v1=invalidsignature', self::TEST_TIMESTAMP);
+        return ['absent' => [null], 'empty' => ['']];
     }
 }

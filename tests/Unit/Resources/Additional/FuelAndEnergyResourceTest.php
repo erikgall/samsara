@@ -26,6 +26,7 @@ class FuelAndEnergyResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -67,28 +68,6 @@ class FuelAndEnergyResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_drivers_fuel_energy_report(): void
-    {
-        $this->http->fake([
-            '*fleet/reports/drivers/fuel-energy*' => $this->http->response([
-                'data' => [
-                    ['driverId' => 'driver-1', 'totalFuel' => 100],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new FuelAndEnergyResource($this->samsara);
-
-        $result = $resource->driversFuelEnergyReport([
-            'startDate' => '2024-01-01',
-            'endDate'   => '2024-01-31',
-        ]);
-
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('data', $result);
-    }
-
-    #[Test]
     public function it_can_get_vehicle_efficiency_builder(): void
     {
         $resource = new FuelAndEnergyResource($this->samsara);
@@ -96,28 +75,6 @@ class FuelAndEnergyResourceTest extends TestCase
         $builder = $resource->vehicleEfficiency();
 
         $this->assertInstanceOf(Builder::class, $builder);
-    }
-
-    #[Test]
-    public function it_can_get_vehicles_fuel_energy_report(): void
-    {
-        $this->http->fake([
-            '*fleet/reports/vehicles/fuel-energy*' => $this->http->response([
-                'data' => [
-                    ['vehicleId' => 'vehicle-1', 'totalFuel' => 500],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new FuelAndEnergyResource($this->samsara);
-
-        $result = $resource->vehiclesFuelEnergyReport([
-            'startDate' => '2024-01-01',
-            'endDate'   => '2024-01-31',
-        ]);
-
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('data', $result);
     }
 
     #[Test]

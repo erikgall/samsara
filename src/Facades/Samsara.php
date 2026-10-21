@@ -12,14 +12,12 @@ use Illuminate\Http\Client\PendingRequest;
  *
  * Core Methods:
  *
+ * @method static SamsaraClient withBaseUrl(string $url)
+ * @method static SamsaraClient withRegion(string $region)
  * @method static SamsaraClient withToken(string $token)
  * @method static SamsaraClient withoutToken()
  * @method static bool hasToken()
  * @method static string getBaseUrl()
- * @method static SamsaraClient useBaseUrl(string $baseUrl)
- * @method static SamsaraClient useCanadaEndpoint()
- * @method static SamsaraClient useEuEndpoint()
- * @method static SamsaraClient useUsEndpoint()
  * @method static PendingRequest client()
  * @method static mixed getConfig(string $key, mixed $default = null)
  * @method static \Samsara\Data\Organization\Organization me()
@@ -91,12 +89,14 @@ class Samsara extends Facade
 {
     /**
      * Create a new SamsaraFake instance for testing.
+     *
+     * @param  array<string, array<mixed>>  $responses
      */
-    public static function fake(): SamsaraFake
+    public static function fake(array $responses = []): SamsaraFake
     {
         static::getFacadeRoot();
 
-        $fake = SamsaraFake::create();
+        $fake = SamsaraFake::create($responses);
         static::swap($fake);
 
         return $fake;

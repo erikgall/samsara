@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Attribute;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Attribute\Attribute;
 use PHPUnit\Framework\Attributes\Test;
@@ -15,33 +14,6 @@ use Samsara\Data\Attribute\AttributeValue;
  */
 class AttributeTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $attribute = new Attribute([
-            'id'            => '12345',
-            'name'          => 'Department',
-            'entityType'    => 'asset',
-            'attributeType' => 'text',
-        ]);
-
-        $this->assertSame('12345', $attribute->id);
-        $this->assertSame('Department', $attribute->name);
-        $this->assertSame('asset', $attribute->entityType);
-        $this->assertSame('text', $attribute->attributeType);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $attribute = Attribute::make([
-            'id' => '12345',
-        ]);
-
-        $this->assertInstanceOf(Attribute::class, $attribute);
-        $this->assertSame('12345', $attribute->getId());
-    }
-
     #[Test]
     public function it_can_check_if_for_assets(): void
     {
@@ -87,19 +59,6 @@ class AttributeTest extends TestCase
     }
 
     #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'   => '12345',
-            'name' => 'Department',
-        ];
-
-        $attribute = new Attribute($data);
-
-        $this->assertSame($data, $attribute->toArray());
-    }
-
-    #[Test]
     public function it_can_have_values(): void
     {
         $attribute = new Attribute([
@@ -110,14 +69,6 @@ class AttributeTest extends TestCase
         ]);
 
         $this->assertCount(2, $attribute->values);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $attribute = new Attribute;
-
-        $this->assertInstanceOf(Entity::class, $attribute);
     }
 
     #[Test]

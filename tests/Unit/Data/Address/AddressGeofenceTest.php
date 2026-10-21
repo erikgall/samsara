@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Address;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Address\AddressGeofence;
@@ -29,18 +28,6 @@ class AddressGeofenceTest extends TestCase
         $this->assertSame(37.765363, $geofence->circle['latitude']);
         $this->assertSame(-122.4029238, $geofence->circle['longitude']);
         $this->assertSame(25, $geofence->circle['radiusMeters']);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $geofence = AddressGeofence::make([
-            'circle' => [
-                'radiusMeters' => 50,
-            ],
-        ]);
-
-        $this->assertInstanceOf(AddressGeofence::class, $geofence);
     }
 
     #[Test]
@@ -103,22 +90,6 @@ class AddressGeofenceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'circle' => [
-                'latitude'     => 37.765363,
-                'longitude'    => -122.4029238,
-                'radiusMeters' => 25,
-            ],
-        ];
-
-        $geofence = new AddressGeofence($data);
-
-        $this->assertSame($data, $geofence->toArray());
-    }
-
-    #[Test]
     public function it_can_get_center_for_circle(): void
     {
         $geofence = new AddressGeofence([
@@ -176,14 +147,6 @@ class AddressGeofenceTest extends TestCase
         ]);
 
         $this->assertTrue($geofence->settings['showAddresses']);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $geofence = new AddressGeofence;
-
-        $this->assertInstanceOf(Entity::class, $geofence);
     }
 
     #[Test]

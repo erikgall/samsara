@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Industrial;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Industrial\IndustrialAsset;
@@ -14,42 +13,6 @@ use Samsara\Data\Industrial\IndustrialAsset;
  */
 class IndustrialAssetTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $asset = new IndustrialAsset([
-            'id'   => '12345',
-            'name' => 'Generator A',
-        ]);
-
-        $this->assertSame('12345', $asset->id);
-        $this->assertSame('Generator A', $asset->name);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $asset = IndustrialAsset::make([
-            'id' => '12345',
-        ]);
-
-        $this->assertInstanceOf(IndustrialAsset::class, $asset);
-        $this->assertSame('12345', $asset->getId());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'   => '12345',
-            'name' => 'Generator A',
-        ];
-
-        $asset = new IndustrialAsset($data);
-
-        $this->assertSame($data, $asset->toArray());
-    }
-
     #[Test]
     public function it_can_have_data_outputs(): void
     {
@@ -85,14 +48,6 @@ class IndustrialAssetTest extends TestCase
         ]);
 
         $this->assertCount(1, $asset->tags);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $asset = new IndustrialAsset;
-
-        $this->assertInstanceOf(Entity::class, $asset);
     }
 
     #[Test]

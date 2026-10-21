@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Trailer;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Trailer\Trailer;
 use Samsara\Data\Vehicle\Gateway;
@@ -15,47 +14,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class TrailerTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $trailer = new Trailer([
-            'id'                  => '112',
-            'name'                => 'Trailer A7',
-            'trailerSerialNumber' => 'ABC123',
-            'licensePlate'        => 'XHK1234',
-        ]);
-
-        $this->assertSame('112', $trailer->id);
-        $this->assertSame('Trailer A7', $trailer->name);
-        $this->assertSame('ABC123', $trailer->trailerSerialNumber);
-        $this->assertSame('XHK1234', $trailer->licensePlate);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $trailer = Trailer::make([
-            'id'   => '112',
-            'name' => 'Trailer A7',
-        ]);
-
-        $this->assertInstanceOf(Trailer::class, $trailer);
-        $this->assertSame('112', $trailer->getId());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'   => '112',
-            'name' => 'Trailer A7',
-        ];
-
-        $trailer = new Trailer($data);
-
-        $this->assertSame($data, $trailer->toArray());
-    }
-
     #[Test]
     public function it_can_get_display_name(): void
     {
@@ -161,14 +119,6 @@ class TrailerTest extends TestCase
         ]);
 
         $this->assertCount(1, $trailer->tags);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $trailer = new Trailer;
-
-        $this->assertInstanceOf(Entity::class, $trailer);
     }
 
     #[Test]

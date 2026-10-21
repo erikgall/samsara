@@ -9,7 +9,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Samsara\Exceptions\SamsaraException;
 use Samsara\Resources\Industrial\SensorsResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the SensorsResource class (Legacy v1).
@@ -27,6 +26,7 @@ class SensorsResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -203,23 +203,17 @@ class SensorsResourceTest extends TestCase
             ),
         ]);
 
-        $this->expectException(SamsaraException::class);
-        $this->expectExceptionMessage('Expected response data to be a JSON list');
-
-        (new SensorsResource($this->samsara))->list();
-    }
-
-    #[Test]
-    public function it_rejects_phantom_generic_operations(): void
-    {
-        $this->http->fake();
-        $resource = new SensorsResource($this->samsara);
-
         try {
-            $resource->all();
-            $this->fail('Expected the inherited all operation to be rejected.');
-        } catch (UnsupportedOperationException) {
-            $this->http->assertNothingSent();
+            (new SensorsResource($this->samsara))->list();
+            $this->fail('Expected invalid collection data to be rejected.');
+        } catch (SamsaraException $exception) {
+            $this->assertSame(SamsaraException::class, $exception::class);
+            $this->assertSame(200, $exception->getCode());
+            $this->assertSame([
+                'status'   => 200,
+                'endpoint' => '/v1/sensors/list',
+                'body'     => '{"sensors":null}',
+            ], $exception->getContext());
         }
     }
 

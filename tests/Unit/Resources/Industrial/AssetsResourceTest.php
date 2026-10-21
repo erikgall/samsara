@@ -12,7 +12,6 @@ use Samsara\Data\Asset\AssetLocation;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Industrial\AssetsResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the AssetsResource class.
@@ -30,6 +29,7 @@ class AssetsResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -82,26 +82,6 @@ class AssetsResourceTest extends TestCase
         $this->http->assertSent(fn ($request): bool => $request->method() === 'DELETE'
             && parse_url($request->url(), PHP_URL_PATH) === '/assets'
             && $this->queryFor($request->url()) === ['id' => 'asset-123']);
-    }
-
-    #[Test]
-    public function it_can_get_all_assets(): void
-    {
-        $this->http->fake([
-            '*/assets' => $this->http->response([
-                'data' => [
-                    ['id' => 'asset-1', 'name' => 'Asset 1'],
-                    ['id' => 'asset-2', 'name' => 'Asset 2'],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new AssetsResource($this->samsara);
-
-        $result = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
     }
 
     #[Test]
@@ -322,18 +302,43 @@ class AssetsResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_rejects_the_phantom_generic_find_operation(): void
+    public function it_queries_assets(): void
     {
-        $this->http->fake();
+        $this->http->fake([
+            '*/assets' => $this->http->response([
+                'data' => [
+                    ['id' => 'asset-1', 'name' => 'Asset 1'],
+                    ['id' => 'asset-2', 'name' => 'Asset 2'],
+                ],
+            ], 200),
+        ]);
 
         $resource = new AssetsResource($this->samsara);
 
-        try {
-            $resource->find('asset-123');
-            $this->fail('Expected the inherited find operation to be rejected.');
-        } catch (UnsupportedOperationException) {
-            $this->http->assertNothingSent();
-        }
+        $result = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $result);
+        $this->assertCount(2, $result);
+        $this->assertInstanceOf(Asset::class, $result->first());
+    }
+
+    #[Test]
+    public function it_query_does_not_add_a_limit_the_contract_does_not_support(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data'       => [['id' => 'asset-1']],
+                'pagination' => ['hasNextPage' => false],
+            ]),
+        ]);
+
+        $resource = new AssetsResource($this->samsara);
+
+        $result = $resource->query()->after('cursor-1')->paginate();
+
+        $this->assertInstanceOf(Asset::class, $result->items()->first());
+        $this->http->assertSent(fn ($request): bool => parse_url($request->url(), PHP_URL_PATH) === '/assets'
+            && $this->queryFor($request->url()) === ['after' => 'cursor-1']);
     }
 
     #[Test]
@@ -374,25 +379,6 @@ class AssetsResourceTest extends TestCase
                 'assetIds' => 'asset-1',
                 'after'    => 'cursor-1',
             ]);
-    }
-
-    #[Test]
-    public function its_query_does_not_add_a_limit_the_contract_does_not_support(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data'       => [['id' => 'asset-1']],
-                'pagination' => ['hasNextPage' => false],
-            ]),
-        ]);
-
-        $resource = new AssetsResource($this->samsara);
-
-        $result = $resource->query()->after('cursor-1')->paginate();
-
-        $this->assertInstanceOf(Asset::class, $result->items()->first());
-        $this->http->assertSent(fn ($request): bool => parse_url($request->url(), PHP_URL_PATH) === '/assets'
-            && $this->queryFor($request->url()) === ['after' => 'cursor-1']);
     }
 
     /**

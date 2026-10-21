@@ -2,8 +2,8 @@
 
 namespace Samsara\Tests\Unit\Data\Driver;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
+use Illuminate\Support\Carbon;
 use Samsara\Data\Driver\Driver;
 use Samsara\Data\Driver\EldSettings;
 use Samsara\Data\Driver\DriverQrCode;
@@ -20,52 +20,6 @@ use Samsara\Data\Driver\StaticAssignedVehicle;
  */
 class DriverTest extends TestCase
 {
-    #[Test]
-    public function driver_auth_tokens_can_report_expiration(): void
-    {
-        $this->assertTrue((new DriverAuthToken(['expirationTime' => 1]))->isExpired());
-        $this->assertFalse((new DriverAuthToken(['expirationTime' => PHP_INT_MAX]))->isExpired());
-        $this->assertFalse((new DriverAuthToken)->isExpired());
-        $this->assertFalse((new DriverAuthToken(['expirationTime' => null]))->isExpired());
-    }
-
-    #[Test]
-    public function driver_qr_codes_report_whether_a_link_exists(): void
-    {
-        $this->assertTrue((new DriverQrCode(['qrCodeLink' => 'https://cloud.samsara.com/qr_code/123']))->hasQrCode());
-        $this->assertFalse((new DriverQrCode(['driverId' => 123]))->hasQrCode());
-        $this->assertFalse((new DriverQrCode(['qrCodeLink' => '']))->hasQrCode());
-        $this->assertFalse((new DriverQrCode(['qrCodeLink' => null]))->hasQrCode());
-    }
-
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $driver = new Driver([
-            'id'       => '123',
-            'name'     => 'Susan Jones',
-            'username' => 'SusanJones',
-            'phone'    => '5558234327',
-        ]);
-
-        $this->assertSame('123', $driver->id);
-        $this->assertSame('Susan Jones', $driver->name);
-        $this->assertSame('SusanJones', $driver->username);
-        $this->assertSame('5558234327', $driver->phone);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $driver = Driver::make([
-            'id'   => '123',
-            'name' => 'Susan Jones',
-        ]);
-
-        $this->assertInstanceOf(Driver::class, $driver);
-        $this->assertSame('123', $driver->getId());
-    }
-
     #[Test]
     public function it_can_check_for_a_tag_by_id(): void
     {
@@ -146,20 +100,6 @@ class DriverTest extends TestCase
     }
 
     #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'       => '123',
-            'name'     => 'Susan Jones',
-            'username' => 'SusanJones',
-        ];
-
-        $driver = new Driver($data);
-
-        $this->assertSame($data, $driver->toArray());
-    }
-
-    #[Test]
     public function it_can_get_activation_status_enum(): void
     {
         $driver = new Driver([
@@ -173,20 +113,6 @@ class DriverTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_carrier_settings_as_entity(): void
-    {
-        $driver = new Driver([
-            'carrierSettings' => [
-                'carrierName' => 'Acme Inc.',
-            ],
-        ]);
-
-        $settings = $driver->getCarrierSettings();
-
-        $this->assertInstanceOf(CarrierSettings::class, $settings);
-    }
-
-    #[Test]
     public function it_can_get_display_name(): void
     {
         $driver = new Driver([
@@ -194,20 +120,6 @@ class DriverTest extends TestCase
         ]);
 
         $this->assertSame('Susan Jones', $driver->getDisplayName());
-    }
-
-    #[Test]
-    public function it_can_get_eld_settings_as_entity(): void
-    {
-        $driver = new Driver([
-            'eldSettings' => [
-                'rulesets' => [],
-            ],
-        ]);
-
-        $settings = $driver->getEldSettings();
-
-        $this->assertInstanceOf(EldSettings::class, $settings);
     }
 
     #[Test]
@@ -452,6 +364,31 @@ class DriverTest extends TestCase
     }
 
     #[Test]
+    public function it_driver_auth_tokens_can_report_expiration(): void
+    {
+        Carbon::setTestNow('2024-01-15T10:30:00.123999Z');
+
+        try {
+            $this->assertTrue((new DriverAuthToken(['expirationTime' => 1705314600122]))->isExpired());
+            $this->assertTrue((new DriverAuthToken(['expirationTime' => 1705314600123]))->isExpired());
+            $this->assertFalse((new DriverAuthToken(['expirationTime' => 1705314600124]))->isExpired());
+            $this->assertFalse((new DriverAuthToken)->isExpired());
+            $this->assertFalse((new DriverAuthToken(['expirationTime' => null]))->isExpired());
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    #[Test]
+    public function it_driver_qr_codes_report_whether_a_link_exists(): void
+    {
+        $this->assertTrue((new DriverQrCode(['qrCodeLink' => 'https://cloud.samsara.com/qr_code/123']))->hasQrCode());
+        $this->assertFalse((new DriverQrCode(['driverId' => 123]))->hasQrCode());
+        $this->assertFalse((new DriverQrCode(['qrCodeLink' => '']))->hasQrCode());
+        $this->assertFalse((new DriverQrCode(['qrCodeLink' => null]))->hasQrCode());
+    }
+
+    #[Test]
     public function it_exposes_current_profile_and_feature_fields(): void
     {
         $driver = new Driver([
@@ -471,14 +408,6 @@ class DriverTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
-    {
-        $driver = new Driver;
-
-        $this->assertInstanceOf(Entity::class, $driver);
-    }
-
-    #[Test]
     public function it_falls_back_to_username_for_display_name(): void
     {
         $driver = new Driver([
@@ -486,6 +415,39 @@ class DriverTest extends TestCase
         ]);
 
         $this->assertSame('SusanJones', $driver->getDisplayName());
+    }
+
+    #[Test]
+    public function it_preserves_nested_carrier_settings(): void
+    {
+        $driver = new Driver([
+            'carrierSettings' => [
+                'carrierName' => 'Acme Inc.',
+                'dotNumber'   => 123456,
+            ],
+        ]);
+
+        $settings = $driver->getCarrierSettings();
+
+        $this->assertInstanceOf(CarrierSettings::class, $settings);
+        $this->assertSame('Acme Inc.', $settings->getCarrierName());
+        $this->assertSame(123456, $settings->getDotNumber());
+    }
+
+    #[Test]
+    public function it_preserves_nested_eld_rulesets(): void
+    {
+        $rulesets = [['name' => 'USA Property', 'cycle' => 'USA 70 hour / 8 day']];
+        $driver = new Driver([
+            'eldSettings' => [
+                'rulesets' => $rulesets,
+            ],
+        ]);
+
+        $settings = $driver->getEldSettings();
+
+        $this->assertInstanceOf(EldSettings::class, $settings);
+        $this->assertSame($rulesets, $settings->getRulesets());
     }
 
     #[Test]
@@ -534,6 +496,20 @@ class DriverTest extends TestCase
         $driver = new Driver;
 
         $this->assertNull($driver->getEldSettings());
+    }
+
+    #[Test]
+    public function it_returns_null_for_an_unknown_activation_status(): void
+    {
+        foreach (['unknown', '', null] as $status) {
+            $attributes = ['driverActivationStatus' => $status];
+            $driver = Driver::make($attributes);
+
+            $this->assertNull($driver->getActivationStatus());
+            $this->assertFalse($driver->isActive());
+            $this->assertFalse($driver->isDeactivated());
+            $this->assertSame($attributes, $driver->toArray());
+        }
     }
 
     #[Test]

@@ -12,6 +12,8 @@ use Samsara\Resources\Resource;
  * Provides access to hub endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class HubsResource extends Resource
 {
@@ -29,17 +31,11 @@ class HubsResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Entity>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all'];
+        return $this->newQuery();
     }
 }

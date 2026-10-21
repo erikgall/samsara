@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Data\Entity;
 use Samsara\Resources\Resource;
 
 /**
@@ -10,6 +11,8 @@ use Samsara\Resources\Resource;
  * Provides access to organization settings endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class SettingsResource extends Resource
 {
@@ -98,13 +101,5 @@ class SettingsResource extends Resource
         );
 
         return $this->decodeJsonData($response, $endpoint);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

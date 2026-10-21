@@ -33,68 +33,9 @@ class EquipmentResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new EquipmentResource($this->samsara);
-
-        $this->assertInstanceOf(EquipmentResource::class, $resource);
-    }
-
-    #[Test]
-    public function it_can_create_equipment(): void
-    {
-        $resource = new EquipmentResource($this->samsara);
-
-        try {
-            $resource->create(['name' => 'New Equipment']);
-            $this->fail('Equipment create must fail before sending HTTP.');
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame('create', $exception->getContext()['operation'] ?? null);
-        }
-
-        $this->http->assertNothingSent();
-    }
-
-    #[Test]
-    public function it_can_delete_equipment(): void
-    {
-        $resource = new EquipmentResource($this->samsara);
-
-        try {
-            $resource->delete('123');
-            $this->fail('Equipment delete must fail before sending HTTP.');
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame('delete', $exception->getContext()['operation'] ?? null);
-        }
-
-        $this->http->assertNothingSent();
-    }
-
-    #[Test]
-    public function it_can_find_equipment_by_external_id(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response(['data' => []]),
-        ]);
-
-        $resource = new EquipmentResource($this->samsara);
-
-        try {
-            $resource->findByExternalId('asset_code', 'EQ-123');
-            $this->fail('Equipment external-ID lookup must fail before sending HTTP.');
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame(
-                'Equipment cannot be looked up by external ID in the current API contract. Use find() with a Samsara equipment ID.',
-                $exception->getMessage()
-            );
-        }
-
-        $this->http->assertNothingSent();
     }
 
     #[Test]
@@ -112,27 +53,6 @@ class EquipmentResourceTest extends TestCase
         $this->assertInstanceOf(Equipment::class, $equipment);
         $this->assertSame('123', $equipment->id);
         $this->assertSame('Equipment 001', $equipment->name);
-    }
-
-    #[Test]
-    public function it_can_get_all_equipment(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    ['id' => '1', 'name' => 'Equipment 001'],
-                    ['id' => '2', 'name' => 'Equipment 002'],
-                ],
-            ]),
-        ]);
-
-        $resource = new EquipmentResource($this->samsara);
-        $equipment = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $equipment);
-        $this->assertCount(2, $equipment);
-        $this->assertInstanceOf(Equipment::class, $equipment->first());
-        $this->assertSame('Equipment 001', $equipment->first()->name);
     }
 
     #[Test]
@@ -187,21 +107,6 @@ class EquipmentResourceTest extends TestCase
         $query = $resource->stats();
 
         $this->assertInstanceOf(Builder::class, $query);
-    }
-
-    #[Test]
-    public function it_can_update_equipment(): void
-    {
-        $resource = new EquipmentResource($this->samsara);
-
-        try {
-            $resource->update('123', ['name' => 'Updated Equipment']);
-            $this->fail('Equipment update must fail before sending HTTP.');
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame('update', $exception->getContext()['operation'] ?? null);
-        }
-
-        $this->http->assertNothingSent();
     }
 
     #[Test]
@@ -435,6 +340,46 @@ class EquipmentResourceTest extends TestCase
             && parse_url($request->url(), PHP_URL_PATH) === '/fleet/equipment/locations'
             && $request->data() === ['equipmentIds' => 'equipment-1', 'after' => 'equipment-next']
         );
+    }
+
+    #[Test]
+    public function it_queries_equipment(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [
+                    ['id' => '1', 'name' => 'Equipment 001'],
+                    ['id' => '2', 'name' => 'Equipment 002'],
+                ],
+            ]),
+        ]);
+
+        $resource = new EquipmentResource($this->samsara);
+        $equipment = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $equipment);
+        $this->assertCount(2, $equipment);
+        $this->assertInstanceOf(Equipment::class, $equipment->first());
+        $this->assertSame('Equipment 001', $equipment->first()->name);
+    }
+
+    #[Test]
+    public function it_rejects_external_id_lookup_without_sending_http(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response(['data' => []]),
+        ]);
+
+        $resource = new EquipmentResource($this->samsara);
+
+        try {
+            $resource->findByExternalId('asset_code', 'EQ-123');
+            $this->fail('Equipment external-ID lookup must fail before sending HTTP.');
+        } catch (UnsupportedOperationException $exception) {
+            $this->assertSame(['key' => 'asset_code', 'value' => 'EQ-123'], $exception->getContext());
+        }
+
+        $this->http->assertNothingSent();
     }
 
     #[Test]

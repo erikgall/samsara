@@ -4,6 +4,7 @@ namespace Samsara\Tests\Unit\Exceptions;
 
 use Exception;
 use Samsara\Tests\TestCase;
+use Illuminate\Http\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Exceptions\SamsaraException;
 use Samsara\Exceptions\InvalidSignatureException;
@@ -16,14 +17,6 @@ use Samsara\Exceptions\InvalidSignatureException;
 class InvalidSignatureExceptionTest extends TestCase
 {
     #[Test]
-    public function it_can_be_created_with_message(): void
-    {
-        $exception = new InvalidSignatureException('Webhook signature verification failed');
-
-        $this->assertSame('Webhook signature verification failed', $exception->getMessage());
-    }
-
-    #[Test]
     public function it_can_be_created_with_previous_exception(): void
     {
         $previous = new Exception('HMAC calculation failed');
@@ -33,12 +26,11 @@ class InvalidSignatureExceptionTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_created_with_static_make_method(): void
+    public function it_can_be_created_with_status(): void
     {
-        $exception = InvalidSignatureException::make('Invalid signature', 401);
+        $exception = new InvalidSignatureException('Invalid signature', 401);
 
         $this->assertInstanceOf(InvalidSignatureException::class, $exception);
-        $this->assertSame('Invalid signature', $exception->getMessage());
         $this->assertSame(401, $exception->getCode());
     }
 
@@ -46,7 +38,6 @@ class InvalidSignatureExceptionTest extends TestCase
     public function it_can_store_context_with_signature_details(): void
     {
         $context = [
-            'expected'  => 'v1=abc123',
             'received'  => 'v1=xyz789',
             'timestamp' => '1640000000',
         ];
@@ -71,11 +62,20 @@ class InvalidSignatureExceptionTest extends TestCase
         $exception = InvalidSignatureException::expiredTimestamp(300, 600);
 
         $this->assertInstanceOf(InvalidSignatureException::class, $exception);
-        $this->assertStringContainsString('expired', strtolower($exception->getMessage()));
         $this->assertSame([
             'tolerance' => 300,
             'age'       => 600,
         ], $exception->getContext());
+        $this->assertSame(401, $exception->getCode());
+    }
+
+    #[Test]
+    public function it_has_future_timestamp_factory_method(): void
+    {
+        $exception = InvalidSignatureException::futureTimestamp(1);
+
+        $this->assertSame(401, $exception->getCode());
+        $this->assertSame(['seconds_in_future' => 1], $exception->getContext());
     }
 
     #[Test]
@@ -84,10 +84,10 @@ class InvalidSignatureExceptionTest extends TestCase
         $exception = InvalidSignatureException::invalidSignature('v1=expected', 'v1=received');
 
         $this->assertInstanceOf(InvalidSignatureException::class, $exception);
-        $this->assertStringContainsString('signature', strtolower($exception->getMessage()));
         $this->assertSame([
             'received' => 'v1=received',
         ], $exception->getContext());
+        $this->assertSame(401, $exception->getCode());
     }
 
     #[Test]
@@ -96,7 +96,6 @@ class InvalidSignatureExceptionTest extends TestCase
         $exception = InvalidSignatureException::invalidTimestamp('not-a-timestamp');
 
         $this->assertSame(401, $exception->getCode());
-        $this->assertStringContainsString('invalid X-Samsara-Timestamp', $exception->getMessage());
         $this->assertSame(
             ['timestamp' => 'not-a-timestamp'],
             $exception->getContext()
@@ -109,7 +108,8 @@ class InvalidSignatureExceptionTest extends TestCase
         $exception = InvalidSignatureException::missingSignature();
 
         $this->assertInstanceOf(InvalidSignatureException::class, $exception);
-        $this->assertStringContainsString('missing', strtolower($exception->getMessage()));
+        $this->assertSame(401, $exception->getCode());
+        $this->assertSame(['header' => 'X-Samsara-Signature'], $exception->getContext());
     }
 
     #[Test]
@@ -118,7 +118,8 @@ class InvalidSignatureExceptionTest extends TestCase
         $exception = InvalidSignatureException::missingTimestamp();
 
         $this->assertInstanceOf(InvalidSignatureException::class, $exception);
-        $this->assertStringContainsString('timestamp', strtolower($exception->getMessage()));
+        $this->assertSame(401, $exception->getCode());
+        $this->assertSame(['header' => 'X-Samsara-Timestamp'], $exception->getContext());
     }
 
     #[Test]
@@ -127,7 +128,28 @@ class InvalidSignatureExceptionTest extends TestCase
         $exception = InvalidSignatureException::missingWebhookSecret();
 
         $this->assertInstanceOf(InvalidSignatureException::class, $exception);
-        $this->assertStringContainsString('webhook secret not configured', strtolower($exception->getMessage()));
         $this->assertSame(500, $exception->getCode());
+    }
+
+    #[Test]
+    public function it_renders_missing_configuration_as_server_error(): void
+    {
+        $response = InvalidSignatureException::missingWebhookSecret()
+            ->render(Request::create('/webhook', 'POST'));
+
+        $this->assertSame(500, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function it_renders_verification_failures_as_unauthorized(): void
+    {
+        $exception = InvalidSignatureException::invalidSignature('v1=expected', 'v1=received');
+        $response = $exception->render(Request::create('/webhook', 'POST'));
+        $content = $response->getContent();
+
+        $this->assertSame(401, $response->getStatusCode());
+        $this->assertIsString($content);
+        $this->assertStringNotContainsString('v1=expected', $content);
+        $this->assertStringNotContainsString('v1=received', $content);
     }
 }

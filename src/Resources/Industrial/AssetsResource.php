@@ -7,6 +7,7 @@ use Samsara\Query\Builder;
 use Samsara\Data\Asset\Asset;
 use Samsara\Resources\Resource;
 use Samsara\Data\Asset\AssetLocation;
+use Samsara\Resources\Concerns\CreatesEntities;
 
 /**
  * Assets resource for the Samsara API.
@@ -14,9 +15,14 @@ use Samsara\Data\Asset\AssetLocation;
  * Provides access to asset management endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Asset>
  */
 class AssetsResource extends Resource
 {
+    /** @use CreatesEntities<Asset> */
+    use CreatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -45,10 +51,12 @@ class AssetsResource extends Resource
 
     /**
      * Get a query builder for asset depreciation.
+     *
+     * @return Builder<Entity>
      */
     public function depreciation(): Builder
     {
-        return $this->createBuilderWithEndpoint('/assets/depreciation')
+        return $this->newQuery('/assets/depreciation')
             ->withoutDefaultPageSize()
             ->repeatQueryParameters('assetIds')
             ->usingEntity(Entity::class);
@@ -56,20 +64,24 @@ class AssetsResource extends Resource
 
     /**
      * Get a query builder for asset inputs stream.
+     *
+     * @return Builder<Entity>
      */
     public function inputsStream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/assets/inputs/stream')
+        return $this->newQuery('/assets/inputs/stream')
             ->withoutDefaultPageSize()
             ->usingEntity(Entity::class);
     }
 
     /**
      * Get a query builder for asset location and speed stream.
+     *
+     * @return Builder<AssetLocation>
      */
     public function locationAndSpeedStream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/assets/location-and-speed/stream')
+        return $this->newQuery('/assets/location-and-speed/stream')
             ->usingEntity(AssetLocation::class);
     }
 
@@ -92,10 +104,12 @@ class AssetsResource extends Resource
 
     /**
      * Get a query builder for legacy asset locations.
+     *
+     * @return Builder<Entity>
      */
     public function locationsQuery(): Builder
     {
-        return $this->createBuilderWithEndpoint('/v1/fleet/assets/locations')
+        return $this->newQuery('/v1/fleet/assets/locations')
             ->withResponseCollectionKey('assets')
             ->withCursorParameter('startingAfter')
             ->usingEntity(Entity::class);
@@ -103,10 +117,12 @@ class AssetsResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Asset>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
+        return $this->newQuery()
             ->withoutDefaultPageSize()
             ->repeatQueryParameters('attributes');
     }
@@ -130,10 +146,12 @@ class AssetsResource extends Resource
 
     /**
      * Get a query builder for legacy reefer stats.
+     *
+     * @return Builder<Entity>
      */
     public function reefersQuery(): Builder
     {
-        return $this->createBuilderWithEndpoint('/v1/fleet/assets/reefers')
+        return $this->newQuery('/v1/fleet/assets/reefers')
             ->withResponseCollectionKey('data')
             ->withCursorParameter('startingAfter')
             ->usingEntity(Entity::class);
@@ -152,15 +170,6 @@ class AssetsResource extends Resource
             $endpoint
         );
 
-        /** @var Asset */
         return $this->mapToEntity($this->decodeJsonData($response, $endpoint));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'create'];
     }
 }

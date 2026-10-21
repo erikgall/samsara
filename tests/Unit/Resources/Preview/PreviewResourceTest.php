@@ -7,7 +7,6 @@ use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Preview\PreviewResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the PreviewResource class.
@@ -25,6 +24,7 @@ class PreviewResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -88,19 +88,5 @@ class PreviewResourceTest extends TestCase
         $this->http->assertSent(fn ($request): bool => $request->method() === 'DELETE'
             && parse_url($request->url(), PHP_URL_PATH) === '/preview/fleet/vehicles/vehicle-123/lock'
             && $request->data() === []);
-    }
-
-    #[Test]
-    public function it_rejects_phantom_generic_operations_on_the_preview_root(): void
-    {
-        $this->http->fake();
-        $resource = new PreviewResource($this->samsara);
-
-        try {
-            $resource->all();
-            $this->fail('Expected the inherited all operation to be rejected.');
-        } catch (UnsupportedOperationException) {
-            $this->http->assertNothingSent();
-        }
     }
 }

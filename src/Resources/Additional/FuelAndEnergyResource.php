@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 
@@ -11,6 +12,8 @@ use Samsara\Resources\Resource;
  * Provides access to fuel and energy efficiency endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class FuelAndEnergyResource extends Resource
 {
@@ -38,10 +41,12 @@ class FuelAndEnergyResource extends Resource
 
     /**
      * Get a query builder for driver efficiency.
+     *
+     * @return Builder<Entity>
      */
     public function driverEfficiency(): Builder
     {
-        return $this->createBuilderWithEndpoint('/driver-efficiency/drivers')
+        return $this->newQuery('/driver-efficiency/drivers')
             ->withoutDefaultPageSize();
     }
 
@@ -65,20 +70,24 @@ class FuelAndEnergyResource extends Resource
 
     /**
      * Get a query builder for drivers fuel and energy reports.
+     *
+     * @return Builder<Entity>
      */
     public function driversFuelEnergyReportQuery(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/reports/drivers/fuel-energy')
+        return $this->newQuery('/fleet/reports/drivers/fuel-energy')
             ->withoutDefaultPageSize()
             ->withResponseCollectionKey('data.driverReports');
     }
 
     /**
      * Get a query builder for vehicle efficiency.
+     *
+     * @return Builder<Entity>
      */
     public function vehicleEfficiency(): Builder
     {
-        return $this->createBuilderWithEndpoint('/driver-efficiency/vehicles')
+        return $this->newQuery('/driver-efficiency/vehicles')
             ->withoutDefaultPageSize();
     }
 
@@ -98,19 +107,13 @@ class FuelAndEnergyResource extends Resource
 
     /**
      * Get a query builder for vehicles fuel and energy reports.
+     *
+     * @return Builder<Entity>
      */
     public function vehiclesFuelEnergyReportQuery(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/reports/vehicles/fuel-energy')
+        return $this->newQuery('/fleet/reports/vehicles/fuel-energy')
             ->withoutDefaultPageSize()
             ->withResponseCollectionKey('data.vehicleReports');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

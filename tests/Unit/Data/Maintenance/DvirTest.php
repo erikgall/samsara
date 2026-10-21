@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Maintenance;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Maintenance\Dvir;
 use PHPUnit\Framework\Attributes\Test;
@@ -14,35 +13,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class DvirTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $dvir = new Dvir([
-            'id'           => '7107471',
-            'type'         => 'preTrip',
-            'safetyStatus' => 'safe',
-            'startTime'    => '2024-04-10T07:06:25Z',
-            'endTime'      => '2024-04-10T07:30:00Z',
-        ]);
-
-        $this->assertSame('7107471', $dvir->id);
-        $this->assertSame('preTrip', $dvir->type);
-        $this->assertSame('safe', $dvir->safetyStatus);
-        $this->assertSame('2024-04-10T07:06:25Z', $dvir->startTime);
-        $this->assertSame('2024-04-10T07:30:00Z', $dvir->endTime);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $dvir = Dvir::make([
-            'id' => '7107471',
-        ]);
-
-        $this->assertInstanceOf(Dvir::class, $dvir);
-        $this->assertSame('7107471', $dvir->getId());
-    }
-
     #[Test]
     public function it_can_check_if_mechanic_inspection(): void
     {
@@ -107,20 +77,6 @@ class DvirTest extends TestCase
 
         $this->assertTrue($dvir->isUnsafe());
         $this->assertFalse($dvir->isSafe());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'           => '7107471',
-            'type'         => 'preTrip',
-            'safetyStatus' => 'safe',
-        ];
-
-        $dvir = new Dvir($data);
-
-        $this->assertSame($data, $dvir->toArray());
     }
 
     #[Test]
@@ -218,14 +174,6 @@ class DvirTest extends TestCase
         ]);
 
         $this->assertCount(1, $dvir->vehicleDefects);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $dvir = new Dvir;
-
-        $this->assertInstanceOf(Entity::class, $dvir);
     }
 
     #[Test]

@@ -23,14 +23,7 @@ use Samsara\Exceptions\InvalidSignatureException;
  *     Route::post('/webhook', WebhookController::class)
  *         ->middleware('samsara.webhook:rGoy+beNph0qGBLj6Aqoydj6SGA=,600');
  *
- * Or instantiate directly:
- *
- *     Route::post('/webhook', WebhookController::class)
- *         ->middleware(new VerifyWebhookSignature('rGoy+beNph0qGBLj6Aqoydj6SGA=', 600));
- *
  * @author Erik Galloway <erik@erikgall.com>
- *
- * @phpstan-consistent-constructor
  */
 class VerifyWebhookSignature
 {
@@ -70,7 +63,9 @@ class VerifyWebhookSignature
         int|string|null $tolerance = null
     ): Response {
         // Priority: route params > constructor > config
-        $webhookSecret = $secret ?? $this->secret ?? config('samsara.webhook_secret');
+        $webhookSecret = ($secret === '' ? null : $secret)
+            ?? ($this->secret === '' ? null : $this->secret)
+            ?? config('samsara.webhook_secret');
         $timestampTolerance = $tolerance !== null ? (int) $tolerance : $this->tolerance;
 
         if ($webhookSecret === null || $webhookSecret === '') {
@@ -87,16 +82,5 @@ class VerifyWebhookSignature
         );
 
         return $next($request);
-    }
-
-    /**
-     * Create a new middleware instance.
-     *
-     * @param  string|null  $secret  The Base64-encoded secret key (defaults to config)
-     * @param  int  $tolerance  Maximum age of the request in seconds (default: 300)
-     */
-    public static function make(?string $secret = null, int $tolerance = 300): static
-    {
-        return new static($secret, $tolerance);
     }
 }

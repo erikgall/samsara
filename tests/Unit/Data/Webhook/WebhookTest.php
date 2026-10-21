@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Webhook;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Webhook\Webhook;
 use PHPUnit\Framework\Attributes\Test;
@@ -15,37 +14,6 @@ use PHPUnit\Framework\Attributes\Test;
 class WebhookTest extends TestCase
 {
     #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $webhook = new Webhook([
-            'id'         => '12345',
-            'name'       => 'Fleet Alerts Webhook',
-            'url'        => 'https://example.com/webhooks/samsara',
-            'secretKey'  => 'webhook-secret-key',
-            'version'    => '2021-06-09',
-            'eventTypes' => ['VehicleCreated', 'VehicleUpdated'],
-        ]);
-
-        $this->assertSame('12345', $webhook->id);
-        $this->assertSame('Fleet Alerts Webhook', $webhook->name);
-        $this->assertSame('https://example.com/webhooks/samsara', $webhook->url);
-        $this->assertSame('webhook-secret-key', $webhook->secretKey);
-        $this->assertSame('2021-06-09', $webhook->version);
-        $this->assertCount(2, $webhook->eventTypes);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $webhook = Webhook::make([
-            'id' => '12345',
-        ]);
-
-        $this->assertInstanceOf(Webhook::class, $webhook);
-        $this->assertSame('12345', $webhook->getId());
-    }
-
-    #[Test]
     public function it_can_check_if_has_event_type(): void
     {
         $webhook = new Webhook([
@@ -54,20 +22,6 @@ class WebhookTest extends TestCase
 
         $this->assertTrue($webhook->hasEventType('VehicleCreated'));
         $this->assertFalse($webhook->hasEventType('vehicleCreated'));
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'   => '12345',
-            'name' => 'Fleet Alerts Webhook',
-            'url'  => 'https://example.com/webhooks/samsara',
-        ];
-
-        $webhook = new Webhook($data);
-
-        $this->assertSame($data, $webhook->toArray());
     }
 
     #[Test]
@@ -90,14 +44,6 @@ class WebhookTest extends TestCase
 
         $this->assertFalse(method_exists($webhook, 'isActive'));
         $this->assertFalse(method_exists($webhook, 'isPaused'));
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $webhook = new Webhook;
-
-        $this->assertInstanceOf(Entity::class, $webhook);
     }
 
     #[Test]

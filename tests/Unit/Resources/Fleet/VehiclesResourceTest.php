@@ -3,7 +3,6 @@
 namespace Samsara\Tests\Unit\Resources\Fleet;
 
 use Samsara\Samsara;
-use ReflectionMethod;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Vehicle\Vehicle;
 use Samsara\Data\EntityCollection;
@@ -11,7 +10,6 @@ use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Fleet\VehiclesResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the VehiclesResource.
@@ -29,16 +27,9 @@ class VehiclesResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new VehiclesResource($this->samsara);
-
-        $this->assertInstanceOf(VehiclesResource::class, $resource);
     }
 
     #[Test]
@@ -88,27 +79,6 @@ class VehiclesResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_all_vehicles(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [
-                    ['id' => '1', 'name' => 'Truck 001', 'vin' => 'VIN123'],
-                    ['id' => '2', 'name' => 'Truck 002', 'vin' => 'VIN456'],
-                ],
-            ]),
-        ]);
-
-        $resource = new VehiclesResource($this->samsara);
-        $vehicles = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $vehicles);
-        $this->assertCount(2, $vehicles);
-        $this->assertInstanceOf(Vehicle::class, $vehicles->first());
-        $this->assertSame('Truck 001', $vehicles->first()->name);
-    }
-
-    #[Test]
     public function it_can_update_vehicle(): void
     {
         $this->http->fake([
@@ -155,6 +125,27 @@ class VehiclesResourceTest extends TestCase
         $resource = new VehiclesResource($this->samsara);
 
         $this->assertSame(Vehicle::class, $resource->getEntityClass());
+    }
+
+    #[Test]
+    public function it_queries_vehicles(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [
+                    ['id' => '1', 'name' => 'Truck 001', 'vin' => 'VIN123'],
+                    ['id' => '2', 'name' => 'Truck 002', 'vin' => 'VIN456'],
+                ],
+            ]),
+        ]);
+
+        $resource = new VehiclesResource($this->samsara);
+        $vehicles = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $vehicles);
+        $this->assertCount(2, $vehicles);
+        $this->assertInstanceOf(Vehicle::class, $vehicles->first());
+        $this->assertSame('Truck 001', $vehicles->first()->name);
     }
 
     #[Test]
@@ -210,42 +201,6 @@ class VehiclesResourceTest extends TestCase
         $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
             && $request->url()
             === 'https://api.samsara.com/fleet/vehicles?attributes=make&attributes=model&parentTagIds=parent-1%2Cparent-2&tagIds=tag-1%2Ctag-2&attributeValueIds=attribute-1%2Cattribute-2&updatedAfterTime=2026-08-10T14%3A00%3A00Z&createdAfterTime=2026-08-09T14%3A00%3A00Z&limit=50&after=vehicle-cursor'
-        );
-    }
-
-    #[Test]
-    public function it_throws_exception_when_creating_vehicle(): void
-    {
-        $this->expectException(UnsupportedOperationException::class);
-        $this->expectExceptionMessage('Generic operation [create] is not supported');
-
-        $resource = new VehiclesResource($this->samsara);
-        $resource->create([
-            'name' => 'New Vehicle',
-            'vin'  => 'VIN789',
-        ]);
-    }
-
-    #[Test]
-    public function it_throws_exception_when_deleting_vehicle(): void
-    {
-        $this->expectException(UnsupportedOperationException::class);
-        $this->expectExceptionMessage('Generic operation [delete] is not supported');
-
-        $resource = new VehiclesResource($this->samsara);
-        $resource->delete('123');
-    }
-
-    #[Test]
-    public function it_uses_the_shared_generic_operation_gate(): void
-    {
-        $this->assertSame(
-            \Samsara\Resources\Resource::class,
-            (new ReflectionMethod(VehiclesResource::class, 'create'))->getDeclaringClass()->getName()
-        );
-        $this->assertSame(
-            \Samsara\Resources\Resource::class,
-            (new ReflectionMethod(VehiclesResource::class, 'delete'))->getDeclaringClass()->getName()
         );
     }
 }

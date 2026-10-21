@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Organization;
 
+use Samsara\Data\Entity;
 use Samsara\Resources\Resource;
 use Samsara\Data\Organization\Organization;
 
@@ -9,6 +10,8 @@ use Samsara\Data\Organization\Organization;
  * Current organization resource for the Samsara API.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class OrganizationResource extends Resource
 {
@@ -25,13 +28,5 @@ class OrganizationResource extends Resource
         $response = $this->executeSdkGet($this->endpoint);
 
         return Organization::make($this->decodeJsonData($response, $this->endpoint, false));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

@@ -15,7 +15,6 @@ use Samsara\Data\Industrial\VisionCamera;
 use Samsara\Data\Industrial\IndustrialAsset;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Samsara\Resources\Industrial\IndustrialResource;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the IndustrialResource class.
@@ -33,6 +32,7 @@ class IndustrialResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -226,20 +226,6 @@ class IndustrialResourceTest extends TestCase
         $this->assertInstanceOf(VisionCamera::class, $cameras->first());
         $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
             && parse_url($request->url(), PHP_URL_PATH) === '/v1/industrial/vision/cameras');
-    }
-
-    #[Test]
-    public function it_rejects_the_phantom_generic_find_operation(): void
-    {
-        $this->http->fake();
-        $resource = new IndustrialResource($this->samsara);
-
-        try {
-            $resource->find('asset-123');
-            $this->fail('Expected the inherited find operation to be rejected.');
-        } catch (UnsupportedOperationException) {
-            $this->http->assertNothingSent();
-        }
     }
 
     #[Test]

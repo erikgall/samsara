@@ -10,6 +10,9 @@ use Samsara\Data\Industrial\DataInput;
 use Samsara\Exceptions\SamsaraException;
 use Samsara\Data\Industrial\VisionCamera;
 use Samsara\Data\Industrial\IndustrialAsset;
+use Samsara\Resources\Concerns\CreatesEntities;
+use Samsara\Resources\Concerns\DeletesEntities;
+use Samsara\Resources\Concerns\UpdatesEntities;
 
 /**
  * Industrial resource for the Samsara API.
@@ -17,9 +20,20 @@ use Samsara\Data\Industrial\IndustrialAsset;
  * Provides access to industrial assets and data inputs endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<IndustrialAsset>
  */
 class IndustrialResource extends Resource
 {
+    /** @use CreatesEntities<IndustrialAsset> */
+    use CreatesEntities;
+
+    /** @use DeletesEntities<IndustrialAsset> */
+    use DeletesEntities;
+
+    /** @use UpdatesEntities<IndustrialAsset> */
+    use UpdatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -34,6 +48,8 @@ class IndustrialResource extends Resource
 
     /**
      * Get a query builder for industrial assets.
+     *
+     * @return Builder<IndustrialAsset>
      */
     public function assets(): Builder
     {
@@ -47,45 +63,52 @@ class IndustrialResource extends Resource
      */
     public function createAsset(array $data): IndustrialAsset
     {
-        /** @var IndustrialAsset */
         return $this->create($data);
     }
 
     /**
      * Get a query builder for data inputs.
+     *
+     * @return Builder<DataInput>
      */
     public function dataInputs(): Builder
     {
-        return $this->createBuilderWithEndpoint('/industrial/data-inputs')
+        return $this->newQuery('/industrial/data-inputs')
             ->usingEntity(DataInput::class);
     }
 
     /**
      * Get a query builder for data points.
+     *
+     * @return Builder<DataInput>
      */
     public function dataPoints(): Builder
     {
-        return $this->createBuilderWithEndpoint('/industrial/data-inputs/data-points')
+        return $this->newQuery('/industrial/data-inputs/data-points')
             ->withoutDefaultPageSize()
             ->usingEntity(DataInput::class);
     }
 
     /**
      * Get a query builder for data points feed.
+     *
+     * @return Builder<DataInput>
      */
     public function dataPointsFeed(): Builder
     {
-        return $this->createBuilderWithEndpoint('/industrial/data-inputs/data-points/feed')
+        return $this->newQuery('/industrial/data-inputs/data-points/feed')
             ->withoutDefaultPageSize()
             ->usingEntity(DataInput::class);
     }
 
     /**
      * Get a query builder for data points history.
+     *
+     * @return Builder<DataInput>
      */
     public function dataPointsHistory(): Builder
     {
-        return $this->createBuilderWithEndpoint('/industrial/data-inputs/data-points/history')
+        return $this->newQuery('/industrial/data-inputs/data-points/history')
             ->withoutDefaultPageSize()
             ->usingEntity(DataInput::class);
     }
@@ -117,11 +140,12 @@ class IndustrialResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<IndustrialAsset>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
-            ->usingEntity(IndustrialAsset::class);
+        return $this->newQuery();
     }
 
     /**
@@ -131,7 +155,6 @@ class IndustrialResource extends Resource
      */
     public function updateAsset(string $id, array $data): IndustrialAsset
     {
-        /** @var IndustrialAsset */
         return $this->update($id, $data);
     }
 
@@ -156,13 +179,5 @@ class IndustrialResource extends Resource
         }
 
         return new EntityCollection(array_map(VisionCamera::make(...), $cameras));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'create', 'delete', 'update'];
     }
 }

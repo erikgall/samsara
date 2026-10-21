@@ -12,6 +12,8 @@ use Samsara\Data\EntityCollection;
  * Provides access to legacy sensor endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class SensorsResource extends Resource
 {
@@ -121,13 +123,5 @@ class SensorsResource extends Resource
         );
 
         return $this->decodeJsonArray($response, $endpoint);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

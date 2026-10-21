@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Trip;
 
-use Samsara\Data\Entity;
 use Samsara\Data\Trip\Trip;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
@@ -15,53 +14,6 @@ use PHPUnit\Framework\Attributes\Test;
 class TripTest extends TestCase
 {
     #[Test]
-    public function completion_status_checks_require_an_exact_known_value(): void
-    {
-        $attributes = [
-            [],
-            ['completionStatus' => null],
-            ['completionStatus' => ''],
-            ['completionStatus' => 'unknown'],
-            ['completionStatus' => 'in progress'],
-        ];
-
-        foreach ($attributes as $values) {
-            $trip = new Trip($values);
-
-            $this->assertFalse($trip->isCompleted());
-            $this->assertFalse($trip->isInProgress());
-        }
-    }
-
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $trip = new Trip([
-            'tripStartTime'    => '2024-04-10T07:06:25Z',
-            'tripEndTime'      => '2024-04-10T09:30:00Z',
-            'createdAtTime'    => '2024-04-10T07:07:00Z',
-            'updatedAtTime'    => '2024-04-10T09:31:00Z',
-            'completionStatus' => 'completed',
-        ]);
-
-        $this->assertSame('2024-04-10T07:06:25Z', $trip->tripStartTime);
-        $this->assertSame('2024-04-10T09:30:00Z', $trip->tripEndTime);
-        $this->assertSame('2024-04-10T07:07:00Z', $trip->createdAtTime);
-        $this->assertSame('2024-04-10T09:31:00Z', $trip->updatedAtTime);
-        $this->assertSame('completed', $trip->completionStatus);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $trip = Trip::make([
-            'tripStartTime' => '2024-04-10T07:06:25Z',
-        ]);
-
-        $this->assertInstanceOf(Trip::class, $trip);
-    }
-
-    #[Test]
     public function it_can_check_each_documented_completion_status(): void
     {
         $completed = new Trip(['completionStatus' => 'completed']);
@@ -71,19 +23,6 @@ class TripTest extends TestCase
         $this->assertFalse($completed->isInProgress());
         $this->assertFalse($inProgress->isCompleted());
         $this->assertTrue($inProgress->isInProgress());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'tripStartTime' => '2024-04-10T07:06:25Z',
-            'tripEndTime'   => '2024-04-10T09:30:00Z',
-        ];
-
-        $trip = new Trip($data);
-
-        $this->assertSame($data, $trip->toArray());
     }
 
     #[Test]
@@ -126,6 +65,25 @@ class TripTest extends TestCase
     }
 
     #[Test]
+    public function it_completion_status_checks_require_an_exact_known_value(): void
+    {
+        $attributes = [
+            [],
+            ['completionStatus' => null],
+            ['completionStatus' => ''],
+            ['completionStatus' => 'unknown'],
+            ['completionStatus' => 'in progress'],
+        ];
+
+        foreach ($attributes as $values) {
+            $trip = new Trip($values);
+
+            $this->assertFalse($trip->isCompleted());
+            $this->assertFalse($trip->isInProgress());
+        }
+    }
+
+    #[Test]
     public function it_does_not_expose_helpers_for_fields_absent_from_the_current_contract(): void
     {
         $trip = new Trip;
@@ -134,13 +92,5 @@ class TripTest extends TestCase
         $this->assertFalse(method_exists($trip, 'getDistanceKilometers'));
         $this->assertFalse(method_exists($trip, 'getDrivingTimeHours'));
         $this->assertFalse(method_exists($trip, 'getDrivingTimeMinutes'));
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $trip = new Trip;
-
-        $this->assertInstanceOf(Entity::class, $trip);
     }
 }

@@ -5,6 +5,10 @@ namespace Samsara\Resources\Dispatch;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Address\Address;
+use Samsara\Resources\Concerns\FindsEntities;
+use Samsara\Resources\Concerns\CreatesEntities;
+use Samsara\Resources\Concerns\DeletesEntities;
+use Samsara\Resources\Concerns\UpdatesEntities;
 
 /**
  * Addresses resource for the Samsara API.
@@ -12,9 +16,23 @@ use Samsara\Data\Address\Address;
  * Provides access to address/geofence management endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Address>
  */
 class AddressesResource extends Resource
 {
+    /** @use CreatesEntities<Address> */
+    use CreatesEntities;
+
+    /** @use DeletesEntities<Address> */
+    use DeletesEntities;
+
+    /** @use FindsEntities<Address> */
+    use FindsEntities;
+
+    /** @use UpdatesEntities<Address> */
+    use UpdatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -29,19 +47,11 @@ class AddressesResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Address>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'find', 'create', 'update', 'delete'];
+        return $this->newQuery();
     }
 }

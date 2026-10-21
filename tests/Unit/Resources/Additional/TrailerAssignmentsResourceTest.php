@@ -9,7 +9,6 @@ use Samsara\Data\Trailer\Trailer;
 use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 use Samsara\Resources\Additional\TrailerAssignmentsResource;
 
 /**
@@ -28,6 +27,7 @@ class TrailerAssignmentsResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -82,22 +82,5 @@ class TrailerAssignmentsResourceTest extends TestCase
         $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
             && parse_url($request->url(), PHP_URL_PATH) === '/v1/fleet/trailers/assignments'
             && parse_url($request->url(), PHP_URL_QUERY) === 'startMs=1000');
-    }
-
-    #[Test]
-    public function it_rejects_generic_all_for_the_wrapped_collection_shape(): void
-    {
-        $this->http->fake();
-
-        $resource = new TrailerAssignmentsResource($this->samsara);
-
-        try {
-            $resource->all();
-            $this->fail('Expected the generic all operation to be rejected.');
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame('all', $exception->getContext()['operation']);
-        }
-
-        $this->http->assertNothingSent();
     }
 }

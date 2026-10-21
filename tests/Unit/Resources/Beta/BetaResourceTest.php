@@ -13,7 +13,6 @@ use Samsara\Resources\Beta\BetaResource;
 use Samsara\Exceptions\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the BetaResource class.
@@ -31,6 +30,7 @@ class BetaResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
@@ -180,7 +180,7 @@ class BetaResourceTest extends TestCase
 
         $resource->qualificationsRecords()
             ->where('ids', 'record-1')
-            ->getWithPagination();
+            ->paginate();
 
         $this->http->assertSent(fn ($request): bool => $this->queryFor($request->url()) === [
             'ids' => 'record-1',
@@ -203,20 +203,6 @@ class BetaResourceTest extends TestCase
                 '/beta/industrial/jobs?id=job%2F123%20%26',
                 $exception->getContext()['endpoint'],
             );
-        }
-    }
-
-    #[Test]
-    public function it_rejects_phantom_generic_operations_on_the_beta_root(): void
-    {
-        $this->http->fake();
-        $resource = new BetaResource($this->samsara);
-
-        try {
-            $resource->all();
-            $this->fail('Expected the inherited all operation to be rejected.');
-        } catch (UnsupportedOperationException) {
-            $this->http->assertNothingSent();
         }
     }
 
@@ -367,9 +353,9 @@ class BetaResourceTest extends TestCase
                     'after'      => 'cursor-1',
                 ],
             ],
-            'trailer stats snapshot' => ['trailerStatsCurrent', '/fleet/trailers/stats', TrailerStats::class, ['after' => 'cursor-1']],
-            'trailer stats feed'     => ['trailerStatsFeed', '/fleet/trailers/stats/feed', Entity::class, ['after' => 'cursor-1']],
-            'trailer stats history'  => ['trailerStatsHistory', '/fleet/trailers/stats/history', Entity::class, ['after' => 'cursor-1']],
+            'trailer stats snapshot' => ['trailerStatsCurrent', '/fleet/trailers/stats', TrailerStats::class, ['types' => 'gpsOdometerMeters', 'after' => 'cursor-1']],
+            'trailer stats feed'     => ['trailerStatsFeed', '/fleet/trailers/stats/feed', Entity::class, ['types' => 'gpsOdometerMeters', 'after' => 'cursor-1']],
+            'trailer stats history'  => ['trailerStatsHistory', '/fleet/trailers/stats/history', Entity::class, ['types' => 'gpsOdometerMeters', 'startTime' => '2026-08-10T12:00:00Z', 'endTime' => '2026-08-10T13:00:00Z', 'after' => 'cursor-1']],
             'training assignments'   => [
                 'trainingAssignments',
                 '/training-assignments/stream',
@@ -407,6 +393,9 @@ class BetaResourceTest extends TestCase
             'readingsLatest' => $builder
                 ->where('readingIds', 'reading-1')
                 ->where('entityType', 'asset'),
+            'trailerStatsCurrent', 'trailerStatsFeed' => $builder->where('types', 'gpsOdometerMeters'),
+            'trailerStatsHistory'                     => $builder->where('types', 'gpsOdometerMeters')
+                ->between('2026-08-10T12:00:00Z', '2026-08-10T13:00:00Z'),
             'trainingAssignments' => $builder->startTime('2026-08-10T12:00:00Z'),
             default               => $builder,
         };

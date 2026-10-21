@@ -6,6 +6,7 @@ use Exception;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\AuthenticationException;
 
 /**
  * Unit tests for the SamsaraException base class.
@@ -23,10 +24,10 @@ class SamsaraExceptionTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_created_with_context_via_static_method(): void
+    public function it_can_be_created_with_context(): void
     {
         $context = ['key' => 'value'];
-        $exception = SamsaraException::make('Test error', 500, null, $context);
+        $exception = new SamsaraException('Test error', 500, null, $context);
 
         $this->assertSame($context, $exception->getContext());
     }
@@ -49,16 +50,6 @@ class SamsaraExceptionTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_created_with_static_make_method(): void
-    {
-        $exception = SamsaraException::make('Test error', 500);
-
-        $this->assertInstanceOf(SamsaraException::class, $exception);
-        $this->assertSame('Test error', $exception->getMessage());
-        $this->assertSame(500, $exception->getCode());
-    }
-
-    #[Test]
     public function it_can_store_context(): void
     {
         $context = ['endpoint' => '/fleet/drivers', 'method' => 'GET'];
@@ -66,6 +57,13 @@ class SamsaraExceptionTest extends TestCase
         $exception->setContext($context);
 
         $this->assertSame($context, $exception->getContext());
+    }
+
+    #[Test]
+    public function it_does_not_expose_generic_make_factory(): void
+    {
+        $this->assertFalse(method_exists(SamsaraException::class, 'make'));
+        $this->assertFalse(method_exists(AuthenticationException::class, 'make'));
     }
 
     #[Test]

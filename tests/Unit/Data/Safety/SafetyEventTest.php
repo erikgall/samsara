@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Safety;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Safety\SafetyEvent;
 use PHPUnit\Framework\Attributes\Test;
@@ -14,29 +13,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class SafetyEventTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $event = new SafetyEvent([
-            'id'   => '212014918174029-1550954461759',
-            'time' => '2024-04-10T19:08:25.455Z',
-        ]);
-
-        $this->assertSame('212014918174029-1550954461759', $event->id);
-        $this->assertSame('2024-04-10T19:08:25.455Z', $event->time);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $event = SafetyEvent::make([
-            'id' => '212014918174029-1550954461759',
-        ]);
-
-        $this->assertInstanceOf(SafetyEvent::class, $event);
-        $this->assertSame('212014918174029-1550954461759', $event->getId());
-    }
-
     #[Test]
     public function it_can_check_if_coaching_is_needed(): void
     {
@@ -55,19 +31,6 @@ class SafetyEventTest extends TestCase
         ]);
 
         $this->assertTrue($event->hasVideo());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'   => '212014918174029-1550954461759',
-            'time' => '2024-04-10T19:08:25.455Z',
-        ];
-
-        $event = new SafetyEvent($data);
-
-        $this->assertSame($data, $event->toArray());
     }
 
     #[Test]
@@ -155,14 +118,6 @@ class SafetyEventTest extends TestCase
 
         $this->assertSame('https://example.com/forward.mp4', $event->downloadForwardVideoUrl);
         $this->assertSame('https://example.com/inward.mp4', $event->downloadInwardVideoUrl);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $event = new SafetyEvent;
-
-        $this->assertInstanceOf(Entity::class, $event);
     }
 
     #[Test]

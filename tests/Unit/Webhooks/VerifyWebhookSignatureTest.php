@@ -5,10 +5,12 @@ namespace Samsara\Tests\Unit\Webhooks;
 use Samsara\Tests\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Webhooks\VerifyWebhookSignature;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Samsara\Exceptions\InvalidSignatureException;
 
 /**
@@ -28,13 +30,27 @@ class VerifyWebhookSignatureTest extends TestCase
      */
     private const TEST_SECRET = 'rGoy+beNph0qGBLj6Aqoydj6SGA=';
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNow(Carbon::createFromTimestamp(1640000000));
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function it_accepts_custom_secret_via_constructor(): void
     {
         $customSecret = base64_encode('custom-secret');
         $middleware = new VerifyWebhookSignature($customSecret);
 
-        $timestamp = (string) time();
+        $timestamp = (string) Carbon::now()->getTimestamp();
         $decodedSecret = base64_decode($customSecret);
         $message = "v1:{$timestamp}:".self::TEST_BODY;
         $signature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
@@ -44,7 +60,7 @@ class VerifyWebhookSignatureTest extends TestCase
             'X-Samsara-Timestamp' => $timestamp,
         ], self::TEST_BODY);
 
-        $response = $middleware->handle($request, function () {
+        $response = $middleware->handle($request, function (Request $request): Response {
             return new Response('OK', 200);
         });
 
@@ -56,7 +72,7 @@ class VerifyWebhookSignatureTest extends TestCase
     {
         $middleware = new VerifyWebhookSignature(self::TEST_SECRET, 500);
 
-        $oldTimestamp = (string) (time() - 400); // 400 seconds ago, within 500s tolerance
+        $oldTimestamp = (string) (Carbon::now()->getTimestamp() - 400); // 400 seconds ago, within 500s tolerance
         $signature = $this->createValidSignature(self::TEST_BODY, $oldTimestamp);
 
         $request = $this->createRequest([
@@ -64,7 +80,7 @@ class VerifyWebhookSignatureTest extends TestCase
             'X-Samsara-Timestamp' => $oldTimestamp,
         ], self::TEST_BODY);
 
-        $response = $middleware->handle($request, function () {
+        $response = $middleware->handle($request, function (Request $request): Response {
             return new Response('OK', 200);
         });
 
@@ -77,7 +93,7 @@ class VerifyWebhookSignatureTest extends TestCase
         $middleware = new VerifyWebhookSignature;
 
         $routeSecret = base64_encode('route-param-secret');
-        $timestamp = (string) time();
+        $timestamp = (string) Carbon::now()->getTimestamp();
         $decodedSecret = base64_decode($routeSecret);
         $message = "v1:{$timestamp}:".self::TEST_BODY;
         $signature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
@@ -88,7 +104,7 @@ class VerifyWebhookSignatureTest extends TestCase
         ], self::TEST_BODY);
 
         // Pass secret as route middleware parameter (third argument)
-        $response = $middleware->handle($request, function () {
+        $response = $middleware->handle($request, function (Request $request): Response {
             return new Response('OK', 200);
         }, $routeSecret);
 
@@ -100,7 +116,7 @@ class VerifyWebhookSignatureTest extends TestCase
     {
         $middleware = new VerifyWebhookSignature;
 
-        $oldTimestamp = (string) (time() - 400); // 400 seconds ago
+        $oldTimestamp = (string) (Carbon::now()->getTimestamp() - 400); // 400 seconds ago
         $signature = $this->createValidSignature(self::TEST_BODY, $oldTimestamp);
 
         $request = $this->createRequest([
@@ -109,7 +125,7 @@ class VerifyWebhookSignatureTest extends TestCase
         ], self::TEST_BODY);
 
         // Pass tolerance as route middleware parameter (fourth argument as string, simulating route params)
-        $response = $middleware->handle($request, function () {
+        $response = $middleware->handle($request, function (Request $request): Response {
             return new Response('OK', 200);
         }, self::TEST_SECRET, '500');
 
@@ -120,7 +136,7 @@ class VerifyWebhookSignatureTest extends TestCase
     public function it_allows_request_with_valid_signature(): void
     {
         $middleware = new VerifyWebhookSignature;
-        $timestamp = (string) time();
+        $timestamp = (string) Carbon::now()->getTimestamp();
         $signature = $this->createValidSignature(self::TEST_BODY, $timestamp);
 
         $request = $this->createRequest([
@@ -128,7 +144,7 @@ class VerifyWebhookSignatureTest extends TestCase
             'X-Samsara-Timestamp' => $timestamp,
         ], self::TEST_BODY);
 
-        $response = $middleware->handle($request, function () {
+        $response = $middleware->handle($request, function (Request $request): Response {
             return new Response('OK', 200);
         });
 
@@ -137,11 +153,83 @@ class VerifyWebhookSignatureTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_instantiated_with_static_make_method(): void
+    public function it_does_not_expose_a_middleware_instance_factory(): void
     {
-        $middleware = VerifyWebhookSignature::make(self::TEST_SECRET);
+        $this->assertFalse(method_exists(VerifyWebhookSignature::class, 'make'));
+    }
 
-        $this->assertInstanceOf(VerifyWebhookSignature::class, $middleware);
+    #[Test]
+    public function it_falls_back_to_config_for_an_empty_constructor_secret(): void
+    {
+        $middleware = new VerifyWebhookSignature('');
+        $timestamp = (string) Carbon::now()->getTimestamp();
+        $request = $this->createRequest([
+            'X-Samsara-Signature' => $this->createValidSignature(self::TEST_BODY, $timestamp),
+            'X-Samsara-Timestamp' => $timestamp,
+        ], self::TEST_BODY);
+
+        $response = $middleware->handle($request, fn (Request $request): Response => new Response('OK'));
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function it_falls_back_to_config_for_an_empty_route_secret(): void
+    {
+        $timestamp = (string) (Carbon::now()->getTimestamp() - 400);
+        $signature = $this->createValidSignature(self::TEST_BODY, $timestamp);
+        Route::post('/webhook-config', fn (): Response => new Response('OK'))
+            ->middleware('samsara.webhook:,600');
+
+        $response = $this->postRawWebhook('/webhook-config', self::TEST_BODY, [
+            'X-Samsara-Signature' => $signature,
+            'X-Samsara-Timestamp' => $timestamp,
+        ]);
+
+        $response->assertOk()->assertSeeText('OK');
+    }
+
+    #[Test]
+    public function it_falls_back_to_constructor_for_an_empty_route_secret(): void
+    {
+        config(['samsara.webhook_secret' => base64_encode('different-config-secret')]);
+        $middleware = new VerifyWebhookSignature(self::TEST_SECRET);
+        $timestamp = (string) Carbon::now()->getTimestamp();
+        $request = $this->createRequest([
+            'X-Samsara-Signature' => $this->createValidSignature(self::TEST_BODY, $timestamp),
+            'X-Samsara-Timestamp' => $timestamp,
+        ], self::TEST_BODY);
+
+        $response = $middleware->handle($request, fn (Request $request): Response => new Response('OK'), '');
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function it_prioritizes_route_params_over_constructor_params(): void
+    {
+        // Create middleware with one secret via constructor
+        $constructorSecret = base64_encode('constructor-secret');
+        $middleware = new VerifyWebhookSignature($constructorSecret, 100);
+
+        // But use a different secret for the signature (route param secret)
+        $routeSecret = base64_encode('route-param-secret');
+        $timestamp = (string) Carbon::now()->getTimestamp();
+        $decodedSecret = base64_decode($routeSecret);
+        $message = "v1:{$timestamp}:".self::TEST_BODY;
+        $signature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
+
+        $request = $this->createRequest([
+            'X-Samsara-Signature' => $signature,
+            'X-Samsara-Timestamp' => $timestamp,
+        ], self::TEST_BODY);
+
+        // Route param should override constructor param
+        $response = $middleware->handle($request, function (Request $request): Response {
+            return new Response('OK', 200);
+        }, $routeSecret);
+
+        $this->assertSame(200, $response->getStatusCode());
     }
 
     #[Test]
@@ -151,7 +239,7 @@ class VerifyWebhookSignatureTest extends TestCase
 
         // Body with special characters that should not be post-processed
         $bodyWithSpecialChars = '{"event":"test","emoji":"\\u2764"}';
-        $timestamp = (string) time();
+        $timestamp = (string) Carbon::now()->getTimestamp();
         $signature = $this->createValidSignature($bodyWithSpecialChars, $timestamp);
 
         $request = $this->createRequest([
@@ -159,7 +247,7 @@ class VerifyWebhookSignatureTest extends TestCase
             'X-Samsara-Timestamp' => $timestamp,
         ], $bodyWithSpecialChars);
 
-        $response = $middleware->handle($request, function () {
+        $response = $middleware->handle($request, function (Request $request): Response {
             return new Response('OK', 200);
         });
 
@@ -170,7 +258,7 @@ class VerifyWebhookSignatureTest extends TestCase
     public function it_rejects_request_with_expired_timestamp(): void
     {
         $middleware = new VerifyWebhookSignature;
-        $oldTimestamp = (string) (time() - 400); // 400 seconds ago
+        $oldTimestamp = (string) (Carbon::now()->getTimestamp() - 400); // 400 seconds ago
         $signature = $this->createValidSignature(self::TEST_BODY, $oldTimestamp);
 
         $request = $this->createRequest([
@@ -178,48 +266,58 @@ class VerifyWebhookSignatureTest extends TestCase
             'X-Samsara-Timestamp' => $oldTimestamp,
         ], self::TEST_BODY);
 
-        $this->expectException(InvalidSignatureException::class);
-        $this->expectExceptionMessage('expired');
-
-        $middleware->handle($request, function () {
-            return new Response('OK', 200);
-        });
+        try {
+            $middleware->handle($request, function (Request $request): Response {
+                $this->fail('Rejected webhooks must not reach the handler.');
+            });
+            $this->fail('Expected webhook verification to fail.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['tolerance' => 300, 'age' => 400], $exception->getContext());
+        }
     }
 
     #[Test]
     public function it_rejects_request_with_invalid_signature(): void
     {
         $middleware = new VerifyWebhookSignature;
-        $timestamp = (string) time();
+        $timestamp = (string) Carbon::now()->getTimestamp();
 
         $request = $this->createRequest([
             'X-Samsara-Signature' => 'v1=invalidsignature',
             'X-Samsara-Timestamp' => $timestamp,
         ], self::TEST_BODY);
 
-        $this->expectException(InvalidSignatureException::class);
-
-        $middleware->handle($request, function () {
-            return new Response('OK', 200);
-        });
+        try {
+            $middleware->handle($request, function (Request $request): Response {
+                $this->fail('Rejected webhooks must not reach the handler.');
+            });
+            $this->fail('Expected webhook verification to fail.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['received' => 'v1=invalidsignature'], $exception->getContext());
+        }
     }
 
     #[Test]
     public function it_rejects_request_with_missing_signature_header(): void
     {
         $middleware = new VerifyWebhookSignature;
-        $timestamp = (string) time();
+        $timestamp = (string) Carbon::now()->getTimestamp();
 
         $request = $this->createRequest([
             'X-Samsara-Timestamp' => $timestamp,
         ], self::TEST_BODY);
 
-        $this->expectException(InvalidSignatureException::class);
-        $this->expectExceptionMessage('missing X-Samsara-Signature');
-
-        $middleware->handle($request, function () {
-            return new Response('OK', 200);
-        });
+        try {
+            $middleware->handle($request, function (Request $request): Response {
+                $this->fail('Rejected webhooks must not reach the handler.');
+            });
+            $this->fail('Expected webhook verification to fail.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['header' => 'X-Samsara-Signature'], $exception->getContext());
+        }
     }
 
     #[Test]
@@ -231,12 +329,15 @@ class VerifyWebhookSignatureTest extends TestCase
             'X-Samsara-Signature' => 'v1=somesignature',
         ], self::TEST_BODY);
 
-        $this->expectException(InvalidSignatureException::class);
-        $this->expectExceptionMessage('missing X-Samsara-Timestamp');
-
-        $middleware->handle($request, function () {
-            return new Response('OK', 200);
-        });
+        try {
+            $middleware->handle($request, function (Request $request): Response {
+                $this->fail('Rejected webhooks must not reach the handler.');
+            });
+            $this->fail('Expected webhook verification to fail.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['header' => 'X-Samsara-Timestamp'], $exception->getContext());
+        }
     }
 
     #[Test]
@@ -244,7 +345,7 @@ class VerifyWebhookSignatureTest extends TestCase
     {
         $middleware = new VerifyWebhookSignature;
 
-        $timestamp = (string) time();
+        $timestamp = (string) Carbon::now()->getTimestamp();
         // Create signature for original body
         $signature = $this->createValidSignature(self::TEST_BODY, $timestamp);
 
@@ -255,17 +356,21 @@ class VerifyWebhookSignatureTest extends TestCase
             'X-Samsara-Timestamp' => $timestamp,
         ], $tamperedBody);
 
-        $this->expectException(InvalidSignatureException::class);
-
-        $middleware->handle($request, function () {
-            return new Response('OK', 200);
-        });
+        try {
+            $middleware->handle($request, function (Request $request): Response {
+                $this->fail('Rejected webhooks must not reach the handler.');
+            });
+            $this->fail('Expected webhook verification to fail.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(401, $exception->getCode());
+            $this->assertSame(['received' => $signature], $exception->getContext());
+        }
     }
 
     #[Test]
     public function it_resolves_the_documented_route_middleware_alias(): void
     {
-        $timestamp = (string) time();
+        $timestamp = (string) Carbon::now()->getTimestamp();
         $signature = $this->createValidSignature(self::TEST_BODY, $timestamp);
         Route::post('/webhook-alias', fn (): Response => new Response('OK'))
             ->middleware('samsara.webhook:'.self::TEST_SECRET.',600');
@@ -286,7 +391,7 @@ class VerifyWebhookSignatureTest extends TestCase
 
         $response = $this->postRawWebhook('/webhook-forged', self::TEST_BODY, [
             'X-Samsara-Signature' => 'v1=deadbeef',
-            'X-Samsara-Timestamp' => (string) time(),
+            'X-Samsara-Timestamp' => (string) Carbon::now()->getTimestamp(),
         ]);
 
         $response->assertUnauthorized();
@@ -295,7 +400,7 @@ class VerifyWebhookSignatureTest extends TestCase
     #[Test]
     public function it_returns_unauthorized_for_an_expired_route_webhook(): void
     {
-        $timestamp = (string) (time() - 400);
+        $timestamp = (string) (Carbon::now()->getTimestamp() - 400);
         $signature = $this->createValidSignature(self::TEST_BODY, $timestamp);
         Route::post('/webhook-expired', fn (): Response => new Response('OK'))
             ->middleware(VerifyWebhookSignature::class);
@@ -320,24 +425,27 @@ class VerifyWebhookSignatureTest extends TestCase
     }
 
     #[Test]
-    public function it_throws_when_webhook_secret_not_configured(): void
+    #[DataProvider('unconfiguredSecrets')]
+    public function it_throws_when_webhook_secret_not_configured(?string $secret): void
     {
-        // Set config to null to simulate missing configuration
-        config(['samsara.webhook_secret' => null]);
+        config(['samsara.webhook_secret' => $secret]);
 
         $middleware = new VerifyWebhookSignature;
 
         $request = $this->createRequest([
             'X-Samsara-Signature' => 'v1=somesignature',
-            'X-Samsara-Timestamp' => (string) time(),
+            'X-Samsara-Timestamp' => (string) Carbon::now()->getTimestamp(),
         ], self::TEST_BODY);
 
-        $this->expectException(InvalidSignatureException::class);
-        $this->expectExceptionMessage('Webhook secret not configured');
-
-        $middleware->handle($request, function () {
-            return new Response('OK', 200);
-        });
+        try {
+            $middleware->handle($request, function (Request $request): Response {
+                $this->fail('Rejected webhooks must not reach the handler.');
+            });
+            $this->fail('Expected webhook verification to fail.');
+        } catch (InvalidSignatureException $exception) {
+            $this->assertSame(500, $exception->getCode());
+            $this->assertSame([], $exception->getContext());
+        }
     }
 
     #[Test]
@@ -345,7 +453,7 @@ class VerifyWebhookSignatureTest extends TestCase
     {
         $middleware = new VerifyWebhookSignature;
 
-        $timestamp = (string) time();
+        $timestamp = (string) Carbon::now()->getTimestamp();
         $signature = $this->createValidSignature(self::TEST_BODY, $timestamp);
 
         $request = $this->createRequest([
@@ -354,38 +462,19 @@ class VerifyWebhookSignatureTest extends TestCase
         ], self::TEST_BODY);
 
         // This test verifies the middleware uses config('samsara.webhook_secret')
-        $response = $middleware->handle($request, function () {
+        $response = $middleware->handle($request, function (Request $request): Response {
             return new Response('OK', 200);
         });
 
         $this->assertSame(200, $response->getStatusCode());
     }
 
-    #[Test]
-    public function route_params_take_priority_over_constructor_params(): void
+    /**
+     * @return array<string, array{string|null}>
+     */
+    public static function unconfiguredSecrets(): array
     {
-        // Create middleware with one secret via constructor
-        $constructorSecret = base64_encode('constructor-secret');
-        $middleware = new VerifyWebhookSignature($constructorSecret, 100);
-
-        // But use a different secret for the signature (route param secret)
-        $routeSecret = base64_encode('route-param-secret');
-        $timestamp = (string) time();
-        $decodedSecret = base64_decode($routeSecret);
-        $message = "v1:{$timestamp}:".self::TEST_BODY;
-        $signature = 'v1='.hash_hmac('sha256', $message, $decodedSecret);
-
-        $request = $this->createRequest([
-            'X-Samsara-Signature' => $signature,
-            'X-Samsara-Timestamp' => $timestamp,
-        ], self::TEST_BODY);
-
-        // Route param should override constructor param
-        $response = $middleware->handle($request, function () {
-            return new Response('OK', 200);
-        }, $routeSecret);
-
-        $this->assertSame(200, $response->getStatusCode());
+        return ['absent' => [null], 'empty' => ['']];
     }
 
     protected function defineEnvironment($app): void
@@ -424,6 +513,7 @@ class VerifyWebhookSignatureTest extends TestCase
 
     /**
      * @param  array<string, string>  $headers
+     * @return TestResponse<\Symfony\Component\HttpFoundation\Response>
      */
     private function postRawWebhook(string $uri, string $body, array $headers = []): TestResponse
     {

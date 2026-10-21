@@ -39,12 +39,13 @@ class CurrentContractAResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
     }
 
     #[Test]
-    public function alert_builders_use_current_paths_and_endpoint_specific_entities(): void
+    public function it_alert_builders_use_current_paths_and_endpoint_specific_entities(): void
     {
         $this->resetHttp();
         $this->http->fake([
@@ -92,7 +93,7 @@ class CurrentContractAResourceTest extends TestCase
     }
 
     #[Test]
-    public function alert_configuration_methods_follow_the_collection_contract(): void
+    public function it_alert_configuration_methods_follow_the_collection_contract(): void
     {
         $this->resetHttp();
         $this->http->fake([
@@ -134,7 +135,7 @@ class CurrentContractAResourceTest extends TestCase
     }
 
     #[Test]
-    public function camera_media_methods_preserve_the_current_response_wrappers(): void
+    public function it_camera_media_methods_preserve_the_current_response_wrappers(): void
     {
         $parameters = [
             'vehicleIds'     => 'vehicle-1',
@@ -191,7 +192,7 @@ class CurrentContractAResourceTest extends TestCase
     }
 
     #[Test]
-    public function cursor_builders_without_an_official_limit_omit_the_default_page_size(): void
+    public function it_cursor_builders_without_an_official_limit_omit_the_default_page_size(): void
     {
         $this->http->fake([
             '*' => $this->http->response([
@@ -217,7 +218,7 @@ class CurrentContractAResourceTest extends TestCase
         ];
 
         foreach ($builders as $builder) {
-            $builder->getWithPagination();
+            $builder->paginate();
         }
 
         $this->http->assertNotSent(fn (Request $request): bool => array_key_exists('limit', $request->data()));
@@ -225,7 +226,7 @@ class CurrentContractAResourceTest extends TestCase
     }
 
     #[Test]
-    public function direct_and_builder_failures_use_the_sdk_error_hierarchy(): void
+    public function it_direct_and_builder_failures_use_the_sdk_error_hierarchy(): void
     {
         $this->resetHttp();
         $this->http->fake([
@@ -253,7 +254,7 @@ class CurrentContractAResourceTest extends TestCase
     }
 
     #[Test]
-    public function form_builders_map_submissions_and_templates_to_their_own_entities(): void
+    public function it_form_builders_map_submissions_and_templates_to_their_own_entities(): void
     {
         $resource = new FormsResource($this->samsara);
         $this->http->fake(['*' => $this->http->response(['data' => [['id' => 'submission-1']]])]);
@@ -293,7 +294,7 @@ class CurrentContractAResourceTest extends TestCase
     }
 
     #[Test]
-    public function form_submission_writes_use_collection_endpoints_and_current_parameters(): void
+    public function it_form_submission_writes_use_collection_endpoints_and_current_parameters(): void
     {
         $resource = new FormsResource($this->samsara);
         $payload = [
@@ -328,7 +329,7 @@ class CurrentContractAResourceTest extends TestCase
     }
 
     #[Test]
-    public function hubs_and_route_events_execute_their_current_stream_contracts(): void
+    public function it_hubs_and_route_events_execute_their_current_stream_contracts(): void
     {
         $this->resetHttp();
         $this->http->fake([
@@ -359,7 +360,7 @@ class CurrentContractAResourceTest extends TestCase
     }
 
     #[Test]
-    public function settings_methods_use_the_fleet_namespace_and_preserve_documented_shapes(): void
+    public function it_settings_methods_use_the_fleet_namespace_and_preserve_documented_shapes(): void
     {
         $resource = new SettingsResource($this->samsara);
 
@@ -391,7 +392,7 @@ class CurrentContractAResourceTest extends TestCase
     }
 
     #[Test]
-    public function work_order_methods_use_endpoint_specific_response_types(): void
+    public function it_work_order_methods_use_endpoint_specific_response_types(): void
     {
         $resource = new WorkOrdersResource($this->samsara);
         $this->resetHttp();
@@ -527,6 +528,7 @@ class CurrentContractAResourceTest extends TestCase
     private function resetHttp(): void
     {
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara->setHttpFactory($this->http);
     }
 }

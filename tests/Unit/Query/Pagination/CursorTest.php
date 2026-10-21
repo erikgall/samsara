@@ -2,6 +2,7 @@
 
 namespace Samsara\Tests\Unit\Query\Pagination;
 
+use Error;
 use Samsara\Tests\TestCase;
 use Samsara\Query\Pagination\Cursor;
 use PHPUnit\Framework\Attributes\Test;
@@ -23,8 +24,8 @@ class CursorTest extends TestCase
 
         $cursor = Cursor::fromResponse($data);
 
-        $this->assertSame('cursor-xyz-789', $cursor->getEndCursor());
-        $this->assertTrue($cursor->hasNextPage());
+        $this->assertSame('cursor-xyz-789', $cursor->endCursor);
+        $this->assertTrue($cursor->hasNextPage);
     }
 
     #[Test]
@@ -40,7 +41,16 @@ class CursorTest extends TestCase
     {
         $cursor = new Cursor(null, false);
 
-        $this->assertNull($cursor->getEndCursor());
+        $this->assertNull($cursor->endCursor);
+    }
+
+    #[Test]
+    public function it_cannot_change_whether_another_page_exists(): void
+    {
+        $cursor = new Cursor(null, false);
+        $this->expectException(Error::class);
+
+        $cursor->hasNextPage = true;
     }
 
     #[Test]
@@ -57,14 +67,26 @@ class CursorTest extends TestCase
     }
 
     #[Test]
+    public function it_exposes_cursor_state_as_readonly_properties(): void
+    {
+        $cursor = new Cursor('abc-123', true);
+
+        $this->assertSame('abc-123', $cursor->endCursor);
+        $this->assertTrue($cursor->hasNextPage);
+        $this->expectException(Error::class);
+
+        $cursor->endCursor = 'changed';
+    }
+
+    #[Test]
     public function it_handles_missing_pagination_data(): void
     {
         $data = [];
 
         $cursor = Cursor::fromResponse($data);
 
-        $this->assertNull($cursor->getEndCursor());
-        $this->assertFalse($cursor->hasNextPage());
+        $this->assertNull($cursor->endCursor);
+        $this->assertFalse($cursor->hasNextPage);
     }
 
     #[Test]
@@ -72,7 +94,7 @@ class CursorTest extends TestCase
     {
         $cursor = new Cursor('abc-123', true);
 
-        $this->assertSame('abc-123', $cursor->getEndCursor());
+        $this->assertSame('abc-123', $cursor->endCursor);
     }
 
     #[Test]
@@ -80,7 +102,7 @@ class CursorTest extends TestCase
     {
         $cursor = new Cursor('abc-123', false);
 
-        $this->assertFalse($cursor->hasNextPage());
+        $this->assertFalse($cursor->hasNextPage);
     }
 
     #[Test]
@@ -88,6 +110,6 @@ class CursorTest extends TestCase
     {
         $cursor = new Cursor('abc-123', true);
 
-        $this->assertTrue($cursor->hasNextPage());
+        $this->assertTrue($cursor->hasNextPage);
     }
 }

@@ -5,6 +5,8 @@ namespace Samsara\Resources\Integrations;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Vehicle\Gateway;
+use Samsara\Resources\Concerns\CreatesEntities;
+use Samsara\Resources\Concerns\DeletesEntities;
 
 /**
  * Gateways resource for the Samsara API.
@@ -12,9 +14,17 @@ use Samsara\Data\Vehicle\Gateway;
  * Provides access to gateway device management endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Gateway>
  */
 class GatewaysResource extends Resource
 {
+    /** @use CreatesEntities<Gateway> */
+    use CreatesEntities;
+
+    /** @use DeletesEntities<Gateway> */
+    use DeletesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -29,21 +39,12 @@ class GatewaysResource extends Resource
 
     /**
      * Create a query builder for cursor-paginated gateway results.
+     *
+     * @return Builder<Gateway>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
-            ->withoutDefaultPageSize()
-            ->usingEntity(Gateway::class);
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'create', 'delete'];
+        return $this->newQuery()
+            ->withoutDefaultPageSize();
     }
 }

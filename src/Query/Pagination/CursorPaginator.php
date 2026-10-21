@@ -9,6 +9,7 @@ use IteratorAggregate;
 use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Data\EntityCollection;
+use Samsara\Exceptions\SamsaraException;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**
@@ -19,13 +20,17 @@ use Illuminate\Contracts\Support\Arrayable;
  *
  * @author Erik Galloway <erik@erikgall.com>
  *
- * @implements IteratorAggregate<int, Entity>
+ * @template TEntity of Entity = Entity
+ *
+ * @implements IteratorAggregate<int, TEntity>
  * @implements Arrayable<string, mixed>
  */
 class CursorPaginator implements Arrayable, Countable, IteratorAggregate
 {
     /**
      * The query builder instance.
+     *
+     * @var Builder<TEntity>
      */
     protected Builder $builder;
 
@@ -37,20 +42,32 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
     /**
      * The items for the current page.
      *
-     * @var EntityCollection<int, Entity>
+     * @var EntityCollection<int, TEntity>
      */
     protected EntityCollection $items;
 
     /**
+     * Cursors already used to request pages in this traversal.
+     *
+     * @var list<string>
+     */
+    protected array $visitedCursors;
+
+    /**
      * Create a new cursor paginator instance.
      *
-     * @param  EntityCollection<int, Entity>  $items
+     * @param  EntityCollection<int, TEntity>  $items
+     * @param  Builder<TEntity>  $builder
+     * @param  list<string>  $visitedCursors
      */
-    public function __construct(EntityCollection $items, Cursor $cursor, Builder $builder)
+    public function __construct(EntityCollection $items, Cursor $cursor, Builder $builder, array $visitedCursors = [])
     {
         $this->items = $items;
         $this->cursor = $cursor;
         $this->builder = clone $builder;
+        $this->visitedCursors = $visitedCursors;
+
+        $this->ensureCursorAdvances();
     }
 
     /**
@@ -58,7 +75,7 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
      */
     public function count(): int
     {
-        return max(0, $this->items->count());
+        return $this->items->count();
     }
 
     /**
@@ -72,7 +89,7 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
     /**
      * Get an iterator for the items.
      *
-     * @return Traversable<int, Entity>
+     * @return Traversable<int, TEntity>
      */
     public function getIterator(): Traversable
     {
@@ -84,15 +101,15 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
      */
     public function hasMorePages(): bool
     {
-        return $this->cursor->hasNextPage()
-            && $this->cursor->getEndCursor() !== null
-            && $this->cursor->getEndCursor() !== '';
+        return $this->cursor->hasNextPage
+            && $this->cursor->endCursor !== null
+            && $this->cursor->endCursor !== '';
     }
 
     /**
      * Get the items.
      *
-     * @return EntityCollection<int, Entity>
+     * @return EntityCollection<int, TEntity>
      */
     public function items(): EntityCollection
     {
@@ -101,6 +118,8 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
 
     /**
      * Fetch the next page of results.
+     *
+     * @return self<TEntity>|null
      */
     public function nextPage(): ?self
     {
@@ -108,14 +127,16 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
             return null;
         }
 
-        $endCursor = $this->cursor->getEndCursor();
+        $endCursor = $this->cursor->endCursor;
         if ($endCursor === null) {
             return null;
         }
 
-        return $this->builder
-            ->after($endCursor)
-            ->getWithPagination();
+        $nextPage = (clone $this->builder)->after($endCursor)->paginate();
+        $nextPage->visitedCursors = [...$this->visitedCursors, $endCursor];
+        $nextPage->ensureCursorAdvances();
+
+        return $nextPage;
     }
 
     /**
@@ -129,5 +150,20 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
             'data'       => $this->items->toArray(),
             'pagination' => $this->cursor->toArray(),
         ];
+    }
+
+    /**
+     * Reject a continuing page whose cursor has already been requested.
+     */
+    private function ensureCursorAdvances(): void
+    {
+        if (! $this->hasMorePages() || ! in_array($this->cursor->endCursor, $this->visitedCursors, true)) {
+            return;
+        }
+
+        throw new SamsaraException('Pagination cursor did not advance.', context: [
+            'endpoint' => $this->builder->getEndpoint(),
+            'cursor'   => $this->cursor->endCursor,
+        ]);
     }
 }

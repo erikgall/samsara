@@ -9,7 +9,6 @@ use Samsara\Data\EntityCollection;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Resources\Additional\HubsResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 
 /**
  * Unit tests for the HubsResource class.
@@ -27,58 +26,9 @@ class HubsResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_create_hub(): void
-    {
-        $resource = new HubsResource($this->samsara);
-
-        $this->expectException(UnsupportedOperationException::class);
-
-        $resource->create(['name' => 'New Hub']);
-    }
-
-    #[Test]
-    public function it_can_delete_hub(): void
-    {
-        $resource = new HubsResource($this->samsara);
-
-        $this->expectException(UnsupportedOperationException::class);
-
-        $resource->delete('hub-123');
-    }
-
-    #[Test]
-    public function it_can_find_hub(): void
-    {
-        $resource = new HubsResource($this->samsara);
-
-        $this->expectException(UnsupportedOperationException::class);
-
-        $resource->find('hub-123');
-    }
-
-    #[Test]
-    public function it_can_get_all_hubs(): void
-    {
-        $this->http->fake([
-            '*/hubs' => $this->http->response([
-                'data' => [
-                    ['id' => 'hub-1'],
-                    ['id' => 'hub-2'],
-                ],
-            ], 200),
-        ]);
-
-        $resource = new HubsResource($this->samsara);
-
-        $result = $resource->all();
-
-        $this->assertInstanceOf(EntityCollection::class, $result);
-        $this->assertCount(2, $result);
     }
 
     #[Test]
@@ -92,13 +42,27 @@ class HubsResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_update_hub(): void
+    public function it_does_not_expose_create_hub(): void
     {
-        $resource = new HubsResource($this->samsara);
+        $this->assertFalse(method_exists(HubsResource::class, 'create'));
+    }
 
-        $this->expectException(UnsupportedOperationException::class);
+    #[Test]
+    public function it_does_not_expose_delete_hub(): void
+    {
+        $this->assertFalse(method_exists(HubsResource::class, 'delete'));
+    }
 
-        $resource->update('hub-123', ['name' => 'Updated Hub']);
+    #[Test]
+    public function it_does_not_expose_find_hub(): void
+    {
+        $this->assertFalse(method_exists(HubsResource::class, 'find'));
+    }
+
+    #[Test]
+    public function it_does_not_expose_update_hub(): void
+    {
+        $this->assertFalse(method_exists(HubsResource::class, 'update'));
     }
 
     #[Test]
@@ -107,5 +71,25 @@ class HubsResourceTest extends TestCase
         $resource = new HubsResource($this->samsara);
 
         $this->assertSame('/hubs', $resource->getEndpoint());
+    }
+
+    #[Test]
+    public function it_queries_hubs(): void
+    {
+        $this->http->fake([
+            '*/hubs' => $this->http->response([
+                'data' => [
+                    ['id' => 'hub-1'],
+                    ['id' => 'hub-2'],
+                ],
+            ], 200),
+        ]);
+
+        $resource = new HubsResource($this->samsara);
+
+        $result = $resource->query()->get();
+
+        $this->assertInstanceOf(EntityCollection::class, $result);
+        $this->assertCount(2, $result);
     }
 }

@@ -29,16 +29,9 @@ class VehicleLocationsResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new VehicleLocationsResource($this->samsara);
-
-        $this->assertInstanceOf(VehicleLocationsResource::class, $resource);
     }
 
     #[Test]
@@ -165,6 +158,33 @@ class VehicleLocationsResourceTest extends TestCase
     }
 
     #[Test]
+    public function it_queries_the_snapshot_contract(): void
+    {
+        $this->http->fake([
+            '*' => $this->http->response([
+                'data' => [[
+                    'id'       => 'vehicle-1',
+                    'name'     => 'Truck 1',
+                    'location' => [
+                        'latitude'  => 35.8456,
+                        'longitude' => -86.3903,
+                        'time'      => '2026-08-10T15:00:00Z',
+                    ],
+                ]],
+                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
+            ]),
+        ]);
+
+        $locations = (new VehicleLocationsResource($this->samsara))->query()->get();
+
+        $this->assertInstanceOf(VehicleLocationResult::class, $locations->first());
+        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/locations'
+            && $request->data() === []
+        );
+    }
+
+    #[Test]
     public function it_sends_the_exact_current_location_request_and_maps_vehicle_wrappers(): void
     {
         $this->http->fake([
@@ -203,33 +223,6 @@ class VehicleLocationsResourceTest extends TestCase
                 'vehicleIds'   => 'vehicle-1,vehicle-2',
                 'after'        => 'cursor-1',
             ]
-        );
-    }
-
-    #[Test]
-    public function it_terminal_executes_inherited_all_with_the_snapshot_contract(): void
-    {
-        $this->http->fake([
-            '*' => $this->http->response([
-                'data' => [[
-                    'id'       => 'vehicle-1',
-                    'name'     => 'Truck 1',
-                    'location' => [
-                        'latitude'  => 35.8456,
-                        'longitude' => -86.3903,
-                        'time'      => '2026-08-10T15:00:00Z',
-                    ],
-                ]],
-                'pagination' => ['endCursor' => '', 'hasNextPage' => false],
-            ]),
-        ]);
-
-        $locations = (new VehicleLocationsResource($this->samsara))->all();
-
-        $this->assertInstanceOf(VehicleLocationResult::class, $locations->first());
-        $this->http->assertSent(fn (Request $request): bool => $request->method() === 'GET'
-            && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/locations'
-            && $request->data() === []
         );
     }
 

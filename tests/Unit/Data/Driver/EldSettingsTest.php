@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Driver;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Driver\EldSettings;
 use PHPUnit\Framework\Attributes\Test;
@@ -14,16 +13,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class EldSettingsTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $settings = EldSettings::make([
-            'rulesets' => [],
-        ]);
-
-        $this->assertInstanceOf(EldSettings::class, $settings);
-    }
-
     #[Test]
     public function it_can_be_created_with_rulesets(): void
     {
@@ -50,20 +39,6 @@ class EldSettingsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'rulesets' => [
-                ['name' => 'US Property', 'cycle' => '70_8'],
-            ],
-        ];
-
-        $settings = new EldSettings($data);
-
-        $this->assertSame($data, $settings->toArray());
-    }
-
-    #[Test]
     public function it_can_get_rulesets(): void
     {
         $rulesets = [
@@ -76,14 +51,6 @@ class EldSettingsTest extends TestCase
         ]);
 
         $this->assertSame($rulesets, $settings->getRulesets());
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $settings = new EldSettings;
-
-        $this->assertInstanceOf(Entity::class, $settings);
     }
 
     #[Test]

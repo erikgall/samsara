@@ -12,6 +12,8 @@ use Samsara\Resources\Resource;
  * Provides access to trip stream endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Trip>
  */
 class TripsResource extends Resource
 {
@@ -29,6 +31,8 @@ class TripsResource extends Resource
 
     /**
      * Get a query builder for completed trips.
+     *
+     * @return Builder<Trip>
      */
     public function completed(): Builder
     {
@@ -37,6 +41,8 @@ class TripsResource extends Resource
 
     /**
      * Get a query builder for in-progress trips.
+     *
+     * @return Builder<Trip>
      */
     public function inProgress(): Builder
     {
@@ -45,21 +51,12 @@ class TripsResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Trip>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
-            ->withoutDefaultPageSize()
-            ->usingEntity(Trip::class);
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
+        return $this->newQuery()
+            ->withoutDefaultPageSize();
     }
 }

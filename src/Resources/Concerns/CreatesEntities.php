@@ -1,0 +1,47 @@
+<?php
+
+namespace Samsara\Resources\Concerns;
+
+use Samsara\Data\Entity;
+use Samsara\Resources\Resource;
+use Samsara\Exceptions\ServerException;
+use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\ValidationException;
+use Samsara\Exceptions\AuthorizationException;
+use Samsara\Exceptions\AuthenticationException;
+
+/**
+ * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @template TEntity of Entity
+ *
+ * @phpstan-require-extends Resource<TEntity>
+ */
+trait CreatesEntities
+{
+    /**
+     * Create a new entity.
+     *
+     * @param  array<string, mixed>  $data
+     * @return TEntity
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws ValidationException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
+     */
+    public function create(array $data): Entity
+    {
+        $response = $this->executeSdkRequest(
+            fn () => $this->client()->post($this->endpoint, $data),
+            $this->endpoint
+        );
+
+        $responseData = $this->decodeJsonData($response, $this->endpoint);
+
+        return $this->mapToEntity($responseData);
+    }
+}

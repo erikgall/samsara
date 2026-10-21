@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Route;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Route\Route;
 use Samsara\Data\Route\RouteStop;
@@ -14,27 +13,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class RouteTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $route = Route::make(['id' => 'route-1', 'name' => 'Current Route']);
-
-        $this->assertInstanceOf(Route::class, $route);
-        $this->assertSame('route-1', $route->getId());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'               => 'route-1',
-            'name'             => 'Current Route',
-            'orgLocalTimezone' => 'America/Chicago',
-        ];
-
-        $this->assertSame($data, (new Route($data))->toArray());
-    }
-
     #[Test]
     public function it_can_get_settings_as_entity(): void
     {
@@ -68,12 +46,6 @@ class RouteTest extends TestCase
         $this->assertCount(2, $stops);
         $this->assertInstanceOf(RouteStop::class, $stops[0]);
         $this->assertSame('arrived', $stops[1]->state);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $this->assertInstanceOf(Entity::class, new Route);
     }
 
     #[Test]

@@ -11,7 +11,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Vehicle\VehicleStats;
 use Samsara\Data\Vehicle\VehicleStatsSeries;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Samsara\Exceptions\UnsupportedOperationException;
 use Samsara\Resources\Telematics\VehicleStatsResource;
 
 /**
@@ -30,16 +29,9 @@ class VehicleStatsResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_be_created(): void
-    {
-        $resource = new VehicleStatsResource($this->samsara);
-
-        $this->assertInstanceOf(VehicleStatsResource::class, $resource);
     }
 
     #[Test]
@@ -144,21 +136,6 @@ class VehicleStatsResourceTest extends TestCase
             && parse_url($request->url(), PHP_URL_PATH) === '/fleet/vehicles/stats'
             && $request->data() === ['types' => 'obdOdometerMeters,gpsOdometerMeters']
         );
-    }
-
-    #[Test]
-    public function it_can_get_all_stats(): void
-    {
-        $resource = new VehicleStatsResource($this->samsara);
-
-        try {
-            $resource->all();
-            $this->fail('Vehicle stats all() cannot supply required types.');
-        } catch (UnsupportedOperationException $exception) {
-            $this->assertSame('all', $exception->getContext()['operation'] ?? null);
-        }
-
-        $this->http->assertNothingSent();
     }
 
     #[Test]

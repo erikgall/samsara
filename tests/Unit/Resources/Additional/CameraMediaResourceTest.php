@@ -26,33 +26,9 @@ class CameraMediaResourceTest extends TestCase
         parent::setUp();
 
         $this->http = new HttpFactory;
+        $this->http->preventStrayRequests();
         $this->samsara = new Samsara('test-token');
         $this->samsara->setHttpFactory($this->http);
-    }
-
-    #[Test]
-    public function it_can_get_camera_media(): void
-    {
-        $this->http->fake([
-            '*/cameras/media*' => $this->http->response([
-                'data' => ['media' => [
-                    ['id' => 'media-1'],
-                    ['id' => 'media-2'],
-                ]],
-                'pagination' => ['hasNextPage' => false],
-            ], 200),
-        ]);
-
-        $resource = new CameraMediaResource($this->samsara);
-
-        $result = $resource->get([
-            'vehicleIds' => 'vehicle-1',
-            'startTime'  => '2024-01-01T00:00:00Z',
-            'endTime'    => '2024-01-01T01:00:00Z',
-        ]);
-
-        $this->assertCount(2, $result['data']['media']);
-        $this->assertFalse($result['pagination']['hasNextPage']);
     }
 
     #[Test]

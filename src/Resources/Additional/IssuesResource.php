@@ -5,6 +5,7 @@ namespace Samsara\Resources\Additional;
 use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
+use Samsara\Resources\Concerns\CreatesEntities;
 
 /**
  * Issues resource for the Samsara API.
@@ -12,9 +13,14 @@ use Samsara\Resources\Resource;
  * Provides access to vehicle/equipment issue tracking endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class IssuesResource extends Resource
 {
+    /** @use CreatesEntities<Entity> */
+    use CreatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -22,18 +28,22 @@ class IssuesResource extends Resource
 
     /**
      * Get a query builder for issues by ID.
+     *
+     * @return Builder<Entity>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)->withoutDefaultPageSize();
+        return $this->newQuery()->withoutDefaultPageSize();
     }
 
     /**
      * Get a query builder for issues stream.
+     *
+     * @return Builder<Entity>
      */
     public function stream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/issues/stream')
+        return $this->newQuery('/issues/stream')
             ->withoutDefaultPageSize();
     }
 
@@ -50,13 +60,5 @@ class IssuesResource extends Resource
         );
 
         return Entity::make($this->decodeJsonData($response, $this->endpoint, false));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['create'];
     }
 }

@@ -5,6 +5,10 @@ namespace Samsara\Resources\Integrations;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Webhook\Webhook;
+use Samsara\Resources\Concerns\FindsEntities;
+use Samsara\Resources\Concerns\CreatesEntities;
+use Samsara\Resources\Concerns\DeletesEntities;
+use Samsara\Resources\Concerns\UpdatesEntities;
 
 /**
  * Webhooks resource for the Samsara API.
@@ -12,9 +16,23 @@ use Samsara\Data\Webhook\Webhook;
  * Provides access to webhook management endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Webhook>
  */
 class WebhooksResource extends Resource
 {
+    /** @use CreatesEntities<Webhook> */
+    use CreatesEntities;
+
+    /** @use DeletesEntities<Webhook> */
+    use DeletesEntities;
+
+    /** @use FindsEntities<Webhook> */
+    use FindsEntities;
+
+    /** @use UpdatesEntities<Webhook> */
+    use UpdatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -29,19 +47,11 @@ class WebhooksResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Webhook>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'find', 'create', 'update', 'delete'];
+        return $this->newQuery();
     }
 }

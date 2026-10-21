@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Asset;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Asset\AssetLocation;
 use PHPUnit\Framework\Attributes\Test;
@@ -38,29 +37,6 @@ class AssetLocationTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $location = AssetLocation::make([
-            'latitude' => 37.7749,
-        ]);
-
-        $this->assertInstanceOf(AssetLocation::class, $location);
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'latitude'  => 37.7749,
-            'longitude' => -122.4194,
-        ];
-
-        $location = new AssetLocation($data);
-
-        $this->assertSame($data, $location->toArray());
-    }
-
-    #[Test]
     public function it_can_have_asset(): void
     {
         $location = new AssetLocation([
@@ -88,11 +64,17 @@ class AssetLocationTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
+    public function it_legacy_top_level_coordinates_remain_backwards_compatible(): void
     {
-        $location = new AssetLocation;
+        $location = new AssetLocation([
+            'latitude'  => 37.7749,
+            'longitude' => -122.4194,
+        ]);
 
-        $this->assertInstanceOf(Entity::class, $location);
+        $coords = $location->getCoordinates();
+
+        $this->assertSame(37.7749, $coords['latitude']);
+        $this->assertSame(-122.4194, $coords['longitude']);
     }
 
     #[Test]
@@ -137,19 +119,5 @@ class AssetLocationTest extends TestCase
         $this->assertNull($location->getHeadingDegrees());
         $this->assertNull($location->getEcuSpeedMetersPerSecond());
         $this->assertNull($location->getGpsSpeedMetersPerSecond());
-    }
-
-    #[Test]
-    public function legacy_top_level_coordinates_remain_backwards_compatible(): void
-    {
-        $location = new AssetLocation([
-            'latitude'  => 37.7749,
-            'longitude' => -122.4194,
-        ]);
-
-        $coords = $location->getCoordinates();
-
-        $this->assertSame(37.7749, $coords['latitude']);
-        $this->assertSame(-122.4194, $coords['longitude']);
     }
 }

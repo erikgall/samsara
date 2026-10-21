@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Document;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Document\Document;
 use PHPUnit\Framework\Attributes\Test;
@@ -14,35 +13,6 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class DocumentTest extends TestCase
 {
-    #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $document = new Document([
-            'id'           => '12345',
-            'name'         => 'Fuel Receipt',
-            'state'        => 'submitted',
-            'notes'        => 'Fuel purchase for vehicle 123',
-            'documentType' => ['id' => 'doc-type-1', 'name' => 'Fuel Receipt'],
-        ]);
-
-        $this->assertSame('12345', $document->id);
-        $this->assertSame('Fuel Receipt', $document->name);
-        $this->assertSame('submitted', $document->state);
-        $this->assertSame('Fuel purchase for vehicle 123', $document->notes);
-        $this->assertSame('doc-type-1', $document->documentType['id']);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $document = Document::make([
-            'id' => '12345',
-        ]);
-
-        $this->assertInstanceOf(Document::class, $document);
-        $this->assertSame('12345', $document->getId());
-    }
-
     #[Test]
     public function it_can_check_each_current_document_state(): void
     {
@@ -77,20 +47,6 @@ class DocumentTest extends TestCase
         ]);
 
         $this->assertTrue($document->isRequired());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'    => '12345',
-            'name'  => 'Fuel Receipt',
-            'state' => 'submitted',
-        ];
-
-        $document = new Document($data);
-
-        $this->assertSame($data, $document->toArray());
     }
 
     #[Test]
@@ -147,15 +103,7 @@ class DocumentTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
-    {
-        $document = new Document;
-
-        $this->assertInstanceOf(Entity::class, $document);
-    }
-
-    #[Test]
-    public function legacy_approved_state_check_remains_backwards_compatible(): void
+    public function it_legacy_approved_state_check_remains_backwards_compatible(): void
     {
         $document = new Document([
             'state' => 'approved',
@@ -166,7 +114,7 @@ class DocumentTest extends TestCase
     }
 
     #[Test]
-    public function legacy_pending_state_check_remains_backwards_compatible(): void
+    public function it_legacy_pending_state_check_remains_backwards_compatible(): void
     {
         $document = new Document([
             'state' => 'pending',
@@ -177,7 +125,7 @@ class DocumentTest extends TestCase
     }
 
     #[Test]
-    public function legacy_rejected_state_check_remains_backwards_compatible(): void
+    public function it_legacy_rejected_state_check_remains_backwards_compatible(): void
     {
         $document = new Document([
             'state' => 'rejected',

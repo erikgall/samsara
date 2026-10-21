@@ -4,8 +4,10 @@ namespace Samsara;
 
 use Throwable;
 use Illuminate\Support\Arr;
+use Samsara\Http\RetryAfter;
 use InvalidArgumentException;
 use Illuminate\Container\Container;
+use Illuminate\Http\Client\Request;
 use Samsara\Resources\Beta\BetaResource;
 use Illuminate\Http\Client\PendingRequest;
 use Samsara\Data\Organization\Organization;
@@ -128,11 +130,7 @@ class Samsara
         $this->config = $config;
         $this->http = $http ?? new HttpFactory;
 
-        match ($config['region'] ?? 'us') {
-            'eu'    => $this->useEuEndpoint(),
-            'ca'    => $this->useCanadaEndpoint(),
-            default => $this,
-        };
+        $this->baseUrl = $this->regionBaseUrl($config['region'] ?? 'us');
     }
 
     /**
@@ -140,7 +138,6 @@ class Samsara
      */
     public function addresses(): AddressesResource
     {
-        /** @var AddressesResource */
         return $this->resource(AddressesResource::class);
     }
 
@@ -149,7 +146,6 @@ class Samsara
      */
     public function alerts(): AlertsResource
     {
-        /** @var AlertsResource */
         return $this->resource(AlertsResource::class);
     }
 
@@ -158,7 +154,6 @@ class Samsara
      */
     public function assets(): AssetsResource
     {
-        /** @var AssetsResource */
         return $this->resource(AssetsResource::class);
     }
 
@@ -169,7 +164,6 @@ class Samsara
      */
     public function beta(): BetaResource
     {
-        /** @var BetaResource */
         return $this->resource(BetaResource::class);
     }
 
@@ -178,7 +172,6 @@ class Samsara
      */
     public function cameraMedia(): CameraMediaResource
     {
-        /** @var CameraMediaResource */
         return $this->resource(CameraMediaResource::class);
     }
 
@@ -187,7 +180,6 @@ class Samsara
      */
     public function carrierProposedAssignments(): CarrierProposedAssignmentsResource
     {
-        /** @var CarrierProposedAssignmentsResource */
         return $this->resource(CarrierProposedAssignmentsResource::class);
     }
 
@@ -196,14 +188,21 @@ class Samsara
      */
     public function client(): PendingRequest
     {
+        $method = null;
+
         $request = $this->http->baseUrl($this->baseUrl)
             ->acceptJson()
             ->asJson()
             ->timeout($this->getConfig('timeout', 30))
+            ->beforeSending(function (Request $request) use (&$method): void {
+                $method = $request->method();
+            })
             ->retry(
                 $this->getConfig('attempts', 3),
                 fn (int $attempt, mixed $exception): int => $this->retryDelayMilliseconds($exception),
-                fn (Throwable $exception): bool          => $this->shouldRetry($exception),
+                function (Throwable $exception) use (&$method): bool {
+                    return $this->shouldRetry($exception, $method);
+                },
             );
 
         if ($this->token !== null) {
@@ -218,7 +217,6 @@ class Samsara
      */
     public function contacts(): ContactsResource
     {
-        /** @var ContactsResource */
         return $this->resource(ContactsResource::class);
     }
 
@@ -227,7 +225,6 @@ class Samsara
      */
     public function drivers(): DriversResource
     {
-        /** @var DriversResource */
         return $this->resource(DriversResource::class);
     }
 
@@ -236,7 +233,6 @@ class Samsara
      */
     public function driverTrailerAssignments(): DriverTrailerAssignmentsResource
     {
-        /** @var DriverTrailerAssignmentsResource */
         return $this->resource(DriverTrailerAssignmentsResource::class);
     }
 
@@ -245,7 +241,6 @@ class Samsara
      */
     public function driverVehicleAssignments(): DriverVehicleAssignmentsResource
     {
-        /** @var DriverVehicleAssignmentsResource */
         return $this->resource(DriverVehicleAssignmentsResource::class);
     }
 
@@ -254,7 +249,6 @@ class Samsara
      */
     public function equipment(): EquipmentResource
     {
-        /** @var EquipmentResource */
         return $this->resource(EquipmentResource::class);
     }
 
@@ -263,7 +257,6 @@ class Samsara
      */
     public function forms(): FormsResource
     {
-        /** @var FormsResource */
         return $this->resource(FormsResource::class);
     }
 
@@ -272,7 +265,6 @@ class Samsara
      */
     public function fuelAndEnergy(): FuelAndEnergyResource
     {
-        /** @var FuelAndEnergyResource */
         return $this->resource(FuelAndEnergyResource::class);
     }
 
@@ -281,7 +273,6 @@ class Samsara
      */
     public function gateways(): GatewaysResource
     {
-        /** @var GatewaysResource */
         return $this->resource(GatewaysResource::class);
     }
 
@@ -326,7 +317,6 @@ class Samsara
      */
     public function hoursOfService(): HoursOfServiceResource
     {
-        /** @var HoursOfServiceResource */
         return $this->resource(HoursOfServiceResource::class);
     }
 
@@ -335,7 +325,6 @@ class Samsara
      */
     public function hubs(): HubsResource
     {
-        /** @var HubsResource */
         return $this->resource(HubsResource::class);
     }
 
@@ -344,7 +333,6 @@ class Samsara
      */
     public function idling(): IdlingResource
     {
-        /** @var IdlingResource */
         return $this->resource(IdlingResource::class);
     }
 
@@ -353,7 +341,6 @@ class Samsara
      */
     public function ifta(): IftaResource
     {
-        /** @var IftaResource */
         return $this->resource(IftaResource::class);
     }
 
@@ -362,7 +349,6 @@ class Samsara
      */
     public function industrial(): IndustrialResource
     {
-        /** @var IndustrialResource */
         return $this->resource(IndustrialResource::class);
     }
 
@@ -371,7 +357,6 @@ class Samsara
      */
     public function issues(): IssuesResource
     {
-        /** @var IssuesResource */
         return $this->resource(IssuesResource::class);
     }
 
@@ -382,7 +367,6 @@ class Samsara
      */
     public function legacy(): LegacyResource
     {
-        /** @var LegacyResource */
         return $this->resource(LegacyResource::class);
     }
 
@@ -391,7 +375,6 @@ class Samsara
      */
     public function liveShares(): LiveSharingLinksResource
     {
-        /** @var LiveSharingLinksResource */
         return $this->resource(LiveSharingLinksResource::class);
     }
 
@@ -400,7 +383,6 @@ class Samsara
      */
     public function maintenance(): MaintenanceResource
     {
-        /** @var MaintenanceResource */
         return $this->resource(MaintenanceResource::class);
     }
 
@@ -409,7 +391,6 @@ class Samsara
      */
     public function me(): Organization
     {
-        /** @var OrganizationResource $resource */
         $resource = $this->resource(OrganizationResource::class);
 
         return $resource->current();
@@ -422,7 +403,6 @@ class Samsara
      */
     public function preview(): PreviewResource
     {
-        /** @var PreviewResource */
         return $this->resource(PreviewResource::class);
     }
 
@@ -431,7 +411,6 @@ class Samsara
      */
     public function routeEvents(): RouteEventsResource
     {
-        /** @var RouteEventsResource */
         return $this->resource(RouteEventsResource::class);
     }
 
@@ -440,7 +419,6 @@ class Samsara
      */
     public function routes(): RoutesResource
     {
-        /** @var RoutesResource */
         return $this->resource(RoutesResource::class);
     }
 
@@ -449,7 +427,6 @@ class Samsara
      */
     public function safetyEvents(): SafetyEventsResource
     {
-        /** @var SafetyEventsResource */
         return $this->resource(SafetyEventsResource::class);
     }
 
@@ -458,7 +435,6 @@ class Samsara
      */
     public function sensors(): SensorsResource
     {
-        /** @var SensorsResource */
         return $this->resource(SensorsResource::class);
     }
 
@@ -481,7 +457,6 @@ class Samsara
      */
     public function settings(): SettingsResource
     {
-        /** @var SettingsResource */
         return $this->resource(SettingsResource::class);
     }
 
@@ -490,7 +465,6 @@ class Samsara
      */
     public function speeding(): SpeedingResource
     {
-        /** @var SpeedingResource */
         return $this->resource(SpeedingResource::class);
     }
 
@@ -499,7 +473,6 @@ class Samsara
      */
     public function tachograph(): TachographResource
     {
-        /** @var TachographResource */
         return $this->resource(TachographResource::class);
     }
 
@@ -508,7 +481,6 @@ class Samsara
      */
     public function tags(): TagsResource
     {
-        /** @var TagsResource */
         return $this->resource(TagsResource::class);
     }
 
@@ -517,7 +489,6 @@ class Samsara
      */
     public function trailerAssignments(): TrailerAssignmentsResource
     {
-        /** @var TrailerAssignmentsResource */
         return $this->resource(TrailerAssignmentsResource::class);
     }
 
@@ -526,7 +497,6 @@ class Samsara
      */
     public function trailers(): TrailersResource
     {
-        /** @var TrailersResource */
         return $this->resource(TrailersResource::class);
     }
 
@@ -535,38 +505,7 @@ class Samsara
      */
     public function trips(): TripsResource
     {
-        /** @var TripsResource */
         return $this->resource(TripsResource::class);
-    }
-
-    /**
-     * Use a custom API base URL.
-     */
-    public function useBaseUrl(string $baseUrl): static
-    {
-        $this->baseUrl = rtrim($baseUrl, '/');
-
-        return $this;
-    }
-
-    /**
-     * Switch to the Canada API endpoint.
-     */
-    public function useCanadaEndpoint(): static
-    {
-        $this->baseUrl = self::CANADA_BASE_URL;
-
-        return $this;
-    }
-
-    /**
-     * Switch to the EU API endpoint.
-     */
-    public function useEuEndpoint(): static
-    {
-        $this->baseUrl = self::EU_BASE_URL;
-
-        return $this;
     }
 
     /**
@@ -574,18 +513,7 @@ class Samsara
      */
     public function users(): UsersResource
     {
-        /** @var UsersResource */
         return $this->resource(UsersResource::class);
-    }
-
-    /**
-     * Switch to the US API endpoint.
-     */
-    public function useUsEndpoint(): static
-    {
-        $this->baseUrl = self::US_BASE_URL;
-
-        return $this;
     }
 
     /**
@@ -593,7 +521,6 @@ class Samsara
      */
     public function vehicleLocations(): VehicleLocationsResource
     {
-        /** @var VehicleLocationsResource */
         return $this->resource(VehicleLocationsResource::class);
     }
 
@@ -602,7 +529,6 @@ class Samsara
      */
     public function vehicles(): VehiclesResource
     {
-        /** @var VehiclesResource */
         return $this->resource(VehiclesResource::class);
     }
 
@@ -611,7 +537,6 @@ class Samsara
      */
     public function vehicleStats(): VehicleStatsResource
     {
-        /** @var VehicleStatsResource */
         return $this->resource(VehicleStatsResource::class);
     }
 
@@ -620,8 +545,19 @@ class Samsara
      */
     public function webhooks(): WebhooksResource
     {
-        /** @var WebhooksResource */
         return $this->resource(WebhooksResource::class);
+    }
+
+    /**
+     * Create an isolated client with a custom API base URL.
+     */
+    public function withBaseUrl(string $url): static
+    {
+        $client = clone $this;
+        $client->baseUrl = rtrim($url, '/');
+        $client->resources = [];
+
+        return $client;
     }
 
     /**
@@ -634,6 +570,14 @@ class Samsara
         $client->resources = [];
 
         return $client;
+    }
+
+    /**
+     * Create an isolated client for an API region.
+     */
+    public function withRegion(string $region): static
+    {
+        return $this->withBaseUrl($this->regionBaseUrl($region));
     }
 
     /**
@@ -655,7 +599,6 @@ class Samsara
      */
     public function workOrders(): WorkOrdersResource
     {
-        /** @var WorkOrdersResource */
         return $this->resource(WorkOrdersResource::class);
     }
 
@@ -677,6 +620,7 @@ class Samsara
                 'region',
                 'timeout',
                 'attempts',
+                'retry_writes',
                 'retry_after_max_seconds',
                 'per_page',
             ]);
@@ -709,6 +653,19 @@ class Samsara
     }
 
     /**
+     * Resolve the API base URL for a supported region.
+     */
+    private function regionBaseUrl(string $region): string
+    {
+        return match ($region) {
+            'us'    => self::US_BASE_URL,
+            'eu'    => self::EU_BASE_URL,
+            'ca'    => self::CANADA_BASE_URL,
+            default => throw new InvalidArgumentException("Unsupported Samsara region [{$region}]."),
+        };
+    }
+
+    /**
      * Determine whether a rate-limit delay is safe to honor synchronously.
      */
     private function retryAfterIsWithinCeiling(RequestException $exception): bool
@@ -727,21 +684,7 @@ class Samsara
      */
     private function retryAfterSeconds(RequestException $exception): ?int
     {
-        $retryAfter = $exception->response->header('Retry-After');
-
-        if ($retryAfter === null) {
-            return null;
-        }
-
-        $retryAfter = trim($retryAfter);
-
-        if (ctype_digit($retryAfter)) {
-            return (int) $retryAfter;
-        }
-
-        $retryAt = strtotime($retryAfter);
-
-        return $retryAt === false ? null : max(0, $retryAt - time());
+        return RetryAfter::seconds($exception->response->header('Retry-After'));
     }
 
     /**
@@ -765,22 +708,21 @@ class Samsara
     /**
      * Retry only transport failures and statuses that are safe to retry.
      */
-    private function shouldRetry(Throwable $exception): bool
+    private function shouldRetry(Throwable $exception, ?string $method): bool
     {
-        if ($exception instanceof ConnectionException) {
-            return true;
+        if ($exception instanceof RequestException && $exception->response->status() === 429) {
+            return $this->retryAfterIsWithinCeiling($exception);
         }
 
-        if (! $exception instanceof RequestException) {
+        if (! $this->getConfig('retry_writes', false) && ! in_array($method, ['GET', 'HEAD', 'OPTIONS'], true)) {
             return false;
         }
 
-        $status = $exception->response->status();
-
         return match (true) {
-            $status === 429                 => $this->retryAfterIsWithinCeiling($exception),
-            $status === 408, $status >= 500 => true,
-            default                         => false,
+            $exception instanceof ConnectionException => true,
+            $exception instanceof RequestException    => $exception->response->status() === 408
+                || $exception->response->serverError(),
+            default => false,
         };
     }
 }

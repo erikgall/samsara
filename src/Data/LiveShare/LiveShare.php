@@ -4,6 +4,7 @@ namespace Samsara\Data\LiveShare;
 
 use DateTimeImmutable;
 use Samsara\Data\Entity;
+use Illuminate\Support\Carbon;
 
 /**
  * LiveShare entity.
@@ -65,6 +66,6 @@ class LiveShare extends Entity
             return false;
         }
 
-        return new DateTimeImmutable($this->expiresAtTime) <= new DateTimeImmutable;
+        return new DateTimeImmutable($this->expiresAtTime) <= Carbon::now();
     }
 }

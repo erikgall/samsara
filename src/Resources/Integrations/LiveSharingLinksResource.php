@@ -5,6 +5,7 @@ namespace Samsara\Resources\Integrations;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\LiveShare\LiveShare;
+use Samsara\Resources\Concerns\CreatesEntities;
 
 /**
  * LiveSharingLinks resource for the Samsara API.
@@ -12,9 +13,14 @@ use Samsara\Data\LiveShare\LiveShare;
  * Provides access to live sharing link management endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<LiveShare>
  */
 class LiveSharingLinksResource extends Resource
 {
+    /** @use CreatesEntities<LiveShare> */
+    use CreatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -43,10 +49,12 @@ class LiveSharingLinksResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<LiveShare>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
+        return $this->newQuery();
     }
 
     /**
@@ -62,17 +70,6 @@ class LiveSharingLinksResource extends Resource
             $endpoint
         );
 
-        /** @var LiveShare */
         return $this->mapToEntity($this->decodeJsonData($response, $endpoint, false));
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'create', 'update', 'delete'];
     }
 }

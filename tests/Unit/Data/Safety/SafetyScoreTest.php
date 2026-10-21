@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Safety;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use Samsara\Data\Safety\SafetyScore;
 use PHPUnit\Framework\Attributes\Test;
@@ -36,33 +35,6 @@ class SafetyScoreTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $score = new SafetyScore([
-            'driverId'              => 'driver-1',
-            'driverScore'           => 92,
-            'driveDistanceMeters'   => 2207296,
-            'driveTimeMilliseconds' => 136997730,
-        ]);
-
-        $this->assertSame('driver-1', $score->driverId);
-        $this->assertSame(92, $score->driverScore);
-        $this->assertSame(2207296, $score->driveDistanceMeters);
-        $this->assertSame(136997730, $score->driveTimeMilliseconds);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $score = SafetyScore::make([
-            'driverId'    => 'driver-1',
-            'driverScore' => 92,
-        ]);
-
-        $this->assertInstanceOf(SafetyScore::class, $score);
-    }
-
-    #[Test]
     public function it_can_check_if_score_is_excellent(): void
     {
         $score = new SafetyScore([
@@ -91,19 +63,6 @@ class SafetyScoreTest extends TestCase
         ]);
 
         $this->assertTrue($score->needsImprovement());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'driverId'    => 'driver-1',
-            'driverScore' => 92,
-        ];
-
-        $score = new SafetyScore($data);
-
-        $this->assertSame($data, $score->toArray());
     }
 
     #[Test]
@@ -170,14 +129,6 @@ class SafetyScoreTest extends TestCase
         ]);
 
         $this->assertCount(2, $score->speeding);
-    }
-
-    #[Test]
-    public function it_extends_entity(): void
-    {
-        $score = new SafetyScore;
-
-        $this->assertInstanceOf(Entity::class, $score);
     }
 
     #[Test]

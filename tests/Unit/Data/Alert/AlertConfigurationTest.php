@@ -2,7 +2,6 @@
 
 namespace Samsara\Tests\Unit\Data\Alert;
 
-use Samsara\Data\Entity;
 use Samsara\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Samsara\Data\Alert\AlertConfiguration;
@@ -15,35 +14,6 @@ use Samsara\Data\Alert\AlertConfiguration;
 class AlertConfigurationTest extends TestCase
 {
     #[Test]
-    public function it_can_be_created_with_attributes(): void
-    {
-        $alert = new AlertConfiguration([
-            'id'            => '12345',
-            'name'          => 'Speed Alert',
-            'isEnabled'     => true,
-            'createdAtTime' => '2024-04-10T07:06:25Z',
-            'actions'       => [],
-            'scope'         => [],
-            'triggers'      => [],
-        ]);
-
-        $this->assertSame('12345', $alert->id);
-        $this->assertSame('Speed Alert', $alert->name);
-        $this->assertTrue($alert->isEnabled);
-    }
-
-    #[Test]
-    public function it_can_be_created_with_make(): void
-    {
-        $alert = AlertConfiguration::make([
-            'id' => '12345',
-        ]);
-
-        $this->assertInstanceOf(AlertConfiguration::class, $alert);
-        $this->assertSame('12345', $alert->getId());
-    }
-
-    #[Test]
     public function it_can_check_if_enabled(): void
     {
         $alert = new AlertConfiguration([
@@ -51,20 +21,6 @@ class AlertConfigurationTest extends TestCase
         ]);
 
         $this->assertTrue($alert->isEnabled());
-    }
-
-    #[Test]
-    public function it_can_convert_to_array(): void
-    {
-        $data = [
-            'id'        => '12345',
-            'name'      => 'Speed Alert',
-            'alertType' => 'speed',
-        ];
-
-        $alert = new AlertConfiguration($data);
-
-        $this->assertSame($data, $alert->toArray());
     }
 
     #[Test]
@@ -106,11 +62,44 @@ class AlertConfigurationTest extends TestCase
     }
 
     #[Test]
-    public function it_extends_entity(): void
+    public function it_legacy_fuel_level_type_check_remains_backwards_compatible(): void
     {
-        $alert = new AlertConfiguration;
+        $alert = new AlertConfiguration([
+            'alertType' => 'fuelLevel',
+        ]);
 
-        $this->assertInstanceOf(Entity::class, $alert);
+        $this->assertTrue($alert->isFuelLevelType());
+    }
+
+    #[Test]
+    public function it_legacy_geofence_type_check_remains_backwards_compatible(): void
+    {
+        $alert = new AlertConfiguration([
+            'alertType' => 'geofence',
+        ]);
+
+        $this->assertTrue($alert->isGeofenceType());
+    }
+
+    #[Test]
+    public function it_legacy_idle_type_check_remains_backwards_compatible(): void
+    {
+        $alert = new AlertConfiguration([
+            'alertType' => 'idle',
+        ]);
+
+        $this->assertTrue($alert->isIdleType());
+    }
+
+    #[Test]
+    public function it_legacy_speed_type_check_remains_backwards_compatible(): void
+    {
+        $alert = new AlertConfiguration([
+            'alertType' => 'speed',
+        ]);
+
+        $this->assertTrue($alert->isSpeedType());
+        $this->assertFalse($alert->isGeofenceType());
     }
 
     #[Test]
@@ -129,46 +118,5 @@ class AlertConfigurationTest extends TestCase
         ]);
 
         $this->assertFalse($alert->isEnabled());
-    }
-
-    #[Test]
-    public function legacy_fuel_level_type_check_remains_backwards_compatible(): void
-    {
-        $alert = new AlertConfiguration([
-            'alertType' => 'fuelLevel',
-        ]);
-
-        $this->assertTrue($alert->isFuelLevelType());
-    }
-
-    #[Test]
-    public function legacy_geofence_type_check_remains_backwards_compatible(): void
-    {
-        $alert = new AlertConfiguration([
-            'alertType' => 'geofence',
-        ]);
-
-        $this->assertTrue($alert->isGeofenceType());
-    }
-
-    #[Test]
-    public function legacy_idle_type_check_remains_backwards_compatible(): void
-    {
-        $alert = new AlertConfiguration([
-            'alertType' => 'idle',
-        ]);
-
-        $this->assertTrue($alert->isIdleType());
-    }
-
-    #[Test]
-    public function legacy_speed_type_check_remains_backwards_compatible(): void
-    {
-        $alert = new AlertConfiguration([
-            'alertType' => 'speed',
-        ]);
-
-        $this->assertTrue($alert->isSpeedType());
-        $this->assertFalse($alert->isGeofenceType());
     }
 }

@@ -6,6 +6,7 @@ use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Form\FormTemplate;
 use Samsara\Data\Form\FormSubmission;
+use Samsara\Resources\Concerns\CreatesEntities;
 
 /**
  * Forms resource for the Samsara API.
@@ -13,9 +14,14 @@ use Samsara\Data\Form\FormSubmission;
  * Provides access to form submission and template endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<FormSubmission>
  */
 class FormsResource extends Resource
 {
+    /** @use CreatesEntities<FormSubmission> */
+    use CreatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -40,7 +46,6 @@ class FormsResource extends Resource
             $this->endpoint
         );
 
-        /** @var FormSubmission */
         return $this->mapToEntity($this->decodeJsonData($response, $this->endpoint));
     }
 
@@ -80,14 +85,18 @@ class FormsResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<FormSubmission>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)->withoutDefaultPageSize();
+        return $this->newQuery()->withoutDefaultPageSize();
     }
 
     /**
      * Get a query builder for form submissions.
+     *
+     * @return Builder<FormSubmission>
      */
     public function submissions(): Builder
     {
@@ -96,20 +105,24 @@ class FormsResource extends Resource
 
     /**
      * Get a query builder for form submissions stream.
+     *
+     * @return Builder<FormSubmission>
      */
     public function submissionsStream(): Builder
     {
-        return $this->createBuilderWithEndpoint('/form-submissions/stream')
+        return $this->newQuery('/form-submissions/stream')
             ->withoutDefaultPageSize()
             ->usingEntity(FormSubmission::class);
     }
 
     /**
      * Get all form templates.
+     *
+     * @return Builder<FormTemplate>
      */
     public function templates(): Builder
     {
-        return $this->createBuilderWithEndpoint('/form-templates')
+        return $this->newQuery('/form-templates')
             ->withoutDefaultPageSize()
             ->usingEntity(FormTemplate::class);
     }
@@ -127,15 +140,6 @@ class FormsResource extends Resource
             $this->endpoint
         );
 
-        /** @var FormSubmission */
         return $this->mapToEntity($this->decodeJsonData($response, $this->endpoint));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['create'];
     }
 }

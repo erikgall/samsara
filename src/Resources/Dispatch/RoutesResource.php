@@ -6,6 +6,10 @@ use Samsara\Query\Builder;
 use Samsara\Data\Route\Route;
 use Samsara\Resources\Resource;
 use Samsara\Data\Route\RouteAuditLog;
+use Samsara\Resources\Concerns\FindsEntities;
+use Samsara\Resources\Concerns\CreatesEntities;
+use Samsara\Resources\Concerns\DeletesEntities;
+use Samsara\Resources\Concerns\UpdatesEntities;
 
 /**
  * Routes resource for the Samsara API.
@@ -13,9 +17,23 @@ use Samsara\Data\Route\RouteAuditLog;
  * Provides access to route management endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Route>
  */
 class RoutesResource extends Resource
 {
+    /** @use CreatesEntities<Route> */
+    use CreatesEntities;
+
+    /** @use DeletesEntities<Route> */
+    use DeletesEntities;
+
+    /** @use FindsEntities<Route> */
+    use FindsEntities;
+
+    /** @use UpdatesEntities<Route> */
+    use UpdatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -30,29 +48,23 @@ class RoutesResource extends Resource
 
     /**
      * Get a query builder for route audit logs.
+     *
+     * @return Builder<RouteAuditLog>
      */
     public function auditLogs(): Builder
     {
-        return $this->createBuilderWithEndpoint('/fleet/routes/audit-logs/feed')
+        return $this->newQuery('/fleet/routes/audit-logs/feed')
             ->withoutDefaultPageSize()
             ->usingEntity(RouteAuditLog::class);
     }
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Route>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['find', 'create', 'update', 'delete'];
+        return $this->newQuery();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Samsara\Resources\Additional;
 
+use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
 use Samsara\Data\Trailer\Trailer;
@@ -12,6 +13,8 @@ use Samsara\Data\Trailer\Trailer;
  * Provides access to legacy trailer assignment endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class TrailerAssignmentsResource extends Resource
 {
@@ -38,21 +41,15 @@ class TrailerAssignmentsResource extends Resource
 
     /**
      * Query all trailer assignments from the wrapped v1 collection.
+     *
+     * @return Builder<Trailer>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)
+        return $this->newQuery()
             ->withoutDefaultPageSize()
             ->withCursorParameter('startingAfter')
             ->withResponseCollectionKey('trailers')
             ->usingEntity(Trailer::class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return [];
     }
 }

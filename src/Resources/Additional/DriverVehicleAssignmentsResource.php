@@ -5,6 +5,7 @@ namespace Samsara\Resources\Additional;
 use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Resources\Resource;
+use Samsara\Resources\Concerns\CreatesEntities;
 
 /**
  * DriverVehicleAssignments resource for the Samsara API.
@@ -12,9 +13,14 @@ use Samsara\Resources\Resource;
  * Provides access to driver-vehicle assignment endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<Entity>
  */
 class DriverVehicleAssignmentsResource extends Resource
 {
+    /** @use CreatesEntities<Entity> */
+    use CreatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -37,10 +43,12 @@ class DriverVehicleAssignmentsResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<Entity>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint)->withoutDefaultPageSize();
+        return $this->newQuery()->withoutDefaultPageSize();
     }
 
     /**
@@ -56,13 +64,5 @@ class DriverVehicleAssignmentsResource extends Resource
         );
 
         return Entity::make($this->decodeJsonData($response, $this->endpoint, false));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['create'];
     }
 }

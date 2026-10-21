@@ -2,6 +2,7 @@
 
 namespace Samsara\Testing;
 
+use ArrayObject;
 use Samsara\Samsara;
 use PHPUnit\Framework\Assert;
 use Illuminate\Http\Client\Request;
@@ -23,18 +24,26 @@ class SamsaraFake extends Samsara
     protected HttpFactory $fakeHttp;
 
     /**
-     * The faked responses keyed by endpoint pattern.
+     * The staged responses shared across credential and region clones.
      *
-     * @var array<string, array{data: array<mixed>, status: int}>
+     * @var ArrayObject<string, array{data: array<mixed>, status: int}>
      */
-    protected array $responses = [];
+    protected ArrayObject $responses;
 
     /**
      * Create a new SamsaraFake instance.
+     *
+     * @param  array<string, array<mixed>>  $responses
      */
-    public function __construct()
+    public function __construct(array $responses = [])
     {
         parent::__construct('fake-token');
+
+        $this->responses = new ArrayObject;
+
+        foreach ($responses as $endpoint => $response) {
+            $this->fakeResponse($endpoint, $response);
+        }
 
         $this->fakeHttp = new HttpFactory;
         $this->setupFake();
@@ -104,16 +113,6 @@ class SamsaraFake extends Samsara
     }
 
     /**
-     * Fake a drivers response.
-     *
-     * @param  array<int, array<string, mixed>>  $drivers
-     */
-    public function fakeDrivers(array $drivers): static
-    {
-        return $this->fakeResponse('/fleet/drivers', $drivers);
-    }
-
-    /**
      * Fake a response for an endpoint.
      *
      * @param  array<mixed>  $data
@@ -129,44 +128,24 @@ class SamsaraFake extends Samsara
     }
 
     /**
-     * Fake a vehicles response.
-     *
-     * @param  array<int, array<string, mixed>>  $vehicles
-     */
-    public function fakeVehicles(array $vehicles): static
-    {
-        return $this->fakeResponse('/fleet/vehicles', $vehicles);
-    }
-
-    /**
-     * Fake a vehicle stats response.
-     *
-     * @param  array<int, array<string, mixed>>  $stats
-     */
-    public function fakeVehicleStats(array $stats): static
-    {
-        return $this->fakeResponse('/fleet/vehicles/stats', $stats);
-    }
-
-    /**
      * Get the recorded requests.
      *
      * @return array<int, \Illuminate\Http\Client\Request>
      */
     public function getRecordedRequests(): array
     {
-        return $this->fakeHttp->recorded()->map(function ($pair) {
-            return $pair[0];
-        })->all();
+        return $this->fakeHttp->recorded()->map(fn (array $pair): Request => $pair[0])->all();
     }
 
     /**
      * Create a new SamsaraFake instance.
+     *
+     * @param  array<string, array<mixed>>  $responses
      */
-    public static function create(): static
+    public static function create(array $responses = []): static
     {
         /** @phpstan-ignore new.static */
-        return new static;
+        return new static($responses);
     }
 
     /**
@@ -206,7 +185,7 @@ class SamsaraFake extends Samsara
     {
         $path = parse_url($request->url(), PHP_URL_PATH);
 
-        if (! is_string($path) || ! array_key_exists($path, $this->responses)) {
+        if (! is_string($path) || ! isset($this->responses[$path])) {
             return null;
         }
 

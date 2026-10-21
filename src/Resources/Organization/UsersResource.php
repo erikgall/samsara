@@ -5,6 +5,10 @@ namespace Samsara\Resources\Organization;
 use Samsara\Query\Builder;
 use Samsara\Data\User\User;
 use Samsara\Resources\Resource;
+use Samsara\Resources\Concerns\FindsEntities;
+use Samsara\Resources\Concerns\CreatesEntities;
+use Samsara\Resources\Concerns\DeletesEntities;
+use Samsara\Resources\Concerns\UpdatesEntities;
 
 /**
  * Users resource for the Samsara API.
@@ -12,9 +16,23 @@ use Samsara\Resources\Resource;
  * Provides access to user management endpoints.
  *
  * @author Erik Galloway <erik@erikgall.com>
+ *
+ * @extends \Samsara\Resources\Resource<User>
  */
 class UsersResource extends Resource
 {
+    /** @use CreatesEntities<User> */
+    use CreatesEntities;
+
+    /** @use DeletesEntities<User> */
+    use DeletesEntities;
+
+    /** @use FindsEntities<User> */
+    use FindsEntities;
+
+    /** @use UpdatesEntities<User> */
+    use UpdatesEntities;
+
     /**
      * The API endpoint for this resource.
      */
@@ -29,19 +47,11 @@ class UsersResource extends Resource
 
     /**
      * Create a new query builder for this resource.
+     *
+     * @return Builder<User>
      */
     public function query(): Builder
     {
-        return $this->createBuilderWithEndpoint($this->endpoint);
-    }
-
-    /**
-     * Get the inherited generic operations supported by this resource.
-     *
-     * @return array<int, string>
-     */
-    protected function supportedGenericOperations(): array
-    {
-        return ['all', 'find', 'create', 'update', 'delete'];
+        return $this->newQuery();
     }
 }
