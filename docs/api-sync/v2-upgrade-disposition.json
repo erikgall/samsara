@@ -8,7 +8,7 @@
     },
     "release_scope": {
         "comparison": "v1.1.0..final-dev",
-        "changed_files": 349,
+        "changed_files": 350,
         "content_digest_exclusions": [
             "docs/api-sync/v2-upgrade-disposition.json"
         ],
@@ -42,7 +42,7 @@
         "additive_no_action": 33,
         "documentation_only": 68,
         "internal_only": 1,
-        "supporting_evidence": 149,
+        "supporting_evidence": 150,
         "upgrade_action": 98
     },
     "records": [
@@ -76,7 +76,7 @@
         {
             "path": ".gitattributes",
             "content_state": "present",
-            "content_sha256": "fef805b5bb8aaa77ca6e4f7ebbf5564e6d1d57155064960e13ccac2d71af7d17",
+            "content_sha256": "29c58307bd713081d4a0d5042cb1a127902ce19fd16b7c51da0bdf21b983392e",
             "disposition": "additive_no_action",
             "guide_sections": [],
             "consumer_action": null,
@@ -85,7 +85,7 @@
         {
             "path": ".github/workflows/tests.yml",
             "content_state": "present",
-            "content_sha256": "c97c7c29f3126d3afb6efc0d561cc738a46f3c47a3a4600cdc56f3e489c11734",
+            "content_sha256": "7e1b40ba7550caacd5c55d792fc9dee869327df2234e4f4aa56417f2a71a7c09",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -107,7 +107,7 @@
         {
             "path": "BREAKING_CHANGES.md",
             "content_state": "present",
-            "content_sha256": "3429663d30b538901a4565b19f7c838e0cd550511bb83af2cf85eef23fbe631d",
+            "content_sha256": "bdf15e3230f33dd0227b0f89ef6afc76e51edddfe1d1876813b9118d218ded10",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -116,7 +116,7 @@
         {
             "path": "CHANGELOG.md",
             "content_state": "present",
-            "content_sha256": "054b989c0ebc15508401372a6094d37967105301ba4d89a40685722aedde9d7e",
+            "content_sha256": "172118292ac80a8f5a638ea2bbf642f2770e3496efa40a892bd5ea5ed646aaa1",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -145,7 +145,7 @@
         {
             "path": "README.md",
             "content_state": "present",
-            "content_sha256": "9a86e2695809053e175696c4ae327aebe1e6a6824226d6621ff031df2f002a54",
+            "content_sha256": "8b1a7cb1a585f0b9b6904b37e9bde87887f810e298c142cb07cc9ec413dcdc24",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -154,7 +154,7 @@
         {
             "path": "UPGRADE.md",
             "content_state": "present",
-            "content_sha256": "115ce4a7a577355c67b80946657dbb49555839a1afefdc69fe14219425952a3d",
+            "content_sha256": "dfbd71914ccbdb199de8248e5d55e696ada9a0bf34a0f2392432b385ce64c56f",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -163,11 +163,22 @@
         {
             "path": "composer.json",
             "content_state": "present",
-            "content_sha256": "7095a8aa757ee75ce796267b4f1847bad6e15545b9408038a7f8226053c83d6c",
+            "content_sha256": "23b232b9a5c0011b24d16c453b8c95f0eda59c7279a3ec9a5fb9522ab786a19b",
             "disposition": "additive_no_action",
             "guide_sections": [],
             "consumer_action": null,
             "no_action_reason": "Adds maintainer-only validation and memory-limit settings; it does not change the installed SDK runtime or require consumer migration."
+        },
+        {
+            "path": "composer.lock",
+            "content_state": "present",
+            "content_sha256": "c5929de69556b4cde909b0e5e6e1913d003f45686d8d9cfcf3a271f57045f17a",
+            "disposition": "supporting_evidence",
+            "guide_sections": [
+                "package-maintainer-evidence"
+            ],
+            "consumer_action": null,
+            "no_action_reason": "Contract, audit, validation, CI, or formatting evidence for the documented migration; it does not add a separate consumer action."
         },
         {
             "path": "config/samsara.php",
@@ -217,7 +228,7 @@
         {
             "path": "docs/.gitignore",
             "content_state": "present",
-            "content_sha256": "b1a429ddf7c79006f54afde6039cdf8603ecdbfe012b4c6cd5e9d525396d898c",
+            "content_sha256": "ee2c7d8e76d3910e84bc355d29a023602236ac140ef9fc1485fd5cf9782cbe2e",
             "disposition": "internal_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -255,7 +266,7 @@
         {
             "path": "docs/api-sync/contract-inventory.json",
             "content_state": "present",
-            "content_sha256": "975c8280bafc9379096cf8e9c9cdca3573bc1e969bac5d15b7f0ea94bd06fe6c",
+            "content_sha256": "9bdc87f20133072415dfddbbaac4e57db48590b109a0bd216fb128b08c7a00e9",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -315,7 +326,7 @@
         {
             "path": "docs/error-handling.md",
             "content_state": "present",
-            "content_sha256": "b78183613ebe2c20f324aa178f6db7a74e7391e0dfbdaed61b407f8aa0a0851e",
+            "content_sha256": "3e4adac14118e7a82674e573bdcda8738420cc863db4532ac6e2fd954c03888f",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -450,7 +461,7 @@
         {
             "path": "docs/resources/fuel-and-energy.md",
             "content_state": "present",
-            "content_sha256": "43d228045712363ca229071a7b0486f33e29955b0c5ffc0127ed244c4486c7e1",
+            "content_sha256": "489eebfc90450de53813cafb0f0f9939b041ebd6245046a532a5b84716466668",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -720,7 +731,7 @@
         {
             "path": "docs/upgrade-guide-v2.md",
             "content_state": "present",
-            "content_sha256": "76b4649c6f42e2dd8d1a3f41e9770237fa5b8f5d6ff7111bcbbfe9fffd01e363",
+            "content_sha256": "68902a7fb3dfc989fcc3fc3b21b13d46cc92689479d99b50c328b1164e64c74a",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -812,7 +823,7 @@
         {
             "path": "resources/boost/skills/upgrade-samsara-sdk-v2/SKILL.md",
             "content_state": "present",
-            "content_sha256": "c93745e329ac5fc1ef91763890da85909105c3c0e9a215d35f64a932aad00813",
+            "content_sha256": "8df27ec85bf56f14a9d94ab45884a78a6a539fb6a700a8269a7344c48363e7ee",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -832,7 +843,7 @@
         {
             "path": "scripts/check-v2-upgrade-guide.php",
             "content_state": "present",
-            "content_sha256": "041f7aedc75474a96862ce7f2605440f10b354f64dc84335212d1ee26e1f5886",
+            "content_sha256": "55ac3aadacb85d3823e97b9191878d0ed87299fb6cf1e289bfed9c2218cb3699",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -1733,7 +1744,7 @@
         {
             "path": "src/Query/Pagination/CursorPaginator.php",
             "content_state": "present",
-            "content_sha256": "47ddfa1e268af09f23f7c7b94e8d4b9e1f35aa107881d1a9177d7b9fa083b9a6",
+            "content_sha256": "da62cee172475b822aee20de65e83806455229326422edef4ae062fc223f5c61",
             "disposition": "upgrade_action",
             "guide_sections": [
                 "mig-19"
@@ -3167,7 +3178,7 @@
         {
             "path": "tests/Unit/DistributionArchiveTest.php",
             "content_state": "present",
-            "content_sha256": "1f26e47f16f2bee35f62effa91ce82ad451153442dba22e30325d953f7cd1815",
+            "content_sha256": "6a81b1cd696be1239df0403e4333af7f46444dfe540b4a629323b88b3ea17107",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
@@ -3277,7 +3288,7 @@
         {
             "path": "tests/Unit/Query/Pagination/CursorPaginatorTest.php",
             "content_state": "present",
-            "content_sha256": "fab75bae8a364991555b93ade422b23b81d064c2c18910cbf2272c370cba8aec",
+            "content_sha256": "a7f2d1e7ccd3fa8fe24171fe823108c28a175281f5183048c7f68eff48d5ca9d",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"

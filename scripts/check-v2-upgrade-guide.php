@@ -117,6 +117,7 @@ PATHS);
 $supportingEvidence = listedPaths(<<<'PATHS'
 .github/workflows/tests.yml
 .prettierrc
+composer.lock
 DEVELOPMENT_CHANGELOG.md
 contracts/samsara/README.md
 contracts/samsara/samsara-api-2026-08-10.json
@@ -625,11 +626,11 @@ $expectedCounts = [
     'additive_no_action'  => 33,
     'documentation_only'  => 68,
     'internal_only'       => 1,
-    'supporting_evidence' => 149,
+    'supporting_evidence' => 150,
     'upgrade_action'      => 98,
 ];
 
-if ($counts !== $expectedCounts || count($baseline) !== 239 || count($releaseScope) !== 349) {
+if ($counts !== $expectedCounts || count($baseline) !== 239 || count($releaseScope) !== 350) {
     fwrite(STDERR, 'FAIL: audited disposition counts drifted: '.json_encode($counts)."\n");
     exit(1);
 }

@@ -50,7 +50,7 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
     {
         $this->items = $items;
         $this->cursor = $cursor;
-        $this->builder = $builder;
+        $this->builder = clone $builder;
     }
 
     /**

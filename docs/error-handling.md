@@ -254,6 +254,14 @@ The SDK retries transient HTTP failures automatically. Configure the maximum num
 
 The value includes the initial request: `1` makes one request without retries, while `3` permits up to two retries.
 
+Retries also apply to writes. A timeout or server error can occur after Samsara has accepted a mutation, so replaying a create or other non-idempotent operation can duplicate its effects. For such writes, use a separate client configured with `attempts => 1`, then reconcile the result before retrying at the application level:
+
+```php
+$writeClient = new \Samsara\Samsara($token, ['attempts' => 1]);
+// Apply the same region as your normal client (useUsEndpoint, useEuEndpoint, or useCanadaEndpoint).
+$writeClient->useUsEndpoint();
+```
+
 The retry-after ceiling limits synchronous rate-limit waits. The SDK honors smaller delta-seconds and HTTP-date values. When Samsara asks for a longer delay, the SDK sends no retry and throws `RateLimitException` with the original delay so a queue or application scheduler can reschedule the work.
 
 For application-level retry with exponential backoff — for example, when a long-running job hits a rate limit — wrap the call in a small helper:

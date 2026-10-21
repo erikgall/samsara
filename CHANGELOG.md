@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Lifecycle coverage**: Added contract-backed issue, work-order, driver-assignment, DVIR, and defect mutations and item reads without enabling fabricated generic item paths.
 - **Typed legacy and organization reads**: Added typed `/me`, machine, vision-camera, defect-type, and all-trailer-assignment access.
-- **Upgrade documentation**: Added a canonical v1.1.0-to-v2.0.0 guide with executable migrations, exact before/after wire contracts, an agent completion record, and a machine-checked disposition for all 348 final release paths.
+- **Upgrade documentation**: Added a canonical v1.1.0-to-v2.0.0 guide with executable migrations, exact before/after wire contracts, an agent completion record, and a machine-checked disposition for all final release paths.
 - **Laravel Boost guidance**: Added package-discovered Agent Skills for current v2 application development and v1.1-to-v2 migration work, with focused references for integration, querying, responses, testing, and webhooks.
 - **Form submissions**: Added seven exact current-status predicates: `isNotStarted()`, `isCompleted()`, `isArchived()`, `isInProgress()`, `needsReview()`, `hasChangesRequested()`, and `isApproved()`.
 - **Route stops**: Added six exact state predicates plus actual/planned distance conversion helpers for kilometers and miles.
@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Cursor pagination**: `CursorPaginator::nextPage()` now clones the query builder instead of mutating the caller's builder, so a reused builder no longer carries a stale `after` cursor.
 - **API contract alignment**: Reconciled capability gates, wrapped paths and methods, query encoding, pagination defaults, typed errors, and endpoint-specific DTO mapping against the pinned 2026-08-10 Samsara contract. See `BREAKING_CHANGES.md` and `UPGRADE.md` before adopting v2.
 - **Request attempts**: Renamed the ambiguous `retry` / `SAMSARA_RETRY` configuration to `attempts` / `SAMSARA_ATTEMPTS`. The value is the maximum total request count, including the initial request, and values below `1` are rejected during client construction.
 - **Bounded Retry-After**: Added a configurable 30-second synchronous `Retry-After` ceiling. Larger rate-limit delays surface immediately as `RateLimitException`; smaller delays remain honored.

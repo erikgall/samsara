@@ -18,3 +18,6 @@ vendor/
 
 # Local collaboration artifacts
 /playgrounds/
+
+# Local bundler state
+.bundle/

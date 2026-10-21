@@ -62,6 +62,8 @@ The builders map `data.driverReports` or `data.vehicleReports` to generic `Entit
 
 The efficiency endpoints expose query builders whose timestamp window uses `startTime` and `endTime`.
 
+As of the September 10, 2026 public Samsara contract, these two endpoints are legacy and unavailable to new customers. Existing eligible organizations can continue using the wrappers. New integrations should evaluate Samsara's beta Custom Reports API; this SDK does not provide a drop-in replacement. A permission or eligibility failure here does not establish that the SDK request is malformed.
+
 ```php
 use Carbon\Carbon;
 

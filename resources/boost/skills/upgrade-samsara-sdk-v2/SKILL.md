@@ -17,7 +17,7 @@ Treat the installed package's complete upgrade guide as the migration authority.
     composer why-not erikgall/samsara ^2.0
     ```
 
-2. From the package root, read `UPGRADE.md`, then read the linked `docs/upgrade-guide-v2.md` completely before editing.
+2. From the package root, read `UPGRADE.md`, then read the linked canonical upgrade guide completely before editing. Composer distributions exclude `docs/`; follow the GitHub link in `UPGRADE.md` when the local guide is absent.
 3. Inventory every Samsara import, facade or client call, resource extension, query-builder extension, caught exception, DTO access, serialized field, stored enum value, HTTP fake, fixture, cassette, cache key, signature, proxy rule, and outbound allowlist in the consuming repository.
 4. Follow every `MIG-*` section in order. Record `not used` only when a reproducible search found zero relevant occurrences.
 5. Add or update a focused HTTP-fake test for every Samsara operation the application uses.

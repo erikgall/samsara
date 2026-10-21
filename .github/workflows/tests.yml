@@ -39,21 +39,23 @@ jobs:
       - name: Validate composer.json
         run: composer validate --strict --no-check-publish
 
-      - name: Pin Laravel ${{ matrix.laravel }} / Testbench ${{ matrix.testbench }}
-        run: |
-          composer require --no-update --no-interaction \
-            "illuminate/http:^${{ matrix.laravel }}.0" \
-            "illuminate/collections:^${{ matrix.laravel }}.0" \
-            "illuminate/support:^${{ matrix.laravel }}.0" \
-            "orchestra/testbench:^${{ matrix.testbench }}.0"
-
       - name: Install dependencies (${{ matrix.dependency-version }})
-        run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-progress
+        # Temporary constraints preserve composer.json for release-content checks.
+        run: |
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-progress \
+            --with="illuminate/http:^${{ matrix.laravel }}.0" \
+            --with="illuminate/collections:^${{ matrix.laravel }}.0" \
+            --with="illuminate/support:^${{ matrix.laravel }}.0" \
+            --with="orchestra/testbench:^${{ matrix.testbench }}.0"
 
       - name: Show resolved versions
         run: |
           jq -r '.packages[]|select(.name=="laravel/framework")|.name + " " + .version' composer.lock
           jq -r '.["packages-dev"][]|select(.name=="orchestra/testbench" or .name=="phpunit/phpunit" or .name=="phpstan/phpstan")|.name + " " + .version' composer.lock
+
+      - name: Restore release lockfile for content verification
+        # Installed vendor packages retain the matrix versions shown above.
+        run: git restore --source=HEAD -- composer.lock
 
       - name: Run phpunit
         run: composer test

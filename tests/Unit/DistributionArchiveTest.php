@@ -23,6 +23,13 @@ class DistributionArchiveTest extends TestCase
         '/tests',
         '/vendor',
         '/.ai',
+        '/.claude',
+        '/.DS_Store',
+        '/.env*',
+        '/.phpunit.cache',
+        '/.phpunit.result.cache',
+        '/auth.json',
+        '/notes',
         '/.github',
         '/.prettierrc',
         '/CLAUDE.md',
@@ -53,5 +60,22 @@ class DistributionArchiveTest extends TestCase
             $this->assertStringContainsString("{$path} export-ignore", $attributes, $path);
             $this->assertContains($path, $composerExcludes, $path);
         }
+    }
+
+    #[Test]
+    public function it_links_shipped_documentation_to_guides_available_outside_the_archive(): void
+    {
+        $root = dirname(__DIR__, 2);
+
+        foreach (['README.md', 'UPGRADE.md', 'BREAKING_CHANGES.md'] as $path) {
+            $contents = (string) file_get_contents($root.'/'.$path);
+
+            $this->assertDoesNotMatchRegularExpression('/\]\((?:\.\/)?docs\//', $contents, $path);
+        }
+
+        $this->assertStringContainsString(
+            'https://github.com/erikgall/samsara/blob/dev/docs/upgrade-guide-v2.md',
+            (string) file_get_contents($root.'/UPGRADE.md'),
+        );
     }
 }

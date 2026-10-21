@@ -105,6 +105,24 @@ class CursorPaginatorTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_advance_the_callers_builder_when_fetching_the_next_page(): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fakeSequence()
+            ->push(['data' => [['id' => '1']], 'pagination' => ['endCursor' => 'next', 'hasNextPage' => true]])
+            ->push(['data' => [['id' => '2']]]);
+        $samsara = new Samsara('test-token', ['attempts' => 1], $http);
+        $builder = $samsara->vehicles()->query()->whereTag('a')->after('initial');
+        $page = $builder->paginate(2);
+
+        $page->nextPage();
+
+        $this->assertSame(['tagIds' => 'a', 'limit' => 2, 'after' => 'initial'], $builder->buildQuery());
+        $http->assertSentCount(2);
+    }
+
+    #[Test]
     public function it_is_countable(): void
     {
         $items = new EntityCollection([
@@ -138,6 +156,30 @@ class CursorPaginatorTest extends TestCase
         }
 
         $this->assertSame(['1', '2'], $ids);
+    }
+
+    #[Test]
+    public function it_preserves_the_original_query_when_the_caller_reuses_the_builder(): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fakeSequence()
+            ->push(['data' => [['id' => 'a-1']], 'pagination' => ['endCursor' => 'cursor-a', 'hasNextPage' => true]])
+            ->push(['data' => [['id' => 'b-1']]])
+            ->push(['data' => [['id' => 'a-2']]]);
+        $samsara = new Samsara('test-token', ['attempts' => 1], $http);
+        $builder = $samsara->vehicles()->query()->whereTag('a');
+
+        $originalPage = $builder->paginate(2);
+        $builder->whereTag('b')->paginate(50);
+        $nextPage = $originalPage->nextPage();
+
+        $this->assertSame('a-2', $nextPage?->items()->first()?->getId());
+        $this->assertSame([
+            'https://api.samsara.com/fleet/vehicles?tagIds=a&limit=2',
+            'https://api.samsara.com/fleet/vehicles?tagIds=b&limit=50',
+            'https://api.samsara.com/fleet/vehicles?tagIds=a&limit=2&after=cursor-a',
+        ], $http->recorded()->map(fn ($record) => $record[0]->url())->all());
     }
 
     #[Test]

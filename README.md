@@ -2,7 +2,7 @@
 
 A Laravel SDK for selected [Samsara Fleet Management API](https://developers.samsara.com/) endpoints. It is built on Laravel's HTTP client and provides resource wrappers, typed and generic entities, raw-array helpers, and a fluent query builder.
 
-See the [documentation coverage and API-sync report](docs/api-sync/documentation-coverage.md) for the audited package surface and current upstream endpoint status as of 2026-08-10.
+See the [documentation coverage and API-sync report](https://github.com/erikgall/samsara/blob/dev/docs/api-sync/documentation-coverage.md) for the audited package surface and current upstream endpoint status as of 2026-08-10.
 
 > **Upgrading to v2:** Version 2 changes public signatures, generic capabilities, DTOs, errors, pagination, query encoding, and HTTP paths. Follow the complete [v1.1.0 to v2.0.0 upgrade guide](UPGRADE.md) before changing the Composer constraint.
 
@@ -131,7 +131,7 @@ $drivers = $samsara->drivers()->all();
 
 ## Available Resources
 
-This section inventories package accessors. Generic methods are capability-gated per resource; consult each resource page and the [capability matrix](docs/api-sync/documentation-coverage.md#exact-generic-capability-matrix) before using an operation.
+This section inventories package accessors. Generic methods are capability-gated per resource; consult each resource page and the [capability matrix](https://github.com/erikgall/samsara/blob/dev/docs/api-sync/documentation-coverage.md#exact-generic-capability-matrix) before using an operation.
 
 ### Fleet Resources
 
@@ -463,7 +463,7 @@ Route::post('/samsara/webhook', WebhookController::class)
     ->middleware(new VerifyWebhookSignature(base64_encode('my-secret-key'), 600));
 ```
 
-For detailed usage, custom secrets, and controller examples, see the [Webhooks documentation](docs/resources/webhooks.md).
+For detailed usage, custom secrets, and controller examples, see the [Webhooks documentation](https://github.com/erikgall/samsara/blob/dev/docs/resources/webhooks.md).
 
 ## Testing
 

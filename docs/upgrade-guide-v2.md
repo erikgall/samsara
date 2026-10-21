@@ -19,19 +19,19 @@ Version 2 is a breaking contract-alignment release. This guide is the canonical 
 The release audit compares tag `v1.1.0` with the integrated v2 worktree while retaining audited `dev` head `1750395c98c1724c40c82ba82b96b4866dd2106b` as its frozen implementation baseline:
 
 - 239 implementation-baseline files were reviewed exactly once at that audited head.
-- Integrated quality, documentation, testing, and publication work extends the final tag-to-worktree scope to 344 paths.
-- 96 files require a consumer upgrade action.
-- 147 files supply tests, contract evidence, fixtures, or tooling for those actions.
-- 32 files are additive and require no migration by themselves.
+- Integrated quality, documentation, testing, and publication work extends the final tag-to-worktree scope beyond the frozen implementation baseline.
+- 98 files require a consumer upgrade action.
+- 150 files supply tests, contract evidence, fixtures, or tooling for those actions.
+- 33 files are additive and require no migration by themselves.
 - 1 file is internal-only.
 - 68 files are documentation-only.
 - The pinned OpenAPI and runtime ledgers cover 372 official declarations, 206 package operations, 42 concrete resource gates, 261 public request variants, and 172 source files with zero runtime-capture failures.
 
-The machine-readable [v2 disposition ledger](api-sync/v2-upgrade-disposition.json) records all 348 final release paths and their migration section or no-action reason, while retaining the frozen 239-file implementation comparison as a separate proof boundary. `composer check:v2-upgrade-guide` fails if the live tag-to-worktree scope, counts, section references, or required evidence are incomplete.
+The machine-readable [v2 disposition ledger](api-sync/v2-upgrade-disposition.json) records all final release paths and their migration section or no-action reason, while retaining the frozen 239-file implementation comparison as a separate proof boundary. `composer check:v2-upgrade-guide` fails if the live tag-to-worktree scope, counts, section references, or required evidence are incomplete.
 
 ## Maintainer integration result
 
-All quality lanes were classified after integration. The live ledger derives its 348-path scope directly from the tag-to-worktree diff plus publication and implementation artifacts, stores a SHA-256 content identity for every present classified file, records deletions explicitly, and excludes only the self-referential ledger. The normal maintenance/CI gate therefore fails for new, edited, deleted, or restored paths until the migration or explicit no-action rationale is reviewed and the ledger is regenerated. The resource/query, fixture, enum, pagination, error, and documentation follow-ups are included in the counts above.
+All quality lanes were classified after integration. The live ledger derives its final scope directly from the tag-to-worktree diff plus publication and implementation artifacts, stores a SHA-256 content identity for every present classified file, records deletions explicitly, and excludes only the self-referential ledger. The normal maintenance/CI gate therefore fails for new, edited, deleted, or restored paths until the migration or explicit no-action rationale is reviewed and the ledger is regenerated. The resource/query, fixture, enum, pagination, error, and documentation follow-ups are included in the counts above.
 
 ## Agent execution contract
 

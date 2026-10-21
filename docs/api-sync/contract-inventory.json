@@ -21,9 +21,9 @@
             "root": "/Users/erikgall/Code/samsara",
             "git_branch": "dev",
             "git_head": "bfbba723ff37010e37e67ce1ad338dd09990d3e0",
-            "source_sha256": "0dc7dfcdb1d21fcad91834a9a6796ce2bb158047159307f719f84404290b6364",
+            "source_sha256": "a354dcc9d42e166724dff0776d549c7299a0271220f5dbb7b422cd885ec8b6d5",
             "source_files": 172,
-            "source_bytes": 395829,
+            "source_bytes": 395835,
             "source_file_count": 172,
             "hash_definition": "SHA-256 of a sorted manifest whose rows are '<file-sha256>  <relative-path>\\n' for src/**/*.php, src/**/*.json, and config/samsara.php"
         },

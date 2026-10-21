@@ -6,6 +6,13 @@
 /tests export-ignore
 /vendor export-ignore
 /.ai export-ignore
+/.claude export-ignore
+/.DS_Store export-ignore
+/.env* export-ignore
+/.phpunit.cache export-ignore
+/.phpunit.result.cache export-ignore
+/auth.json export-ignore
+/notes export-ignore
 /.github export-ignore
 /.prettierrc export-ignore
 /CLAUDE.md export-ignore
