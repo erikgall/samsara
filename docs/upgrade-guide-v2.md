@@ -20,11 +20,11 @@ The release audit compares tag `v1.1.0` with the integrated v2 worktree while re
 
 - 239 implementation-baseline files were reviewed exactly once at that audited head.
 - Integrated quality, documentation, testing, and publication work extends the final tag-to-worktree scope beyond the frozen implementation baseline.
-- 98 files require a consumer upgrade action.
-- 150 files supply tests, contract evidence, fixtures, or tooling for those actions.
-- 33 files are additive and require no migration by themselves.
+- 106 files require a consumer upgrade action.
+- 170 files supply tests, contract evidence, fixtures, or tooling for those actions.
+- 34 files are additive and require no migration by themselves.
 - 1 file is internal-only.
-- 68 files are documentation-only.
+- 65 files are documentation-only.
 - The pinned OpenAPI and runtime ledgers cover 372 official declarations, 206 package operations, 42 concrete resource gates, 261 public request variants, and 172 source files with zero runtime-capture failures.
 
 The machine-readable [v2 disposition ledger](api-sync/v2-upgrade-disposition.json) records all final release paths and their migration section or no-action reason, while retaining the frozen 239-file implementation comparison as a separate proof boundary. `composer check:v2-upgrade-guide` fails if the live tag-to-worktree scope, counts, section references, or required evidence are incomplete.

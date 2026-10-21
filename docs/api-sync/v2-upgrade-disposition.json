@@ -802,7 +802,7 @@
         {
             "path": "docs/upgrade-guide-v2.md",
             "content_state": "present",
-            "content_sha256": "ad3ecccd486ebc91c6acd62cba9462270fc572bf8f6a025cb3ce65454933d59f",
+            "content_sha256": "8cc1382bbb0396222be0aa0fbea4661b83c1013fd71727602c532f9491a5cf44",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
