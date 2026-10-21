@@ -165,7 +165,7 @@ try {
 
 ### RateLimitException
 
-Thrown when Samsara returns a `429`. `getRetryAfter()` returns the requested delay in seconds for nonnegative integer headers and RFC 7231 dates such as `Wed, 21 Oct 2026 13:00:00 GMT`. It returns `null` for missing or invalid headers. Other formats, including fractional seconds, negative numbers, and relative dates, are ignored; an otherwise retryable request uses the normal retry delay.
+Thrown when Samsara returns a `429`. `getRetryAfter()` returns the requested delay in seconds for nonnegative integer headers and an HTTP-date in the `Wed, 21 Oct 2026 13:00:00 GMT` form (RFC 850 and asctime forms are ignored). It returns `null` for missing or invalid headers. Other formats, including fractional seconds, negative numbers, and relative dates, are ignored; an otherwise retryable request uses the normal retry delay.
 
 ```php
 use Samsara\Exceptions\RateLimitException;
@@ -197,7 +197,7 @@ try {
 
 ### InvalidSignatureException
 
-Thrown by `Samsara\Webhooks\WebhookSignatureVerifier` when an inbound webhook fails verification — missing headers, an expired timestamp, a configuration error, or a signature mismatch. Catch it in your webhook controller and respond with `401`.
+Thrown by `WebhookSignatureVerifier` for missing or malformed headers, an out-of-tolerance or future timestamp, or a signature mismatch (renders 401). `VerifyWebhookSignature` also throws it with code 500 when no secret is configured. A non-Base64 secret throws `InvalidArgumentException`.
 
 ```php
 use Samsara\Exceptions\InvalidSignatureException;
@@ -257,7 +257,7 @@ Writes (POST, PUT, PATCH, DELETE) do not retry connection failures, HTTP 408, or
 $writeClient = \Samsara\Samsara::make($token, ['retry_writes' => true]);
 ```
 
-`getRetryAfter()` returns the requested delay in seconds for both delta-seconds and HTTP-date headers. `getContext()['retry_after_header']` preserves the raw header, including a literal `"0"`, and is `null` when the header is missing or empty. Values that are neither delta-seconds nor an RFC 7231 date are ignored, so `getRetryAfter()` returns `null` for them. The retry-after ceiling limits synchronous rate-limit waits. The SDK honors smaller delta-seconds and HTTP-date values. When Samsara asks for a longer delay, the SDK sends no retry and throws `RateLimitException` with the original delay so a queue or application scheduler can reschedule the work.
+`getRetryAfter()` returns the requested delay in seconds for both delta-seconds and HTTP-date headers. `getContext()['retry_after_header']` preserves the raw header, including a literal `"0"`, and is `null` when the header is missing or empty. Values that are neither delta-seconds nor an HTTP-date in the `Wed, 21 Oct 2026 13:00:00 GMT` form are ignored, so `getRetryAfter()` returns `null` for them. The retry-after ceiling limits synchronous rate-limit waits. The SDK honors smaller delta-seconds and HTTP-date values. When Samsara asks for a longer delay, the SDK sends no retry and throws `RateLimitException` with the original delay so a queue or application scheduler can reschedule the work.
 
 For application-level retry with exponential backoff — for example, when a long-running job hits a rate limit — wrap the call in a small helper:
 

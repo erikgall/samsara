@@ -5,7 +5,9 @@ namespace Samsara\Tests\Unit\Testing;
 use Samsara\Samsara;
 use Samsara\Tests\TestCase;
 use Samsara\Testing\SamsaraFake;
+use Illuminate\Http\Client\Request;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Samsara\Exceptions\AuthenticationException;
 use Illuminate\Http\Client\StrayRequestException;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -45,6 +47,20 @@ class SamsaraFakeTest extends TestCase
         $fake->drivers()->query()->where('tagIds', 'tag-1')->get();
 
         $fake->assertRequestedWithParams('/fleet/drivers', ['tagIds' => 'tag-1']);
+    }
+
+    #[Test]
+    public function it_can_assert_sent_requests_and_their_count(): void
+    {
+        $fake = SamsaraFake::create(['fleet/drivers' => [['id' => 'driver-1']]]);
+        $fake->drivers()->query()->where('tagIds', 'tag-1')->get();
+
+        $this->assertSame($fake, $fake->assertSent(
+            fn (Request $request): bool => $request->method() === 'GET'
+                && parse_url($request->url(), PHP_URL_PATH) === '/fleet/drivers'
+                && $request['tagIds'] === 'tag-1',
+        ));
+        $this->assertSame($fake, $fake->assertSentCount(1));
     }
 
     #[Test]
@@ -237,6 +253,16 @@ class SamsaraFakeTest extends TestCase
         }
     }
 
+    /** @param array<string, mixed> $payload */
+    #[Test]
+    #[DataProvider('responseEnvelopes')]
+    public function it_preserves_full_response_envelopes(array $payload): void
+    {
+        $fake = SamsaraFake::create(['fleet/drivers' => $payload]);
+
+        $this->assertSame($payload, $fake->client()->get('/fleet/drivers')->json());
+    }
+
     #[Test]
     public function it_preserves_recorded_requests_when_a_later_response_is_staged(): void
     {
@@ -287,6 +313,28 @@ class SamsaraFakeTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
 
         $fake->assertRequestedWithParams('/fleet/drivers', ['tagIds' => 'tag-2']);
+    }
+
+    #[Test]
+    public function it_rejects_an_incorrect_sent_count(): void
+    {
+        $fake = SamsaraFake::create(['fleet/drivers' => []]);
+        $fake->drivers()->query()->get();
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $fake->assertSentCount(2);
+    }
+
+    #[Test]
+    public function it_rejects_an_unmatched_sent_request(): void
+    {
+        $fake = SamsaraFake::create(['fleet/drivers' => []]);
+        $fake->drivers()->query()->get();
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $fake->assertSent(fn (Request $request): bool => $request->method() === 'POST');
     }
 
     #[Test]
@@ -364,5 +412,14 @@ class SamsaraFakeTest extends TestCase
         $this->expectException(AuthenticationException::class);
 
         $fake->drivers()->query()->get();
+    }
+
+    /** @return array<string, array{array<string, mixed>}> */
+    public static function responseEnvelopes(): array
+    {
+        return [
+            'data'      => [['data' => [['id' => 'driver-1']]]],
+            'null data' => [['data' => null]],
+        ];
     }
 }

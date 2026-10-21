@@ -7,7 +7,6 @@ description: Build or change a Laravel application's integration with erikgall/s
 
 Find the installed version and root with `composer show erikgall/samsara --path`. Its `src/`, `config/samsara.php` and `README.md` define shipped behavior. Composer distributions omit `docs/`, `tests/` and `contracts/`; read those from the matching release tag in the package repository.
 
-- `UnsupportedOperationException` is a deliberate local rejection, not a transient error. Do not replace the call with a raw request unless the application owner accepts that integration.
 - `get()` and `paginate()` read one page. `lazy()` follows cursors automatically; `nextPage()` fetches one subsequent page.
 - A supported `find()` returns `null` on 404 instead of throwing.
 - Transport failures throw `Illuminate\Http\Client\ConnectionException`. `Samsara\Exceptions\ConnectionException` exists but is never thrown.

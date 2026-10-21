@@ -142,6 +142,8 @@ class WebhookSignatureVerifier
      * Create a new WebhookSignatureVerifier instance.
      *
      * @param  string  $secret  The Base64-encoded secret key from Samsara webhook configuration
+     *
+     * @throws \InvalidArgumentException
      */
     public static function make(string $secret): static
     {

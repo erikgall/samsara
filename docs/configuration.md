@@ -29,14 +29,14 @@ permalink: /configuration
 
 ## Introduction
 
-Samsara reads its configuration from `config/samsara.php`, which is merged into the published file when you run `vendor:publish`. The service provider passes `api_key`, `timeout`, `attempts`, `retry_writes`, `retry_after_max_seconds`, and `per_page` into the lifecycle-scoped client and applies the selected US, EU, or Canada base URL. The reference below covers every config key and the runtime overrides the client exposes for switching regions, swapping tokens, and inspecting the active configuration.
+Samsara reads `config/samsara.php`; the service provider fills any key your published file omits from the package defaults. The service provider passes `api_key`, `timeout`, `attempts`, `retry_writes`, `retry_after_max_seconds`, and `per_page` into the lifecycle-scoped client and applies the selected US, EU, or Canada base URL. The reference below covers every config key and the runtime overrides the client exposes for switching regions, swapping tokens, and inspecting the active configuration.
 
 ## Publishing the Configuration
 
 Publish the config file with the package's `samsara-config` tag:
 
 ```bash
-php artisan vendor:publish --provider="Samsara\SamsaraServiceProvider"
+php artisan vendor:publish --tag=samsara-config
 ```
 
 This creates `config/samsara.php` in your application. Edit it directly, or override individual values from `.env`.
@@ -45,7 +45,7 @@ This creates `config/samsara.php` in your application. Edit it directly, or over
 
 ### API Key
 
-Your Samsara API token. The service provider resolves the lifecycle-scoped client with this token, and every request authenticates with `Authorization: Bearer <token>`.
+Your Samsara API token. The service provider resolves the lifecycle-scoped client with this token. A nonempty token authenticates requests with `Authorization: Bearer <token>`. An unset or blank `SAMSARA_API_KEY=` means no token, so requests omit the `Authorization` header.
 
 ```php
 // config/samsara.php
@@ -120,7 +120,7 @@ SAMSARA_RETRY_WRITES=false
 
 ### Maximum Retry-After Delay
 
-The default ceiling of 30 seconds is the largest `Retry-After` delay the SDK honors synchronously. A 429 response above this ceiling throws `RateLimitException` without another request so your application can reschedule the work. Only nonnegative integer seconds or an RFC 7231 date such as `Wed, 21 Oct 2026 13:00:00 GMT` are accepted. Other values are ignored and use the normal retry delay; valid delays within the ceiling are honored.
+The default ceiling of 30 seconds is the largest `Retry-After` delay the SDK honors synchronously. A 429 response above this ceiling throws `RateLimitException` without another request so your application can reschedule the work. Only nonnegative integer seconds or an HTTP-date in the `Wed, 21 Oct 2026 13:00:00 GMT` form (RFC 850 and asctime forms are ignored) are accepted. Other values are ignored and use the normal retry delay; valid delays within the ceiling are honored.
 
 ```php
 // config/samsara.php

@@ -164,7 +164,7 @@ public function handle(Request $request)
 }
 ```
 
-`verify()` is the lower-level variant: it accepts the payload, signature, and timestamp directly without validating headers.
+`verify()` checks only the HMAC. It skips header-presence, timestamp-tolerance, and future-timestamp checks, so it does not reject replayed requests.
 
 ```php
 $verifier->verify($payload, $signature, $timestamp);
@@ -229,6 +229,8 @@ Route::post('/webhooks/samsara', SamsaraWebhookController::class)
 $verifier->verifyFromRequest($payload, $signature, $timestamp, 600);
 ```
 
+An empty secret in `'samsara.webhook:,600'` falls back to configuration, and an empty tolerance in `'samsara.webhook:secret,'` falls back to the default 300 seconds. An explicit alias secret is stored in the route definition, so `route:cache` writes it to disk. `VerifyWebhookSignature::class` and the bare `samsara.webhook` alias both keep the 300-second default.
+
 ## Example Webhook Handler
 
 ```php
@@ -282,7 +284,7 @@ Route::post('/webhooks/samsara', [SamsaraWebhookController::class, 'handle'])
     ->middleware(VerifyWebhookSignature::class);
 ```
 
-> **Note:** If you must register the webhook under `routes/web.php`, exclude it from CSRF protection via `bootstrap/app.php` rather than the route. On Laravel 12+ the supported pattern is `->withMiddleware(function (Middleware $middleware) { $middleware->validateCsrfTokens(except: ['webhooks/samsara']); })`. Per-route disabling via `withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)` also works but is discouraged.
+> **Note:** If you must register the webhook under `routes/web.php`, exclude it from CSRF protection via `bootstrap/app.php` rather than the route. On Laravel 12+ the supported pattern is `->withMiddleware(function (Middleware $middleware) { $middleware->validateCsrfTokens(except: ['webhooks/samsara']); })`.
 
 ## Helper Methods
 
@@ -311,8 +313,6 @@ if ($webhook->hasEventType('VehicleCreated')) {
 | `customHeaders` | `?array` | Additional headers Samsara appends to each delivery. Each item exposes `key` and `value`. |
 
 The current response contains no lifecycle status. Removed `isActive()` and `isPaused()` calls have no direct replacement.
-
-An empty secret in `'samsara.webhook:,600'` falls back to configuration, and an empty tolerance in `'samsara.webhook:secret,'` falls back to the default 300 seconds. An explicit alias secret is stored in the route definition, so `route:cache` writes it to disk. To keep the default 300-second tolerance, use `VerifyWebhookSignature::class`.
 
 ## Related Resources
 

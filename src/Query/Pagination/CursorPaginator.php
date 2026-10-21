@@ -9,8 +9,14 @@ use IteratorAggregate;
 use Samsara\Data\Entity;
 use Samsara\Query\Builder;
 use Samsara\Data\EntityCollection;
+use Samsara\Exceptions\ServerException;
 use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\NotFoundException;
+use Samsara\Exceptions\RateLimitException;
 use Illuminate\Contracts\Support\Arrayable;
+use Samsara\Exceptions\ValidationException;
+use Samsara\Exceptions\AuthorizationException;
+use Samsara\Exceptions\AuthenticationException;
 
 /**
  * Paginator for cursor-based API responses.
@@ -115,9 +121,18 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Fetch the next page of results.
+     * Fetch the next page, rejecting repeated pagination cursors.
      *
      * @return self<TEntity>|null
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function nextPage(): ?self
     {

@@ -34,6 +34,7 @@ trait UpdatesEntities
      * @throws RateLimitException
      * @throws ServerException
      * @throws SamsaraException
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function update(string $id, array $data): Entity
     {

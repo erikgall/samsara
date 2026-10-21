@@ -69,6 +69,19 @@ Standalone `new Samsara(...)` remains container-independent and creates its own 
 
 Pass path-to-response stubs to `Samsara::fake([...])`, or stage individual paths with `fakeResponse()`.
 
+`Samsara::fake([...])` wraps a stub in `data` only when the stub has no `data` key. A stub with a `data` key is used unchanged, preserving pagination and other top-level fields. This includes `data => null`, so malformed-envelope tests can pass that response through unchanged.
+
+```php
+$fake = Samsara::fake([
+    '/fleet/drivers' => [
+        'data' => [['id' => 'driver-1', 'name' => 'John Doe']],
+        'pagination' => ['endCursor' => null, 'hasNextPage' => false],
+    ],
+]);
+
+$page = $fake->drivers()->query()->paginate();
+```
+
 ### Drivers
 
 ```php
@@ -145,7 +158,7 @@ $fake->fakeResponse('/fleet/drivers/invalid-id', [], 404);
 $fake->fakeResponse('/fleet/drivers', [], 400);
 ```
 
-`fakeResponse()` always wraps the supplied array in a top-level `data` key. It cannot currently stage an arbitrary top-level error envelope such as `message` plus `errors`; use the [advanced HTTP factory](#advanced-http-mocking) when the error body or headers matter.
+`fakeResponse()` wraps the supplied array in a top-level `data` key unless the array already has one. It cannot currently stage an arbitrary top-level error envelope such as `message` plus `errors`; use the [advanced HTTP factory](#advanced-http-mocking) when the error body or headers matter.
 
 Stubs match exact paths. `/fleet/drivers` does not cover `/fleet/drivers/{id}`, and `/fleet/vehicles/stats` does not cover its history path. Stage those paths explicitly:
 
@@ -158,11 +171,11 @@ $fake->fakeResponse('/fleet/drivers/driver-1', [
 $driver = $fake->drivers()->find('driver-1');
 ```
 
-Staged responses and recorded requests are shared across `withToken()` and `withRegion()` clones. Staging a path on either copy updates the fake seen by both. `Samsara::fake(['/fleet/drivers' => [['id' => 'driver-1']]])` stages the same inner data arrays as `fakeResponse()`. The removed `fakeDrivers()`, `fakeVehicles()`, and `fakeVehicleStats()` helpers are replaced by path stubs.
+Staged responses and recorded requests are shared across `withToken()` and `withRegion()` clones. Staging a path on either copy updates the fake seen by both. `Samsara::fake(['/fleet/drivers' => [['id' => 'driver-1']]])` wraps the inner list just like `fakeResponse()`. The removed `fakeDrivers()`, `fakeVehicles()`, and `fakeVehicleStats()` helpers are replaced by path stubs.
 
 ## Assertions
 
-The fake records every request made against it. Three assertion helpers cover the common cases.
+The fake records every request made against it. Its assertion helpers cover endpoint paths, parameters, custom request checks, and request counts.
 
 ### `assertRequested(string $endpoint)`
 
@@ -213,6 +226,33 @@ $fake = Samsara::fake();
 $fake->assertNothingRequested();
 ```
 
+### `assertSent(callable $callback)`
+
+Asserts that at least one recorded request satisfies the callback. Use the `Illuminate\Http\Client\Request` to check the method, URL, headers, or body.
+
+```php
+use Illuminate\Http\Client\Request;
+
+$fake = Samsara::fake(['/fleet/drivers' => [['id' => 'driver-1']]]);
+
+$fake->drivers()->query()->get();
+
+$fake->assertSent(fn (Request $request): bool => $request->method() === 'GET'
+    && $request->url() === 'https://api.samsara.com/fleet/drivers');
+```
+
+### `assertSentCount(int $count)`
+
+Asserts the total number of recorded requests, including requests made through credential or region clones.
+
+```php
+$fake = Samsara::fake(['/fleet/drivers' => []]);
+
+$fake->withToken('carrier-token')->drivers()->query()->get();
+
+$fake->assertSentCount(1);
+```
+
 ### Inspecting Recorded Requests
 
 For ad-hoc assertions, `getRecordedRequests()` returns the underlying `Illuminate\Http\Client\Request` objects.
@@ -230,7 +270,7 @@ $this->assertStringContainsString('/fleet/drivers', $requests[0]->url());
 
 ## Using Fixtures
 
-The SDK ships JSON fixtures for common resources. Each helper returns a complete decoded response envelope with a top-level `data` key (and, where present, pagination metadata). Fake helpers expect the inner item list, so pass `Fixtures::drivers()['data']` rather than the full envelope.
+The SDK ships JSON fixtures for common resources. Each helper returns a complete decoded response envelope with a top-level `data` key (and, where present, pagination metadata). Pass the full envelope to a `Samsara::fake([...])` path stub. For `fakeResponse()`, pass the inner item list, such as `Fixtures::drivers()['data']`.
 
 ```php
 use Samsara\Testing\Fixtures;
@@ -303,7 +343,7 @@ use Samsara\Exceptions\AuthenticationException;
 public function it_handles_auth_error(): void
 {
     $fake = Samsara::fake();
-    $fake->fakeResponse('/fleet/drivers', ['message' => 'Invalid API token'], 401);
+    $fake->fakeResponse('/fleet/drivers', [], 401);
 
     $this->expectException(AuthenticationException::class);
 
@@ -337,7 +377,7 @@ use Samsara\Exceptions\RateLimitException;
 public function it_handles_rate_limit(): void
 {
     $fake = Samsara::fake();
-    $fake->fakeResponse('/fleet/drivers', ['message' => 'Rate limit exceeded'], 429);
+    $fake->fakeResponse('/fleet/drivers', [], 429);
 
     $this->expectException(RateLimitException::class);
 

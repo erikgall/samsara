@@ -21,10 +21,10 @@
         "current_package_source": {
             "root": "/Users/erikgall/Code/samsara",
             "git_branch": "dev",
-            "git_head": "a5da3fa93b1c7f807ba0040baaf747b6d35c9b78",
-            "source_sha256": "ecc80414e40618f2f4ce1c0535948e2e88d64db8b5f251502c5be955299a6d80",
+            "git_head": "18205b2c868f8504f111408d3000ac25f9529e93",
+            "source_sha256": "8a01a9eae5498a59ba47b00f8cd7f34ce9b7833224756bd20a777abcc99c2da6",
             "source_files": 174,
-            "source_bytes": 393120,
+            "source_bytes": 396584,
             "source_file_count": 174,
             "hash_definition": "SHA-256 of a sorted manifest whose rows are '<file-sha256>  <relative-path>\\n' for src/**/*.php, src/**/*.json, and config/samsara.php"
         },
@@ -244,13 +244,13 @@
                         "class": "AddressesResource",
                         "method": "delete",
                         "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 36,
                         "returns_builder": false,
                         "declared_return_type": "bool",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                        "source": "src/Resources/Concerns/DeletesEntities.php:36",
                         "signature": "delete(string $id): bool",
                         "return_type": "bool",
                         "response_mapping": {
@@ -1056,13 +1056,13 @@
                         "class": "ContactsResource",
                         "method": "delete",
                         "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 36,
                         "returns_builder": false,
                         "declared_return_type": "bool",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                        "source": "src/Resources/Concerns/DeletesEntities.php:36",
                         "signature": "delete(string $id): bool",
                         "return_type": "bool",
                         "response_mapping": {
@@ -1546,13 +1546,13 @@
                         "class": "CarrierProposedAssignmentsResource",
                         "method": "delete",
                         "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 36,
                         "returns_builder": false,
                         "declared_return_type": "bool",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                        "source": "src/Resources/Concerns/DeletesEntities.php:36",
                         "signature": "delete(string $id): bool",
                         "return_type": "bool",
                         "response_mapping": {
@@ -2132,13 +2132,13 @@
                         "class": "RoutesResource",
                         "method": "delete",
                         "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 36,
                         "returns_builder": false,
                         "declared_return_type": "bool",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                        "source": "src/Resources/Concerns/DeletesEntities.php:36",
                         "signature": "delete(string $id): bool",
                         "return_type": "bool",
                         "response_mapping": {
@@ -2333,13 +2333,13 @@
                         "class": "TrailersResource",
                         "method": "delete",
                         "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 36,
                         "returns_builder": false,
                         "declared_return_type": "bool",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                        "source": "src/Resources/Concerns/DeletesEntities.php:36",
                         "signature": "delete(string $id): bool",
                         "return_type": "bool",
                         "response_mapping": {
@@ -2897,13 +2897,13 @@
                         "class": "GatewaysResource",
                         "method": "delete",
                         "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 36,
                         "returns_builder": false,
                         "declared_return_type": "bool",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                        "source": "src/Resources/Concerns/DeletesEntities.php:36",
                         "signature": "delete(string $id): bool",
                         "return_type": "bool",
                         "response_mapping": {
@@ -3382,13 +3382,13 @@
                         "class": "IndustrialResource",
                         "method": "delete",
                         "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 36,
                         "returns_builder": false,
                         "declared_return_type": "bool",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                        "source": "src/Resources/Concerns/DeletesEntities.php:36",
                         "signature": "delete(string $id): bool",
                         "return_type": "bool",
                         "response_mapping": {
@@ -5557,13 +5557,13 @@
                         "class": "TagsResource",
                         "method": "delete",
                         "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 36,
                         "returns_builder": false,
                         "declared_return_type": "bool",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                        "source": "src/Resources/Concerns/DeletesEntities.php:36",
                         "signature": "delete(string $id): bool",
                         "return_type": "bool",
                         "response_mapping": {
@@ -5850,13 +5850,13 @@
                         "class": "UsersResource",
                         "method": "delete",
                         "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 36,
                         "returns_builder": false,
                         "declared_return_type": "bool",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                        "source": "src/Resources/Concerns/DeletesEntities.php:36",
                         "signature": "delete(string $id): bool",
                         "return_type": "bool",
                         "response_mapping": {
@@ -6142,13 +6142,13 @@
                         "class": "WebhooksResource",
                         "method": "delete",
                         "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 36,
                         "returns_builder": false,
                         "declared_return_type": "bool",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                        "source": "src/Resources/Concerns/DeletesEntities.php:36",
                         "signature": "delete(string $id): bool",
                         "return_type": "bool",
                         "response_mapping": {
@@ -6404,13 +6404,13 @@
                         "class": "AddressesResource",
                         "method": "find",
                         "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 38,
                         "returns_builder": false,
                         "declared_return_type": "?Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/FindsEntities.php:33",
+                        "source": "src/Resources/Concerns/FindsEntities.php:38",
                         "signature": "find(string $id): ?Entity",
                         "return_type": "?Entity",
                         "response_mapping": {
@@ -10887,13 +10887,13 @@
                         "class": "ContactsResource",
                         "method": "find",
                         "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 38,
                         "returns_builder": false,
                         "declared_return_type": "?Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/FindsEntities.php:33",
+                        "source": "src/Resources/Concerns/FindsEntities.php:38",
                         "signature": "find(string $id): ?Entity",
                         "return_type": "?Entity",
                         "response_mapping": {
@@ -17554,13 +17554,13 @@
                         "class": "DriversResource",
                         "method": "find",
                         "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 38,
                         "returns_builder": false,
                         "declared_return_type": "?Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/FindsEntities.php:33",
+                        "source": "src/Resources/Concerns/FindsEntities.php:38",
                         "signature": "find(string $id): ?Entity",
                         "return_type": "?Entity",
                         "response_mapping": {
@@ -18969,13 +18969,13 @@
                         "class": "EquipmentResource",
                         "method": "find",
                         "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 38,
                         "returns_builder": false,
                         "declared_return_type": "?Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/FindsEntities.php:33",
+                        "source": "src/Resources/Concerns/FindsEntities.php:38",
                         "signature": "find(string $id): ?Entity",
                         "return_type": "?Entity",
                         "response_mapping": {
@@ -22627,13 +22627,13 @@
                         "class": "RoutesResource",
                         "method": "find",
                         "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 38,
                         "returns_builder": false,
                         "declared_return_type": "?Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/FindsEntities.php:33",
+                        "source": "src/Resources/Concerns/FindsEntities.php:38",
                         "signature": "find(string $id): ?Entity",
                         "return_type": "?Entity",
                         "response_mapping": {
@@ -25031,13 +25031,13 @@
                         "class": "TrailersResource",
                         "method": "find",
                         "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 38,
                         "returns_builder": false,
                         "declared_return_type": "?Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/FindsEntities.php:33",
+                        "source": "src/Resources/Concerns/FindsEntities.php:38",
                         "signature": "find(string $id): ?Entity",
                         "return_type": "?Entity",
                         "response_mapping": {
@@ -27484,13 +27484,13 @@
                         "class": "VehiclesResource",
                         "method": "find",
                         "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 38,
                         "returns_builder": false,
                         "declared_return_type": "?Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/FindsEntities.php:33",
+                        "source": "src/Resources/Concerns/FindsEntities.php:38",
                         "signature": "find(string $id): ?Entity",
                         "return_type": "?Entity",
                         "response_mapping": {
@@ -44358,13 +44358,13 @@
                         "class": "TagsResource",
                         "method": "find",
                         "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 38,
                         "returns_builder": false,
                         "declared_return_type": "?Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/FindsEntities.php:33",
+                        "source": "src/Resources/Concerns/FindsEntities.php:38",
                         "signature": "find(string $id): ?Entity",
                         "return_type": "?Entity",
                         "response_mapping": {
@@ -45538,13 +45538,13 @@
                         "class": "UsersResource",
                         "method": "find",
                         "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 38,
                         "returns_builder": false,
                         "declared_return_type": "?Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/FindsEntities.php:33",
+                        "source": "src/Resources/Concerns/FindsEntities.php:38",
                         "signature": "find(string $id): ?Entity",
                         "return_type": "?Entity",
                         "response_mapping": {
@@ -48987,13 +48987,13 @@
                         "class": "WebhooksResource",
                         "method": "find",
                         "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                        "declared_line": 33,
+                        "declared_line": 38,
                         "returns_builder": false,
                         "declared_return_type": "?Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "",
-                        "source": "src/Resources/Concerns/FindsEntities.php:33",
+                        "source": "src/Resources/Concerns/FindsEntities.php:38",
                         "signature": "find(string $id): ?Entity",
                         "return_type": "?Entity",
                         "response_mapping": {
@@ -49103,13 +49103,13 @@
                         "class": "AddressesResource",
                         "method": "update",
                         "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                        "declared_line": 38,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                        "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                         "signature": "update(string $id, array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -50342,13 +50342,13 @@
                         "class": "ContactsResource",
                         "method": "update",
                         "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                        "declared_line": 38,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                        "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                         "signature": "update(string $id, array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -51236,13 +51236,13 @@
                         "class": "DriversResource",
                         "method": "update",
                         "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                        "declared_line": 38,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                        "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                         "signature": "update(string $id, array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -51768,13 +51768,13 @@
                         "class": "RoutesResource",
                         "method": "update",
                         "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                        "declared_line": 38,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                        "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                         "signature": "update(string $id, array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -52396,13 +52396,13 @@
                         "class": "TrailersResource",
                         "method": "update",
                         "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                        "declared_line": 38,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                        "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                         "signature": "update(string $id, array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -52512,13 +52512,13 @@
                         "class": "VehiclesResource",
                         "method": "update",
                         "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                        "declared_line": 38,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                        "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                         "signature": "update(string $id, array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -53825,13 +53825,13 @@
                         "class": "IndustrialResource",
                         "method": "update",
                         "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                        "declared_line": 38,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                        "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                         "signature": "update(string $id, array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -56368,13 +56368,13 @@
                         "class": "TagsResource",
                         "method": "update",
                         "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                        "declared_line": 38,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                        "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                         "signature": "update(string $id, array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -56684,13 +56684,13 @@
                         "class": "UsersResource",
                         "method": "update",
                         "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                        "declared_line": 38,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                        "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                         "signature": "update(string $id, array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -56900,13 +56900,13 @@
                         "class": "WebhooksResource",
                         "method": "update",
                         "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                        "declared_line": 38,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                        "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                         "signature": "update(string $id, array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -57007,13 +57007,13 @@
                         "class": "AddressesResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -57214,13 +57214,13 @@
                         "class": "AlertsResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -57441,13 +57441,13 @@
                         "class": "AssetsResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -58047,13 +58047,13 @@
                         "class": "ContactsResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -58254,13 +58254,13 @@
                         "class": "DriverTrailerAssignmentsResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -60272,13 +60272,13 @@
                         "class": "CarrierProposedAssignmentsResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -60753,13 +60753,13 @@
                         "class": "DriverVehicleAssignmentsResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -60860,13 +60860,13 @@
                         "class": "DriversResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -62338,13 +62338,13 @@
                         "class": "RoutesResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -62732,13 +62732,13 @@
                         "class": "TrailersResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -62939,13 +62939,13 @@
                         "class": "FormsResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -64335,13 +64335,13 @@
                         "class": "GatewaysResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -65770,13 +65770,13 @@
                         "class": "IndustrialResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -65997,13 +65997,13 @@
                         "class": "IssuesResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -66204,13 +66204,13 @@
                         "class": "LiveSharingLinksResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -67586,13 +67586,13 @@
                         "class": "WorkOrdersResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -69770,13 +69770,13 @@
                         "class": "TagsResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -70085,13 +70085,13 @@
                         "class": "UsersResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -71334,13 +71334,13 @@
                         "class": "WebhooksResource",
                         "method": "create",
                         "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                        "declared_line": 36,
+                        "declared_line": 39,
                         "returns_builder": false,
                         "declared_return_type": "Entity",
                         "query": null,
                         "request_data": [],
                         "request_body": "[]",
-                        "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                        "source": "src/Resources/Concerns/CreatesEntities.php:39",
                         "signature": "create(array $data): Entity",
                         "return_type": "Entity",
                         "response_mapping": {
@@ -72437,7 +72437,7 @@
         {
             "class": "AddressesResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -72453,7 +72453,7 @@
         {
             "class": "AddressesResource",
             "method": "delete",
-            "source": "src/Resources/Concerns/DeletesEntities.php:33",
+            "source": "src/Resources/Concerns/DeletesEntities.php:36",
             "operations": [
                 [
                     "DELETE",
@@ -72469,7 +72469,7 @@
         {
             "class": "AddressesResource",
             "method": "find",
-            "source": "src/Resources/Concerns/FindsEntities.php:33",
+            "source": "src/Resources/Concerns/FindsEntities.php:38",
             "operations": [
                 [
                     "GET",
@@ -72501,7 +72501,7 @@
         {
             "class": "AddressesResource",
             "method": "update",
-            "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+            "source": "src/Resources/Concerns/UpdatesEntities.php:39",
             "operations": [
                 [
                     "PATCH",
@@ -72533,7 +72533,7 @@
         {
             "class": "AlertsResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -72631,7 +72631,7 @@
         {
             "class": "AssetsResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -73275,7 +73275,7 @@
         {
             "class": "CarrierProposedAssignmentsResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -73291,7 +73291,7 @@
         {
             "class": "CarrierProposedAssignmentsResource",
             "method": "delete",
-            "source": "src/Resources/Concerns/DeletesEntities.php:33",
+            "source": "src/Resources/Concerns/DeletesEntities.php:36",
             "operations": [
                 [
                     "DELETE",
@@ -73323,7 +73323,7 @@
         {
             "class": "ContactsResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -73339,7 +73339,7 @@
         {
             "class": "ContactsResource",
             "method": "delete",
-            "source": "src/Resources/Concerns/DeletesEntities.php:33",
+            "source": "src/Resources/Concerns/DeletesEntities.php:36",
             "operations": [
                 [
                     "DELETE",
@@ -73355,7 +73355,7 @@
         {
             "class": "ContactsResource",
             "method": "find",
-            "source": "src/Resources/Concerns/FindsEntities.php:33",
+            "source": "src/Resources/Concerns/FindsEntities.php:38",
             "operations": [
                 [
                     "GET",
@@ -73387,7 +73387,7 @@
         {
             "class": "ContactsResource",
             "method": "update",
-            "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+            "source": "src/Resources/Concerns/UpdatesEntities.php:39",
             "operations": [
                 [
                     "PATCH",
@@ -73403,7 +73403,7 @@
         {
             "class": "DriverTrailerAssignmentsResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -73454,7 +73454,7 @@
         {
             "class": "DriverVehicleAssignmentsResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -73561,7 +73561,7 @@
         {
             "class": "DriversResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -73663,7 +73663,7 @@
         {
             "class": "DriversResource",
             "method": "find",
-            "source": "src/Resources/Concerns/FindsEntities.php:33",
+            "source": "src/Resources/Concerns/FindsEntities.php:38",
             "operations": [
                 [
                     "GET",
@@ -73747,7 +73747,7 @@
         {
             "class": "DriversResource",
             "method": "update",
-            "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+            "source": "src/Resources/Concerns/UpdatesEntities.php:39",
             "operations": [
                 [
                     "PATCH",
@@ -73763,7 +73763,7 @@
         {
             "class": "EquipmentResource",
             "method": "find",
-            "source": "src/Resources/Concerns/FindsEntities.php:33",
+            "source": "src/Resources/Concerns/FindsEntities.php:38",
             "operations": [
                 [
                     "GET",
@@ -73891,7 +73891,7 @@
         {
             "class": "FormsResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -74151,7 +74151,7 @@
         {
             "class": "GatewaysResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -74167,7 +74167,7 @@
         {
             "class": "GatewaysResource",
             "method": "delete",
-            "source": "src/Resources/Concerns/DeletesEntities.php:33",
+            "source": "src/Resources/Concerns/DeletesEntities.php:36",
             "operations": [
                 [
                     "DELETE",
@@ -74407,7 +74407,7 @@
         {
             "class": "IndustrialResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -74503,7 +74503,7 @@
         {
             "class": "IndustrialResource",
             "method": "delete",
-            "source": "src/Resources/Concerns/DeletesEntities.php:33",
+            "source": "src/Resources/Concerns/DeletesEntities.php:36",
             "operations": [
                 [
                     "DELETE",
@@ -74567,7 +74567,7 @@
         {
             "class": "IndustrialResource",
             "method": "update",
-            "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+            "source": "src/Resources/Concerns/UpdatesEntities.php:39",
             "operations": [
                 [
                     "PATCH",
@@ -74615,7 +74615,7 @@
         {
             "class": "IssuesResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -74895,7 +74895,7 @@
         {
             "class": "LiveSharingLinksResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -75206,7 +75206,7 @@
         {
             "class": "RoutesResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -75222,7 +75222,7 @@
         {
             "class": "RoutesResource",
             "method": "delete",
-            "source": "src/Resources/Concerns/DeletesEntities.php:33",
+            "source": "src/Resources/Concerns/DeletesEntities.php:36",
             "operations": [
                 [
                     "DELETE",
@@ -75238,7 +75238,7 @@
         {
             "class": "RoutesResource",
             "method": "find",
-            "source": "src/Resources/Concerns/FindsEntities.php:33",
+            "source": "src/Resources/Concerns/FindsEntities.php:38",
             "operations": [
                 [
                     "GET",
@@ -75270,7 +75270,7 @@
         {
             "class": "RoutesResource",
             "method": "update",
-            "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+            "source": "src/Resources/Concerns/UpdatesEntities.php:39",
             "operations": [
                 [
                     "PATCH",
@@ -75558,7 +75558,7 @@
         {
             "class": "TagsResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -75574,7 +75574,7 @@
         {
             "class": "TagsResource",
             "method": "delete",
-            "source": "src/Resources/Concerns/DeletesEntities.php:33",
+            "source": "src/Resources/Concerns/DeletesEntities.php:36",
             "operations": [
                 [
                     "DELETE",
@@ -75590,7 +75590,7 @@
         {
             "class": "TagsResource",
             "method": "find",
-            "source": "src/Resources/Concerns/FindsEntities.php:33",
+            "source": "src/Resources/Concerns/FindsEntities.php:38",
             "operations": [
                 [
                     "GET",
@@ -75622,7 +75622,7 @@
         {
             "class": "TagsResource",
             "method": "update",
-            "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+            "source": "src/Resources/Concerns/UpdatesEntities.php:39",
             "operations": [
                 [
                     "PATCH",
@@ -75672,7 +75672,7 @@
         {
             "class": "TrailersResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -75688,7 +75688,7 @@
         {
             "class": "TrailersResource",
             "method": "delete",
-            "source": "src/Resources/Concerns/DeletesEntities.php:33",
+            "source": "src/Resources/Concerns/DeletesEntities.php:36",
             "operations": [
                 [
                     "DELETE",
@@ -75704,7 +75704,7 @@
         {
             "class": "TrailersResource",
             "method": "find",
-            "source": "src/Resources/Concerns/FindsEntities.php:33",
+            "source": "src/Resources/Concerns/FindsEntities.php:38",
             "operations": [
                 [
                     "GET",
@@ -75752,7 +75752,7 @@
         {
             "class": "TrailersResource",
             "method": "update",
-            "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+            "source": "src/Resources/Concerns/UpdatesEntities.php:39",
             "operations": [
                 [
                     "PATCH",
@@ -75820,7 +75820,7 @@
         {
             "class": "UsersResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -75836,7 +75836,7 @@
         {
             "class": "UsersResource",
             "method": "delete",
-            "source": "src/Resources/Concerns/DeletesEntities.php:33",
+            "source": "src/Resources/Concerns/DeletesEntities.php:36",
             "operations": [
                 [
                     "DELETE",
@@ -75852,7 +75852,7 @@
         {
             "class": "UsersResource",
             "method": "find",
-            "source": "src/Resources/Concerns/FindsEntities.php:33",
+            "source": "src/Resources/Concerns/FindsEntities.php:38",
             "operations": [
                 [
                     "GET",
@@ -75884,7 +75884,7 @@
         {
             "class": "UsersResource",
             "method": "update",
-            "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+            "source": "src/Resources/Concerns/UpdatesEntities.php:39",
             "operations": [
                 [
                     "PATCH",
@@ -76100,7 +76100,7 @@
         {
             "class": "VehiclesResource",
             "method": "find",
-            "source": "src/Resources/Concerns/FindsEntities.php:33",
+            "source": "src/Resources/Concerns/FindsEntities.php:38",
             "operations": [
                 [
                     "GET",
@@ -76148,7 +76148,7 @@
         {
             "class": "VehiclesResource",
             "method": "update",
-            "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+            "source": "src/Resources/Concerns/UpdatesEntities.php:39",
             "operations": [
                 [
                     "PATCH",
@@ -76164,7 +76164,7 @@
         {
             "class": "WebhooksResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -76180,7 +76180,7 @@
         {
             "class": "WebhooksResource",
             "method": "delete",
-            "source": "src/Resources/Concerns/DeletesEntities.php:33",
+            "source": "src/Resources/Concerns/DeletesEntities.php:36",
             "operations": [
                 [
                     "DELETE",
@@ -76196,7 +76196,7 @@
         {
             "class": "WebhooksResource",
             "method": "find",
-            "source": "src/Resources/Concerns/FindsEntities.php:33",
+            "source": "src/Resources/Concerns/FindsEntities.php:38",
             "operations": [
                 [
                     "GET",
@@ -76228,7 +76228,7 @@
         {
             "class": "WebhooksResource",
             "method": "update",
-            "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+            "source": "src/Resources/Concerns/UpdatesEntities.php:39",
             "operations": [
                 [
                     "PATCH",
@@ -76244,7 +76244,7 @@
         {
             "class": "WorkOrdersResource",
             "method": "create",
-            "source": "src/Resources/Concerns/CreatesEntities.php:36",
+            "source": "src/Resources/Concerns/CreatesEntities.php:39",
             "operations": [
                 [
                     "POST",
@@ -133433,13 +133433,13 @@
                     "class": "AddressesResource",
                     "method": "delete",
                     "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 36,
                     "returns_builder": false,
                     "declared_return_type": "bool",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36",
                     "signature": "delete(string $id): bool",
                     "return_type": "bool",
                     "response_mapping": {
@@ -133578,13 +133578,13 @@
                     "class": "ContactsResource",
                     "method": "delete",
                     "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 36,
                     "returns_builder": false,
                     "declared_return_type": "bool",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36",
                     "signature": "delete(string $id): bool",
                     "return_type": "bool",
                     "response_mapping": {
@@ -133653,13 +133653,13 @@
                     "class": "CarrierProposedAssignmentsResource",
                     "method": "delete",
                     "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 36,
                     "returns_builder": false,
                     "declared_return_type": "bool",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36",
                     "signature": "delete(string $id): bool",
                     "return_type": "bool",
                     "response_mapping": {
@@ -133730,13 +133730,13 @@
                     "class": "RoutesResource",
                     "method": "delete",
                     "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 36,
                     "returns_builder": false,
                     "declared_return_type": "bool",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36",
                     "signature": "delete(string $id): bool",
                     "return_type": "bool",
                     "response_mapping": {
@@ -133767,13 +133767,13 @@
                     "class": "TrailersResource",
                     "method": "delete",
                     "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 36,
                     "returns_builder": false,
                     "declared_return_type": "bool",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36",
                     "signature": "delete(string $id): bool",
                     "return_type": "bool",
                     "response_mapping": {
@@ -133804,13 +133804,13 @@
                     "class": "GatewaysResource",
                     "method": "delete",
                     "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 36,
                     "returns_builder": false,
                     "declared_return_type": "bool",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36",
                     "signature": "delete(string $id): bool",
                     "return_type": "bool",
                     "response_mapping": {
@@ -133841,13 +133841,13 @@
                     "class": "IndustrialResource",
                     "method": "delete",
                     "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 36,
                     "returns_builder": false,
                     "declared_return_type": "bool",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36",
                     "signature": "delete(string $id): bool",
                     "return_type": "bool",
                     "response_mapping": {
@@ -134005,13 +134005,13 @@
                     "class": "TagsResource",
                     "method": "delete",
                     "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 36,
                     "returns_builder": false,
                     "declared_return_type": "bool",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36",
                     "signature": "delete(string $id): bool",
                     "return_type": "bool",
                     "response_mapping": {
@@ -134042,13 +134042,13 @@
                     "class": "UsersResource",
                     "method": "delete",
                     "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 36,
                     "returns_builder": false,
                     "declared_return_type": "bool",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36",
                     "signature": "delete(string $id): bool",
                     "return_type": "bool",
                     "response_mapping": {
@@ -134079,13 +134079,13 @@
                     "class": "WebhooksResource",
                     "method": "delete",
                     "declared_in": "src/Resources/Concerns/DeletesEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 36,
                     "returns_builder": false,
                     "declared_return_type": "bool",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33",
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36",
                     "signature": "delete(string $id): bool",
                     "return_type": "bool",
                     "response_mapping": {
@@ -134153,13 +134153,13 @@
                     "class": "AddressesResource",
                     "method": "find",
                     "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 38,
                     "returns_builder": false,
                     "declared_return_type": "?Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33",
+                    "source": "src/Resources/Concerns/FindsEntities.php:38",
                     "signature": "find(string $id): ?Entity",
                     "return_type": "?Entity",
                     "response_mapping": {
@@ -134675,13 +134675,13 @@
                     "class": "ContactsResource",
                     "method": "find",
                     "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 38,
                     "returns_builder": false,
                     "declared_return_type": "?Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33",
+                    "source": "src/Resources/Concerns/FindsEntities.php:38",
                     "signature": "find(string $id): ?Entity",
                     "return_type": "?Entity",
                     "response_mapping": {
@@ -135372,13 +135372,13 @@
                     "class": "DriversResource",
                     "method": "find",
                     "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 38,
                     "returns_builder": false,
                     "declared_return_type": "?Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33",
+                    "source": "src/Resources/Concerns/FindsEntities.php:38",
                     "signature": "find(string $id): ?Entity",
                     "return_type": "?Entity",
                     "response_mapping": {
@@ -135688,13 +135688,13 @@
                     "class": "EquipmentResource",
                     "method": "find",
                     "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 38,
                     "returns_builder": false,
                     "declared_return_type": "?Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33",
+                    "source": "src/Resources/Concerns/FindsEntities.php:38",
                     "signature": "find(string $id): ?Entity",
                     "return_type": "?Entity",
                     "response_mapping": {
@@ -136171,13 +136171,13 @@
                     "class": "RoutesResource",
                     "method": "find",
                     "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 38,
                     "returns_builder": false,
                     "declared_return_type": "?Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33",
+                    "source": "src/Resources/Concerns/FindsEntities.php:38",
                     "signature": "find(string $id): ?Entity",
                     "return_type": "?Entity",
                     "response_mapping": {
@@ -136538,13 +136538,13 @@
                     "class": "TrailersResource",
                     "method": "find",
                     "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 38,
                     "returns_builder": false,
                     "declared_return_type": "?Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33",
+                    "source": "src/Resources/Concerns/FindsEntities.php:38",
                     "signature": "find(string $id): ?Entity",
                     "return_type": "?Entity",
                     "response_mapping": {
@@ -137056,13 +137056,13 @@
                     "class": "VehiclesResource",
                     "method": "find",
                     "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 38,
                     "returns_builder": false,
                     "declared_return_type": "?Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33",
+                    "source": "src/Resources/Concerns/FindsEntities.php:38",
                     "signature": "find(string $id): ?Entity",
                     "return_type": "?Entity",
                     "response_mapping": {
@@ -138374,13 +138374,13 @@
                     "class": "TagsResource",
                     "method": "find",
                     "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 38,
                     "returns_builder": false,
                     "declared_return_type": "?Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33",
+                    "source": "src/Resources/Concerns/FindsEntities.php:38",
                     "signature": "find(string $id): ?Entity",
                     "return_type": "?Entity",
                     "response_mapping": {
@@ -138603,13 +138603,13 @@
                     "class": "UsersResource",
                     "method": "find",
                     "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 38,
                     "returns_builder": false,
                     "declared_return_type": "?Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33",
+                    "source": "src/Resources/Concerns/FindsEntities.php:38",
                     "signature": "find(string $id): ?Entity",
                     "return_type": "?Entity",
                     "response_mapping": {
@@ -139247,13 +139247,13 @@
                     "class": "WebhooksResource",
                     "method": "find",
                     "declared_in": "src/Resources/Concerns/FindsEntities.php",
-                    "declared_line": 33,
+                    "declared_line": 38,
                     "returns_builder": false,
                     "declared_return_type": "?Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33",
+                    "source": "src/Resources/Concerns/FindsEntities.php:38",
                     "signature": "find(string $id): ?Entity",
                     "return_type": "?Entity",
                     "response_mapping": {
@@ -139284,13 +139284,13 @@
                     "class": "AddressesResource",
                     "method": "update",
                     "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                    "declared_line": 38,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                     "signature": "update(string $id, array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -139433,13 +139433,13 @@
                     "class": "ContactsResource",
                     "method": "update",
                     "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                    "declared_line": 38,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                     "signature": "update(string $id, array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -139633,13 +139633,13 @@
                     "class": "DriversResource",
                     "method": "update",
                     "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                    "declared_line": 38,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                     "signature": "update(string $id, array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -139710,13 +139710,13 @@
                     "class": "RoutesResource",
                     "method": "update",
                     "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                    "declared_line": 38,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                     "signature": "update(string $id, array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -139819,13 +139819,13 @@
                     "class": "TrailersResource",
                     "method": "update",
                     "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                    "declared_line": 38,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                     "signature": "update(string $id, array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -139856,13 +139856,13 @@
                     "class": "VehiclesResource",
                     "method": "update",
                     "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                    "declared_line": 38,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                     "signature": "update(string $id, array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -139932,13 +139932,13 @@
                     "class": "IndustrialResource",
                     "method": "update",
                     "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                    "declared_line": 38,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                     "signature": "update(string $id, array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140106,13 +140106,13 @@
                     "class": "TagsResource",
                     "method": "update",
                     "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                    "declared_line": 38,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                     "signature": "update(string $id, array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140143,13 +140143,13 @@
                     "class": "UsersResource",
                     "method": "update",
                     "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                    "declared_line": 38,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                     "signature": "update(string $id, array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140180,13 +140180,13 @@
                     "class": "WebhooksResource",
                     "method": "update",
                     "declared_in": "src/Resources/Concerns/UpdatesEntities.php",
-                    "declared_line": 38,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38",
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39",
                     "signature": "update(string $id, array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140217,13 +140217,13 @@
                     "class": "AddressesResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140254,13 +140254,13 @@
                     "class": "AlertsResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140311,13 +140311,13 @@
                     "class": "AssetsResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140420,13 +140420,13 @@
                     "class": "ContactsResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140457,13 +140457,13 @@
                     "class": "DriverTrailerAssignmentsResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140531,13 +140531,13 @@
                     "class": "CarrierProposedAssignmentsResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140568,13 +140568,13 @@
                     "class": "DriverVehicleAssignmentsResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140605,13 +140605,13 @@
                     "class": "DriversResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140755,13 +140755,13 @@
                     "class": "RoutesResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140792,13 +140792,13 @@
                     "class": "TrailersResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140829,13 +140829,13 @@
                     "class": "FormsResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -140958,13 +140958,13 @@
                     "class": "GatewaysResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -141031,13 +141031,13 @@
                     "class": "IndustrialResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -141088,13 +141088,13 @@
                     "class": "IssuesResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -141125,13 +141125,13 @@
                     "class": "LiveSharingLinksResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -141198,13 +141198,13 @@
                     "class": "WorkOrdersResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -141307,13 +141307,13 @@
                     "class": "TagsResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -141344,13 +141344,13 @@
                     "class": "UsersResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -141695,13 +141695,13 @@
                     "class": "WebhooksResource",
                     "method": "create",
                     "declared_in": "src/Resources/Concerns/CreatesEntities.php",
-                    "declared_line": 36,
+                    "declared_line": 39,
                     "returns_builder": false,
                     "declared_return_type": "Entity",
                     "query": null,
                     "request_data": [],
                     "request_body": "[]",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36",
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39",
                     "signature": "create(array $data): Entity",
                     "return_type": "Entity",
                     "response_mapping": {
@@ -170778,7 +170778,7 @@
                 "create": {
                     "method": "POST",
                     "path": "/alerts/configurations",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 }
             }
         },
@@ -170810,12 +170810,12 @@
                 "create": {
                     "method": "POST",
                     "path": "/fleet/carrier-proposed-assignments",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "delete": {
                     "method": "DELETE",
                     "path": "/fleet/carrier-proposed-assignments/{}",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33"
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36"
                 }
             }
         },
@@ -170835,7 +170835,7 @@
                 "create": {
                     "method": "POST",
                     "path": "/driver-trailer-assignments",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 }
             }
         },
@@ -170855,7 +170855,7 @@
                 "create": {
                     "method": "POST",
                     "path": "/fleet/driver-vehicle-assignments",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 }
             }
         },
@@ -170875,7 +170875,7 @@
                 "create": {
                     "method": "POST",
                     "path": "/form-submissions",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 }
             }
         },
@@ -170935,7 +170935,7 @@
                 "create": {
                     "method": "POST",
                     "path": "/issues",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 }
             }
         },
@@ -171005,7 +171005,7 @@
                 "create": {
                     "method": "POST",
                     "path": "/maintenance/work-orders",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 }
             }
         },
@@ -171041,22 +171041,22 @@
                 "find": {
                     "method": "GET",
                     "path": "/addresses/{}",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33"
+                    "source": "src/Resources/Concerns/FindsEntities.php:38"
                 },
                 "create": {
                     "method": "POST",
                     "path": "/addresses",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
                     "path": "/addresses/{}",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38"
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39"
                 },
                 "delete": {
                     "method": "DELETE",
                     "path": "/addresses/{}",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33"
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36"
                 }
             }
         },
@@ -171082,22 +171082,22 @@
                 "find": {
                     "method": "GET",
                     "path": "/fleet/routes/{}",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33"
+                    "source": "src/Resources/Concerns/FindsEntities.php:38"
                 },
                 "create": {
                     "method": "POST",
                     "path": "/fleet/routes",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
                     "path": "/fleet/routes/{}",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38"
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39"
                 },
                 "delete": {
                     "method": "DELETE",
                     "path": "/fleet/routes/{}",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33"
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36"
                 }
             }
         },
@@ -171121,17 +171121,17 @@
                 "find": {
                     "method": "GET",
                     "path": "/fleet/drivers/{}",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33"
+                    "source": "src/Resources/Concerns/FindsEntities.php:38"
                 },
                 "create": {
                     "method": "POST",
                     "path": "/fleet/drivers",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
                     "path": "/fleet/drivers/{}",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38"
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39"
                 }
             }
         },
@@ -171151,7 +171151,7 @@
                 "find": {
                     "method": "GET",
                     "path": "/fleet/equipment/{}",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33"
+                    "source": "src/Resources/Concerns/FindsEntities.php:38"
                 }
             }
         },
@@ -171177,22 +171177,22 @@
                 "find": {
                     "method": "GET",
                     "path": "/fleet/trailers/{}",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33"
+                    "source": "src/Resources/Concerns/FindsEntities.php:38"
                 },
                 "create": {
                     "method": "POST",
                     "path": "/fleet/trailers",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
                     "path": "/fleet/trailers/{}",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38"
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39"
                 },
                 "delete": {
                     "method": "DELETE",
                     "path": "/fleet/trailers/{}",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33"
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36"
                 }
             }
         },
@@ -171214,12 +171214,12 @@
                 "find": {
                     "method": "GET",
                     "path": "/fleet/vehicles/{}",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33"
+                    "source": "src/Resources/Concerns/FindsEntities.php:38"
                 },
                 "update": {
                     "method": "PATCH",
                     "path": "/fleet/vehicles/{}",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38"
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39"
                 }
             }
         },
@@ -171244,7 +171244,7 @@
                 "create": {
                     "method": "POST",
                     "path": "/assets",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
@@ -171278,17 +171278,17 @@
                 "create": {
                     "method": "POST",
                     "path": "/industrial/assets",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
                     "path": "/industrial/assets/{}",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38"
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39"
                 },
                 "delete": {
                     "method": "DELETE",
                     "path": "/industrial/assets/{}",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33"
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36"
                 }
             }
         },
@@ -171320,12 +171320,12 @@
                 "create": {
                     "method": "POST",
                     "path": "/gateways",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "delete": {
                     "method": "DELETE",
                     "path": "/gateways/{}",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33"
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36"
                 }
             }
         },
@@ -171350,7 +171350,7 @@
                 "create": {
                     "method": "POST",
                     "path": "/live-shares",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
@@ -171386,22 +171386,22 @@
                 "find": {
                     "method": "GET",
                     "path": "/webhooks/{}",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33"
+                    "source": "src/Resources/Concerns/FindsEntities.php:38"
                 },
                 "create": {
                     "method": "POST",
                     "path": "/webhooks",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
                     "path": "/webhooks/{}",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38"
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39"
                 },
                 "delete": {
                     "method": "DELETE",
                     "path": "/webhooks/{}",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33"
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36"
                 }
             }
         },
@@ -171437,22 +171437,22 @@
                 "find": {
                     "method": "GET",
                     "path": "/contacts/{}",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33"
+                    "source": "src/Resources/Concerns/FindsEntities.php:38"
                 },
                 "create": {
                     "method": "POST",
                     "path": "/contacts",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
                     "path": "/contacts/{}",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38"
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39"
                 },
                 "delete": {
                     "method": "DELETE",
                     "path": "/contacts/{}",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33"
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36"
                 }
             }
         },
@@ -171488,22 +171488,22 @@
                 "find": {
                     "method": "GET",
                     "path": "/tags/{}",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33"
+                    "source": "src/Resources/Concerns/FindsEntities.php:38"
                 },
                 "create": {
                     "method": "POST",
                     "path": "/tags",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
                     "path": "/tags/{}",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38"
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39"
                 },
                 "delete": {
                     "method": "DELETE",
                     "path": "/tags/{}",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33"
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36"
                 }
             }
         },
@@ -171529,22 +171529,22 @@
                 "find": {
                     "method": "GET",
                     "path": "/users/{}",
-                    "source": "src/Resources/Concerns/FindsEntities.php:33"
+                    "source": "src/Resources/Concerns/FindsEntities.php:38"
                 },
                 "create": {
                     "method": "POST",
                     "path": "/users",
-                    "source": "src/Resources/Concerns/CreatesEntities.php:36"
+                    "source": "src/Resources/Concerns/CreatesEntities.php:39"
                 },
                 "update": {
                     "method": "PATCH",
                     "path": "/users/{}",
-                    "source": "src/Resources/Concerns/UpdatesEntities.php:38"
+                    "source": "src/Resources/Concerns/UpdatesEntities.php:39"
                 },
                 "delete": {
                     "method": "DELETE",
                     "path": "/users/{}",
-                    "source": "src/Resources/Concerns/DeletesEntities.php:33"
+                    "source": "src/Resources/Concerns/DeletesEntities.php:36"
                 }
             }
         },

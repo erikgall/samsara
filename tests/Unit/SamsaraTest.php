@@ -410,17 +410,43 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
-    public function it_omits_the_authorization_header_when_token_is_not_set(): void
+    public function it_omits_the_authorization_header_when_cloned_with_a_blank_token(): void
     {
         $http = new HttpFactory;
         $http->preventStrayRequests();
         $http->fake(['*' => $http->response(['data' => []])]);
-        $samsara = new Samsara(null, ['attempts' => 1]);
+        $authenticated = new Samsara('base-token', ['attempts' => 1], $http);
+        $drivers = $authenticated->drivers();
+
+        $tokenless = $authenticated->withToken('');
+        $tokenless->drivers()->query()->get();
+        $drivers->query()->get();
+
+        $this->assertNotSame($authenticated, $tokenless);
+        $this->assertNotSame($drivers, $tokenless->drivers());
+        $this->assertTrue($authenticated->hasToken());
+        $this->assertFalse($tokenless->hasToken());
+        $http->assertSentInOrder([
+            fn (Request $request): bool => ! $request->hasHeader('Authorization'),
+            fn (Request $request): bool => $request->header('Authorization') === ['Bearer base-token'],
+        ]);
+    }
+
+    #[Test]
+    #[DataProvider('absentTokens')]
+    public function it_omits_the_authorization_header_when_token_is_not_set(?string $token): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response(['data' => []])]);
+        $samsara = new Samsara($token, ['attempts' => 1]);
         $samsara->setHttpFactory($http);
 
         $samsara->drivers()->query()->get();
 
         $http->assertSent(fn (Request $request): bool => ! $request->hasHeader('Authorization'));
+        $http->assertSentCount(1);
+        $this->assertFalse($samsara->hasToken());
     }
 
     #[Test]
@@ -824,6 +850,12 @@ class SamsaraTest extends TestCase
         $samsara = new Samsara('test-token');
 
         $this->assertSame('https://api.samsara.com', $samsara->getBaseUrl());
+    }
+
+    /** @return array<string, array{?string}> */
+    public static function absentTokens(): array
+    {
+        return ['empty' => [''], 'null' => [null]];
     }
 
     /** @return array<string, array{?string}> */

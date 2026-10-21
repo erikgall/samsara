@@ -104,10 +104,12 @@ class SamsaraServiceProviderTest extends TestCase
         $this->app->instance(HttpFactory::class, $http);
         $this->app->forgetInstance(Samsara::class);
 
-        $this->app->make(Samsara::class)->drivers()->query()->get();
+        $samsara = $this->app->make(Samsara::class);
+        $samsara->drivers()->query()->get();
 
         $http->assertSentCount(1);
         $http->assertSent(fn (Request $request): bool => $request->header('Authorization') === $headers);
+        $this->assertSame($headers !== [], $samsara->hasToken());
     }
 
     #[Test]
@@ -220,6 +222,7 @@ class SamsaraServiceProviderTest extends TestCase
     {
         return [
             'configured' => ['my-test-token', ['Bearer my-test-token']],
+            'blank'      => ['', []],
             'absent'     => [null, []],
         ];
     }

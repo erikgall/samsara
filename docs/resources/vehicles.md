@@ -96,7 +96,7 @@ $vehicles = Samsara::vehicles()
 $vehicle = Samsara::vehicles()->findByExternalId('fleet_id', 'TRUCK001');
 ```
 
-The SDK converts the pair to the item identifier `fleet_id:TRUCK001`. Vehicle queries are also the sole Fleet/platform operation with an OpenAPI `explode=true` array: an `attributes` array passed through `where()` is emitted as repeated keys (`attributes=a&attributes=b`).
+The SDK converts the pair to the item identifier `fleet_id:TRUCK001`. An `attributes` array passed through `where()` is sent as repeated keys (`attributes=a&attributes=b`).
 
 ## Helper Methods
 

@@ -10,12 +10,12 @@ Resources now expose only supported methods. Review every removed call below bef
 
 ### Final v2 API changes (waves 1 and 2)
 
-- **Retry policy:** POST/PUT/PATCH/DELETE no longer retry connection failures, HTTP 408, or 5xx by default. Opt in with `retry_writes` / `SAMSARA_RETRY_WRITES` (default `false`). HTTP 429 remains retryable for every method within `attempts` and `retry_after_max_seconds`. `Retry-After` accepts only nonnegative integer seconds or an RFC 7231 date (for example, `Wed, 21 Oct 2026 13:00:00 GMT`); other values are ignored. `RateLimitException::getRetryAfter()` returns seconds for valid headers and `null` otherwise, and `getContext()['retry_after_header']` retains the raw header.
+- **Retry policy:** POST/PUT/PATCH/DELETE no longer retry connection failures, HTTP 408, or 5xx by default. Opt in with `retry_writes` / `SAMSARA_RETRY_WRITES` (default `false`). HTTP 429 remains retryable for every method within `attempts` and `retry_after_max_seconds`. GET requests no longer retry other 4xx responses (400, 401, 403, 404, 422); v1.1.0 retried every failure. `Retry-After` accepts only nonnegative integer seconds or an HTTP-date in the `Wed, 21 Oct 2026 13:00:00 GMT` form (RFC 850 and asctime forms are ignored); other values are ignored. `RateLimitException::getRetryAfter()` returns seconds for valid headers and `null` otherwise, and `getContext()['retry_after_header']` retains the raw header.
 - **Client copies:** `useBaseUrl`, `useUsEndpoint`, `useEuEndpoint`, and `useCanadaEndpoint` are removed. Retain the copies returned by `withBaseUrl(string $url)` and `withRegion(string $region)` (`us`, `eu`, `ca`). An unset or blank `SAMSARA_REGION` falls back to `us`. Unknown nonempty regions throw `InvalidArgumentException`; `withRegion()` still requires `us`, `eu`, or `ca`.
-- **Fakes:** `Samsara::fake([...])` accepts exact path-to-response stubs containing the inner `data` value. Replace `fakeDrivers`, `fakeVehicles`, and `fakeVehicleStats` with path stubs or `fakeResponse()`. Staging and recorded history are shared across `withToken()` / `withRegion()` clones.
-- **Queries:** replace `Builder::getWithPagination()` with `paginate()`. `Cursor` is final with readonly `endCursor` and `hasNextPage` properties; its getters are removed. `QueryBuilderInterface` is removed. `Builder` adds Laravel `Conditionable` (`when` / `unless`); `types()` and `withDecorations()` accept individual `VehicleStatType` cases and mixed enum/string arrays. Repeated or cyclic cursors throw `SamsaraException`. `first()` does not inject a limit when automatic page sizing is disabled.
+- **Fakes:** `Samsara::fake([...])` accepts exact path-to-response stubs. A stub with a `data` key is used unchanged; otherwise it is wrapped in `data`. `fakeResponse()` follows the same rule. Replace `fakeDrivers`, `fakeVehicles`, and `fakeVehicleStats` with path stubs or `fakeResponse()`. Staging and recorded history are shared across `withToken()` / `withRegion()` clones.
+- **Queries:** replace `Builder::getWithPagination()` with `paginate()`. `Cursor` is final with readonly `endCursor` and `hasNextPage` properties; its getters are removed. `Cursor::next()` returns the next cursor or `null`. `QueryBuilderInterface` is removed. `Builder` adds Laravel `Conditionable` (`when` / `unless`); `types()` and `withDecorations()` accept individual `VehicleStatType` cases and mixed enum/string arrays. Repeated or cyclic cursors throw `SamsaraException`. `first()` does not inject a limit when automatic page sizing is disabled.
 - **Builder extensions:** The protected `parseTime()`, `toUnixMilliseconds()`, and `fromUnixMilliseconds()` helpers are removed from `InteractsWithTime`. Move any required parsing or millisecond conversion into the application subclass; `formatTime()` and `toUtcString()` remain for request formatting.
-- **Factories and webhooks:** `SamsaraException::make()`, `VerifyWebhookSignature::make()`, and the `Makeable` trait are removed. Construct exceptions directly and register webhook middleware by class string or alias. Empty route/constructor secrets fall back to config. Missing-header exceptions expose the exact header through `getContext()['header']`.
+- **Factories and webhooks:** `SamsaraException::make()`, `VerifyWebhookSignature::make()`, and the `Makeable` trait are removed. Construct exceptions directly and register webhook middleware by class string or alias. Empty route/constructor secrets fall back to config. Missing-header exceptions expose the exact header through `getContext()['header']`. A blank route tolerance (`samsara.webhook:secret,`) now uses the 300-second default instead of `0`.
 - **DTOs:** `new DataInput($attributes)` hydrates nested points just like `DataInput::make($attributes)`; `toArray()` exports those points as arrays. Driver auth-token and live-share expiry checks use Laravel's clock; freeze it with `Illuminate\Support\Carbon::setTestNow()`.
 - **Resources:** `all()` is removed everywhere; use the documented endpoint builder and its required filters. CRUD is composed from `FindsEntities`, `CreatesEntities`, `UpdatesEntities`, and `DeletesEntities` traits so unsupported methods are absent, rather than callable methods throwing `UnsupportedOperationException`. `ResourceInterface` is removed, as is `supportedGenericOperations()`. Entity return contracts use `Samsara\Data\Entity` and concrete domain subclasses instead of `Fluent`; update custom overrides and type declarations.
 
@@ -81,7 +81,7 @@ Route::post('/webhooks/samsara', SamsaraWebhookController::class)
     ->middleware('samsara.webhook:,600');
 ```
 
-The empty alias secret uses configuration. With the default 300-second tolerance, use `VerifyWebhookSignature::class`. Explicit secrets embedded in aliases are written to disk by `route:cache`. Replace message-text assertions for missing headers with `InvalidSignatureException` and `getContext()['header']` (`X-Samsara-Signature` or `X-Samsara-Timestamp`).
+The empty alias secret uses configuration. `VerifyWebhookSignature::class` and the bare `samsara.webhook` alias both keep the 300-second default. Explicit secrets embedded in aliases are written to disk by `route:cache`. Replace message-text assertions for missing headers with `InvalidSignatureException` and `getContext()['header']` (`X-Samsara-Signature` or `X-Samsara-Timestamp`).
 
 ```php
 // Before: constructor hydration and serialization differed from make().
@@ -201,13 +201,13 @@ assertions after replacing those shapes.
 #### Bound synchronous rate-limit waits and validate collection envelopes
 
 - Add `retry_after_max_seconds` / `SAMSARA_RETRY_AFTER_MAX_SECONDS` to published configuration. The default ceiling is 30 seconds.
-- A 429 whose `Retry-After` exceeds the ceiling is no longer retried inside the current process; the SDK throws `RateLimitException` immediately so the caller can reschedule work. Smaller delta-seconds and HTTP-date delays remain honored.
+- A 429 whose `Retry-After` exceeds the ceiling is no longer retried inside the current process; the SDK throws `RateLimitException` immediately so the caller can reschedule work. Smaller delays expressed as delta-seconds or an HTTP-date in the `Wed, 21 Oct 2026 13:00:00 GMT` form are honored; v1.1.0 always waited a fixed 100 ms.
 - Successful collection reads require the collection key to decode to a PHP list. A missing key returns an empty collection. A null or scalar value, a non-list array, or a non-JSON or empty body throws `SamsaraException`. An empty JSON object `{}` decodes as an empty list and is accepted. List items are not validated; a null or scalar item raises `TypeError` during hydration.
 - Review response fakes and exception handling under `MIG-21`.
 
 #### Use Laravel's shared HTTP factory for the container binding
 
-- The package binding now resolves `Illuminate\\Http\\Client\\Factory` from Laravel and injects it into the SDK client. `Http::fake()`, `Http::preventStrayRequests()`, global middleware, and global options now cover container/facade-resolved Samsara traffic.
+- The package binding now resolves `Illuminate\Http\Client\Factory` from Laravel and injects it into the SDK client. `Http::fake()`, `Http::preventStrayRequests()`, global middleware, and global options now cover container/facade-resolved Samsara traffic.
 - Standalone `new Samsara(...)` remains supported and creates its own factory when none is injected. Tests for standalone clients may pass an optional third constructor argument or call `setHttpFactory()`.
 - Review custom HTTP instrumentation and fakes under `MIG-22`; remove duplicate SDK-only factory setup where Laravel's shared factory is intended.
 
@@ -235,14 +235,14 @@ assertions after replacing those shapes.
 #### Stage exact SamsaraFake request paths
 
 - `SamsaraFake` always prevents stray requests and no longer supplies a zero-stub fallback response.
-- Fake helpers and `fakeResponse()` match an exact URL path while ignoring query parameters. A collection path no longer covers item or subresource paths; suffixes from unrelated endpoints cannot collide.
+- Path stubs passed to `Samsara::fake([...])` and `fakeResponse()` match an exact URL path while ignoring query parameters. A collection path no longer covers item or subresource paths; suffixes from unrelated endpoints cannot collide.
 - `assertRequested()` and `assertRequestedWithParams()` use the same exact-path rule, and adding a later fake no longer erases already recorded requests.
 - Update tests under the expanded `MIG-18` guidance.
 
 #### Catch SDK exceptions for every wrapped request
 
 - Builder terminals, supported generic methods, and custom resource helpers now use the same typed error boundary, including after retries are exhausted.
-- Replace Builder-specific catches for `Illuminate\Http\Client\RequestException` with the SDK exception hierarchy.
+- Replace Builder-specific catches for `Illuminate\Http\Client\RequestException` with the SDK exception hierarchy. Exhausted transport failures still throw `Illuminate\Http\Client\ConnectionException`; keep that catch.
 - Catch `ValidationException` for HTTP 400 and 422; use `getCode()` only when the distinction matters.
 - `find()` still returns `null` for 404. Unsupported generic methods are removed. Explicit unsupported helpers still throw `UnsupportedOperationException` before HTTP.
 
@@ -394,10 +394,6 @@ Qualification, training, HOS ELD-event, and industrial-job helpers now use their
 - `createDriverAuthToken(string $driverId, array $data = []): array` becomes `createDriverAuthToken(array $data): array` on `/preview/fleet/drivers/create-auth-token`.
 - `lockVehicle()` changes from POST/array to PUT/bool.
 - `unlockVehicle()` changes from POST/array to DELETE/bool.
-
-- `createDriverAuthToken(array): array` is payload-only and posts to `/preview/fleet/drivers/create-auth-token`.
-- `lockVehicle(string): bool` sends PUT to `/preview/fleet/vehicles/{id}/lock`.
-- `unlockVehicle(string): bool` sends DELETE to the same path.
 
 Samsara describes Preview endpoints as nonfunctional and unsuitable for business-critical applications. These methods are contract-stage only.
 

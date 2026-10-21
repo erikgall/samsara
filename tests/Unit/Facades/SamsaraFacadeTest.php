@@ -127,6 +127,38 @@ class SamsaraFacadeTest extends TestCase
     }
 
     #[Test]
+    public function it_fakes_a_two_page_cursor_flow(): void
+    {
+        $fake = SamsaraFacade::fake([
+            'fleet/drivers' => [
+                'data'       => [['id' => 'driver-1']],
+                'pagination' => ['endCursor' => 'page-2', 'hasNextPage' => true],
+            ],
+        ]);
+
+        $firstPage = SamsaraFacade::drivers()->query()->paginate();
+
+        $this->assertSame(['driver-1'], $firstPage->items()->pluck('id')->all());
+        $this->assertTrue($firstPage->hasMorePages());
+
+        $fake->fakeResponse('fleet/drivers', [
+            'data'       => [['id' => 'driver-2']],
+            'pagination' => ['endCursor' => null, 'hasNextPage' => false],
+        ]);
+        $secondPage = $firstPage->nextPage();
+
+        $this->assertNotNull($secondPage);
+        $this->assertSame(['driver-2'], $secondPage->items()->pluck('id')->all());
+        $this->assertFalse($secondPage->hasMorePages());
+        $this->assertNull($secondPage->nextPage());
+        $fake->getHttpFactory()->assertSentInOrder([
+            fn (Request $request): bool => ! array_key_exists('after', $request->data()),
+            fn (Request $request): bool => $request['after'] === 'page-2',
+        ]);
+        $fake->assertSentCount(2);
+    }
+
+    #[Test]
     public function it_resolves_samsara_instance(): void
     {
         $samsara = SamsaraFacade::getFacadeRoot();

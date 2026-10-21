@@ -80,7 +80,7 @@ $drivers = Samsara::drivers()
 
 Dedicated list helpers serialize non-empty arrays as comma-separated values: `types()`, `expand()`, `withDecorations()`, `whereAttribute()`, `whereDriver()`, `whereParentTag()`, `whereTag()`, and `whereVehicle()`. Arbitrary arrays passed through `where()` retain Laravel's standard bracketed encoding.
 
-Endpoint helpers use `repeatQueryParameters()` when the official operation declares a form/`explode=true` array. Those values move into the URL as repeated RFC 3986 keys (`ids=a&ids=b`). Top-level boolean query values serialize as the literal strings `true` and `false` rather than `1` and `0`. Fleet/platform repeated keys include vehicle-list and asset-list `attributes` plus asset-depreciation `assetIds`; Safety/operations uses repeated keys for alert configuration IDs, incident configuration IDs, Camera Media lists, DVIR safety status, service-task IDs, work-order IDs, and work-order-stream status/asset/assignee lists. Call `repeatQueryParameters()` directly only when building a custom endpoint whose contract requires that encoding.
+Endpoint helpers use `repeatQueryParameters()` when the official operation declares a form/`explode=true` array. Those values move into the URL as repeated RFC 3986 keys (`ids=a&ids=b`). Top-level boolean query values serialize as the literal strings `true` and `false` rather than `1` and `0`. Each resource page names its repeated-key parameters. Call `repeatQueryParameters()` directly only when building a custom endpoint whose contract requires that encoding.
 
 ## Modifiers
 
@@ -111,7 +111,7 @@ $drivers = Samsara::drivers()
 
 ### Stat types
 
-For telemetry endpoints, `types()` selects which stat streams to retrieve. It accepts a single string or an array of strings.
+For telemetry endpoints, `types()` selects which stat streams to retrieve. It accepts strings, `VehicleStatType` cases, or arrays mixing both.
 
 ```php
 $stats = Samsara::vehicleStats()
@@ -122,7 +122,7 @@ $stats = Samsara::vehicleStats()
     ->get();
 ```
 
-> **Note:** `types()` accepts string values only. To use the [`VehicleStatType`](enums.html#vehiclestattype) enum, unwrap each case explicitly: `->types([VehicleStatType::GPS->value])`.
+> **Note:** `types()` and `withDecorations()` accept strings, `VehicleStatType` cases, or arrays mixing both, for example `->types([VehicleStatType::GPS, 'engineStates'])`.
 
 ### Decorations
 
@@ -174,7 +174,7 @@ $page = Samsara::vehicles()
 
 `paginate()` makes one request and returns a `Samsara\Query\Pagination\CursorPaginator`. The paginator is iterable, countable, and exposes the cursor metadata returned by the API. When no explicit limit exists, `paginate()` and `lazy()` apply the configured `per_page`. Explicit method arguments, `limit()`, and `where('limit', ...)` take precedence.
 
-Some official cursor endpoints accept `after` but no `limit`. Their resource helpers call `withoutDefaultPageSize()`, so pagination sends no implicit limit. The builder still preserves an explicit caller-supplied limit, but that does not make the parameter contract-valid: omit it when the selected endpoint does not declare `limit`. Fleet/platform currently has 15 such helpers. The opt-out persists when `nextPage()` and `lazy()` clone the builder.
+Some official cursor endpoints accept `after` but no `limit`. Their resource helpers call `withoutDefaultPageSize()`, so pagination sends no implicit limit. The builder still preserves an explicit caller-supplied limit, but that does not make the parameter contract-valid: omit it when the selected endpoint does not declare `limit`. The opt-out persists when `nextPage()` and `lazy()` clone the builder.
 
 ```php
 $paginator = Samsara::vehicles()
@@ -209,6 +209,7 @@ The final `Cursor` class exposes readonly pagination properties; its former gett
 |---|---|---|
 | `$cursor->endCursor` | `?string` | The cursor token for the next page. |
 | `$cursor->hasNextPage` | `bool` | Whether the API reports more results. |
+| `next()` | `?string` | `endCursor` when `hasNextPage` is true and the cursor is non-empty; otherwise `null`. |
 | `toArray()` | `array<string, mixed>` | An `['endCursor' => ..., 'hasNextPage' => ...]` representation. |
 
 ## Execution Methods
@@ -285,7 +286,7 @@ $driver = $drivers->findById('driver-1');
 
 Because `EntityCollection` is a Laravel collection, every method on the base class — `filter()`, `map()`, `pluck()`, `keyBy()`, `groupBy()`, and so on — works without modification.
 
-`Builder` supports Laravel's `when()` and `unless()` methods. `types()` and `withDecorations()` accept a `VehicleStatType` case, strings, or arrays mixing both.
+`Builder` supports Laravel's `when()` and `unless()` methods.
 
 Repeated or cyclic cursors throw `SamsaraException` during `lazy()` traversal or `nextPage()` navigation. Catch that exception at the traversal boundary.
 

@@ -16,8 +16,14 @@ use Samsara\Enums\VehicleStatType;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\LazyCollection;
 use Samsara\Concerns\InteractsWithTime;
+use Samsara\Exceptions\ServerException;
 use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\NotFoundException;
+use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\ValidationException;
 use Illuminate\Support\Traits\Conditionable;
+use Samsara\Exceptions\AuthorizationException;
+use Samsara\Exceptions\AuthenticationException;
 
 /**
  * Query builder for API requests.
@@ -149,6 +155,8 @@ class Builder
     /**
      * Build the query parameters array.
      *
+     * @internal
+     *
      * @return array<string, mixed>
      */
     public function buildQuery(): array
@@ -214,6 +222,15 @@ class Builder
      * Get the first result.
      *
      * @return TEntity|null
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function first(): ?Entity
     {
@@ -228,6 +245,15 @@ class Builder
      * Execute the query and get results.
      *
      * @return EntityCollection<int, TEntity>
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function get(): EntityCollection
     {
@@ -251,9 +277,18 @@ class Builder
     }
 
     /**
-     * Get results as a lazy collection.
+     * Stream results, rejecting repeated pagination cursors.
      *
      * @return LazyCollection<int, TEntity>
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function lazy(?int $chunkSize = null): LazyCollection
     {
@@ -337,6 +372,15 @@ class Builder
      *
      * @param  int|null  $perPage  The number of items per page
      * @return Pagination\CursorPaginator<TEntity>
+     *
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @throws RateLimitException
+     * @throws ServerException
+     * @throws SamsaraException
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function paginate(?int $perPage = null): Pagination\CursorPaginator
     {
@@ -370,6 +414,8 @@ class Builder
 
     /**
      * Declare form/explode=true list parameters that use repeated query keys.
+     *
+     * @internal
      */
     public function repeatQueryParameters(string ...$parameters): static
     {
@@ -423,6 +469,8 @@ class Builder
 
     /**
      * Map endpoint response items into the selected entity class.
+     *
+     * @internal
      *
      * @template TMapped of Entity
      *
@@ -510,6 +558,8 @@ class Builder
 
     /**
      * Set the query parameter used to request the next cursor page.
+     *
+     * @internal
      */
     public function withCursorParameter(string $parameter): static
     {
@@ -532,6 +582,8 @@ class Builder
 
     /**
      * Disable automatic configured page-size injection for this query.
+     *
+     * @internal
      */
     public function withoutDefaultPageSize(): static
     {
@@ -542,6 +594,8 @@ class Builder
 
     /**
      * Set the response key containing the result collection.
+     *
+     * @internal
      */
     public function withResponseCollectionKey(string $key): static
     {

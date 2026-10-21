@@ -55,6 +55,9 @@ class VerifyWebhookSignature
      * @param  Closure(Request): Response  $next
      * @param  string|null  $secret  Optional secret passed via route middleware parameters
      * @param  int|string|null  $tolerance  Optional tolerance passed via route middleware parameters
+     *
+     * @throws InvalidSignatureException
+     * @throws \InvalidArgumentException
      */
     public function handle(
         Request $request,

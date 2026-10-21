@@ -21,6 +21,9 @@ final class Cursor implements Arrayable
         public readonly bool $hasNextPage,
     ) {}
 
+    /**
+     * Get the next cursor, or null when pagination is complete.
+     */
     public function next(): ?string
     {
         return $this->hasNextPage && $this->endCursor !== '' ? $this->endCursor : null;

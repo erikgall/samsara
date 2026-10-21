@@ -6,7 +6,9 @@ use Samsara\Data\Entity;
 use Samsara\Resources\Resource;
 use Samsara\Exceptions\ServerException;
 use Samsara\Exceptions\SamsaraException;
+use Samsara\Exceptions\NotFoundException;
 use Samsara\Exceptions\RateLimitException;
+use Samsara\Exceptions\ValidationException;
 use Samsara\Exceptions\AuthorizationException;
 use Samsara\Exceptions\AuthenticationException;
 
@@ -26,9 +28,12 @@ trait FindsEntities
      *
      * @throws AuthenticationException
      * @throws AuthorizationException
+     * @throws NotFoundException
+     * @throws ValidationException
      * @throws RateLimitException
      * @throws ServerException
      * @throws SamsaraException
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function find(string $id): ?Entity
     {

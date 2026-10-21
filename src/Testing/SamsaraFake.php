@@ -107,6 +107,26 @@ class SamsaraFake extends Samsara
     }
 
     /**
+     * Assert a request matching the callback was sent.
+     */
+    public function assertSent(callable $callback): static
+    {
+        $this->fakeHttp->assertSent($callback);
+
+        return $this;
+    }
+
+    /**
+     * Assert the number of requests sent.
+     */
+    public function assertSentCount(int $count): static
+    {
+        $this->fakeHttp->assertSentCount($count);
+
+        return $this;
+    }
+
+    /**
      * Fake a response for an endpoint.
      *
      * @param  array<mixed>  $data
@@ -114,7 +134,7 @@ class SamsaraFake extends Samsara
     public function fakeResponse(string $endpoint, array $data, int $status = 200): static
     {
         $this->responses[$this->normalizeEndpoint($endpoint)] = [
-            'data'   => $data,
+            'data'   => array_key_exists('data', $data) ? $data : ['data' => $data],
             'status' => $status,
         ];
 
@@ -186,7 +206,7 @@ class SamsaraFake extends Samsara
         $response = $this->responses[$path];
 
         return $this->fakeHttp->response(
-            ['data' => $response['data']],
+            $response['data'],
             $response['status'],
         );
     }

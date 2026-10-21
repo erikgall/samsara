@@ -2,6 +2,7 @@
 
 namespace Samsara;
 
+use Closure;
 use Throwable;
 use Illuminate\Support\Arr;
 use Samsara\Http\RetryAfter;
@@ -116,6 +117,8 @@ class Samsara
      * @param  string|null  $token  The API token
      * @param  array<string, mixed>  $config  Configuration options
      * @param  HttpFactory|null  $http  Optional HTTP factory for framework integration and testing
+     *
+     * @throws InvalidArgumentException
      */
     public function __construct(
         ?string $token = null,
@@ -126,7 +129,7 @@ class Samsara
             throw new InvalidArgumentException('Samsara request attempts must be at least 1.');
         }
 
-        $this->token = $token;
+        $this->token = $token ?: null;
         $this->config = $config;
         $this->http = $http ?? new HttpFactory;
 
@@ -440,9 +443,7 @@ class Samsara
     }
 
     /**
-     * Set the HTTP factory instance.
-     *
-     * Useful for testing.
+     * Mutate the HTTP factory explicitly as a test seam.
      *
      * @param  HttpFactory  $http  The HTTP factory
      */
@@ -554,11 +555,9 @@ class Samsara
      */
     public function withBaseUrl(string $url): static
     {
-        $client = clone $this;
-        $client->baseUrl = rtrim($url, '/');
-        $client->resources = [];
-
-        return $client;
+        return $this->cloneWith(function (self $client) use ($url): void {
+            $client->baseUrl = rtrim($url, '/');
+        });
     }
 
     /**
@@ -566,17 +565,13 @@ class Samsara
      */
     public function withoutToken(): static
     {
-        $client = clone $this;
-        $client->token = null;
-        $client->resources = [];
-
-        return $client;
+        return $this->withToken('');
     }
 
     /**
      * Create an isolated client for the us, eu, or ca API region.
      *
-     * @throws InvalidArgumentException When the region is unknown.
+     * @throws InvalidArgumentException
      */
     public function withRegion(string $region): static
     {
@@ -590,11 +585,9 @@ class Samsara
      */
     public function withToken(string $token): static
     {
-        $client = clone $this;
-        $client->token = $token;
-        $client->resources = [];
-
-        return $client;
+        return $this->cloneWith(function (self $client) use ($token): void {
+            $client->token = $token ?: null;
+        });
     }
 
     /**
@@ -610,6 +603,8 @@ class Samsara
      *
      * @param  string|null  $token  The API token
      * @param  array<string, mixed>  $config  Configuration options
+     *
+     * @throws InvalidArgumentException
      */
     public static function make(?string $token = null, array $config = []): static
     {
@@ -649,6 +644,20 @@ class Samsara
     {
         /** @phpstan-ignore return.type */
         return $this->resources[$class] ??= new $class($this);
+    }
+
+    /**
+     * Clone the client without its cached resources.
+     *
+     * @param  Closure(static): void  $mutate
+     */
+    private function cloneWith(Closure $mutate): static
+    {
+        $client = clone $this;
+        $client->resources = [];
+        $mutate($client);
+
+        return $client;
     }
 
     /**
