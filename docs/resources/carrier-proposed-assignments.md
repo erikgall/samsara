@@ -17,14 +17,14 @@ permalink: /resources/carrier-proposed-assignments
 
 ## Introduction
 
-Carrier-proposed assignments represent assignment suggestions a carrier surfaces to drivers. The resource supports generic `all`, `create`, and `delete`, plus `query()` for cursor-aware collection access. `find()` and `update()` are rejected locally. Reach for [Assignments](assignments.html) when you need confirmed assignments.
+Carrier-proposed assignments represent assignment suggestions a carrier surfaces to drivers. The resource exposes `create`, `delete`, and `query()` for collection access. `all`, `find`, and `update` are removed. Reach for [Assignments](assignments.html) when you need confirmed assignments.
 
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-$proposals = Samsara::carrierProposedAssignments()->all();
+$proposals = Samsara::carrierProposedAssignments()->query()->get();
 ```
 
 ## Creating Records
@@ -40,7 +40,7 @@ The accepted payload shape is dictated by the Samsara API. Pass the same keys yo
 
 ## Updating Records
 
-`update()` is unsupported and throws `UnsupportedOperationException` before HTTP.
+`update()` is removed from this resource.
 
 ## Deleting Records
 

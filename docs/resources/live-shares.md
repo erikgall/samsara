@@ -22,14 +22,14 @@ permalink: /resources/live-shares
 
 The `Samsara::liveShares()` resource manages live sharing links — URLs that let people without Samsara accounts watch selected assets on a map. Each share selects one link type and its corresponding configuration object. A share may expire at `expiresAtTime`; revoke it by deleting the live share record.
 
-The resource owns generic `all`, `create`, `update`, and `delete`. `update($id, $data)` and `delete($id)` use the collection path `/live-shares?id={id}`. Generic `find` is unsupported and throws before HTTP.
+The resource exposes `query`, `create`, `update`, and `delete`. `update($id, $data)` and `delete($id)` use the collection path `/live-shares?id={id}`. `all` and `find` are removed.
 
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-$shares = Samsara::liveShares()->all();
+$shares = Samsara::liveShares()->query()->get();
 
 $active = Samsara::liveShares()
     ->query()
@@ -37,7 +37,7 @@ $active = Samsara::liveShares()
     ->get();
 ```
 
-`all()` returns an `EntityCollection<int, LiveShare>`. Use `query()` to filter the collection; there is no single-record `find()` capability.
+`query()->get()` returns an `EntityCollection<int, LiveShare>`. Use `query()` to filter the collection; there is no single-record `find()` capability.
 
 ## Creating Records
 
@@ -87,7 +87,7 @@ $shares = Samsara::liveShares()
 The `LiveShare` entity exposes two helpers:
 
 ```php
-$share = Samsara::liveShares()->all()->first();
+$share = Samsara::liveShares()->query()->get()->first();
 
 $share->isActive();   // bool
 $share->isExpired();  // bool

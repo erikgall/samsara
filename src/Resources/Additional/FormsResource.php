@@ -116,7 +116,7 @@ class FormsResource extends Resource
     }
 
     /**
-     * Get all form templates.
+     * Get a query builder for form templates.
      *
      * @return Builder<FormTemplate>
      */

@@ -21,14 +21,14 @@ permalink: /resources/addresses
 
 ## Introduction
 
-An address in Samsara is a named location with an optional **geofence** — a polygon or circle that encloses an area you care about, such as a yard, customer site, or distribution center. The Samsara platform uses geofences to detect arrivals, departures, and dwell time. Reach for this resource when you need to maintain that directory of geofenced locations and the contacts attached to them.
+An address in Samsara is a named location with a **geofence** — a polygon or circle that encloses an area you care about, such as a yard, customer site, or distribution center. The Samsara platform uses geofences to detect arrivals, departures, and dwell time. Reach for this resource when you need to maintain that directory of geofenced locations and the contacts attached to them.
 
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-$addresses = Samsara::addresses()->all();
+$addresses = Samsara::addresses()->query()->get();
 
 $address = Samsara::addresses()->find('address-id');
 ```
@@ -37,6 +37,7 @@ $address = Samsara::addresses()->find('address-id');
 
 ```php
 $address = Samsara::addresses()->create([
+    'geofence' => ['circle' => ['latitude' => 37.7749, 'longitude' => -122.4194, 'radiusMeters' => 200]],
     'name'             => 'Distribution Center',
     'formattedAddress' => '123 Warehouse Blvd, City, ST 12345',
     'notes'            => 'Main loading dock on west side',

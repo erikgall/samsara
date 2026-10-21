@@ -18,7 +18,7 @@ permalink: /resources/assignments
 
 Assignments record which driver was paired with which vehicle or trailer over time. The SDK exposes four facade accessors: `driverVehicleAssignments()`, `driverTrailerAssignments()`, `trailerAssignments()`, and `carrierProposedAssignments()`. Reach for these resources when you need to reconstruct an audit trail of who drove what, or who pulled which trailer, over a given window. The driver-vehicle, driver-trailer, and carrier-proposed builders return generic `Samsara\Data\Entity` (`Fluent`) rows; the legacy `trailerAssignments()->forTrailer()` helper returns a typed `Trailer` wrapper.
 
-Driver-vehicle and driver-trailer resources support generic `create`, read builders, and dedicated contract-shaped mutations. Generic update/delete verbs remain rejected. The legacy trailer-assignment resource exposes both `query()` for the wrapped `trailers` collection and `forTrailer()` for one trailer.
+Driver-vehicle and driver-trailer resources support generic `create`, read builders, and dedicated contract-shaped mutations. Generic `all`, `find`, `update`, and `delete` methods are removed. The legacy trailer-assignment resource exposes both `query()` for the wrapped `trailers` collection and `forTrailer()` for one trailer.
 
 For carrier-proposed driver-vehicle assignments, see the [Carrier Proposed Assignments](carrier-proposed-assignments.html) page.
 

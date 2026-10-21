@@ -10,7 +10,7 @@ permalink: /resources/safety-events
 - [Introduction](#introduction)
 - [Retrieving Records](#retrieving-records)
 - [Audit Logs](#audit-logs)
-- [Event Types](#event-types)
+- [Behavior Labels](#behavior-labels)
 - [Filtering](#filtering)
 - [Helper Methods](#helper-methods)
 - [Properties](#properties)
@@ -41,7 +41,7 @@ Samsara::safetyEvents()
     ->each(fn ($event) => SafetyEventReport::record($event->toArray()));
 ```
 
-No generic CRUD operation is supported; `all`, `find`, `create`, `update`, and `delete` all fail locally. Use `query()` and `auditLogs()`.
+No generic CRUD operation is supported; `all`, `find`, `create`, `update`, and `delete` are removed. Use `query()` and `auditLogs()`.
 
 ## Audit Logs
 

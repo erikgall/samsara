@@ -22,14 +22,14 @@ permalink: /resources/work-orders
 
 Work orders track the maintenance lifecycle for a vehicle or asset — what needs servicing, who is doing the work, and what tasks (oil change, tire rotation, brake inspection) the order covers. Use `query()` to filter the collection, `stream()` for back-fill across long windows, and `serviceTasks()` for the catalog of available tasks.
 
-The resource owns generic `all` and `create`. Generic `find`, `update`, and `delete` remain rejected because the current API uses collection-style identifiers that those generic signatures do not model. Use `updateWorkOrder()` and `deleteWorkOrder()` for the contract-backed collection operations.
+The resource exposes `create()` and read builders. Generic `all`, `find`, `update`, and `delete` methods are removed because their signatures do not model the current collection operations. Use `updateWorkOrder()` and `deleteWorkOrder()` for the contract-backed collection operations.
 
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-$workOrders = Samsara::workOrders()->all();
+$workOrders = Samsara::workOrders()->query()->get();
 
 $workOrder = Samsara::workOrders()
     ->query()
@@ -60,7 +60,7 @@ $workOrder = Samsara::workOrders()->updateWorkOrder([
 ]);
 ```
 
-The required work-order ID belongs in the PATCH body. Generic `update()` still throws locally rather than emitting a fabricated item path.
+The required work-order ID belongs in the PATCH body. Generic `update()` is removed; call `updateWorkOrder()` instead.
 
 ## Deleting Records
 
@@ -121,13 +121,15 @@ The package's `MaintenanceStatus` enum is legacy vocabulary and is not the curre
 
 ## Invoice Scans
 
-`uploadInvoiceScan()` posts a metadata payload to `/maintenance/invoice-scans` and returns the API's raw `data` envelope as an array — useful for attaching invoices to a work order.
+`uploadInvoiceScan()` posts Base64 file content and either `workOrderId` or `assetId` to `/maintenance/invoice-scans`, then returns the decoded `data` object as an array.
 
 ```php
 $result = Samsara::workOrders()->uploadInvoiceScan([
     'workOrderId' => 'work-order-id',
-    'fileName' => 'invoice.pdf',
-    'contentType' => 'application/pdf',
+    'file' => [
+        'base64Content' => base64_encode(file_get_contents($invoicePath)),
+        'contentType' => 'application/pdf',
+    ],
 ]);
 ```
 

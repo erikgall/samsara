@@ -26,7 +26,7 @@ The `Samsara::maintenance()` resource exposes Driver Vehicle Inspection Reports 
 
 ## Retrieving Records
 
-Use `dvirs()` for the stream. Generic `all()` is rejected locally.
+Use `dvirs()` for the stream. `all()` is removed.
 
 ```php
 use Samsara\Facades\Samsara;
@@ -96,7 +96,7 @@ Generic `update()` remains unsupported because the resource spans separate DVIR 
 
 ## Deleting Records
 
-Generic `delete()` is unsupported and fails locally.
+Generic `delete()` is removed from this resource.
 
 > **Note:** Treat DVIRs as append-only. Resolve safety issues by uploading a follow-up inspection, not by deleting the old one.
 
@@ -196,7 +196,7 @@ The `Dvir` entity exposes the following `@property-read` keys:
 | `trailerName` | `?string` | Trailer name captured at inspection time. |
 | `vehicle` | `?array{id?: string, name?: string}` | Vehicle inspected. |
 | `trailer` | `?array{id?: string, name?: string}` | Trailer inspected (single nested object). |
-| `location` | `?array{latitude?: float, longitude?: float}` | Inspection location. |
+| `location` | `?string` | Formatted inspection location. |
 | `authorSignature` | `?array{signedAtTime?: string}` | Driver signature payload. |
 | `secondSignature` | `?array{signedAtTime?: string}` | Second-driver signature payload. |
 | `thirdSignature` | `?array{signedAtTime?: string}` | Third-driver signature payload. |

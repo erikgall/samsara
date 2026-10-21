@@ -171,7 +171,7 @@ class LegacyResource extends Resource
      * Get vision cameras (v1).
      *
      * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     public function visionCameras(array $data): array
     {
@@ -182,7 +182,7 @@ class LegacyResource extends Resource
      * Execute a legacy GET request through the shared SDK boundary.
      *
      * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * @return array<mixed>
      */
     private function getLegacy(string $endpoint, array $data): array
     {

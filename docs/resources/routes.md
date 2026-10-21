@@ -36,15 +36,13 @@ $weekly = Samsara::routes()
     ->get();
 ```
 
-`find()` returns `null` when the route does not exist. Collection reads must use `query()` with the required time window; generic `all()` is unsupported and fails locally. Generic `find`, `create`, `update`, and `delete` remain supported.
+`find()` returns `null` when the route does not exist. Collection reads must use `query()` with the required time window; `all()` is removed. Generic `find`, `create`, `update`, and `delete` remain supported.
 
 ## Creating Records
 
 ```php
 $route = Samsara::routes()->create([
     'name' => 'Delivery Route A',
-    'scheduledRouteStartTime' => now()->addHour()->toIso8601String(),
-    'scheduledRouteEndTime' => now()->addHours(8)->toIso8601String(),
     'stops' => [
         [
             'name' => 'Pickup',
@@ -91,9 +89,11 @@ Samsara::routes()->delete('route-id');
 ```php
 $logs = Samsara::routes()
     ->auditLogs()
-    ->between(now()->subDays(7), now())
+    ->after($cursor)
     ->get();
 ```
+
+The audit feed accepts `after` and `expand`, not a time window. Save the cursor returned by `paginate()` for subsequent reads.
 
 Audit-log rows are mapped to `Samsara\Data\Route\RouteAuditLog`. The builder suppresses the implicit page size because the feed accepts cursors but no `limit`.
 

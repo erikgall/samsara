@@ -36,7 +36,7 @@ Webhooks deliver Samsara events to your application as POST requests, signed wit
 ```php
 use Samsara\Facades\Samsara;
 
-$webhooks = Samsara::webhooks()->all();
+$webhooks = Samsara::webhooks()->query()->get();
 
 $webhook = Samsara::webhooks()->find('webhook-id');
 ```
@@ -190,7 +190,7 @@ if (! $verifier->isValid($payload, $signature, $timestamp)) {
 $verifier = new WebhookSignatureVerifier(config('samsara.webhook_secret'));
 
 $payload = '{"eventType":"VehicleCreated"}';
-$timestamp = (string) time();
+$timestamp = (string) \Illuminate\Support\Carbon::now()->getTimestamp();
 $signature = $verifier->computeSignature($payload, $timestamp);
 
 $this->call(
@@ -223,7 +223,7 @@ The time window does not prevent replay inside the accepted interval. Make handl
 ```php
 // Middleware with a 10-minute tolerance
 Route::post('/webhooks/samsara', SamsaraWebhookController::class)
-    ->middleware(new VerifyWebhookSignature(null, 600));
+    ->middleware('samsara.webhook:,600');
 
 // Or directly on the verifier
 $verifier->verifyFromRequest($payload, $signature, $timestamp, 600);
@@ -311,6 +311,8 @@ if ($webhook->hasEventType('VehicleCreated')) {
 | `customHeaders` | `?array` | Additional headers Samsara appends to each delivery. Each item exposes `key` and `value`. |
 
 The current response contains no lifecycle status. Removed `isActive()` and `isPaused()` calls have no direct replacement.
+
+An empty secret in `'samsara.webhook:,600'` falls back to configuration. An explicit alias secret is stored in the route definition, so `route:cache` writes it to disk. To keep the default 300-second tolerance, use `VerifyWebhookSignature::class`.
 
 ## Related Resources
 

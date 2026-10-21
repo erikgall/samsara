@@ -1,32 +1,26 @@
 <?php
 
-declare(strict_types=1);
-
 /**
- * Dependency-free, read-only reconciliation audit for docs/api-sync/contract-inventory.json.
+ * Reconcile the pinned OpenAPI contract with resource methods and operation traits.
  *
- * The checker never writes. It derives the official operation declarations and
- * lifecycle stages from the pinned OpenAPI document, derives inherited generic
- * operations from current PHP source, and verifies the inventory ledger and
- * provenance against both authorities. It also derives the tracked package
- * enum and DTO annotation catalogs from current source so their evidence
- * cannot remain stale behind a matching source-tree digest.
+ * --write refreshes source-derived evidence while preserving audited explicit
+ * endpoint bindings and official classifications. Validation always runs before writing.
  *
- * Usage:
- *   php scripts/check-samsara-contract-reconciliation.php
- *   php scripts/check-samsara-contract-reconciliation.php --root /path/to/repo
+ * Usage: php scripts/check-samsara-contract-reconciliation.php [--write] [--root PATH]
+ *
+ * @author Erik Galloway <erik@erikgall.com>
  */
+const PINNED_CONTRACT = 'contracts/samsara/samsara-api-2026-08-10.json';
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'];
 const GENERIC_OPERATIONS = [
-    'all'    => ['GET', false],
-    'find'   => ['GET', true],
-    'create' => ['POST', false],
-    'update' => ['PATCH', true],
-    'delete' => ['DELETE', true],
+    'find'   => ['GET', true, 'FindsEntities'],
+    'create' => ['POST', false, 'CreatesEntities'],
+    'update' => ['PATCH', true, 'UpdatesEntities'],
+    'delete' => ['DELETE', true, 'DeletesEntities'],
 ];
 const CLASSIFICATIONS = ['breaking', 'additive', 'docs-only'];
 
-$options = parseArguments(array_slice($argv, 1));
+$options = parseReconciliationArguments(array_slice($argv, 1));
 $root = realpath($options['root']) ?: $options['root'];
 $inventoryPath = absolutePath($root, $options['inventory']);
 $contractPath = absolutePath($root, $options['contract']);
@@ -36,12 +30,19 @@ $passes = 0;
 try {
     $inventory = decodeJsonFile($inventoryPath, 'Inventory');
     $contract = decodeJsonFile($contractPath, 'Contract');
+    checkSame('pinned official contract', realpath($root.'/'.PINNED_CONTRACT), realpath($contractPath), $errors, $passes);
 
     $official = deriveOfficialOperations($contract, $errors);
-    $package = deriveInventoryOperations($inventory, $official, $root, $errors);
-    $capabilities = deriveInheritedCapabilities($root, $official['wire_keys'], $errors);
+    $capabilities = deriveResourceCapabilities($root, $official['wire_keys'], $errors);
     $source = deriveSourceIdentity($root, $errors);
     $declarations = derivePackageDeclarations($root, $errors);
+
+    if ($options['write']) {
+        $inventory = refreshInventory($inventory, $capabilities, $source, $declarations, $official, $root);
+    }
+
+    $package = deriveInventoryOperations($inventory, $official, $root, $errors);
+    verifyMethodBindings($inventory, $capabilities, $errors, $passes);
 
     verifyRecordedSourceContext($inventory, $errors, $passes);
     checkSame('generated date', '2026-08-10', $inventory['generated_for_date'] ?? null, $errors, $passes);
@@ -61,8 +62,8 @@ try {
     fwrite(STDOUT, "Derived changed operations: {$package['changed_count']}\n");
     fwrite(STDOUT, 'Derived official stages: '.formatStageCounts($official['stage_counts'])."\n");
     fwrite(STDOUT, 'Derived official-only stages: '.formatStageCounts($package['official_only_stage_counts'])."\n");
-    fwrite(STDOUT, "Derived inherited operations/phantoms: {$capabilities['effective_count']}/{$capabilities['phantom_count']}\n");
-    fwrite(STDOUT, "Derived concrete resource capability overrides: {$capabilities['override_count']}/{$capabilities['resource_count']}\n");
+    fwrite(STDOUT, "Derived generic operations/phantoms: {$capabilities['effective_count']}/{$capabilities['phantom_count']}\n");
+    fwrite(STDOUT, "Derived concrete resources: {$capabilities['resource_count']}\n");
     fwrite(STDOUT, "Derived src tree: {$source['file_count']} files, SHA-256 {$source['tree_sha256']}\n");
     fwrite(STDOUT, "Derived package enums/cases: {$declarations['enum_count']}/{$declarations['enum_case_count']}\n");
     fwrite(STDOUT, "Derived package data classes/properties: {$declarations['data_class_count']}/{$declarations['data_property_count']}\n");
@@ -75,6 +76,11 @@ try {
         exit(1);
     }
 
+    if ($options['write']) {
+        file_put_contents($inventoryPath, json_encode($inventory, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)."\n");
+        fwrite(STDOUT, "WROTE: {$inventoryPath}\n");
+    }
+
     fwrite(STDOUT, "PASS: {$passes} reconciliation assertions; unclassified differences = 0.\n");
     exit(0);
 } catch (Throwable $exception) {
@@ -82,18 +88,27 @@ try {
     exit(2);
 }
 
-/** @return array{root:string, inventory:string, contract:string} */
-function parseArguments(array $arguments): array
+/**
+ * @param  list<string>  $arguments
+ * @return array{root:string, inventory:string, contract:string, write:bool}
+ */
+function parseReconciliationArguments(array $arguments): array
 {
     $options = [
-        'root'      => getcwd(),
+        'root'      => getcwd() ?: dirname(__DIR__),
+        'write'     => false,
         'inventory' => 'docs/api-sync/contract-inventory.json',
-        'contract'  => 'contracts/samsara/samsara-api-2026-08-10.json',
+        'contract'  => PINNED_CONTRACT,
     ];
 
-    for ($i = 0; $i < count($arguments); $i += 2) {
-        $flag = $arguments[$i] ?? '';
-        $value = $arguments[$i + 1] ?? null;
+    for ($i = 0; $i < count($arguments); $i++) {
+        $flag = $arguments[$i];
+        if ($flag === '--write') {
+            $options['write'] = true;
+
+            continue;
+        }
+        $value = $arguments[++$i] ?? null;
         if (! in_array($flag, ['--root', '--inventory', '--contract'], true) || $value === null) {
             throw new RuntimeException('Expected --root, --inventory, or --contract followed by a value.');
         }
@@ -133,6 +148,10 @@ function operationKey(string $method, string $path): string
     return strtoupper($method).' '.normalizePath($path);
 }
 
+/**
+ * @param  array<mixed>  $tags
+ * @return 'beta'|'preview'|'stable'
+ */
 function operationStage(array $tags): string
 {
     $beta = in_array('Beta APIs', $tags, true);
@@ -145,8 +164,13 @@ function operationStage(array $tags): string
 }
 
 /**
+ * @param  array<string, mixed>  $contract
+ * @param  list<string>  $errors
  * @return array{
  *   declaration_count:int,
+ *   path_count:int,
+ *   openapi:mixed,
+ *   info_version:mixed,
  *   wire_keys:array<string,true>,
  *   declarations_by_key:array<string,list<array{operation_id:string,method:string,path:string,stage:string}>>,
  *   operation_ids:array<string,true>,
@@ -202,6 +226,9 @@ function deriveOfficialOperations(array $contract, array &$errors): array
 
     return [
         'declaration_count'      => $count,
+        'path_count'             => count($paths),
+        'openapi'                => $contract['openapi'] ?? null,
+        'info_version'           => $contract['info']['version'] ?? null,
         'wire_keys'              => array_fill_keys(array_keys($byKey), true),
         'declarations_by_key'    => $byKey,
         'operation_ids'          => $ids,
@@ -213,6 +240,9 @@ function deriveOfficialOperations(array $contract, array &$errors): array
 }
 
 /**
+ * @param  array<string, mixed>  $inventory
+ * @param  array<string, mixed>  $official
+ * @param  list<string>  $errors
  * @return array{
  *   keys:array<string,true>, matched_count:int, official_only_unique_count:int,
  *   official_only_declaration_count:int, package_only_count:int, changed_count:int,
@@ -358,13 +388,16 @@ function deriveInventoryOperations(array $inventory, array $official, string $ro
         'package_only_count'              => count($packageOnlyKeys),
         'changed_count'                   => $changed,
         'accurate_count'                  => $accurate,
-        'official_only_stage_counts'      => $stageCounts,
+        'official_only_stage_counts'      => normalizeStageCounts($stageCounts),
         'official_only_stable_ids'        => $stableIds,
         'actual_unclassified'             => $unclassified,
         'method_keys'                     => $methodKeys,
     ];
 }
 
+/**
+ * @param  array<string, mixed>  $side
+ */
 function inventorySideKey(array $side): string
 {
     if (is_string($side['match_key'] ?? null)) {
@@ -374,6 +407,11 @@ function inventorySideKey(array $side): string
     return operationKey((string) ($side['method'] ?? ''), (string) ($side['path'] ?? ''));
 }
 
+/**
+ * @param  array<string, mixed>  $side
+ * @param  list<array<string, mixed>>  $expectedDeclarations
+ * @param  list<string>  $errors
+ */
 function verifyOfficialEntry(string $key, array $side, array $expectedDeclarations, array &$errors): void
 {
     $actual = [];
@@ -394,6 +432,10 @@ function verifyOfficialEntry(string $key, array $side, array $expectedDeclaratio
     }
 }
 
+/**
+ * @param  array<string, mixed>  $side
+ * @param  list<string>  $errors
+ */
 function verifyPackageEvidence(array $side, string $root, array &$errors): void
 {
     foreach (($side['sdk_methods'] ?? []) as $method) {
@@ -421,6 +463,9 @@ function verifyPackageEvidence(array $side, string $root, array &$errors): void
     }
 }
 
+/**
+ * @param  list<string>  $lines
+ */
 function sourceWindowContainsMethod(array $lines, int $line, string $method): bool
 {
     $start = max(0, $line - 4);
@@ -430,93 +475,249 @@ function sourceWindowContainsMethod(array $lines, int $line, string $method): bo
 }
 
 /**
- * @return array{resource_count:int,override_count:int,effective_count:int,phantom_count:int,keys:array<string,true>,resource_sources:list<string>}
+ * @param  array<string, true>  $officialKeys
+ * @param  list<string>  $errors
+ * @return array<string, mixed>
  */
-function deriveInheritedCapabilities(string $root, array $officialKeys, array &$errors): array
+function deriveResourceCapabilities(string $root, array $officialKeys, array &$errors): array
 {
-    $directory = $root.'/src/Resources';
-    $files = [];
-    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS));
-    foreach ($iterator as $file) {
-        if ($file->isFile() && str_ends_with($file->getFilename(), 'Resource.php') && $file->getFilename() !== 'Resource.php') {
-            $files[] = $file->getPathname();
-        }
-    }
-    sort($files, SORT_STRING);
-
+    $resources = [];
+    $methods = [];
     $keys = [];
-    $phantoms = [];
-    $overrides = 0;
-    $sources = [];
-    foreach ($files as $file) {
-        $source = file_get_contents($file);
-        if ($source === false) {
-            $errors[] = "Unreadable resource source: {$file}.";
-
+    $bindings = [];
+    foreach (phpFilesUnder($root.'/src/Resources') as $file) {
+        if (! str_ends_with($file, 'Resource.php') || basename($file) === 'Resource.php') {
             continue;
         }
-        $relative = substr($file, strlen($root) + 1);
-        $sources[] = $relative;
-        if (! preg_match('/protected\s+string\s+\$endpoint\s*=\s*([\'\"])(?<endpoint>.*?)\1\s*;/', $source, $endpointMatch)) {
-            $errors[] = "Concrete resource has no literal endpoint: {$relative}.";
-
-            continue;
-        }
-        $operations = parseSupportedGenericOperations($source);
-        if ($operations === null) {
-            $errors[] = "Concrete resource does not override supportedGenericOperations(): {$relative}.";
-
-            continue;
-        }
-        $overrides++;
-        foreach ($operations as $operation) {
-            if (! isset(GENERIC_OPERATIONS[$operation])) {
-                $errors[] = "{$relative}: unknown generic capability {$operation}.";
-
-                continue;
-            }
-            if (preg_match('/public\s+function\s+'.preg_quote($operation, '/').'\s*\(/', $source) === 1) {
-                continue; // Explicit override, not inherited behavior.
-            }
-            [$method, $item] = GENERIC_OPERATIONS[$operation];
-            $path = $endpointMatch['endpoint'].($item ? '/{}' : '');
-            $key = operationKey($method, $path);
+        [$resource, $effective] = deriveResource($root, substr($file, strlen($root) + 1));
+        $methods[$resource['class']] = $effective;
+        $resources[] = $resource;
+        foreach ($resource['generic_bindings'] as $operation => $binding) {
+            $key = operationKey($binding['method'], $binding['path']);
             $keys[$key] = true;
-            if (! isset($officialKeys[$key])) {
-                $phantoms[$relative.'::'.$operation] = $key;
-            }
+            $bindings[$resource['class'].'::'.$operation] = $key;
         }
     }
-
-    foreach ($phantoms as $method => $key) {
-        $errors[] = "Phantom inherited operation {$method} => {$key}.";
+    $phantoms = array_diff($bindings, array_keys($officialKeys));
+    foreach ($phantoms as $method => $phantom) {
+        $errors[] = 'Phantom generic operation '.$method.' => '.$phantom.'.';
     }
 
     return [
-        'resource_count'   => count($files),
-        'override_count'   => $overrides,
+        'resource_count'   => count($resources),
         'effective_count'  => count($keys),
         'phantom_count'    => count($phantoms),
         'keys'             => $keys,
-        'resource_sources' => $sources,
+        'resource_sources' => array_column($resources, 'source'),
+        'resources'        => $resources,
+        'methods'          => $methods,
     ];
 }
 
-/** @return list<string>|null */
-function parseSupportedGenericOperations(string $source): ?array
+/** @return array{array<string, mixed>, array<string, mixed>} */
+function deriveResource(string $root, string $relative): array
 {
-    if (! preg_match('/function\s+supportedGenericOperations\s*\(\s*\)\s*:\s*array\s*\{(?<body>.*?)\n\s*\}/s', $source, $method)) {
-        return null;
+    $source = (string) file_get_contents($root.'/'.$relative);
+    preg_match('/protected string \$endpoint = [\'"]([^\'"]+)[\'"]/', $source, $endpoint);
+    preg_match('/protected string \$entity = (\w+)::class/', $source, $entity);
+    $declared = sourceMethods($root, $relative);
+    $effective = $declared;
+    $traits = [];
+    $bindings = [];
+    foreach (GENERIC_OPERATIONS as $operation => [$verb, $item, $trait]) {
+        $traitPath = 'src/Resources/Concerns/'.$trait.'.php';
+        if (preg_match('/^    use '.preg_quote($trait, '/').';$/m', $source) === 1) {
+            $traits[] = $traitPath;
+            $effective += sourceMethods($root, $traitPath);
+        }
+        if (! isset($effective[$operation])) {
+            continue;
+        }
+        $path = ($endpoint[1] ?? '').($item ? '/{}' : '');
+        if (isset($declared[$operation])) {
+            $path = explicitGenericPath($declared[$operation]['body'], $endpoint[1] ?? '', $verb);
+        }
+        $bindings[$operation] = [
+            'method' => $verb,
+            'path'   => $path,
+            'source' => $effective[$operation]['source'],
+        ];
     }
-    if (! preg_match('/return\s*\[(?<values>.*?)\]\s*;/s', $method['body'], $return)) {
-        return null;
-    }
-    preg_match_all('/[\'\"](?<value>[a-z]+)[\'\"]/', $return['values'], $values);
 
-    return $values['value'];
+    return [[
+        'class'              => basename($relative, '.php'),
+        'source'             => $relative,
+        'endpoint'           => $endpoint[1] ?? '',
+        'entity'             => $entity[1] ?? 'Entity',
+        'traits'             => $traits,
+        'generic_operations' => array_keys($bindings),
+        'explicit_overrides' => array_values(array_intersect(array_keys($declared), array_keys(GENERIC_OPERATIONS))),
+        'generic_bindings'   => $bindings,
+    ], $effective];
 }
 
-/** @return array{file_count:int,php_file_count:int,tree_sha256:string} */
+/** @return array<string, array{source:string, declared_in:string, declared_line:int, signature:string, declared_return_type:string, body:string}> */
+function sourceMethods(string $root, string $relative): array
+{
+    $source = (string) file_get_contents($root.'/'.$relative);
+    preg_match_all('/public function (\w+)\s*(\([^{}]*?\)\s*:\s*[^\s{]+)\s*\{(.*?)^    \}/ms', $source, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
+    $methods = [];
+    foreach ($matches as $match) {
+        $line = substr_count(substr($source, 0, $match[0][1]), "\n") + 1;
+        $signature = preg_replace('/\s+/', ' ', $match[2][0]) ?? $match[2][0];
+        $methods[$match[1][0]] = [
+            'source'               => $relative.':'.$line,
+            'declared_in'          => $relative,
+            'declared_line'        => $line,
+            'signature'            => $match[1][0].$signature,
+            'declared_return_type' => trim(substr($signature, strrpos($signature, ':') + 1)),
+            'body'                 => $match[3][0],
+        ];
+    }
+
+    return $methods;
+}
+
+function explicitGenericPath(string $body, string $endpoint, string $verb): string
+{
+    // Explicit collection mutations use query IDs; never append an item path.
+    $body = str_replace('$this->endpoint', "'".$endpoint."'", $body);
+    if (preg_match('/\$endpoint = [\'"]([^\'"]+)[\'"]\s*\.\s*[\'"]\?id=/', $body, $match) === 1
+        || preg_match('/\$endpoint = [\'"]([^\'"]+)\?id=/', $body, $match) === 1) {
+        if (str_contains($body, '->'.strtolower($verb).'($endpoint')) {
+            return $match[1];
+        }
+    }
+
+    throw new RuntimeException('Unrecognized explicit generic binding; audit its method/path before regenerating.');
+}
+
+/**
+ * @param  array<string, mixed>  $inventory
+ * @param  array<string, mixed>  $capabilities
+ * @param  list<string>  $errors
+ */
+function verifyMethodBindings(array $inventory, array $capabilities, array &$errors, int &$passes): void
+{
+    checkSame('per-resource generic bindings', $capabilities['resources'], $inventory['package_resources'] ?? null, $errors, $passes);
+    $recorded = [];
+    foreach ($inventory['package_endpoint_methods'] as $binding) {
+        $class = $binding['class'];
+        $method = $binding['method'];
+        $actual = $capabilities['methods'][$class][$method] ?? null;
+        checkSame($class.'::'.$method.' source', $actual['source'] ?? null, $binding['source'], $errors, $passes);
+        $recorded[$class][$method] = $binding['operations'];
+    }
+    $sourceMethods = [];
+    foreach ($capabilities['methods'] as $class => $methods) {
+        foreach ($methods as $method => $declaration) {
+            $sourceMethods[$class.'::'.$method] = preg_match('/^\s*throw new UnsupportedOperationException\b/', $declaration['body']) !== 1;
+        }
+    }
+    $recordedMethods = [];
+    foreach ($inventory['package_endpoint_methods'] as $binding) {
+        $recordedMethods[$binding['class'].'::'.$binding['method']] = true;
+    }
+    compareSets('public resource endpoint methods', array_filter($sourceMethods), $recordedMethods, $errors);
+    foreach ($capabilities['resources'] as $resource) {
+        foreach ($resource['generic_bindings'] as $method => $binding) {
+            checkSame($resource['class'].'::'.$method.' wire binding', [[$binding['method'], $binding['path']]], $recorded[$resource['class']][$method] ?? null, $errors, $passes);
+        }
+    }
+}
+
+/**
+ * @param  array<string, mixed>  $inventory
+ * @param  array<string, mixed>  $capabilities
+ * @param  array<string, mixed>  $source
+ * @param  array<string, mixed>  $declarations
+ * @param  array<string, mixed>  $official
+ * @return array<string, mixed>
+ */
+function refreshInventory(array $inventory, array $capabilities, array $source, array $declarations, array $official, string $root): array
+{
+    $methods = $capabilities['methods'];
+    $inventory['package_endpoint_methods'] = refreshMethods($inventory['package_endpoint_methods'], $methods);
+    foreach ($inventory['operations'] as &$operation) {
+        if (! is_array($operation['package'])) {
+            continue;
+        }
+        $operation['package']['sdk_methods'] = refreshMethods($operation['package']['sdk_methods'], $methods);
+        $operation['package']['schema_support']['pagination'] = 'Builder get() returns one page; paginate() exposes cursor metadata and lazy() traverses pages.';
+    }
+    unset($operation);
+    foreach ($inventory['package_operations'] as &$operation) {
+        $operation['sdk_methods'] = refreshMethods($operation['sdk_methods'], $methods);
+        $operation['schema_support']['pagination'] = 'Builder get() returns one page; paginate() exposes cursor metadata and lazy() traverses pages.';
+    }
+    unset($operation);
+    $inventory['sources']['official_openapi']['path'] = PINNED_CONTRACT;
+    $inventory['sources']['official_openapi']['paths'] = $official['path_count'];
+    $inventory['sources']['official_contract']['path'] = PINNED_CONTRACT;
+    $inventory['package_resources'] = $capabilities['resources'];
+    $inventory['package_enums'] = $declarations['enums'];
+    $inventory['package_data_classes'] = $declarations['data_classes'];
+    $identity = &$inventory['sources']['current_package_source'];
+    $identity['root'] = $root;
+    $identity['git_head'] = trim((string) shell_exec('git -C '.escapeshellarg($root).' rev-parse HEAD'));
+    $identity['git_branch'] = trim((string) shell_exec('git -C '.escapeshellarg($root).' branch --show-current'));
+    $identity['source_sha256'] = $source['tree_sha256'];
+    $identity['source_files'] = $source['file_count'];
+    $identity['source_file_count'] = $source['file_count'];
+    $identity['source_bytes'] = $source['bytes'];
+    unset($identity);
+    $inventory['counts']['package_method_request_variants'] = count($inventory['package_endpoint_methods']);
+    $inventory['counts']['effective_generic_operations'] = $capabilities['effective_count'];
+    $inventory['counts']['phantom_generic_operations'] = $capabilities['phantom_count'];
+    $inventory['counts']['package_resources'] = $capabilities['resource_count'];
+    $inventory['counts']['package_enums'] = $declarations['enum_count'];
+    $inventory['counts']['package_enum_cases'] = $declarations['enum_case_count'];
+    $inventory['counts']['package_data_classes'] = $declarations['data_class_count'];
+    $inventory['counts']['package_data_properties'] = $declarations['data_property_count'];
+    foreach (['effective_inherited_operations', 'blocked_inherited_operations', 'explicit_unsupported_operations', 'blocked_public_operation_calls', 'phantom_inherited_operations', 'package_resource_capability_gates'] as $field) {
+        unset($inventory['counts'][$field]);
+    }
+    unset($inventory['phantom_inherited_operations']);
+    $inventory['source_coverage']['src_files_inspected'] = $source['file_count'];
+    $variants = count($inventory['package_endpoint_methods']);
+    $inventory['source_coverage']['package_method_request_variants'] = ['inspected' => $variants, 'total' => $variants];
+    unset($inventory['source_coverage']['package_capability_gates'], $inventory['source_coverage']['full_test_suite'], $inventory['source_coverage']['runtime_capture_failures']);
+    $inventory['methodology']['package_operation_definition'] = 'Unique normalized method/path from audited explicit endpoint bindings and current composed operation traits. Source evidence is refreshed; explicit request captures are not rerun by this checker.';
+    $inventory['methodology']['matched_definition'] = 'A package unique wire key equals an official normalized wire key. Duplicate placeholder aliases remain separate official declarations.';
+    $inventory['verification'] = [['command' => 'php scripts/check-samsara-contract-reconciliation.php', 'scope' => 'Source reconciliation only; no live API or full-suite claim.']];
+
+    return $inventory;
+}
+
+/**
+ * @param  list<array<string, mixed>>  $bindings
+ * @param  array<string, mixed>  $methods
+ * @return list<array<string, mixed>>
+ */
+function refreshMethods(array $bindings, array $methods): array
+{
+    $refreshed = [];
+    foreach ($bindings as $binding) {
+        $source = $methods[$binding['class']][$binding['method']] ?? null;
+        if ($source === null) {
+            continue;
+        }
+        unset($source['body']);
+        if (isset($binding['declared_in'])) {
+            $binding = array_replace($binding, $source);
+            $binding['return_type'] = $source['declared_return_type'];
+        }
+        $binding['source'] = $source['source'];
+        $refreshed[] = $binding;
+    }
+
+    return $refreshed;
+}
+
+/**
+ * @param  list<string>  $errors
+ * @return array{file_count:int,php_file_count:int,tree_sha256:string,bytes:int}
+ */
 function deriveSourceIdentity(string $root, array &$errors): array
 {
     $files = [];
@@ -534,11 +735,13 @@ function deriveSourceIdentity(string $root, array &$errors): array
     if (is_file($root.'/config/samsara.php')) {
         $files[] = 'config/samsara.php';
         $php++;
-    } else {
+    }
+    if (! is_file($root.'/config/samsara.php')) {
         $errors[] = 'Missing package behavior configuration: config/samsara.php.';
     }
     sort($files, SORT_STRING);
     $manifest = '';
+    $bytes = 0;
     foreach ($files as $relative) {
         $hash = hash_file('sha256', $root.'/'.$relative);
         if ($hash === false) {
@@ -546,6 +749,7 @@ function deriveSourceIdentity(string $root, array &$errors): array
 
             continue;
         }
+        $bytes += filesize($root.'/'.$relative);
         $manifest .= $hash.'  '.$relative."\n";
     }
 
@@ -553,10 +757,12 @@ function deriveSourceIdentity(string $root, array &$errors): array
         'file_count'     => count($files),
         'php_file_count' => $php,
         'tree_sha256'    => hash('sha256', $manifest),
+        'bytes'          => $bytes,
     ];
 }
 
 /**
+ * @param  list<string>  $errors
  * @return array{
  *   enums:list<array{class:string,source:string,cases:list<array{case:string,value:string,source:string}>}>,
  *   data_classes:list<array{class:string,source:string,properties:list<array{name:string,php_type:string}>}>,
@@ -650,20 +856,28 @@ function phpFilesUnder(string $directory): array
     return $files;
 }
 
+/**
+ * @param  array<string, mixed>  $inventory
+ * @param  array<string, mixed>  $declarations
+ * @param  list<string>  $errors
+ */
 function verifyPackageDeclarations(array $inventory, array $declarations, array &$errors, int &$passes): void
 {
     checkSame('package enum catalog', $declarations['enums'], $inventory['package_enums'] ?? null, $errors, $passes);
     checkSame('package data-class catalog', $declarations['data_classes'], $inventory['package_data_classes'] ?? null, $errors, $passes);
 }
 
+/**
+ * @param  array<string, mixed>  $inventory
+ * @param  list<string>  $errors
+ */
 function verifyRecordedSourceContext(array $inventory, array &$errors, int &$passes): void
 {
     $worktree = $inventory['worktree'] ?? null;
     if (! is_string($worktree) || $worktree === '') {
         $errors[] = 'Inventory worktree provenance must be a non-empty string.';
-    } else {
-        $passes++;
     }
+    $passes++;
 
     $identity = firstValue($inventory, [
         ['sources', 'current_package_source'],
@@ -674,28 +888,44 @@ function verifyRecordedSourceContext(array $inventory, array &$errors, int &$pas
 
     if (! is_string($recordedRoot) || $recordedRoot === '') {
         $errors[] = 'Package source root provenance must be a non-empty string.';
-    } else {
-        $passes++;
     }
+    $passes++;
 
     if (! is_string($recordedBranch) || $recordedBranch === '') {
         $errors[] = 'Package source branch provenance must be a non-empty string.';
-    } else {
-        $passes++;
     }
+    $passes++;
 }
 
+/**
+ * @param  array<string, mixed>  $inventory
+ * @param  array<string, mixed>  $official
+ * @param  list<string>  $errors
+ */
 function verifyOfficialSource(array $inventory, string $contractPath, array $official, array &$errors, int &$passes): void
 {
     $source = $inventory['sources']['official_openapi'] ?? [];
+    checkSame('official source path', PINNED_CONTRACT, $source['path'] ?? null, $errors, $passes);
+    checkSame('official contract provenance path', $source['path'] ?? null, $inventory['sources']['official_contract']['path'] ?? null, $errors, $passes);
     $hash = hash_file('sha256', $contractPath);
     $bytes = filesize($contractPath);
     checkSame('official source SHA-256', $hash, $source['sha256'] ?? null, $errors, $passes);
     checkSame('official source bytes', $bytes, $source['bytes'] ?? null, $errors, $passes);
+    checkSame('official source paths', $official['path_count'], $source['paths'] ?? null, $errors, $passes);
+    $provenance = $inventory['sources']['official_contract'] ?? [];
+    checkSame('official contract SHA-256', $hash, $provenance['sha256'] ?? null, $errors, $passes);
+    checkSame('official contract bytes', $bytes, $provenance['raw_bytes'] ?? null, $errors, $passes);
+    checkSame('official OpenAPI version', $official['openapi'], $provenance['openapi'] ?? null, $errors, $passes);
+    checkSame('official document version', $official['info_version'], $provenance['info_version'] ?? null, $errors, $passes);
     checkSame('official source operation count', $official['declaration_count'], $source['operations'] ?? null, $errors, $passes);
     checkSame('official source unique operation count', count($official['wire_keys']), $source['unique_wire_operations'] ?? null, $errors, $passes);
 }
 
+/**
+ * @param  array<string, mixed>  $inventory
+ * @param  array<string, mixed>  $source
+ * @param  list<string>  $errors
+ */
 function verifySourceIdentity(array $inventory, array $source, array &$errors, int &$passes): void
 {
     $identity = firstValue($inventory, [
@@ -711,6 +941,14 @@ function verifySourceIdentity(array $inventory, array $source, array &$errors, i
     checkSame('package src file count', $source['file_count'], $identity['source_file_count'] ?? $identity['files'] ?? null, $errors, $passes);
 }
 
+/**
+ * @param  array<string, mixed>  $inventory
+ * @param  array<string, mixed>  $official
+ * @param  array<string, mixed>  $package
+ * @param  array<string, mixed>  $capabilities
+ * @param  array<string, mixed>  $declarations
+ * @param  list<string>  $errors
+ */
 function verifyCounts(array $inventory, array $official, array $package, array $capabilities, array $declarations, array &$errors, int &$passes): void
 {
     $counts = $inventory['counts'] ?? [];
@@ -758,6 +996,12 @@ function verifyCounts(array $inventory, array $official, array $package, array $
     );
 }
 
+/**
+ * @param  array<string, mixed>  $inventory
+ * @param  array<string, mixed>  $official
+ * @param  array<string, mixed>  $package
+ * @param  list<string>  $errors
+ */
 function verifyStages(array $inventory, array $official, array $package, array &$errors, int &$passes): void
 {
     $officialCounts = firstValue($inventory, [
@@ -774,16 +1018,8 @@ function verifyStages(array $inventory, array $official, array $package, array &
         ['lifecycle', 'official_only_counts'],
         ['official_only_backlog', 'counts'],
     ]);
-    if (! is_array($officialCounts)) {
-        $errors[] = 'Missing official stable/Beta/Preview stage counts.';
-    } else {
-        checkSame('official stage counts', $official['stage_counts'], normalizeStageCounts($officialCounts), $errors, $passes);
-    }
-    if (! is_array($officialOnlyCounts)) {
-        $errors[] = 'Missing official-only stable/Beta/Preview stage counts.';
-    } else {
-        checkSame('official-only stage counts', $package['official_only_stage_counts'], normalizeStageCounts($officialOnlyCounts), $errors, $passes);
-    }
+    checkSame('official stage counts', $official['stage_counts'], is_array($officialCounts) ? normalizeStageCounts($officialCounts) : null, $errors, $passes);
+    checkSame('official-only stage counts', $package['official_only_stage_counts'], is_array($officialOnlyCounts) ? normalizeStageCounts($officialOnlyCounts) : null, $errors, $passes);
 
     $stableList = firstValue($inventory, [
         ['official_only_stable_operations'],
@@ -801,7 +1037,10 @@ function verifyStages(array $inventory, array $official, array $package, array &
     foreach ($stableList as $item) {
         if (is_string($item)) {
             $actualIds[] = $item;
-        } elseif (is_array($item) && is_string($item['operation_id'] ?? null)) {
+
+            continue;
+        }
+        if (is_array($item) && is_string($item['operation_id'] ?? null)) {
             $actualIds[] = $item['operation_id'];
         }
     }
@@ -809,26 +1048,36 @@ function verifyStages(array $inventory, array $official, array $package, array &
     checkSame('official-only stable GA operation IDs', $package['official_only_stable_ids'], $actualIds, $errors, $passes);
 }
 
+/**
+ * @param  array<string, mixed>  $inventory
+ * @param  array<string, mixed>  $package
+ * @param  array<string, mixed>  $capabilities
+ * @param  list<string>  $errors
+ */
 function verifyCapabilities(array $inventory, array $package, array $capabilities, array &$errors, int &$passes): void
 {
     foreach ($capabilities['keys'] as $key => $_) {
         if (! isset($package['keys'][$key])) {
-            $errors[] = "Effective inherited operation missing from package ledger: {$key}.";
-        } else {
-            $passes++;
+            $errors[] = "Effective generic operation missing from package ledger: {$key}.";
+
+            continue;
         }
+        $passes++;
     }
-    $counts = $inventory['counts'] ?? [];
-    $effective = $counts['effective_inherited_operations']
-        ?? ($inventory['package_contract_statistics']['effective_inherited_crud_wire_bindings'] ?? null);
-    $phantoms = $counts['phantom_inherited_operations']
-        ?? ($inventory['package_contract_statistics']['phantom_inherited_operations'] ?? null);
-    checkSame('effective inherited operation count', $capabilities['effective_count'], $effective, $errors, $passes);
-    checkSame('phantom inherited operation count', 0, $capabilities['phantom_count'], $errors, $passes);
-    checkSame('inventory phantom inherited operation count', 0, $phantoms, $errors, $passes);
-    checkSame('capability override coverage', $capabilities['resource_count'], $capabilities['override_count'], $errors, $passes);
+    checkSame('effective generic operation count', $capabilities['effective_count'], $inventory['counts']['effective_generic_operations'] ?? null, $errors, $passes);
+    checkSame('phantom generic operation count', 0, $capabilities['phantom_count'], $errors, $passes);
+    checkSame('inventory phantom generic operation count', 0, $inventory['counts']['phantom_generic_operations'] ?? null, $errors, $passes);
+    checkSame('package operations without an official contract', 0, $package['package_only_count'], $errors, $passes);
 }
 
+/**
+ * @param  array<string, mixed>  $inventory
+ * @param  array<string, mixed>  $official
+ * @param  array<string, mixed>  $package
+ * @param  array<string, mixed>  $capabilities
+ * @param  array<string, mixed>  $source
+ * @param  list<string>  $errors
+ */
 function verifyCoverage(array $inventory, array $official, array $package, array $capabilities, array $source, array &$errors, int &$passes): void
 {
     $coverage = $inventory['source_coverage'] ?? [];
@@ -861,6 +1110,11 @@ function verifyCoverage(array $inventory, array $official, array $package, array
     checkSame('package resource source coverage', $expectedSources, $resourceSources, $errors, $passes);
 }
 
+/**
+ * @param  array<string, true>  $expected
+ * @param  array<string, true>  $actual
+ * @param  list<string>  $errors
+ */
 function compareSets(string $label, array $expected, array $actual, array &$errors): void
 {
     $missing = array_keys(array_diff_key($expected, $actual));
@@ -870,6 +1124,9 @@ function compareSets(string $label, array $expected, array $actual, array &$erro
     }
 }
 
+/**
+ * @param  list<string>  $errors
+ */
 function checkSame(string $label, mixed $expected, mixed $actual, array &$errors, int &$passes): void
 {
     if ($expected === $actual) {
@@ -880,6 +1137,10 @@ function checkSame(string $label, mixed $expected, mixed $actual, array &$errors
     $errors[] = "{$label}: expected ".json_encode($expected, JSON_UNESCAPED_SLASHES).', got '.json_encode($actual, JSON_UNESCAPED_SLASHES).'.';
 }
 
+/**
+ * @param  array<string, mixed>  $data
+ * @param  list<list<string>>  $paths
+ */
 function firstValue(array $data, array $paths): mixed
 {
     foreach ($paths as $path) {
@@ -900,7 +1161,10 @@ function firstValue(array $data, array $paths): mixed
     return null;
 }
 
-/** @return array{stable:int,beta:int,preview:int} */
+/**
+ * @param  array<string, mixed>  $counts
+ * @return array{stable:int,beta:int,preview:int}
+ */
 function normalizeStageCounts(array $counts): array
 {
     $normalized = ['stable' => 0, 'beta' => 0, 'preview' => 0];
@@ -917,6 +1181,9 @@ function normalizeStageCounts(array $counts): array
     return $normalized;
 }
 
+/**
+ * @param  array<string, mixed>  $counts
+ */
 function formatStageCounts(array $counts): string
 {
     return "stable={$counts['stable']}, beta={$counts['beta']}, preview={$counts['preview']}";

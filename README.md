@@ -67,6 +67,7 @@ return [
     'region' => env('SAMSARA_REGION', 'us'),
     'timeout' => env('SAMSARA_TIMEOUT', 30),
     'attempts' => env('SAMSARA_ATTEMPTS', 3),
+    'retry_writes' => env('SAMSARA_RETRY_WRITES', false),
     'retry_after_max_seconds' => env('SAMSARA_RETRY_AFTER_MAX_SECONDS', 30),
     'per_page' => env('SAMSARA_PER_PAGE', 100),
     'webhook_secret' => env('SAMSARA_WEBHOOK_SECRET'),
@@ -79,6 +80,19 @@ return [
 
 `per_page` is the implicit `limit` for `paginate()` and `lazy()` when the caller does not supply one. An explicit `paginate($perPage)`, `lazy($chunkSize)`, `limit()`, or `where('limit', ...)` value wins. Endpoint helpers whose official contract has cursors but no `limit` disable this default automatically; do not add an explicit limit to those endpoints.
 
+For a fleet-wide token, the `api_key` setting above reads `SAMSARA_API_KEY`. For per-tenant credentials, retain or chain the isolated client:
+
+```php
+use Samsara\Facades\Samsara;
+
+$client = Samsara::withToken($carrier->samsara_token);
+$drivers = $client->drivers()->query()->get();
+```
+
+`withToken()`, `withRegion('us'|'eu'|'ca')`, and `withBaseUrl($url)` return copies. An unknown region throws `InvalidArgumentException`.
+
+Writes (POST, PATCH, DELETE) are not retried on connection failures, HTTP 408, or 5xx by default. Set `SAMSARA_RETRY_WRITES=true` only when replaying accepted writes is safe. HTTP 429 remains retryable for every method within the attempt budget and Retry-After ceiling.
+
 ## Quick Start
 
 ### Using the Facade
@@ -87,7 +101,7 @@ return [
 use Samsara\Facades\Samsara;
 
 // Get one response page of drivers
-$drivers = Samsara::drivers()->all();
+$drivers = Samsara::drivers()->query()->get();
 
 // Find a specific vehicle
 $vehicle = Samsara::vehicles()->find('vehicle-id');
@@ -111,7 +125,7 @@ class FleetController extends Controller
 
     public function drivers()
     {
-        return $this->samsara->drivers()->all();
+        return $this->samsara->drivers()->query()->get();
     }
 }
 ```
@@ -123,36 +137,40 @@ use Samsara\Samsara;
 
 $samsara = new Samsara('your-api-token');
 
-// Use the Canada endpoint (useEuEndpoint() and useUsEndpoint() are also available)
-$samsara->useCanadaEndpoint();
+// Retain the copy for the Canada region ('us' and 'eu' are also supported).
+$samsara = $samsara->withRegion('ca');
 
-$drivers = $samsara->drivers()->all();
+$drivers = $samsara->drivers()->query()->get();
 ```
 
 ## Available Resources
 
-This section inventories package accessors. Generic methods are capability-gated per resource; consult each resource page and the [capability matrix](https://github.com/erikgall/samsara/blob/dev/docs/api-sync/documentation-coverage.md#exact-generic-capability-matrix) before using an operation.
+This section inventories package accessors. Resources expose only supported CRUD methods; `all()` is removed. Use an endpoint builder for collection reads; consult each resource page and the [capability matrix](https://github.com/erikgall/samsara/blob/dev/docs/api-sync/documentation-coverage.md#exact-generic-capability-matrix) before using an operation.
 
 ### Fleet Resources
 
 ```php
 // Drivers
-$drivers = Samsara::drivers()->all();
+$drivers = Samsara::drivers()->query()->get();
 $driver = Samsara::drivers()->find('driver-id');
-$driver = Samsara::drivers()->create(['name' => 'John Doe', ...]);
+$driver = Samsara::drivers()->create([
+    'name' => 'John Doe',
+    'username' => 'john.doe',
+    'password' => $driverPassword,
+]);
 $driver = Samsara::drivers()->update('driver-id', ['name' => 'Jane Doe']);
 Samsara::drivers()->activate('driver-id');
 Samsara::drivers()->deactivate('driver-id');
 
 // Vehicles
-$vehicles = Samsara::vehicles()->all();
+$vehicles = Samsara::vehicles()->query()->get();
 $vehicle = Samsara::vehicles()->find('vehicle-id');
 
 // Trailers
-$trailers = Samsara::trailers()->all();
+$trailers = Samsara::trailers()->query()->get();
 
 // Equipment
-$equipment = Samsara::equipment()->all();
+$equipment = Samsara::equipment()->query()->get();
 ```
 
 ### Telematics Resources
@@ -209,10 +227,16 @@ $defects = Samsara::maintenance()->defects()->startTime($startTime)->get();
 ```php
 // Routes
 $routes = Samsara::routes()->query()->between($startTime, $endTime)->get();
-$route = Samsara::routes()->create([...]);
+$route = Samsara::routes()->create([
+    'name' => 'Morning delivery',
+    'stops' => [
+        ['addressId' => 'address-1', 'scheduledArrivalTime' => $startTime],
+        ['addressId' => 'address-2', 'scheduledArrivalTime' => $endTime],
+    ],
+]);
 
 // Addresses
-$addresses = Samsara::addresses()->all();
+$addresses = Samsara::addresses()->query()->get();
 ```
 
 ### Organization Resources
@@ -221,13 +245,13 @@ $addresses = Samsara::addresses()->all();
 $organization = Samsara::me();
 
 // Users
-$users = Samsara::users()->all();
+$users = Samsara::users()->query()->get();
 
 // Tags
-$tags = Samsara::tags()->all();
+$tags = Samsara::tags()->query()->get();
 
 // Contacts
-$contacts = Samsara::contacts()->all();
+$contacts = Samsara::contacts()->query()->get();
 ```
 
 ### Industrial Resources
@@ -247,7 +271,7 @@ $sensors = Samsara::sensors()->list();
 
 ```php
 // Webhooks
-$webhooks = Samsara::webhooks()->all();
+$webhooks = Samsara::webhooks()->query()->get();
 $webhook = Samsara::webhooks()->create([
     'name' => 'My Webhook',
     'url' => 'https://example.com/webhook',
@@ -255,10 +279,10 @@ $webhook = Samsara::webhooks()->create([
 ]);
 
 // Gateways
-$gateways = Samsara::gateways()->all();
+$gateways = Samsara::gateways()->query()->get();
 
 // Live Sharing Links
-$shares = Samsara::liveShares()->all();
+$shares = Samsara::liveShares()->query()->get();
 ```
 
 ### Additional Resources
@@ -409,7 +433,7 @@ $driver->toJson();
 ### Entity Collections
 
 ```php
-$drivers = Samsara::drivers()->all();
+$drivers = Samsara::drivers()->query()->get();
 
 // Find by ID
 $driver = $drivers->findById('driver-123');
@@ -433,7 +457,7 @@ use Samsara\Exceptions\RateLimitException;
 use Samsara\Exceptions\ServerException;
 
 try {
-    $drivers = Samsara::drivers()->all();
+    $drivers = Samsara::drivers()->query()->get();
 } catch (RateLimitException $e) {
     $retryAfter = $e->getRetryAfter();
     // Handle rate limiting
@@ -443,7 +467,7 @@ try {
 }
 ```
 
-Supported generic resource operations, custom resource helpers, and all query-builder terminal methods use the same typed exception mapper. `find()` remains the exception: a 404 returns `null`. HTTP 400 and 422 responses become `ValidationException`; 401, 403, 404, 429, and 5xx responses use their status-specific SDK exceptions. Unsupported generic operations throw `UnsupportedOperationException` before any HTTP request.
+Supported generic resource operations, custom resource helpers, and all query-builder terminal methods use the same typed exception mapper. `find()` remains the exception: a 404 returns `null`. HTTP 400 and 422 responses become `ValidationException`; 401, 403, 404, 429, and 5xx responses use their status-specific SDK exceptions. Unsupported CRUD methods are absent. Explicitly unsupported helpers, such as equipment external-ID lookup, throw `UnsupportedOperationException` before any HTTP request. Exhausted transport failures remain `Illuminate\Http\Client\ConnectionException`.
 
 ## Webhook Signature Verification
 
@@ -456,11 +480,11 @@ Route::post('/samsara/webhook', WebhookController::class)
     ->middleware(VerifyWebhookSignature::class);
 ```
 
-The middleware uses the `webhook_secret` from your `config/samsara.php` by default. To configure a custom secret and tolerance (in seconds) without registering your own middleware alias, instantiate it directly:
+The middleware uses the `webhook_secret` from your `config/samsara.php` by default. To configure a custom secret and tolerance (in seconds) without registering your own middleware alias, pass a custom secret and tolerance through the `samsara.webhook` alias:
 
 ```php
 Route::post('/samsara/webhook', WebhookController::class)
-    ->middleware(new VerifyWebhookSignature(base64_encode('my-secret-key'), 600));
+    ->middleware('samsara.webhook:'.base64_encode('my-secret-key').',600');
 ```
 
 For detailed usage, custom secrets, and controller examples, see the [Webhooks documentation](https://github.com/erikgall/samsara/blob/dev/docs/resources/webhooks.md).
@@ -472,17 +496,18 @@ The SDK includes a `SamsaraFake` class for testing:
 ```php
 use Samsara\Facades\Samsara;
 
-public function test_it_fetches_drivers(): void
+#[\PHPUnit\Framework\Attributes\Test]
+public function it_fetches_drivers(): void
 {
-    $fake = Samsara::fake();
-
-    $fake->fakeDrivers([
-        ['id' => 'driver-1', 'name' => 'John Doe'],
-        ['id' => 'driver-2', 'name' => 'Jane Doe'],
+    $fake = Samsara::fake([
+        '/fleet/drivers' => [
+            ['id' => 'driver-1', 'name' => 'John Doe'],
+            ['id' => 'driver-2', 'name' => 'Jane Doe'],
+        ],
     ]);
 
     // The facade root and both container bindings now resolve to this fake.
-    $drivers = Samsara::drivers()->all();
+    $drivers = Samsara::drivers()->query()->get();
 
     $this->assertCount(2, $drivers);
     $fake->assertRequested('/fleet/drivers');

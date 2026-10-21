@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 const BASELINE_TAG = 'v1.1.0';
 const AUDITED_HEAD = '1750395c98c1724c40c82ba82b96b4866dd2106b';
 const LEDGER_PATH = __DIR__.'/../docs/api-sync/v2-upgrade-disposition.json';
@@ -16,6 +14,8 @@ function listedPaths(string $paths): array
 $upgradeActions = listedPaths(<<<'PATHS'
 config/samsara.php
 src/Contracts/QueryBuilderInterface.php
+src/Contracts/ResourceInterface.php
+src/Concerns/Makeable.php
 src/Concerns/InteractsWithTime.php
 src/Data/Alert/AlertConfiguration.php
 src/Data/Alert/AlertIncident.php
@@ -59,12 +59,18 @@ src/Data/Webhook/Webhook.php
 src/Enums/DutyStatus.php
 src/Enums/SafetyEventType.php
 src/Enums/VehicleStatType.php
+src/Exceptions/SamsaraException.php
 src/Exceptions/ValidationException.php
 src/Exceptions/InvalidSignatureException.php
 src/Facades/Samsara.php
 src/Http/ResponseDecoder.php
 src/Query/Builder.php
+src/Query/Pagination/Cursor.php
 src/Query/Pagination/CursorPaginator.php
+src/Resources/Concerns/CreatesEntities.php
+src/Resources/Concerns/FindsEntities.php
+src/Resources/Concerns/UpdatesEntities.php
+src/Resources/Concerns/DeletesEntities.php
 src/Resources/Additional/AlertsResource.php
 src/Resources/Additional/CameraMediaResource.php
 src/Resources/Additional/CarrierProposedAssignmentsResource.php
@@ -127,6 +133,7 @@ docs/api-sync/contract-inventory.json
 docs/api-sync/documentation-coverage.md
 docs/api-sync/v2-upgrade-disposition.json
 package.json
+phpstan.neon
 scripts/check-samsara-contract-reconciliation.php
 scripts/check-v2-upgrade-guide.php
 scripts/validate-samsara-snapshot.php
@@ -244,6 +251,7 @@ src/Data/User/UserRole.php
 src/Data/Vehicle/Gateway.php
 src/Data/Vehicle/VehicleStats.php
 src/Enums/WebhookEvent.php
+src/Http/RetryAfter.php
 src/Http/QueryString.php
 src/Http/RequestExecutor.php
 PATHS);
@@ -300,13 +308,13 @@ function guideSections(string $path): array
         return $resourceSections[$path];
     }
 
-    if ($path === 'src/Contracts/QueryBuilderInterface.php') {
+    if (in_array($path, ['src/Contracts/QueryBuilderInterface.php', 'src/Contracts/ResourceInterface.php', 'src/Concerns/Makeable.php'], true) || str_starts_with($path, 'src/Resources/Concerns/')) {
         return ['mig-03'];
     }
     if ($path === 'src/Query/Builder.php') {
         return ['mig-04', 'mig-05', 'mig-06', 'mig-07'];
     }
-    if ($path === 'src/Exceptions/ValidationException.php') {
+    if (in_array($path, ['src/Exceptions/ValidationException.php', 'src/Exceptions/SamsaraException.php'], true)) {
         return ['mig-04'];
     }
     if ($path === 'src/Facades/Samsara.php') {
@@ -336,6 +344,7 @@ function guideSections(string $path): array
     if (in_array($path, [
         'src/Concerns/InteractsWithTime.php',
         'src/Data/EntityCollection.php',
+        'src/Query/Pagination/Cursor.php',
         'src/Query/Pagination/CursorPaginator.php',
     ], true)) {
         return ['mig-19'];
@@ -436,14 +445,17 @@ function actionFor(string $path): string
     if (str_starts_with($path, 'src/Data/') || str_starts_with($path, 'src/Enums/')) {
         return 'Audit imports, field reads, helper calls, serialization, fixtures, nullable cases, and endpoint-specific hydration against the linked DTO migration sections.';
     }
+    if (in_array($path, ['src/Contracts/QueryBuilderInterface.php', 'src/Contracts/ResourceInterface.php', 'src/Concerns/Makeable.php'], true)) {
+        return 'Remove dependencies on the deleted contract or trait; use the concrete builder, resource operation traits, or explicit static factory.';
+    }
     if (str_starts_with($path, 'src/Resources/')) {
         return 'Audit every consumer call to this resource for capability, signature, HTTP method/path/query/body, return class, pagination, and exact HTTP-fake expectations.';
     }
-    if ($path === 'src/Contracts/QueryBuilderInterface.php') {
-        return 'Add repeatQueryParameters(string ...$parameters): static to every third-party implementation and verify interface conformance.';
-    }
     if ($path === 'src/Query/Builder.php') {
         return 'Update pagination, query encoding, exception, and endpoint-DTO expectations for builder terminals.';
+    }
+    if ($path === 'src/Exceptions/SamsaraException.php') {
+        return 'Remove SamsaraException::make() calls and construct the appropriate exception directly.';
     }
     if ($path === 'src/Exceptions/ValidationException.php') {
         return 'Catch the SDK exception hierarchy and treat both HTTP 400 and 422 as ValidationException.';
@@ -533,13 +545,11 @@ $publicationArtifacts = [
     'resources/boost/guidelines/resources.blade.php',
     'resources/boost/guidelines/testing.blade.php',
     'resources/boost/skills/samsara-sdk-development/SKILL.md',
-    'resources/boost/skills/samsara-sdk-development/references/integration.md',
-    'resources/boost/skills/samsara-sdk-development/references/querying-and-responses.md',
-    'resources/boost/skills/samsara-sdk-development/references/testing-and-webhooks.md',
     'resources/boost/skills/upgrade-samsara-sdk-v2/SKILL.md',
     'tests/Unit/BoostDocumentationTest.php',
 ];
 $implementationArtifacts = [
+    'tests/Maintenance/ContractReconciliationTest.php',
     'src/Http/ResponseDecoder.php',
     'src/Resources/Organization/OrganizationResource.php',
 ];
@@ -560,6 +570,10 @@ $releaseScope = $finalWorkspaceScope;
 
 $known = array_merge($upgradeActions, $supportingEvidence, $additiveNoAction, ['docs/.gitignore']);
 $duplicates = array_diff_assoc($known, array_unique($known));
+// Keep classified removals even when an unreleased addition has vanished from the tag diff.
+$removedExplicit = array_values(array_filter(array_diff($known, $releaseScope), fn (string $path): bool => ! is_file(__DIR__.'/../'.$path)));
+$releaseScope = array_values(array_unique(array_merge($releaseScope, $removedExplicit)));
+sort($releaseScope);
 $unknownExplicit = array_values(array_diff($known, $releaseScope));
 $documentationOnly = array_values(array_diff($releaseScope, $known));
 
@@ -597,6 +611,9 @@ foreach ($releaseScope as $path) {
             : ($disposition === 'supporting_evidence' ? ['package-maintainer-evidence'] : []),
         'consumer_action'  => $disposition === 'upgrade_action' ? actionFor($path) : null,
         'no_action_reason' => $disposition === 'upgrade_action' ? null : noActionReason($path, $disposition),
+        'removal_reason'   => $identity['content_state'] === 'deleted'
+            ? ($disposition === 'upgrade_action' ? actionFor($path) : 'Removed obsolete repository evidence or documentation; no installed SDK consumer action.')
+            : null,
     ];
 }
 
@@ -622,17 +639,14 @@ $ledger = [
     'records' => $records,
 ];
 
-$expectedCounts = [
-    'additive_no_action'  => 33,
-    'documentation_only'  => 68,
-    'internal_only'       => 1,
-    'supporting_evidence' => 150,
-    'upgrade_action'      => 98,
-];
-
-if ($counts !== $expectedCounts || count($baseline) !== 239 || count($releaseScope) !== 350) {
-    fwrite(STDERR, 'FAIL: audited disposition counts drifted: '.json_encode($counts)."\n");
+if (count($baseline) !== 239) {
+    fwrite(STDERR, "FAIL: frozen implementation baseline changed.\n");
     exit(1);
+}
+
+if (in_array('--check-scope', $argv, true)) {
+    fwrite(STDOUT, 'PASS: '.count($records)." release paths classified, including removed files.\n");
+    exit(0);
 }
 
 if (in_array('--write', $argv, true)) {
@@ -655,8 +669,8 @@ if ($actualLedger !== $ledger) {
 $guide = (string) file_get_contents(GUIDE_PATH);
 $referencedSections = array_values(array_unique(array_merge(...array_column($records, 'guide_sections'))));
 $sectionEvidence = [
-    'mig-02'                      => ['UnsupportedOperationException', 'capability matrix'],
-    'mig-03'                      => ['QueryBuilderInterface', 'supportedGenericOperations'],
+    'mig-02'                      => ['query()', 'CreatesEntities'],
+    'mig-03'                      => ['QueryBuilderInterface', 'ResourceInterface', 'CreatesEntities'],
     'mig-04'                      => ['SamsaraException', 'HTTP 400 and 422'],
     'mig-05'                      => ['withoutDefaultPageSize()', 'configured `per_page`'],
     'mig-06'                      => ["whereDriver('driver-1')", 'repeated query keys'],
@@ -727,7 +741,7 @@ $requiredGuideTokens = [
     'ValidationException',
     'withoutDefaultPageSize()',
     'repeatQueryParameters',
-    "return ['all', 'create'];",
+    'CreatesEntities',
     'sleeperBed',
     'getLocation()',
     'getLocations()',

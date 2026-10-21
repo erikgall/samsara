@@ -29,14 +29,14 @@ permalink: /resources/drivers
 
 Drivers are the people who operate vehicles in your Samsara fleet. Reach for this resource when you need to maintain the driver roster, manage activation, look drivers up by an external payroll ID, or generate the credentials a driver uses to log into the Samsara app.
 
-The resource owns generic `all`, `find`, `create`, and `update`. Generic `delete` is unsupported and throws `UnsupportedOperationException` before an HTTP request. The custom auth-token, QR-code, and remote-sign-out helpers use the current paths and typed return objects described below.
+Use `query()` for collection reads. The resource exposes `find`, `create`, and `update`; `all` and `delete` are removed. The custom auth-token, QR-code, and remote-sign-out helpers use the current paths and typed return objects described below.
 
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-$drivers = Samsara::drivers()->all();
+$drivers = Samsara::drivers()->query()->get();
 
 $driver = Samsara::drivers()->find('driver-id');
 ```
@@ -45,7 +45,9 @@ $driver = Samsara::drivers()->find('driver-id');
 
 ```php
 $driver = Samsara::drivers()->create([
-    'name'  => 'John Doe',
+    'name' => 'John Doe',
+    'username' => 'john.doe',
+    'password' => $driverPassword,
     'phone' => '+1234567890',
 ]);
 ```
@@ -60,7 +62,7 @@ $driver = Samsara::drivers()->update('driver-id', [
 
 ## Deleting Records
 
-`delete()` is not a supported generic capability for drivers. Calling it throws `UnsupportedOperationException` without sending a request.
+`delete()` is removed. Use `deactivate()` to deactivate a driver.
 
 ## Filtering
 

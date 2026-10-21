@@ -73,13 +73,12 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpunit",
+        "test": "vendor/bin/phpunit tests/Unit tests/Feature tests/Maintenance",
         "analyse": "vendor/bin/phpstan analyse --no-progress --memory-limit=512M",
         "format": "vendor/bin/pint",
         "format:test": "vendor/bin/pint --test",
         "check:maintenance": [
             "@php scripts/validate-samsara-snapshot.php",
-            "@php tests/Maintenance/ApiSnapshotValidatorTest.php",
             "@php scripts/check-samsara-contract-reconciliation.php",
             "@check:v2-upgrade-guide"
         ],

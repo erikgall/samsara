@@ -19,14 +19,14 @@ permalink: /resources/gateways
 
 Gateways are the physical Samsara devices installed in vehicles, trailers, and equipment that report telemetry back to the API. Reach for this resource to enumerate, create, or delete current gateway records. Gateway data is also exposed on `Vehicle` and `Equipment` entities.
 
-> **Package/upstream boundary:** Current upstream supports list and create at `/gateways`, plus delete by ID. It does not define find-by-ID or update-by-ID. The resource capability gate supports only `all()`, `create()`, and `delete()`; unsupported generic calls fail locally before HTTP.
+> **Package/upstream boundary:** Current upstream supports list and create at `/gateways`, plus delete by ID. It does not define find-by-ID or update-by-ID. The resource exposes `query()`, `create()`, and `delete()`; `all`, `find`, and `update` are removed.
 
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-$gateways = Samsara::gateways()->all();
+$gateways = Samsara::gateways()->query()->get();
 
 foreach ($gateways as $gateway) {
     echo "{$gateway->serial} ({$gateway->model})\n";
@@ -43,7 +43,7 @@ $gateway = Samsara::gateways()->create([
 
 ## Updating Records
 
-`update()` and `find()` are unsupported and fail locally. The supported generic operations are `all`, `create`, and `delete`.
+`all()`, `update()`, and `find()` are removed. Use `query()` for collection reads; `create()` and `delete()` remain available.
 
 ## Deleting Records
 

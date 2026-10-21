@@ -31,7 +31,7 @@ use Samsara\Facades\Samsara;
 
 $asset = Samsara::industrial()->query()->where('assetIds', 'asset-id')->first();
 
-$assets = Samsara::industrial()->all();
+$assets = Samsara::industrial()->query()->get();
 
 $active = Samsara::industrial()
     ->assets()
@@ -135,11 +135,13 @@ $assets = Samsara::industrial()
 |----------|------|-------------|
 | `id` | `?string` | Industrial asset ID. |
 | `name` | `?string` | Asset name. |
-| `dataInputs` | `?array<int, array{id?: string, name?: string}>` | Data inputs associated with the asset. |
+| `dataOutputs` | `?array<int, array<string, mixed>>` | Data outputs configured on the asset. |
 | `location` | `?array{latitude?: float, longitude?: float}` | Asset location. |
 | `tags` | `?array<int, array{id?: string, name?: string}>` | Tags assigned to the asset. |
 
 `DataInput` hydrates singular `fftSpectraPoint`, `j1939D1StatusPoint`, `locationPoint`, `numberPoint`, and `stringPoint` fields and their plural series variants as `DataPoint` objects.
+
+Use `Samsara::industrial()->dataInputs()` to retrieve configured inputs.
 
 ## Related Resources
 

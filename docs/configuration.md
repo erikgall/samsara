@@ -15,6 +15,7 @@ permalink: /configuration
     - [Region](#region)
     - [Timeout](#timeout)
     - [Request Attempts](#request-attempts)
+    - [Retry Writes](#retry-writes)
     - [Maximum Retry-After Delay](#maximum-retry-after-delay)
     - [Per Page](#per-page)
     - [Webhook Secret](#webhook-secret)
@@ -28,7 +29,7 @@ permalink: /configuration
 
 ## Introduction
 
-Samsara reads its configuration from `config/samsara.php`, which is merged into the published file when you run `vendor:publish`. The service provider passes `api_key`, `timeout`, `attempts`, `retry_after_max_seconds`, and `per_page` into the lifecycle-scoped client and applies the selected US, EU, or Canada base URL. The reference below covers every config key and the runtime overrides the client exposes for switching regions, swapping tokens, and inspecting the active configuration.
+Samsara reads its configuration from `config/samsara.php`, which is merged into the published file when you run `vendor:publish`. The service provider passes `api_key`, `timeout`, `attempts`, `retry_writes`, `retry_after_max_seconds`, and `per_page` into the lifecycle-scoped client and applies the selected US, EU, or Canada base URL. The reference below covers every config key and the runtime overrides the client exposes for switching regions, swapping tokens, and inspecting the active configuration.
 
 ## Publishing the Configuration
 
@@ -59,7 +60,7 @@ You may obtain a token from the Samsara dashboard under **Settings -> Organizati
 
 ### Region
 
-The Samsara API region your fleet lives in. Use `us`, `eu`, or `ca`. The default is `us`; unknown values also fall back to the US endpoint.
+The Samsara API region your fleet lives in. Use `us`, `eu`, or `ca`. The default is `us`; unknown values throw `InvalidArgumentException`.
 
 ```php
 // config/samsara.php
@@ -76,7 +77,7 @@ SAMSARA_REGION=eu
 | `eu`   | `https://api.eu.samsara.com` |
 | `ca`   | `https://api.ca.samsara.com` |
 
-The same three endpoints are available at runtime through `useUsEndpoint()`, `useEuEndpoint()`, and `useCanadaEndpoint()`.
+Choose a region on a copy with `withRegion('us')`, `withRegion('eu')`, or `withRegion('ca')`.
 
 ### Timeout
 
@@ -102,6 +103,19 @@ This value is the maximum number of request attempts, including the initial requ
 
 ```env
 SAMSARA_ATTEMPTS=5
+```
+
+### Retry Writes
+
+Writes (POST, PATCH, DELETE) do not retry connection failures, HTTP 408, or 5xx by default. Opt in only when replaying an accepted write is safe. HTTP 429 remains retryable for every method, subject to `attempts` and the Retry-After ceiling.
+
+```php
+// config/samsara.php
+'retry_writes' => env('SAMSARA_RETRY_WRITES', false),
+```
+
+```env
+SAMSARA_RETRY_WRITES=false
 ```
 
 ### Maximum Retry-After Delay
@@ -154,29 +168,25 @@ If your application talks to fleets in more than one region, you may switch endp
 ```php
 use Samsara\Facades\Samsara;
 
-Samsara::useEuEndpoint();
+$euClient = Samsara::withRegion('eu');
+$drivers = $euClient->drivers()->query()->get();
 
-// Subsequent calls hit api.eu.samsara.com.
-$drivers = Samsara::drivers()->all();
-
-Samsara::useUsEndpoint();
-
-Samsara::useCanadaEndpoint();
+$usClient = Samsara::withRegion('us');
+$canadaClient = Samsara::withRegion('ca');
 ```
 
-These methods mutate the current scoped client. For tenant-specific credentials or regions, prefer an isolated `Samsara::make()` client.
+Region selection returns a copy and clears its resource cache. Retain or chain that copy; the scoped client keeps its original region.
 
 ### Using a Custom Base URL
 
-`useBaseUrl()` supports a compatible proxy, test server, or gateway while preserving the SDK's normal request configuration. A trailing slash is removed automatically:
+`withBaseUrl()` supports a compatible proxy, test server, or gateway while preserving the SDK's normal request configuration. A trailing slash is removed automatically:
 
 ```php
-Samsara::useBaseUrl('https://samsara-proxy.example.test/');
-
-$drivers = Samsara::drivers()->all();
+$proxyClient = Samsara::withBaseUrl('https://samsara-proxy.example.test/');
+$drivers = $proxyClient->drivers()->query()->get();
 ```
 
-Like the region helpers, this mutates the current client. `getBaseUrl()` returns the active value. Constructing a client with `null` as its token omits the `Authorization` header, which is useful for a proxy that owns authentication.
+Like `withRegion()`, this returns a copy. `getBaseUrl()` returns the active value. Constructing a client with `null` as its token omits the `Authorization` header, which is useful for a proxy that owns authentication.
 
 ### Using a Different Token
 
@@ -184,7 +194,7 @@ Like the region helpers, this mutates the current client. `getBaseUrl()` returns
 
 ```php
 $tenantClient = Samsara::withToken('different-api-token');
-$drivers = $tenantClient->drivers()->all();
+$drivers = $tenantClient->drivers()->query()->get();
 ```
 
 You may also chain it for a single call:
@@ -192,7 +202,7 @@ You may also chain it for a single call:
 ```php
 $drivers = Samsara::withToken('different-api-token')
     ->drivers()
-    ->all();
+    ->query()->get();
 ```
 
 `withoutToken()` returns the same kind of isolated clone with no `Authorization` header. Laravel registers the default client as a scoped service, so Octane requests and queue-job lifecycles do not retain a previous lifecycle's instance.
@@ -201,9 +211,9 @@ $drivers = Samsara::withToken('different-api-token')
 
 The client exposes three read accessors useful for diagnostics and conditional logic:
 
-- `Samsara::getConfig(string $key, mixed $default = null): mixed` — reads a single config value (`timeout`, `attempts`, `retry_after_max_seconds`, `per_page`) the client was constructed with.
+- `Samsara::getConfig(string $key, mixed $default = null): mixed` — reads a single config value (`timeout`, `attempts`, `retry_writes`, `retry_after_max_seconds`, `per_page`) the client was constructed with.
 - `Samsara::hasToken(): bool` — returns `true` if a token has been set, including via `withToken()`.
-- `Samsara::getBaseUrl(): string` — returns the active base URL, switching with `useUsEndpoint()`, `useEuEndpoint()`, and `useCanadaEndpoint()`.
+- `Samsara::getBaseUrl(): string` — returns the active base URL, selected by configuration, `withRegion()`, or `withBaseUrl()`.
 
 ```php
 if (! Samsara::hasToken()) {
@@ -229,7 +239,7 @@ $samsara = Samsara::make('api-token', [
     'per_page' => 50,
 ]);
 
-$drivers = $samsara->drivers()->all();
+$drivers = $samsara->drivers()->query()->get();
 ```
 
 The fresh instance does not affect the scoped client resolved by the `Samsara` facade.
@@ -240,16 +250,21 @@ Bind the authenticated tenant's isolated client at middleware entry so downstrea
 
 ```php
 use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Samsara\Samsara;
+use Samsara\Facades\Samsara as SamsaraFacade;
 
-public function handle($request, Closure $next)
+public function handle(Request $request, Closure $next): Response
 {
     $tenant = $request->user()->tenant;
 
-    app()->instance(Samsara::class, Samsara::make(
+    $client = Samsara::make(
         $tenant->samsara_api_token,
         ['region' => $tenant->samsara_region],
-    ));
+    );
+
+    SamsaraFacade::swap($client);
 
     return $next($request);
 }
@@ -261,7 +276,7 @@ For queue jobs, construct from credentials and region carried by or reloaded for
 public function handle(): void
 {
     $samsara = Samsara::make($this->apiToken, ['region' => $this->region]);
-    $samsara->drivers()->all();
+    $samsara->drivers()->query()->get();
 }
 ```
 
@@ -295,6 +310,6 @@ For testing, replace the facade root and both container bindings with a fake cli
 $fake = Samsara::fake();
 ```
 
-`Samsara::fake()` returns the `SamsaraFake` and swaps it into the facade, the `Samsara\Samsara` binding, and the `samsara` alias. Both `$fake->drivers()->all()` and later `Samsara::drivers()->all()` calls use the same fake.
+`Samsara::fake()` returns the `SamsaraFake` and swaps it into the facade, the `Samsara\Samsara` binding, and the `samsara` alias. Both `$fake->drivers()->query()->get()` and later `Samsara::drivers()->query()->get()` calls use the same fake.
 
 See [testing.md](testing.html) for the full fake API.

@@ -61,7 +61,7 @@ class WorkOrdersResource extends Resource
     }
 
     /**
-     * Get all service tasks.
+     * Get a query builder for service tasks.
      *
      * @return Builder<ServiceTask>
      */

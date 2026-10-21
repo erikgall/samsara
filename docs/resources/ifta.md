@@ -94,7 +94,7 @@ Each detail job may span at most one month. Split a quarterly or longer export i
 | `vehicleReport(array $params)` | `array` | Miles and gallons aggregated by vehicle. |
 | `vehicleReportQuery()` | `Builder` | Fluent cursor traversal over `data.vehicleReports`. |
 | `detailCsv(array $params)` | `array` | Queues a detail CSV export. |
-| `getDetailCsv(string $jobId)` | `array` | Fetches an export job by `jobId`. |
+| `getDetailCsv(string $id)` | `array` | Fetches an export job by `jobId`. |
 
 ## Related Resources
 

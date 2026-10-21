@@ -106,7 +106,7 @@ The helper adds the submission `id` to the collection PATCH body. Do not put the
 
 ## Deleting Records
 
-Generic `delete()` is unsupported and throws before HTTP.
+Generic `delete()` is removed from this resource.
 
 ## Filtering
 
@@ -183,7 +183,7 @@ The `FormSubmission` entity (`Samsara\Data\Form\FormSubmission`) exposes the fol
 | `location` | `?array<string, mixed>` | Submission location. |
 | `routeId` | `?string` | Related route ID. |
 | `routeStopId` | `?string` | Related route-stop ID. |
-| `score` | `?float` | Submission score when present. |
+| `score` | `?array<string, mixed>` | Submission score object when present. |
 | `submittedBy` | `?array<string, mixed>` | User or driver who submitted the form. |
 | `createdAtTime` | `?string` | Creation timestamp (RFC 3339). |
 | `updatedAtTime` | `?string` | Last update timestamp (RFC 3339). |

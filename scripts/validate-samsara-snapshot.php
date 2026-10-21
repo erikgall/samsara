@@ -110,7 +110,7 @@ function discoverSnapshot(string $directory): string
 
     $snapshotsByDate = [];
 
-    $iterator = new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS);
+    $iterator = new DirectoryIterator($directory);
 
     foreach ($iterator as $entry) {
         $filename = $entry->getFilename();
@@ -438,7 +438,7 @@ function validateLicenseMetadata(object $metadata): void
 
 function validatePredecessor(object $metadata): void
 {
-    if ($metadata->predecessor === null) {
+    if (($metadata->predecessor ?? null) === null) {
         return;
     }
 

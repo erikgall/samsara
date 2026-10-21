@@ -203,12 +203,12 @@ Samsara's current pagination guidance says to continue whenever `hasNextPage` is
 | `count()` | `int` | The number of items on the current page. |
 | `toArray()` | `array<string, mixed>` | A `['data' => [...], 'pagination' => [...]]` representation. |
 
-The `Cursor` object exposes the pagination metadata directly:
+The final `Cursor` class exposes readonly pagination properties; its former getters are removed:
 
-| Method | Returns | Description |
+| Member | Type / return | Description |
 |---|---|---|
-| `getEndCursor()` | `?string` | The cursor token for the next page. |
-| `hasNextPage()` | `bool` | Whether the API reports more results. |
+| `$cursor->endCursor` | `?string` | The cursor token for the next page. |
+| `$cursor->hasNextPage` | `bool` | Whether the API reports more results. |
 | `toArray()` | `array<string, mixed>` | An `['endCursor' => ..., 'hasNextPage' => ...]` representation. |
 
 ## Execution Methods
@@ -218,7 +218,7 @@ The builder defers HTTP work until you call a terminal method. Each terminal met
 | Method | Returns | When to use it |
 |---|---|---|
 | `get()` | `EntityCollection` | Eager fetch of the `data` array from one HTTP response. It does not walk subsequent cursors. |
-| `first()` | `?object` | The first result, or `null` when the result set is empty. Internally applies `limit(1)`. |
+| `first()` | `?Entity` | The first mapped entity, or `null`. Adds `limit(1)` only when automatic page sizing is enabled. |
 | `paginate(?int $perPage = null)` | `CursorPaginator` | A page of results plus the cursor metadata for navigation. |
 | `lazy(?int $chunkSize = null)` | `LazyCollection` | A memory-efficient stream that walks every page until the API stops returning a cursor. |
 
@@ -235,7 +235,7 @@ if ($driver === null) {
 }
 ```
 
-Because `first()` injects `limit=1`, use it only on endpoints that declare `limit`. On no-limit endpoints, fetch one response page and select locally with `get()->first()`.
+`first()` respects `withoutDefaultPageSize()`: it reads one page without adding a limit on those endpoints.
 
 `lazy()` is the right choice for unbounded data sets such as historical telemetry. Pass a chunk size only when the selected endpoint declares `limit`; otherwise call `lazy()` with no argument.
 
@@ -250,14 +250,14 @@ Samsara::vehicleStats()
     });
 ```
 
-All builder terminal methods (`get()`, `first()`, `paginate()`, `getWithPagination()`, and every request made by `lazy()`) use the same typed HTTP error boundary as supported generic resource operations and custom helpers. The exception context records the logical endpoint path. Inspect the recorded HTTP request when you need the final encoded query string.
+All builder terminal methods (`get()`, `first()`, `paginate()`, and every request made by `lazy()`) use the same typed HTTP error boundary as supported generic resource operations and custom helpers. The exception context records the logical endpoint path. Inspect the recorded HTTP request when you need the final encoded query string.
 
 Endpoint builders may also select an endpoint-specific result shape through `usingEntity()` or `mapUsing()`. That mapping persists across eager, paginated, and lazy execution, which is why snapshot and time-series endpoints can return distinct DTOs instead of reusing a resource-wide entity class.
 
 Package extenders can adapt nonstandard cursor envelopes without replacing pagination logic:
 
 ```php
-return $this->createBuilderWithEndpoint('/v1/example')
+return $this->newQuery('/v1/example')
     ->withResponseCollectionKey('data.rows')
     ->withCursorParameter('startingAfter');
 ```
@@ -285,17 +285,21 @@ $driver = $drivers->findById('driver-1');
 
 Because `EntityCollection` is a Laravel collection, every method on the base class — `filter()`, `map()`, `pluck()`, `keyBy()`, `groupBy()`, and so on — works without modification.
 
+`Builder` supports Laravel's `when()` and `unless()` methods. `types()` and `withDecorations()` accept a `VehicleStatType` case, strings, or arrays mixing both.
+
+Repeated or cyclic cursors throw `SamsaraException` during `lazy()` traversal or `nextPage()` navigation. Catch that exception at the traversal boundary.
+
 ## Escape Hatch
 
 When you need an endpoint the SDK has not yet wrapped, the underlying HTTP client is exposed via `Samsara::client()`. The returned `Illuminate\Http\Client\PendingRequest` is preconfigured with the base URL, bearer token, JSON headers, timeout, and retry settings.
 
 ```php
-$response = Samsara::client()->get('/fleet/some-new-endpoint', [
-    'tagIds' => 'tag-id',
-]);
+$response = Samsara::client()->get('/fleet/document-types');
 
 $data = $response->json('data', []);
 ```
+
+The example reads the pinned contract's document-type collection, which has no dedicated SDK resource. An application using a raw request owns its request and response contract.
 
 Inside a custom resource subclass, the same instance is available on the resource itself via `$this->client()`, which proxies to `Samsara::client()`.
 
@@ -306,9 +310,9 @@ use Samsara\Resources\Resource;
 
 class CustomResource extends Resource
 {
-    public function specialEndpoint(): array
+    public function documentTypes(): array
     {
-        return $this->client()->get('/fleet/special')->json('data', []);
+        return $this->client()->get('/fleet/document-types')->json('data', []);
     }
 }
 ```

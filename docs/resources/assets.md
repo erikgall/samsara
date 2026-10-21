@@ -24,14 +24,14 @@ permalink: /resources/assets
 
 The Assets resource covers the non-vehicle, non-trailer side of your fleet — generators, reefers, containers, and other tracked equipment. Reach for it when you need a single inventory across asset types, or when you need to read depreciation and input streams that are not exposed on the per-class resources. For typed access to vehicles, trailers, or fleet equipment, use [Vehicles](vehicles.html), [Trailers](trailers.html), or [Equipment](equipment.html) instead.
 
-`all()`, `query()`, and `create()` use `/assets`. The resource overrides `update()` and `delete()` to use `/assets?id={id}`. `find()` is unsupported and throws before HTTP.
+`query()` and `create()` use `/assets`. The resource overrides `update()` and `delete()` to use `/assets?id={id}`. `all()` and `find()` are removed.
 
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-$assets = Samsara::assets()->all();
+$assets = Samsara::assets()->query()->get();
 ```
 
 ## Creating Records
@@ -108,13 +108,9 @@ Two legacy v1 endpoints remain available for parity with older integrations. The
 > **Note:** Prefer the v2 stream endpoints above for new integrations. The legacy endpoints are kept for backwards compatibility only.
 
 ```php
-$locations = Samsara::assets()->locations([
-    'groupId' => 'group-123',
-]);
+$locations = Samsara::assets()->locations();
 
-$reefers = Samsara::assets()->reefers([
-    'groupId' => 'group-123',
-]);
+$reefers = Samsara::assets()->reefers(['startMs' => 1714521600000, 'endMs' => 1714608000000]);
 ```
 
 The raw helpers above preserve their complete legacy envelopes. For cursor traversal, use `locationsQuery()` or `reefersQuery()`; both send the v1 `startingAfter` cursor expected by these endpoints:
@@ -122,12 +118,12 @@ The raw helpers above preserve their complete legacy envelopes. For cursor trave
 ```php
 $locations = Samsara::assets()
     ->locationsQuery()
-    ->where('groupId', 'group-123')
     ->paginate(100);
 
 $reefers = Samsara::assets()
     ->reefersQuery()
-    ->where('groupId', 'group-123')
+    ->where('startMs', 1714521600000)
+    ->where('endMs', 1714608000000)
     ->lazy(100);
 ```
 
@@ -154,7 +150,7 @@ Current upstream `type` values are `uncategorized`, `trailer`, `equipment`, `unp
 The `Asset` entity exposes type-check helpers:
 
 ```php
-$asset = Samsara::assets()->all()->first();
+$asset = Samsara::assets()->query()->get()->first();
 
 $asset->isVehicle();   // bool
 $asset->isTrailer();   // bool

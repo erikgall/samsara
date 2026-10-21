@@ -65,8 +65,11 @@ $jobs = Samsara::beta()->industrialJobs()->get();
 
 ```php
 $job = Samsara::beta()->createIndustrialJob(['job' => [
+    'id' => '8d218e6c-7a16-4f9f-90f7-cc1d93b9e596',
     'name' => 'Crane lift — bay 4',
-    'machineId' => 'machine-id',
+    'industrialAssetIds' => ['industrial-asset-id'],
+    'startDate' => '2026-01-15T08:00:00Z',
+    'endDate' => '2026-01-15T16:00:00Z',
 ]]);
 ```
 
@@ -192,10 +195,15 @@ $latest = Samsara::beta()
 
 `POST /readings`. The official request requires a top-level `data` envelope; the helper returns whether the empty-body response was successful.
 
+`$readingValue` must match the selected reading definition's value object from `/readings/definitions`.
+
 ```php
 $created = Samsara::beta()->createReading(['data' => [[
-    'definitionId' => 'definition-id',
-    'value' => 42,
+    'entityType' => 'asset',
+    'entityId' => 'asset-id',
+    'readingId' => 'reading-id',
+    'happenedAtTime' => '2026-01-15T14:30:00Z',
+    'value' => $readingValue,
 ]]]);
 ```
 

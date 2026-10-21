@@ -27,7 +27,7 @@ Contacts are the people you attach to addresses, dispatch jobs, and routes — t
 ```php
 use Samsara\Facades\Samsara;
 
-$contacts = Samsara::contacts()->all();
+$contacts = Samsara::contacts()->query()->get();
 
 $contact = Samsara::contacts()->find('contact-id');
 ```
@@ -84,6 +84,7 @@ Contacts are most useful when attached to an address. Pass an array of contact I
 
 ```php
 $address = Samsara::addresses()->create([
+    'geofence' => ['circle' => ['latitude' => 37.7749, 'longitude' => -122.4194, 'radiusMeters' => 200]],
     'name'             => 'Customer Warehouse',
     'formattedAddress' => '123 Industrial Blvd, City, ST 12345',
     'contactIds'       => ['contact-123', 'contact-456'],

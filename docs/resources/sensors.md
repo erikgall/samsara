@@ -40,44 +40,23 @@ foreach ($sensors as $sensor) {
 The four reading methods (`temperature`, `humidity`, `door`, `cargo`) all post to `/v1/sensors/{kind}` and return raw arrays:
 
 ```php
-$temperatures = Samsara::sensors()->temperature([
-    'groupId' => 'group-id',
-    'sensors' => [
-        ['id' => 'sensor-1'],
-        ['id' => 'sensor-2'],
-    ],
-]);
-
-$humidity = Samsara::sensors()->humidity([
-    'groupId' => 'group-id',
-    'sensors' => [['id' => 'sensor-1']],
-]);
-
-$doorStatus = Samsara::sensors()->door([
-    'groupId' => 'group-id',
-    'sensors' => [['id' => 'sensor-1']],
-]);
-
-$cargoStatus = Samsara::sensors()->cargo([
-    'groupId' => 'group-id',
-    'sensors' => [['id' => 'sensor-1']],
-]);
+$temperatures = Samsara::sensors()->temperature(['sensors' => [123, 456]]);
+$humidity = Samsara::sensors()->humidity(['sensors' => [123]]);
+$doorStatus = Samsara::sensors()->door(['sensors' => [123]]);
+$cargoStatus = Samsara::sensors()->cargo(['sensors' => [123]]);
 ```
 
 Read keys from the response array directly (`$temperatures['sensors']`); no helper methods are available because the response is not wrapped in a typed entity.
 
 ## Sensor History
 
-`history()` accepts a window (`startMs`, `endMs`, `stepMs`) and a list of sensors with the series you want returned:
+`history()` accepts `startMs`, `endMs`, `stepMs`, and a top-level `series` array of `widgetId`/`field` pairs:
 
 ```php
 $history = Samsara::sensors()->history([
-    'groupId' => 'group-id',
-    'sensors' => [
-        [
-            'id' => 'sensor-1',
-            'series' => ['temperature', 'humidity'],
-        ],
+    'series' => [
+        ['widgetId' => 123, 'field' => 'ambientTemperature'],
+        ['widgetId' => 123, 'field' => 'humidity'],
     ],
     'startMs' => now()->subDay()->getTimestampMs(),
     'endMs' => now()->getTimestampMs(),
@@ -90,25 +69,26 @@ $history = Samsara::sensors()->history([
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `list()` | `EntityCollection<int, Entity>` | List sensors. |
-| `temperature(array $params)` | `array` | Latest temperature readings. |
-| `humidity(array $params)` | `array` | Latest humidity readings. |
-| `door(array $params)` | `array` | Door open/closed status. |
-| `cargo(array $params)` | `array` | Cargo presence status. |
-| `history(array $params)` | `array` | Time-series readings for one or more series. |
+| `temperature(array $data)` | `array` | Latest temperature readings. |
+| `humidity(array $data)` | `array` | Latest humidity readings. |
+| `door(array $data)` | `array` | Door open/closed status. |
+| `cargo(array $data)` | `array` | Cargo presence status. |
+| `history(array $data)` | `array` | Time-series readings for one or more series. |
 
 ## Common Use Cases
 
 ### Watch Refrigerated Trailer Temperature
 
 ```php
+$temperatureSensorId = 123;
 $readings = Samsara::sensors()->temperature([
-    'groupId' => $groupId,
-    'sensors' => [['id' => $temperatureSensorId]],
+    'sensors' => [$temperatureSensorId],
 ]);
 
 foreach ($readings['sensors'] as $sensor) {
-    if ($sensor['ambientTemperature'] > 40) {
-        Log::warning("Sensor {$sensor['id']} temperature alert: {$sensor['ambientTemperature']}F");
+    $fahrenheit = ($sensor['ambientTemperature'] / 1000) * 9 / 5 + 32;
+    if ($fahrenheit > 40) {
+        Log::warning("Sensor {$sensor['id']} temperature alert: {$fahrenheit}F");
     }
 }
 ```
@@ -116,9 +96,9 @@ foreach ($readings['sensors'] as $sensor) {
 ### Track Door Open and Close
 
 ```php
+$doorSensorIds = [123, 456];
 $doorStatus = Samsara::sensors()->door([
-    'groupId' => $groupId,
-    'sensors' => array_map(fn ($id) => ['id' => $id], $doorSensorIds),
+    'sensors' => $doorSensorIds,
 ]);
 
 foreach ($doorStatus['sensors'] as $sensor) {

@@ -39,10 +39,12 @@ class EquipmentResource extends Resource
     protected string $entity = Equipment::class;
 
     /**
-     * Find equipment by external ID.
+     * External-ID equipment lookup is unsupported; use find() with a Samsara equipment ID.
      *
      * @param  string  $key  The external ID key
      * @param  string  $value  The external ID value
+     *
+     * @throws UnsupportedOperationException Always.
      */
     public function findByExternalId(string $key, string $value): ?Equipment
     {

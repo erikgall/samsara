@@ -17,7 +17,7 @@ permalink: /resources/route-events
 
 The `Samsara::routeEvents()` resource exposes lifecycle events emitted as drivers progress through dispatched routes. `RouteEventsResource` declares `$entity = Entity::class`, so each result is a generic `Fluent` instance.
 
-`query()` and the supported generic `all()` target `GET /route-events/stream`. Other generic operations are rejected before HTTP.
+`query()` targets `GET /route-events/stream`. Generic `all`, `find`, `create`, `update`, and `delete` methods are removed.
 
 ## Retrieving Records
 

@@ -11,7 +11,7 @@ permalink: /resources/
 
 ## Introduction
 
-The facade exposes 41 resource accessors, covered by the pages below. Generic operations are capability-gated per resource; see the [Documentation Coverage](../api-sync/documentation-coverage.html) matrix for exact support. For package enums, see [Enums](../enums.html). For the concrete fluent API, see [Query Builder](../query-builder.html).
+The facade exposes 41 resource accessors, covered by the pages below. Resources expose only supported CRUD methods; `all()` is removed; see the [Documentation Coverage](../api-sync/documentation-coverage.html) matrix for exact support. For package enums, see [Enums](../enums.html). For the concrete fluent API, see [Query Builder](../query-builder.html).
 
 ## Fleet Resources
 

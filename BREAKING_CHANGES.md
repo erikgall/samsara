@@ -6,7 +6,116 @@ For an executable, agent-oriented migration sequence with before/after code, exa
 
 ## Unreleased — staged v2
 
-The final audit maps 206 package operations, all of which match the pinned first-party contract with no classified operation difference. Exact capability gates now reject 138 unsupported public operation calls locally, so consumers must apply the migrations below instead of relying on inherited CRUD. The 164 unique official-only operations are additive backlog and do not require a consumer migration until implemented.
+Resources now expose only supported methods. Review every removed call below before adopting the final v2 API.
+
+### Final v2 API changes (waves 1 and 2)
+
+- **Retry policy:** POST/PATCH/DELETE no longer retry connection failures, HTTP 408, or 5xx by default. Opt in with `retry_writes` / `SAMSARA_RETRY_WRITES` (default `false`). HTTP 429 remains retryable for every method within `attempts` and `retry_after_max_seconds`. HTTP-date `Retry-After` is honored; `RateLimitException::getRetryAfter()` returns seconds, and `getContext()['retry_after_header']` retains the raw header.
+- **Client copies:** `useBaseUrl`, `useUsEndpoint`, `useEuEndpoint`, and `useCanadaEndpoint` are removed. Retain the copies returned by `withBaseUrl(string $url)` and `withRegion(string $region)` (`us`, `eu`, `ca`). Unknown regions throw `InvalidArgumentException`.
+- **Fakes:** `Samsara::fake([...])` accepts exact path-to-response stubs containing the inner `data` value. Replace `fakeDrivers`, `fakeVehicles`, and `fakeVehicleStats` with path stubs or `fakeResponse()`. Staging and recorded history are shared across `withToken()` / `withRegion()` clones.
+- **Queries:** replace `Builder::getWithPagination()` with `paginate()`. `Cursor` is final with readonly `endCursor` and `hasNextPage` properties; its getters are removed. `QueryBuilderInterface` is removed. `Builder` adds Laravel `Conditionable` (`when` / `unless`); `types()` and `withDecorations()` accept individual `VehicleStatType` cases and mixed enum/string arrays. Repeated or cyclic cursors throw `SamsaraException`. `first()` does not inject a limit when automatic page sizing is disabled.
+- **Factories and webhooks:** `SamsaraException::make()`, `VerifyWebhookSignature::make()`, and the `Makeable` trait are removed. Construct exceptions directly and register webhook middleware by class string or alias. Empty route/constructor secrets fall back to config. Missing-header exceptions expose the exact header through `getContext()['header']`.
+- **DTOs:** `new DataInput($attributes)` hydrates nested points just like `DataInput::make($attributes)`; `toArray()` exports those points as arrays. Driver auth-token and live-share expiry checks use Laravel's clock; freeze it with `Illuminate\Support\Carbon::setTestNow()`.
+- **Resources:** `all()` is removed everywhere; use the documented endpoint builder and its required filters. CRUD is composed from `FindsEntities`, `CreatesEntities`, `UpdatesEntities`, and `DeletesEntities` traits so unsupported methods are absent, rather than callable methods throwing `UnsupportedOperationException`. `ResourceInterface` is removed, as is `supportedGenericOperations()`. Entity return contracts use `Samsara\Data\Entity` and concrete domain subclasses instead of `Fluent`; update custom overrides and type declarations.
+
+### Before and after
+
+The Before snippets describe the earlier API and are not executable on the final v2 code.
+
+```php
+// Before: mutates the shared client.
+Samsara::useEuEndpoint();
+Samsara::useBaseUrl('https://proxy.example.test');
+
+// After: retain the selected copy.
+$euClient = Samsara::withToken($carrier->samsara_token)->withRegion('eu');
+$proxyClient = $euClient->withBaseUrl('https://proxy.example.test');
+$drivers = $euClient->drivers()->query()->get();
+```
+
+```php
+// Before: retries could replay accepted writes under the default policy.
+$client = \Samsara\Samsara::make($token, ['attempts' => 3]);
+
+// After: writes do not retry transport/408/5xx by default.
+$client = \Samsara\Samsara::make($token, ['retry_writes' => false]);
+// Explicit opt-in, only when replaying writes is safe.
+$retryingClient = \Samsara\Samsara::make($token, ['retry_writes' => true]);
+```
+
+```php
+// Before
+$fake = Samsara::fake();
+$fake->fakeDrivers([['id' => 'driver-1']]);
+$drivers = $fake->drivers()->all();
+
+// After
+$fake = Samsara::fake(['/fleet/drivers' => [['id' => 'driver-1']]]);
+$carrierClient = $fake->withToken('carrier-token')->withRegion('ca');
+$fake->fakeResponse('/fleet/vehicles', [['id' => 'vehicle-1']]);
+$drivers = $carrierClient->drivers()->query()->get();
+$vehicles = $carrierClient->vehicles()->query()->get();
+```
+
+```php
+// Before
+$page = $query->getWithPagination();
+$token = $page->cursor()->getEndCursor();
+$more = $page->cursor()->hasNextPage();
+
+// After
+$page = $query->paginate();
+$token = $page->cursor()->endCursor;
+$more = $page->cursor()->hasNextPage;
+```
+
+```php
+// Before
+$exception = \Samsara\Exceptions\SamsaraException::make('Import failed');
+$middleware = \Samsara\Webhooks\VerifyWebhookSignature::make(null, 600);
+
+// After
+$exception = new \Samsara\Exceptions\SamsaraException('Import failed');
+Route::post('/webhooks/samsara', SamsaraWebhookController::class)
+    ->middleware('samsara.webhook:,600');
+```
+
+The empty alias secret uses configuration. With the default 300-second tolerance, use `VerifyWebhookSignature::class`. Explicit secrets embedded in aliases are written to disk by `route:cache`. Replace message-text assertions for missing headers with `InvalidSignatureException` and `getContext()['header']` (`X-Samsara-Signature` or `X-Samsara-Timestamp`).
+
+```php
+// Before: constructor hydration and serialization differed from make().
+$input = \Samsara\Data\Industrial\DataInput::make($attributes);
+
+// After: either entry point hydrates points; toArray() returns plain arrays.
+$input = new \Samsara\Data\Industrial\DataInput($attributes);
+$points = $input->toArray();
+```
+
+| Before | After |
+| --- | --- |
+| Implements `QueryBuilderInterface` or `ResourceInterface` | Remove the deleted interface; use the concrete builder/resource type or an application-owned contract. |
+| Uses `Makeable` in an application class | Replace its factory use with that class's constructor; DTO `make()` remains available through `Samsara\Data\Entity`. |
+| Calls protected `createBuilderWithEndpoint($endpoint)` in a resource subclass | Use `newQuery($endpoint)`; preserve endpoint-specific mapping and filters. |
+| Overrides `supportedGenericOperations()` | Compose only the supported per-operation traits and preserve their entity return types. |
+| Extends or mutates `Cursor` | Construct a new `Cursor($endCursor, $hasNextPage)`; the class is final and its properties readonly. |
+| Reads nested `DataPoint` objects out of `toArray()` | Read objects from the DTO's point properties, or arrays from `toArray()`. |
+| Tests expiry against `time()` | Freeze `Illuminate\Support\Carbon::setTestNow($instant)` and reset it with `setTestNow()` after the test. |
+| Relies on `first()` sending `limit=1` on every endpoint | Assert no implicit `limit` on builders with `withoutDefaultPageSize()`. |
+| Assumes cursor traversal terminates only by exhaustion | Handle `SamsaraException` for repeated or cyclic cursors. |
+
+### Removed resource methods
+
+| Resource | Removed methods in addition to `all()` |
+| --- | --- |
+| Drivers | `delete` |
+| Equipment | `create`, `update`, `delete` |
+| Vehicles | `create`, `delete` |
+| Assets, Industrial, LiveSharingLinks | `find` |
+| Gateways, CarrierProposedAssignments | `find`, `update` |
+| Alerts, DriverTrailerAssignments, DriverVehicleAssignments, Forms, Issues, WorkOrders | `find`, `update`, `delete` |
+| CameraMedia, FuelAndEnergy, Hubs, Idling, Ifta, RouteEvents, Settings, Speeding, Tachograph, TrailerAssignments, Beta, Sensors, Legacy, Organization, Preview, HoursOfService, Maintenance, SafetyEvents, Trips, VehicleLocations, VehicleStats | `find`, `create`, `update`, `delete` |
+
+Names above omit the `Resource` suffix; `LiveSharingLinksResource` is reached through `liveShares()`, and organization reads through `me()`. Addresses, Contacts, Routes, Tags, Trailers, Users, and Webhooks retain `find`, `create`, `update`, and `delete`; their `all()` method is also removed.
 
 ### Integrated quality-pass compatibility notes
 
@@ -92,7 +201,7 @@ assertions after replacing those shapes.
 
 - Add `retry_after_max_seconds` / `SAMSARA_RETRY_AFTER_MAX_SECONDS` to published configuration. The default ceiling is 30 seconds.
 - A 429 whose `Retry-After` exceeds the ceiling is no longer retried inside the current process; the SDK throws `RateLimitException` immediately so the caller can reschedule work. Smaller delta-seconds and HTTP-date delays remain honored.
-- Successful collection reads now require the selected response key to contain a JSON list. Missing collection keys still produce an empty collection; present null/scalar/object values and non-JSON successful bodies throw `SamsaraException` instead of leaking `TypeError`, emitting warnings, hydrating an envelope, or silently looking empty.
+- Successful collection reads require the collection key to decode to a PHP list. A missing key returns an empty collection. A null or scalar value, a non-list array, or a non-JSON or empty body throws `SamsaraException`. An empty JSON object `{}` decodes as an empty list and is accepted. List items are not validated; a null or scalar item raises `TypeError` during hydration.
 - Review response fakes and exception handling under `MIG-21`.
 
 #### Use Laravel's shared HTTP factory for the container binding
@@ -134,11 +243,11 @@ assertions after replacing those shapes.
 - Builder terminals, supported generic methods, and custom resource helpers now use the same typed error boundary, including after retries are exhausted.
 - Replace Builder-specific catches for `Illuminate\Http\Client\RequestException` with the SDK exception hierarchy.
 - Catch `ValidationException` for HTTP 400 and 422; use `getCode()` only when the distinction matters.
-- `find()` still returns `null` for 404. Unsupported generic operations now throw `UnsupportedOperationException` before any request.
+- `find()` still returns `null` for 404. Unsupported generic methods are removed. Explicit unsupported helpers still throw `UnsupportedOperationException` before HTTP.
 
 #### Account for the configured page size
 
-- `getWithPagination()`, `paginate()`, and `lazy()` now apply configured `per_page` when the query has no explicit limit.
+- `paginate()` and `lazy()` now apply configured `per_page` when the query has no explicit limit.
 - Explicit terminal sizes, `limit()`, and `where('limit', ...)` retain precedence.
 - Update request fakes and signatures that previously expected no `limit`.
 - Endpoint helpers whose official cursor contract has no `limit` suppress only the implicit default; do not add a limit unless the endpoint and your use case allow it.
@@ -153,7 +262,7 @@ These are current-contract audits for pass-through arrays, not new PHP signature
 | DVIR create       | nested `vehicle`, `preTrip`, client timestamps/defect rows | required `authorId`, `safetyStatus`, `type: mechanic`, and either `vehicleId` or `trailerId`  |
 | Work Order create | `vehicleId`, `serviceTasks[*].id`                          | `assetId`, `serviceTaskInstances[*].serviceTaskId`, and a current title-cased task status     |
 
-Revalidate read filters too: Trips requires `startTime` and comma-separated asset `ids`; Idling requires both timestamps; Issues and Work Order streams require `startTime`; Speeding requires `assetIds` and `startTime`; assignment feeds require `filterBy` or `driverIds` as documented; HOS daily logs use date keys. The shared Builder does not validate endpoint parameters. On no-limit operations, `first()` and `lazy($chunkSize)` add an undocumented `limit`; use `get()->first()` or `lazy()`.
+Revalidate read filters too: Trips requires `startTime` and comma-separated asset `ids`; Idling requires both timestamps; Issues and Work Order streams require `startTime`; Speeding requires `assetIds` and `startTime`; assignment feeds require `filterBy` or `driverIds` as documented; HOS daily logs use date keys. The shared Builder does not validate endpoint parameters. On no-limit operations, `lazy($chunkSize)` adds an undocumented `limit`; call `lazy()` without an explicit size. `first()` respects disabled automatic page sizing.
 
 #### Update exact query encoding
 
@@ -184,7 +293,7 @@ Concrete result classes now follow the selected operation and persist across `ge
 
 #### Canada is additive
 
-Canadian organizations may set `SAMSARA_REGION=ca` or call `useCanadaEndpoint()`. Existing US and EU consumers require no change.
+Canadian organizations may set `SAMSARA_REGION=ca` or retain `withRegion('ca')`. Existing US and EU consumers require no change.
 
 ### Fleet and platform migrations
 
@@ -196,7 +305,7 @@ Canadian organizations may set `SAMSARA_REGION=ca` or call `useCanadaEndpoint()`
 | Untyped QR create                 | `createQrCode(array): DriverQrCode`.                                                                                                                                                                                                                              |
 | `getQrCodes()` with no IDs        | `getQrCodes(array\|string $driverIds): EntityCollection<DriverQrCode>`.                                                                                                                                                                                                                                                         |
 | `deleteQrCode(string $qrCodeId)`  | `deleteQrCode(int $driverId): bool`; the ID is sent in the DELETE body.                                                                                                                                                                                           |
-| Untyped/item-path remote sign-out | `remoteSignOut(string $driverId): DriverRemoteSignOutResult`.                                                                                                                                                                                                     |
+| Untyped/item-path remote sign-out | `remoteSignOut(string $id): DriverRemoteSignOutResult`.                                                                                                                                                                                                     |
 | `drivers()->delete($id)`          | No supported driver-delete operation; remove the call.                                                                                                                                                                                                            |
 
 Driver auth uses `POST /fleet/drivers/auth-token`; QR operations use `/drivers/qr-codes`; remote sign-out uses `POST /fleet/drivers/remote-sign-out`.
@@ -233,7 +342,7 @@ Trailer DTOs expose `trailerSerialNumber`. Vehicle DTOs expose list fields `vehi
 | `deleteConfigurations(array $ids)`                                                                 | Call `deleteConfigurations(string $id)` once per ID.                                                                                                                                                                                                            |
 | Camera `get()` returned mapped rows                                                                | Call `get(array $parameters): array` and read the preserved `data` and `pagination` envelope.                                                                                                                                                                   |
 | Camera retrieval used `cameraSerial` / `eventId`, response `id`, or top-level `completed` / `url`  | Send required `vehicleId`, `startTime`, `endTime`, and `mediaType`; poll with `retrievalId`; inspect each `media[*].status` and read `media[*].urlInfo.url` only when `available`.                                                                              |
-| `forms()->exportPdf(array)`                                                                        | `exportPdf(string $submissionId): array`.                                                                                                                                                                                                                       |
+| `forms()->exportPdf(array)`                                                                        | `exportPdf(string $id): array`.                                                                                                                                                                                                                       |
 | `forms()->templates()` returned a collection/parent DTO                                            | Add a terminal call; it is now `Builder<FormTemplate>`.                                                                                                                                                                                                         |
 | `workOrders()->serviceTasks()` returned parent DTOs                                                | It is now `Builder<ServiceTask>`.                                                                                                                                                                                                                               |
 | `trailerAssignments()->forTrailer(string)`                                                         | `forTrailer(int $trailerId, array $params = []): Trailer`.                                                                                                                                                                                                      |
@@ -253,7 +362,7 @@ Trailer DTOs expose `trailerSerialNumber`. Vehicle DTOs expose list fields `vehi
 
 Maintenance generic CRUD is no longer callable. `createDvir()` posts to `/fleet/dvirs`; `dvirs()` and `defects()` return builders, with `Defect` selected for defect rows. Use `findDvir()`, `resolveDvir()`, `findDefect()`, `updateDefect()`, and `defectTypes()` for the dedicated current operations.
 
-Work Orders supports generic `all` and `create` only. Query by repeated `ids`; generic `find`, `update`, and `delete` remain rejected because their inherited signatures do not match the collection contract. Use `updateWorkOrder()` and `deleteWorkOrder()` for the dedicated collection mutations.
+Work Orders supports `create()` and read builders. Query by repeated `ids`; generic `find`, `update`, and `delete` are removed because their inherited signatures do not match the collection contract. Use `updateWorkOrder()` and `deleteWorkOrder()` for the dedicated collection mutations.
 
 The package still implements legacy `/fleet/safety-events` and its audit feed. The modern `/safety-events` family is deferred; do not change production paths until the SDK exposes and documents that additive replacement.
 
@@ -293,7 +402,7 @@ Samsara describes Preview endpoints as nonfunctional and unsuitable for business
 
 ### Exact generic capability action
 
-Unsupported inherited operations now fail locally. Audit every consumer call to `all`, `find`, `create`, `update`, and `delete` against the [capability matrix](https://github.com/erikgall/samsara/blob/dev/docs/api-sync/documentation-coverage.md#exact-generic-capability-matrix). Do not substitute a raw request unless your application intentionally owns that unsupported or official-only contract.
+Unsupported inherited CRUD methods and every `all()` method are removed. Audit every consumer call to `all`, `find`, `create`, `update`, and `delete` against the [capability matrix](https://github.com/erikgall/samsara/blob/dev/docs/api-sync/documentation-coverage.md#exact-generic-capability-matrix). Do not substitute a raw request unless your application intentionally owns that unsupported or official-only contract.
 
 ### Deferred official-only operations
 

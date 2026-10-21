@@ -573,7 +573,9 @@ class Samsara
     }
 
     /**
-     * Create an isolated client for an API region.
+     * Create an isolated client for the us, eu, or ca API region.
+     *
+     * @throws InvalidArgumentException When the region is unknown.
      */
     public function withRegion(string $region): static
     {

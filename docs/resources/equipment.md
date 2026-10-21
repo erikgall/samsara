@@ -24,29 +24,29 @@ permalink: /resources/equipment
 
 Equipment covers the non-vehicle, non-trailer assets in your fleet — generators, light towers, attachments, and similar units that carry a Samsara gateway. Reach for this resource when you need a typed, equipment-specific entity (rather than the generic [Assets](assets.html) view) and when you want the per-equipment locations and stats sub-builders.
 
-The resource owns generic `all` and `find`. Generic `create`, `update`, and `delete` are capability-gated and fail locally. A beta equipment update endpoint exists at `/beta/fleet/equipment/{id}` but is not implemented by this resource.
+Use `query()` for collection reads and `find()` for an item. The `all`, `create`, `update`, and `delete` methods are removed. A beta equipment update endpoint exists at `/beta/fleet/equipment/{id}` but is not implemented by this resource.
 
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-$equipment = Samsara::equipment()->all();
+$equipment = Samsara::equipment()->query()->get();
 
 $item = Samsara::equipment()->find('equipment-id');
 ```
 
 ## Creating Records
 
-`create()` is unsupported and throws `UnsupportedOperationException` before an HTTP request.
+`create()` is removed from this resource.
 
 ## Updating Records
 
-`update()` is unsupported and throws `UnsupportedOperationException` before an HTTP request.
+`update()` is removed from this resource.
 
 ## Deleting Records
 
-`delete()` is unsupported and throws `UnsupportedOperationException` before an HTTP request.
+`delete()` is removed from this resource.
 
 ## Filtering
 

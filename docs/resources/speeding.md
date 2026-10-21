@@ -19,7 +19,7 @@ The `Samsara::speeding()` resource exposes the `/speeding-intervals/stream` feed
 
 ## Retrieving Records
 
-Speeding intervals are streamed through the `intervalsStream()` builder. All generic CRUD operations are rejected before HTTP.
+Speeding intervals are streamed through the `intervalsStream()` builder. Generic CRUD methods are absent.
 
 ```php
 use Samsara\Facades\Samsara;

@@ -85,7 +85,7 @@ The `Samsara` facade resolves the lifecycle-scoped client registered by the serv
 ```php
 use Samsara\Facades\Samsara;
 
-$drivers = Samsara::drivers()->all();
+$drivers = Samsara::drivers()->query()->get();
 
 $vehicle = Samsara::vehicles()->find('vehicle-id');
 
@@ -112,7 +112,7 @@ class FleetController extends Controller
 
     public function index()
     {
-        return $this->samsara->drivers()->all();
+        return $this->samsara->drivers()->query()->get();
     }
 }
 ```
@@ -126,7 +126,7 @@ use Samsara\Samsara;
 
 $samsara = Samsara::make('your-api-token');
 
-$drivers = $samsara->drivers()->all();
+$drivers = $samsara->drivers()->query()->get();
 ```
 
 You may also pass per-instance config overrides:
@@ -169,14 +169,14 @@ See [query-builder.md](query-builder.html) for the full method reference, includ
 
 ## Error Handling
 
-Supported generic resource operations, custom helpers, and query-builder terminal methods map HTTP failures to typed SDK exceptions. Unsupported generic operations fail locally before a request is sent.
+Supported generic resource operations, custom helpers, and query-builder terminal methods map HTTP failures to typed SDK exceptions. Unsupported CRUD methods are absent; explicit unsupported helpers can still throw `UnsupportedOperationException`.
 
 ```php
 use Samsara\Exceptions\AuthenticationException;
 use Samsara\Exceptions\RateLimitException;
 
 try {
-    $drivers = Samsara::drivers()->all();
+    $drivers = Samsara::drivers()->query()->get();
 } catch (AuthenticationException $e) {
     // 401: invalid or revoked token.
 } catch (RateLimitException $e) {
@@ -196,16 +196,17 @@ Use `SamsaraFake` to intercept calls in tests. The fake records every request an
 ```php
 use Samsara\Facades\Samsara;
 
-public function test_it_lists_drivers(): void
+#[\PHPUnit\Framework\Attributes\Test]
+public function it_lists_drivers(): void
 {
     $fake = Samsara::fake();
 
-    $fake->fakeDrivers([
+    $fake->fakeResponse('/fleet/drivers', [
         ['id' => 'driver-1', 'name' => 'John Doe'],
         ['id' => 'driver-2', 'name' => 'Jane Smith'],
     ]);
 
-    $drivers = $fake->drivers()->all();
+    $drivers = $fake->drivers()->query()->get();
 
     $this->assertCount(2, $drivers);
     $this->assertSame('John Doe', $drivers[0]->name);

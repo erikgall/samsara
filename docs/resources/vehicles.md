@@ -28,7 +28,7 @@ A vehicle is a motorized asset tracked by a Samsara vehicle gateway — the on-b
 ```php
 use Samsara\Facades\Samsara;
 
-$vehicles = Samsara::vehicles()->all();
+$vehicles = Samsara::vehicles()->query()->get();
 
 $vehicle = Samsara::vehicles()->find('vehicle-id');
 ```
@@ -43,24 +43,13 @@ $vehicle = Samsara::vehicles()->update('vehicle-id', [
 
 ## Unsupported Operations
 
-The Samsara API does not support creating or deleting vehicles via `/fleet/vehicles`. Calling these methods raises an `UnsupportedOperationException`.
+The Samsara API does not support creating or deleting vehicles via `/fleet/vehicles`. The `create()` and `delete()` methods are absent from `VehiclesResource`.
 
 ### Create
 
 Vehicles are auto-created when a Samsara Vehicle Gateway is installed. To create a vehicle record manually, use the Assets API.
 
 ```php
-use Samsara\Exceptions\UnsupportedOperationException;
-
-try {
-    $vehicle = Samsara::vehicles()->create([
-        'name' => 'Truck 001',
-        'vin' => '1HGBH41JXMN109186',
-    ]);
-} catch (UnsupportedOperationException $e) {
-    // Vehicles cannot be created via /fleet/vehicles.
-}
-
 $vehicle = Samsara::assets()->create([
     'type' => 'vehicle',
     'name' => 'Truck 001',
@@ -69,16 +58,11 @@ $vehicle = Samsara::assets()->create([
 
 ### Delete
 
-Vehicles cannot be deleted. To retire one, update its name or notes field.
+The Fleet Vehicles resource has no delete operation. Delete the corresponding asset through `Samsara::assets()->delete($id)`, or update its name or notes to mark it retired without deleting it.
 
 ```php
-use Samsara\Exceptions\UnsupportedOperationException;
-
-try {
-    Samsara::vehicles()->delete('vehicle-id');
-} catch (UnsupportedOperationException $e) {
-    // Vehicles cannot be deleted via the Samsara API.
-}
+// Delete the corresponding asset through the Assets API.
+Samsara::assets()->delete('vehicle-id');
 
 Samsara::vehicles()->update('vehicle-id', [
     'name' => '[RETIRED] Truck 001',

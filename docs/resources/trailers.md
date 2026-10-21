@@ -27,7 +27,7 @@ A trailer is a non-motorized asset tracked by a Samsara trailer gateway. Trailer
 ```php
 use Samsara\Facades\Samsara;
 
-$trailers = Samsara::trailers()->all();
+$trailers = Samsara::trailers()->query()->get();
 
 $trailer = Samsara::trailers()->find('trailer-id');
 ```

@@ -93,7 +93,7 @@ An `AuthenticationException` is thrown whenever Samsara returns a `401` — typi
 use Samsara\Exceptions\AuthenticationException;
 
 try {
-    $drivers = Samsara::drivers()->all();
+    $drivers = Samsara::drivers()->query()->get();
 } catch (AuthenticationException $e) {
     // Refresh credentials, then retry.
 }
@@ -132,13 +132,13 @@ try {
 
 ### UnsupportedOperationException
 
-Unlike the rest of the hierarchy, `UnsupportedOperationException` is not tied to an HTTP status code. Every integrated resource declares which generic operations it owns from `all`, `find`, `create`, `update`, and `delete`; the SDK rejects all other inherited generic calls before sending a request. The exception context includes the resource class, operation, and base endpoint.
+`UnsupportedOperationException` is a deliberate local rejection by an explicit helper, such as equipment external-ID lookup. Its context is helper-specific; equipment external-ID lookup exposes `key` and `value`. Unsupported generic CRUD methods have been removed; calling an absent method produces a PHP `Error`, not this SDK exception.
 
 ```php
 use Samsara\Exceptions\UnsupportedOperationException;
 
 try {
-    Samsara::vehicles()->create(['name' => 'Truck 001']);
+    Samsara::equipment()->findByExternalId('maintenanceId', 'equipment-1');
 } catch (UnsupportedOperationException $e) {
     // The exception message includes guidance on the correct approach.
     echo $e->getMessage();
@@ -174,7 +174,7 @@ retry.
 use Samsara\Exceptions\RateLimitException;
 
 try {
-    $drivers = Samsara::drivers()->all();
+    $drivers = Samsara::drivers()->query()->get();
 } catch (RateLimitException $e) {
     $wait = $e->getRetryAfter() ?? 30;
     sleep($wait);
@@ -189,7 +189,7 @@ Thrown for any `5xx` response. The HTTP status is preserved on the exception via
 use Samsara\Exceptions\ServerException;
 
 try {
-    $drivers = Samsara::drivers()->all();
+    $drivers = Samsara::drivers()->query()->get();
 } catch (ServerException $e) {
     Log::critical('Samsara API failure', [
         'message' => $e->getMessage(),
@@ -226,7 +226,7 @@ See [Webhooks](resources/webhooks.html) for the full verification flow.
 
 ## Exception Context
 
-HTTP exceptions created by the shared request executor carry a `getContext()` array describing the failed request. Unsupported generic operations also provide local operation context. Other exceptions in the namespace may return an empty context.
+HTTP exceptions created by the shared request executor carry a `getContext()` array describing the failed request. Explicit unsupported helpers also provide local operation context. Other exceptions in the namespace may return an empty context.
 
 ```php
 try {
@@ -254,15 +254,13 @@ The SDK retries transient HTTP failures automatically. Configure the maximum num
 
 The value includes the initial request: `1` makes one request without retries, while `3` permits up to two retries.
 
-Retries also apply to writes. A timeout or server error can occur after Samsara has accepted a mutation, so replaying a create or other non-idempotent operation can duplicate its effects. For such writes, use a separate client configured with `attempts => 1`, then reconcile the result before retrying at the application level:
+Writes (POST, PATCH, DELETE) do not retry connection failures, HTTP 408, or 5xx by default. A failed response can follow an accepted mutation; enable `retry_writes` only when replaying it is safe. HTTP 429 remains retryable for every method within the attempt budget and ceiling.
 
 ```php
-$writeClient = new \Samsara\Samsara($token, ['attempts' => 1]);
-// Apply the same region as your normal client (useUsEndpoint, useEuEndpoint, or useCanadaEndpoint).
-$writeClient->useUsEndpoint();
+$writeClient = \Samsara\Samsara::make($token, ['retry_writes' => true]);
 ```
 
-The retry-after ceiling limits synchronous rate-limit waits. The SDK honors smaller delta-seconds and HTTP-date values. When Samsara asks for a longer delay, the SDK sends no retry and throws `RateLimitException` with the original delay so a queue or application scheduler can reschedule the work.
+`getRetryAfter()` returns the requested delay in seconds for both delta-seconds and HTTP-date headers. `getContext()['retry_after_header']` preserves the raw header. The retry-after ceiling limits synchronous rate-limit waits. The SDK honors smaller delta-seconds and HTTP-date values. When Samsara asks for a longer delay, the SDK sends no retry and throws `RateLimitException` with the original delay so a queue or application scheduler can reschedule the work.
 
 For application-level retry with exponential backoff — for example, when a long-running job hits a rate limit — wrap the call in a small helper:
 
@@ -289,7 +287,7 @@ function fetchWithRetry(callable $callback, int $maxAttempts = 3): mixed
     throw new \RuntimeException('Max retry attempts exceeded');
 }
 
-$drivers = fetchWithRetry(fn () => Samsara::drivers()->all());
+$drivers = fetchWithRetry(fn () => Samsara::drivers()->query()->get());
 ```
 
 ## Connection Errors
@@ -300,7 +298,7 @@ DNS failures, TCP timeouts, and other transport-level errors come through Larave
 use Illuminate\Http\Client\ConnectionException;
 
 try {
-    $drivers = Samsara::drivers()->all();
+    $drivers = Samsara::drivers()->query()->get();
 } catch (ConnectionException $e) {
     Log::error('Cannot reach Samsara API: '.$e->getMessage());
 }

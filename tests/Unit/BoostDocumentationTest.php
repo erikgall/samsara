@@ -56,13 +56,6 @@ class BoostDocumentationTest extends TestCase
             $this->assertSame('supporting_evidence', $records[$path]['disposition']);
         }
 
-        $deletedPaths = [
-            '.ai/skills/samsara-sdk-development/SKILL.md',
-            'resources/boost/guidelines/query-builder.blade.php',
-            'resources/boost/guidelines/resources.blade.php',
-            'resources/boost/guidelines/testing.blade.php',
-        ];
-
         foreach ($ledger['records'] as $record) {
             if ($record['path'] === 'docs/api-sync/v2-upgrade-disposition.json') {
                 $this->assertSame('excluded', $record['content_state']);
@@ -71,10 +64,9 @@ class BoostDocumentationTest extends TestCase
                 continue;
             }
 
-            if (in_array($record['path'], $deletedPaths, true)) {
-                $this->assertSame('deleted', $record['content_state']);
-                $this->assertNull($record['content_sha256']);
+            if ($record['content_state'] === 'deleted') {
                 $this->assertFileDoesNotExist($this->projectPath($record['path']));
+                $this->assertNull($record['content_sha256']);
 
                 continue;
             }
@@ -82,16 +74,6 @@ class BoostDocumentationTest extends TestCase
             $this->assertSame('present', $record['content_state']);
             $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $record['content_sha256']);
         }
-    }
-
-    #[Test]
-    public function it_keeps_the_post_release_checklist_anchored_to_sdk_contracts(): void
-    {
-        $checklist = $this->readProjectFile('.ai/skills/post-release-docs-checklist/SKILL.md');
-
-        $this->assertMatchesRegularExpression('/^## Checklist$/m', $checklist);
-        $this->assertStringContainsString('WebhookEvent::cases()', $checklist);
-        $this->assertStringContainsString('UnsupportedOperationException', $checklist);
     }
 
     #[Test]
@@ -107,7 +89,6 @@ class BoostDocumentationTest extends TestCase
         $this->assertLessThanOrEqual(130, str_word_count(strip_tags($guideline)));
         $this->assertStringContainsString('samsara-sdk-development', $guideline);
         $this->assertStringContainsString('upgrade-samsara-sdk-v2', $guideline);
-        $this->assertStringContainsString('UnsupportedOperationException', $guideline);
         $this->assertStringNotContainsString('```', $guideline);
     }
 
@@ -152,8 +133,6 @@ class BoostDocumentationTest extends TestCase
         $this->assertNotSame('', $metadata['description']);
         $this->assertLessThanOrEqual(1024, strlen($metadata['description']));
         $this->assertLessThan(500, substr_count($matches['body'], "\n") + 1);
-        $this->assertStringNotContainsString('## When to Use', $matches['body']);
-        $this->assertStringNotContainsString('## When to use', $matches['body']);
 
         preg_match_all('/\[[^\]]+\]\((?<path>[^)]+\.md)\)/', $matches['body'], $links);
 

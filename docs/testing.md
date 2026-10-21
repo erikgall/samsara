@@ -29,16 +29,17 @@ Call `Samsara::fake()` to create and install a `SamsaraFake`.
 use Samsara\Facades\Samsara;
 use Samsara\Testing\SamsaraFake;
 
-public function test_it_lists_drivers(): void
+#[\PHPUnit\Framework\Attributes\Test]
+public function it_lists_drivers(): void
 {
     $fake = Samsara::fake();
 
-    $fake->fakeDrivers([
+    $fake->fakeResponse('/fleet/drivers', [
         ['id' => 'driver-1', 'name' => 'John Doe'],
         ['id' => 'driver-2', 'name' => 'Jane Smith'],
     ]);
 
-    $drivers = Samsara::drivers()->all();
+    $drivers = Samsara::drivers()->query()->get();
 
     $this->assertCount(2, $drivers);
     $this->assertSame('John Doe', $drivers->first()->name);
@@ -58,7 +59,7 @@ Http::fake([
     'https://api.samsara.com/fleet/drivers*' => Http::response(['data' => []]),
 ]);
 
-Samsara::drivers()->all();
+Samsara::drivers()->query()->get();
 Http::assertSentCount(1);
 ```
 
@@ -66,12 +67,12 @@ Standalone `new Samsara(...)` remains container-independent and creates its own 
 
 ## Faking Responses
 
-The fake provides shorthand helpers for the resources you mock most often, plus a generic `fakeResponse()` for anything else.
+Pass path-to-response stubs to `Samsara::fake([...])`, or stage individual paths with `fakeResponse()`.
 
 ### Drivers
 
 ```php
-$fake->fakeDrivers([
+$fake->fakeResponse('/fleet/drivers', [
     [
         'id'                     => 'driver-1',
         'name'                   => 'John Doe',
@@ -84,7 +85,7 @@ $fake->fakeDrivers([
 ### Vehicles
 
 ```php
-$fake->fakeVehicles([
+$fake->fakeResponse('/fleet/vehicles', [
     [
         'id'    => 'vehicle-1',
         'name'  => 'Truck 001',
@@ -98,7 +99,7 @@ $fake->fakeVehicles([
 ### Vehicle Stats
 
 ```php
-$fake->fakeVehicleStats([
+$fake->fakeResponse('/fleet/vehicles/stats', [
     [
         'id'   => 'vehicle-1',
         'name' => 'Truck 001',
@@ -117,7 +118,7 @@ $fake->fakeVehicleStats([
 
 ### Custom Endpoints
 
-For endpoints without a dedicated helper, use `fakeResponse()`. The endpoint is matched to the exact URL path; query parameters do not affect the match. A collection fake does not cover item or subresource paths.
+Use `fakeResponse()` to stage or replace an endpoint response. The endpoint is matched to the exact URL path; query parameters do not affect the match. A collection fake does not cover item or subresource paths.
 
 ```php
 $fake->fakeResponse('/fleet/routes', [
@@ -146,7 +147,7 @@ $fake->fakeResponse('/fleet/drivers', [], 400);
 
 `fakeResponse()` always wraps the supplied array in a top-level `data` key. It cannot currently stage an arbitrary top-level error envelope such as `message` plus `errors`; use the [advanced HTTP factory](#advanced-http-mocking) when the error body or headers matter.
 
-Dedicated helpers are exact too. `fakeDrivers()` covers `/fleet/drivers`, not `/fleet/drivers/{id}`. `fakeVehicleStats()` covers `/fleet/vehicles/stats`, not `/fleet/vehicles/stats/history`. Stage those paths explicitly:
+Stubs match exact paths. `/fleet/drivers` does not cover `/fleet/drivers/{id}`, and `/fleet/vehicles/stats` does not cover its history path. Stage those paths explicitly:
 
 ```php
 $fake->fakeResponse('/fleet/drivers/driver-1', [
@@ -156,6 +157,8 @@ $fake->fakeResponse('/fleet/drivers/driver-1', [
 
 $driver = $fake->drivers()->find('driver-1');
 ```
+
+Staged responses and recorded requests are shared across `withToken()` and `withRegion()` clones. Staging a path on either copy updates the fake seen by both. `Samsara::fake(['/fleet/drivers' => [['id' => 'driver-1']]])` stages the same inner data arrays as `fakeResponse()`. The removed `fakeDrivers()`, `fakeVehicles()`, and `fakeVehicleStats()` helpers are replaced by path stubs.
 
 ## Assertions
 
@@ -167,9 +170,9 @@ Asserts that at least one recorded request used the exact endpoint path. Query p
 
 ```php
 $fake = Samsara::fake();
-$fake->fakeDrivers([['id' => 'driver-1', 'name' => 'John']]);
+$fake->fakeResponse('/fleet/drivers', [['id' => 'driver-1', 'name' => 'John']]);
 
-$fake->drivers()->all();
+$fake->drivers()->query()->get();
 
 $fake->assertRequested('/fleet/drivers');
 ```
@@ -216,9 +219,9 @@ For ad-hoc assertions, `getRecordedRequests()` returns the underlying `Illuminat
 
 ```php
 $fake = Samsara::fake();
-$fake->fakeDrivers([['id' => 'driver-1', 'name' => 'John']]);
+$fake->fakeResponse('/fleet/drivers', [['id' => 'driver-1', 'name' => 'John']]);
 
-$fake->drivers()->all();
+$fake->drivers()->query()->get();
 
 $requests = $fake->getRecordedRequests();
 $this->assertCount(1, $requests);
@@ -258,13 +261,14 @@ $stats    = Fixtures::vehicleStats();
 ```php
 use Samsara\Testing\Fixtures;
 
-public function test_with_fixtures(): void
+#[\PHPUnit\Framework\Attributes\Test]
+public function it_loads_fixture_records(): void
 {
     $fake = Samsara::fake();
     $payload = Fixtures::drivers();
-    $fake->fakeDrivers($payload['data']);
+    $fake->fakeResponse('/fleet/drivers', $payload['data']);
 
-    $drivers = $fake->drivers()->all();
+    $drivers = $fake->drivers()->query()->get();
 
     $this->assertNotEmpty($drivers);
 }
@@ -295,14 +299,15 @@ Stage non-200 responses with `fakeResponse()` to exercise your exception handlin
 ```php
 use Samsara\Exceptions\AuthenticationException;
 
-public function test_handles_auth_error(): void
+#[\PHPUnit\Framework\Attributes\Test]
+public function it_handles_auth_error(): void
 {
     $fake = Samsara::fake();
     $fake->fakeResponse('/fleet/drivers', ['message' => 'Invalid API token'], 401);
 
     $this->expectException(AuthenticationException::class);
 
-    $fake->drivers()->all();
+    $fake->drivers()->query()->get();
 }
 ```
 
@@ -311,7 +316,8 @@ public function test_handles_auth_error(): void
 ```php
 use Samsara\Exceptions\ValidationException;
 
-public function test_handles_validation_error(): void
+#[\PHPUnit\Framework\Attributes\Test]
+public function it_handles_validation_error(): void
 {
     $fake = Samsara::fake();
     $fake->fakeResponse('/fleet/drivers', [], 400);
@@ -327,14 +333,15 @@ public function test_handles_validation_error(): void
 ```php
 use Samsara\Exceptions\RateLimitException;
 
-public function test_handles_rate_limit(): void
+#[\PHPUnit\Framework\Attributes\Test]
+public function it_handles_rate_limit(): void
 {
     $fake = Samsara::fake();
     $fake->fakeResponse('/fleet/drivers', ['message' => 'Rate limit exceeded'], 429);
 
     $this->expectException(RateLimitException::class);
 
-    $fake->drivers()->all();
+    $fake->drivers()->query()->get();
 }
 ```
 
@@ -372,13 +379,14 @@ class FleetServiceTest extends TestCase
         $this->setUpSamsara();
     }
 
-    public function test_example(): void
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function it_fetches_a_driver(): void
     {
-        $this->samsara->fakeDrivers([
+        $this->samsara->fakeResponse('/fleet/drivers', [
             ['id' => 'driver-1', 'name' => 'John Doe'],
         ]);
 
-        $drivers = $this->samsara->drivers()->all();
+        $drivers = $this->samsara->drivers()->query()->get();
 
         $this->assertSame('John Doe', $drivers->first()->name);
     }

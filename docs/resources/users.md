@@ -27,7 +27,7 @@ Users are the people who sign in to the Samsara dashboard — admins, fleet mana
 ```php
 use Samsara\Facades\Samsara;
 
-$users = Samsara::users()->all();
+$users = Samsara::users()->query()->get();
 
 $user = Samsara::users()->find('user-id');
 ```

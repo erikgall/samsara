@@ -82,15 +82,15 @@ $dailyLogs = Samsara::hoursOfService()
 
 ## Creating Records
 
-Only generic `all()` is supported. `create()` fails locally before HTTP.
+Use the read builders above. Generic `all()` and `create()` are removed.
 
 ## Updating Records
 
-Generic `update()` fails locally before HTTP.
+Generic `update()` is removed.
 
 ## Deleting Records
 
-Generic `delete()` fails locally before HTTP.
+Generic `delete()` is removed.
 
 ## Filtering
 

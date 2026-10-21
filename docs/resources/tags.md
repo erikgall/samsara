@@ -28,7 +28,7 @@ Tags are labels that group every other resource in Samsara — vehicles, drivers
 ```php
 use Samsara\Facades\Samsara;
 
-$tags = Samsara::tags()->all();
+$tags = Samsara::tags()->query()->get();
 
 $tag = Samsara::tags()->find('tag-id');
 ```
@@ -63,7 +63,7 @@ Samsara::tags()->delete('tag-id');
 
 ## Filtering
 
-The current list-tags operation declares no query filters or pagination parameters. Use `all()` or an unmodified `query()->get()`, then filter the returned collection in memory when needed. Fluent builder methods do not make unsupported parameters valid for this endpoint.
+The current list-tags operation declares no query filters or pagination parameters. Use an unmodified `query()->get()`, then filter the returned collection in memory when needed. Fluent builder methods do not make unsupported parameters valid for this endpoint.
 
 ```php
 $tags = Samsara::tags()

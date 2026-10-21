@@ -20,14 +20,14 @@ permalink: /resources/hubs
 
 A hub is a logical grouping that ties drivers, vehicles, and routes to an operating location. Hubs are not strongly typed: this resource returns generic `Entity` instances.
 
-`HubsResource` supports generic `all()` and the `query()` builder. `find()`, `create()`, `update()`, and `delete()` are capability-gated and fail before HTTP.
+`HubsResource` exposes the `query()` builder. Generic `all`, `find`, `create`, `update`, and `delete` methods are removed.
 
 ## Retrieving Records
 
 ```php
 use Samsara\Facades\Samsara;
 
-$hubs = Samsara::hubs()->all();
+$hubs = Samsara::hubs()->query()->get();
 
 foreach ($hubs as $hub) {
     echo "{$hub->id}: {$hub->name}\n";
@@ -36,15 +36,15 @@ foreach ($hubs as $hub) {
 
 ## Creating Records
 
-`create()` is unsupported and fails locally.
+`create()` is removed from this resource.
 
 ## Updating Records
 
-`update()` is unsupported and fails locally.
+`update()` is removed from this resource.
 
 ## Deleting Records
 
-`delete()` is unsupported and fails locally.
+`delete()` is removed from this resource.
 
 ## Filtering
 

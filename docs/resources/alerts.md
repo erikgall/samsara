@@ -23,7 +23,7 @@ permalink: /resources/alerts
 
 Alerts cover two related concepts in the Samsara API: **alert configurations** define the rules that fire (a speed threshold, a geofence breach, a fuel-level drop), and **alert incidents** are the events those rules generate. The `Samsara::alerts()` resource exposes both. Reach for it when you need to manage what your fleet alerts on, or when you need to stream the incidents those alerts have produced.
 
-Configurations use `/alerts/configurations`; incidents use `/alerts/incidents/stream`. Configuration updates patch the collection payload with `id`; deletion sends one `id` query parameter per call. The resource owns generic `all` and `create`; other generic verbs are rejected locally in favor of the explicit methods below.
+Configurations use `/alerts/configurations`; incidents use `/alerts/incidents/stream`. Configuration updates patch the collection payload with `id`; deletion sends one `id` query parameter per call. The resource exposes `create()` and the builders and explicit methods below. Generic `all`, `find`, `update`, and `delete` methods are removed.
 
 ## Retrieving Records
 
@@ -105,7 +105,6 @@ Use only parameters declared by the selected endpoint. Configuration reads suppo
 $configurations = Samsara::alerts()
     ->configurations()
     ->where('ids', ['config-id'])
-    ->limit(25)
     ->get();
 
 $incidents = Samsara::alerts()

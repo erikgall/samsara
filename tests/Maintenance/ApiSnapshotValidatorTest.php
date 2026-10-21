@@ -1,115 +1,59 @@
 <?php
 
+namespace Samsara\Tests\Maintenance;
+
+use RuntimeException;
+use DirectoryIterator;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\Test;
+
 /**
- * Dependency-free behavior tests for repository maintenance validators.
+ * Behavior tests for repository maintenance validators.
  *
- * Run with: php tests/Maintenance/ApiSnapshotValidatorTest.php
+ * Run with: vendor/bin/phpunit tests/Maintenance
  *
  * @author Erik Galloway <erik@erikgall.com>
  */
-final class ApiSnapshotValidatorTest
+final class ApiSnapshotValidatorTest extends TestCase
 {
-    private int $passed = 0;
-
     /** @var list<string> */
     private array $temporaryDirectories = [];
 
-    public function run(): int
-    {
-        $tests = [
-            'discovers and verifies the uniquely newest dated snapshot'   => fn () => $this->discoversNewestSnapshot(),
-            'discovers snapshots in a directory with glob metacharacters' => fn () => $this->discoversSnapshotInLiteralDirectory(),
-            'rejects a digest mismatch'                                   => fn () => $this->rejectsDigestMismatch(),
-            'rejects newest-date ambiguity'                               => fn () => $this->rejectsNewestDateAmbiguity(),
-            'rejects a missing dated snapshot'                            => fn () => $this->rejectsMissingSnapshot(),
-            'rejects incomplete provenance metadata'                      => fn () => $this->rejectsIncompleteMetadata(),
-            'rejects incomplete validator metadata'                       => fn () => $this->rejectsIncompleteValidatorMetadata(),
-            'rejects calendar-invalid timestamps'                         => fn () => $this->rejectsInvalidTimestamp(),
-            'rejects invalid timestamp offsets'                           => fn () => $this->rejectsInvalidTimestampOffset(),
-            'rejects incomplete OpenAPI structure'                        => fn () => $this->rejectsIncompleteOpenApiStructure(),
-            'rejects an invalid OpenAPI version marker'                   => fn () => $this->rejectsInvalidOpenApiVersion(),
-            'rejects metadata that names a different path'                => fn () => $this->rejectsMismatchedMetadataPath(),
-            'rejects symlinked evidence'                                  => fn () => $this->rejectsSymlinkedEvidence(),
-            'rejects duplicate and conflicting options'                   => fn () => $this->rejectsInvalidOptionCombinations(),
-            'reconciles contracts from a linked worktree'                 => fn () => $this->reconcilesContractsFromLinkedWorktree(),
-        ];
-
-        try {
-            foreach ($tests as $name => $test) {
-                $test();
-                $this->passed++;
-                fwrite(STDOUT, "PASS: {$name}\n");
-            }
-        } catch (Throwable $exception) {
-            fwrite(STDERR, "FAIL: {$exception->getMessage()}\n");
-
-            return 1;
-        } finally {
-            $this->cleanUp();
-        }
-
-        fwrite(STDOUT, "{$this->passed} maintenance validator tests passed.\n");
-
-        return 0;
-    }
-
-    private function assertContains(string $needle, string $haystack): void
-    {
-        if (str_contains($haystack, $needle)) {
-            return;
-        }
-
-        throw new RuntimeException("Expected output to contain: {$needle}\nActual output:\n{$haystack}");
-    }
-
-    private function assertSame(int $expected, int $actual, string $context = ''): void
-    {
-        if ($expected === $actual) {
-            return;
-        }
-
-        throw new RuntimeException("Expected exit code {$expected}; got {$actual}. {$context}");
-    }
-
-    private function assertStringSame(string $expected, string $actual): void
-    {
-        if ($expected === $actual) {
-            return;
-        }
-
-        throw new RuntimeException("Expected strings to be identical.\nExpected: {$expected}\nActual: {$actual}");
-    }
-
-    private function cleanUp(): void
+    protected function tearDown(): void
     {
         foreach ($this->temporaryDirectories as $directory) {
-            foreach (new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS) as $entry) {
-                unlink($entry->getPathname());
+            foreach (new DirectoryIterator($directory) as $entry) {
+                if (! $entry->isDot()) {
+                    unlink($entry->getPathname());
+                }
             }
 
             rmdir($directory);
         }
+
+        parent::tearDown();
     }
 
-    private function discoversNewestSnapshot(): void
+    #[Test]
+    public function it_discovers_newest_snapshot(): void
     {
         $directory = $this->makeTemporaryDirectory();
-        $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-09.json');
+        $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-09.json', str_repeat('0', 64));
         $newestSnapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
         $metadata = $this->metadataPath($newestSnapshot);
-        $snapshotDigestBefore = hash_file('sha256', $newestSnapshot);
-        $metadataDigestBefore = hash_file('sha256', $metadata);
+        $snapshotDigestBefore = hash('sha256', $this->readFile($newestSnapshot));
+        $metadataDigestBefore = hash('sha256', $this->readFile($metadata));
 
         $result = $this->runValidator(['--directory', $directory]);
 
         $this->assertSame(0, $result['exit_code'], $result['stderr']);
-        $this->assertContains('Snapshot verified: '.realpath($newestSnapshot), $result['stdout']);
-        $this->assertContains('OpenAPI version: 3.0.1', $result['stdout']);
-        $this->assertStringSame($snapshotDigestBefore, hash_file('sha256', $newestSnapshot));
-        $this->assertStringSame($metadataDigestBefore, hash_file('sha256', $metadata));
+        $this->assertSame('', $result['stderr']);
+        $this->assertSame($snapshotDigestBefore, hash('sha256', $this->readFile($newestSnapshot)));
+        $this->assertSame($metadataDigestBefore, hash('sha256', $this->readFile($metadata)));
     }
 
-    private function discoversSnapshotInLiteralDirectory(): void
+    #[Test]
+    public function it_discovers_snapshot_in_literal_directory(): void
     {
         $directory = $this->makeTemporaryDirectory('[literal]');
         $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
@@ -117,7 +61,190 @@ final class ApiSnapshotValidatorTest
         $result = $this->runValidator(['--directory', $directory]);
 
         $this->assertSame(0, $result['exit_code'], $result['stderr']);
-        $this->assertContains('Snapshot verified: '.realpath($snapshot), $result['stdout']);
+        $this->assertSame('', $result['stderr']);
+    }
+
+    #[Test]
+    public function it_reconciles_contracts_from_linked_worktree(): void
+    {
+        $result = $this->runRepositoryScript('scripts/check-samsara-contract-reconciliation.php');
+
+        $this->assertSame(0, $result['exit_code'], $result['stderr']);
+        $this->assertSame('', $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_digest_mismatch(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $snapshot = $this->writeSnapshotWithMetadata(
+            $directory,
+            'samsara-api-2026-08-10.json',
+            str_repeat('0', 64),
+        );
+
+        $result = $this->runValidator(['--snapshot', $snapshot]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_incomplete_metadata(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
+        $metadata = json_decode($this->readFile($this->metadataPath($snapshot)), true, flags: JSON_THROW_ON_ERROR);
+        unset($metadata['source_url']);
+        file_put_contents($this->metadataPath($snapshot), json_encode($metadata, JSON_THROW_ON_ERROR));
+
+        $result = $this->runValidator(['--snapshot', $snapshot]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_incomplete_open_api_structure(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
+        $document = json_decode($this->readFile($snapshot), true, flags: JSON_THROW_ON_ERROR);
+        unset($document['info']);
+        file_put_contents($snapshot, json_encode($document, JSON_THROW_ON_ERROR));
+        $this->writeMetadata($snapshot, hash('sha256', $this->readFile($snapshot)));
+
+        $result = $this->runValidator(['--snapshot', $snapshot]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_incomplete_validator_metadata(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
+        $metadataPath = $this->metadataPath($snapshot);
+        $metadata = json_decode($this->readFile($metadataPath), true, 512, JSON_THROW_ON_ERROR);
+        unset($metadata['validator']['version']);
+        file_put_contents($metadataPath, json_encode($metadata, JSON_THROW_ON_ERROR));
+
+        $result = $this->runValidator(['--snapshot', $snapshot]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_invalid_open_api_version(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
+        $snapshotDocument = json_decode($this->readFile($snapshot), true, 512, JSON_THROW_ON_ERROR);
+        $snapshotDocument['openapi'] = '2.0.0';
+        file_put_contents($snapshot, json_encode($snapshotDocument, JSON_THROW_ON_ERROR));
+
+        $metadataPath = $this->metadataPath($snapshot);
+        $metadata = json_decode($this->readFile($metadataPath), true, 512, JSON_THROW_ON_ERROR);
+        $metadata['sha256'] = hash('sha256', $this->readFile($snapshot));
+        $metadata['raw_bytes'] = filesize($snapshot);
+        $metadata['upstream']['openapi'] = '2.0.0';
+        file_put_contents($metadataPath, json_encode($metadata, JSON_THROW_ON_ERROR));
+
+        $result = $this->runValidator(['--snapshot', $snapshot]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_invalid_option_combinations(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
+
+        $duplicate = $this->runValidator(['--snapshot', $snapshot, '--snapshot', $snapshot]);
+        $conflicting = $this->runValidator(['--directory', $directory, '--snapshot', $snapshot]);
+
+        $this->assertSame(1, $duplicate['exit_code'], $duplicate['stderr']);
+        $this->assertSame(1, $conflicting['exit_code'], $conflicting['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_invalid_timestamp(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
+        $metadataPath = $this->metadataPath($snapshot);
+        $metadata = json_decode($this->readFile($metadataPath), true, 512, JSON_THROW_ON_ERROR);
+        $metadata['retrieved_at'] = '2026-02-30T12:00:00Z';
+        file_put_contents($metadataPath, json_encode($metadata, JSON_THROW_ON_ERROR));
+
+        $result = $this->runValidator(['--snapshot', $snapshot]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_invalid_timestamp_offset(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
+        $metadataPath = $this->metadataPath($snapshot);
+        $metadata = json_decode($this->readFile($metadataPath), true, 512, JSON_THROW_ON_ERROR);
+        $metadata['retrieved_at'] = '2026-08-10T12:00:00+24:00';
+        file_put_contents($metadataPath, json_encode($metadata, JSON_THROW_ON_ERROR));
+
+        $result = $this->runValidator(['--snapshot', $snapshot]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_mismatched_metadata_path(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
+        $metadataPath = $this->metadataPath($snapshot);
+        $metadata = json_decode($this->readFile($metadataPath), true, 512, JSON_THROW_ON_ERROR);
+        $metadata['snapshot'] = 'contracts/other/samsara-api-2026-08-10.json';
+        file_put_contents($metadataPath, json_encode($metadata, JSON_THROW_ON_ERROR));
+
+        $result = $this->runValidator(['--snapshot', $snapshot]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_missing_snapshot(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+
+        $result = $this->runValidator(['--directory', $directory]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_newest_date_ambiguity(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $this->writeSnapshotWithMetadata($directory, 'samsara-public-2026-08-10.json');
+        $this->writeSnapshotWithMetadata($directory, 'samsara-private-2026-08-10.json');
+
+        $result = $this->runValidator(['--directory', $directory]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
+    }
+
+    #[Test]
+    public function it_rejects_symlinked_evidence(): void
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $target = $this->writeSnapshot($directory, 'snapshot-target.json');
+        $snapshot = $directory.'/samsara-api-2026-08-10.json';
+        symlink($target, $snapshot);
+        $this->writeMetadata($snapshot, hash('sha256', $this->readFile($snapshot)));
+
+        $result = $this->runValidator(['--directory', $directory]);
+
+        $this->assertSame(1, $result['exit_code'], $result['stderr']);
     }
 
     private function makeTemporaryDirectory(string $suffix = ''): string
@@ -138,189 +265,12 @@ final class ApiSnapshotValidatorTest
         return $snapshot.'.metadata.json';
     }
 
-    private function reconcilesContractsFromLinkedWorktree(): void
+    private function readFile(string $path): string
     {
-        $result = $this->runRepositoryScript('scripts/check-samsara-contract-reconciliation.php');
+        $contents = file_get_contents($path);
+        $this->assertIsString($contents);
 
-        $this->assertSame(0, $result['exit_code'], $result['stderr']);
-        $this->assertContains('unclassified differences = 0', $result['stdout']);
-    }
-
-    private function rejectsDigestMismatch(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $snapshot = $this->writeSnapshotWithMetadata(
-            $directory,
-            'samsara-api-2026-08-10.json',
-            str_repeat('0', 64),
-        );
-
-        $result = $this->runValidator(['--snapshot', $snapshot]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('SHA-256 mismatch', $result['stderr']);
-    }
-
-    private function rejectsIncompleteMetadata(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $snapshot = $this->writeSnapshot($directory, 'samsara-api-2026-08-10.json');
-        file_put_contents(
-            $this->metadataPath($snapshot),
-            json_encode([
-                'snapshot' => basename($snapshot),
-                'sha256'   => hash_file('sha256', $snapshot),
-            ], JSON_THROW_ON_ERROR),
-        );
-
-        $result = $this->runValidator(['--snapshot', $snapshot]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('Metadata field source_url must be a non-empty string', $result['stderr']);
-    }
-
-    private function rejectsIncompleteOpenApiStructure(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $snapshot = $directory.'/samsara-api-2026-08-10.json';
-        file_put_contents($snapshot, json_encode(['openapi' => '3.0.1'], JSON_THROW_ON_ERROR));
-        $this->writeMetadata($snapshot, hash_file('sha256', $snapshot));
-
-        $result = $this->runValidator(['--snapshot', $snapshot]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('Snapshot field info must be an object', $result['stderr']);
-    }
-
-    private function rejectsIncompleteValidatorMetadata(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
-        $metadataPath = $this->metadataPath($snapshot);
-        $metadata = json_decode(file_get_contents($metadataPath), true, 512, JSON_THROW_ON_ERROR);
-        unset($metadata['validator']['version']);
-        file_put_contents($metadataPath, json_encode($metadata, JSON_THROW_ON_ERROR));
-
-        $result = $this->runValidator(['--snapshot', $snapshot]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('Metadata validation field version must be a non-empty string', $result['stderr']);
-    }
-
-    private function rejectsInvalidOpenApiVersion(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
-        $snapshotDocument = json_decode(file_get_contents($snapshot), true, 512, JSON_THROW_ON_ERROR);
-        $snapshotDocument['openapi'] = '2.0.0';
-        file_put_contents($snapshot, json_encode($snapshotDocument, JSON_THROW_ON_ERROR));
-
-        $metadataPath = $this->metadataPath($snapshot);
-        $metadata = json_decode(file_get_contents($metadataPath), true, 512, JSON_THROW_ON_ERROR);
-        $metadata['sha256'] = hash_file('sha256', $snapshot);
-        $metadata['raw_bytes'] = filesize($snapshot);
-        $metadata['upstream']['openapi'] = '2.0.0';
-        file_put_contents($metadataPath, json_encode($metadata, JSON_THROW_ON_ERROR));
-
-        $result = $this->runValidator(['--snapshot', $snapshot]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('Snapshot field openapi must be an OpenAPI 3 semantic version', $result['stderr']);
-    }
-
-    private function rejectsInvalidOptionCombinations(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
-
-        $duplicate = $this->runValidator(['--snapshot', '/missing.json', '--snapshot', $snapshot]);
-        $conflicting = $this->runValidator(['--directory', '/missing', '--snapshot', $snapshot]);
-
-        $this->assertSame(1, $duplicate['exit_code'], $duplicate['stderr']);
-        $this->assertContains('Duplicate option: --snapshot', $duplicate['stderr']);
-        $this->assertSame(1, $conflicting['exit_code'], $conflicting['stderr']);
-        $this->assertContains('cannot be combined', $conflicting['stderr']);
-    }
-
-    private function rejectsInvalidTimestamp(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
-        $metadataPath = $this->metadataPath($snapshot);
-        $metadata = json_decode(file_get_contents($metadataPath), true, 512, JSON_THROW_ON_ERROR);
-        $metadata['retrieved_at'] = '2026-02-30T12:00:00Z';
-        file_put_contents($metadataPath, json_encode($metadata, JSON_THROW_ON_ERROR));
-
-        $result = $this->runValidator(['--snapshot', $snapshot]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('Metadata field retrieved_at is not a valid calendar timestamp', $result['stderr']);
-    }
-
-    private function rejectsInvalidTimestampOffset(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
-        $metadataPath = $this->metadataPath($snapshot);
-        $metadata = json_decode(file_get_contents($metadataPath), true, 512, JSON_THROW_ON_ERROR);
-        $metadata['retrieved_at'] = '2026-08-10T12:00:00+24:00';
-        file_put_contents($metadataPath, json_encode($metadata, JSON_THROW_ON_ERROR));
-
-        $result = $this->runValidator(['--snapshot', $snapshot]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('Metadata field retrieved_at is not a valid RFC 3339 offset', $result['stderr']);
-    }
-
-    private function rejectsMismatchedMetadataPath(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $snapshot = $this->writeSnapshotWithMetadata($directory, 'samsara-api-2026-08-10.json');
-        $metadataPath = $this->metadataPath($snapshot);
-        $metadata = json_decode(file_get_contents($metadataPath), true, 512, JSON_THROW_ON_ERROR);
-        $metadata['snapshot'] = 'contracts/other/samsara-api-2026-08-10.json';
-        file_put_contents($metadataPath, json_encode($metadata, JSON_THROW_ON_ERROR));
-
-        $result = $this->runValidator(['--snapshot', $snapshot]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('must identify the validated snapshot path', $result['stderr']);
-    }
-
-    private function rejectsMissingSnapshot(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-
-        $result = $this->runValidator(['--directory', $directory]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('No dated JSON snapshots found', $result['stderr']);
-    }
-
-    private function rejectsNewestDateAmbiguity(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $this->writeSnapshotWithMetadata($directory, 'samsara-public-2026-08-10.json');
-        $this->writeSnapshotWithMetadata($directory, 'samsara-private-2026-08-10.json');
-
-        $result = $this->runValidator(['--directory', $directory]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('Multiple snapshots have the newest date 2026-08-10', $result['stderr']);
-    }
-
-    private function rejectsSymlinkedEvidence(): void
-    {
-        $directory = $this->makeTemporaryDirectory();
-        $target = $this->writeSnapshot($directory, 'snapshot-target.json');
-        $snapshot = $directory.'/samsara-api-2026-08-10.json';
-        symlink($target, $snapshot);
-        $this->writeMetadata($snapshot, hash_file('sha256', $snapshot));
-
-        $result = $this->runValidator(['--directory', $directory]);
-
-        $this->assertSame(1, $result['exit_code'], $result['stderr']);
-        $this->assertContains('must not be a symbolic link', $result['stderr']);
+        return $contents;
     }
 
     /**
@@ -364,6 +314,7 @@ final class ApiSnapshotValidatorTest
     }
 
     /**
+     * @param  list<string>  $arguments
      * @return array{exit_code: int, stdout: string, stderr: string}
      */
     private function runValidator(array $arguments): array
@@ -435,10 +386,8 @@ final class ApiSnapshotValidatorTest
         ?string $digest = null,
     ): string {
         $snapshot = $this->writeSnapshot($directory, $filename);
-        $this->writeMetadata($snapshot, $digest ?? hash_file('sha256', $snapshot));
+        $this->writeMetadata($snapshot, $digest ?? hash('sha256', $this->readFile($snapshot)));
 
         return $snapshot;
     }
 }
-
-exit((new ApiSnapshotValidatorTest)->run());

@@ -15,7 +15,7 @@ permalink: /resources/idling
 
 ## Introduction
 
-The `Samsara::idling()` resource exposes the `/idling/events` stream so you may report on vehicles left running while parked. It is builder-only: all generic CRUD operations are rejected. Rows are generic `Entity` instances. Reach for it when you build fuel-waste reports, idle-time leaderboards, or notify-on-idle alerts that supplement the [Alerts](alerts.html) resource.
+The `Samsara::idling()` resource exposes the `/idling/events` stream so you may report on vehicles left running while parked. It is builder-only: generic CRUD methods are absent. Rows are generic `Entity` instances. Reach for it when you build fuel-waste reports, idle-time leaderboards, or notify-on-idle alerts that supplement the [Alerts](alerts.html) resource.
 
 ## Retrieving Records
 
@@ -70,12 +70,12 @@ A `between()` window is required by the upstream endpoint. Omitting it leaves va
 | `startTime` | `string` | RFC 3339 start of the idle interval. |
 | `durationMilliseconds` | `int` | Idle duration in milliseconds. |
 | `eventUuid` | `string` | Event UUID. |
-| `fuelConsumedMilliliters` | `int` | Liquid fuel consumed during the event. |
+| `fuelConsumedMilliliters` | `int\|float` | Liquid fuel consumed during the event. |
 | `fuelCost` | `array` | Liquid-fuel cost details. |
-| `gaseousFuelConsumedGrams` | `int` | Gaseous fuel consumed during the event. |
+| `gaseousFuelConsumedGrams` | `int\|float` | Gaseous fuel consumed during the event. |
 | `gaseousFuelCost` | `array` | Gaseous-fuel cost details. |
 | `ptoState` | `string` | Power-take-off state. |
-| `address` | `?string` | Reverse-geocoded address, when available. |
+| `address` | `?array{id: string, addressTypes?: array<int, string>, externalIds?: array<string, string>}` | Geofence address associated with the idling event. |
 | `airTemperatureMillicelsius` | `?int` | Ambient air temperature, when available. |
 | `latitude` / `longitude` | `?float` | Event coordinates, when available. |
 | `operator` | `?array` | Operator details, when available. |

@@ -7,12 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Final v2 compatibility changes
+
+- **Retry policy:** POST/PATCH/DELETE no longer retry connection failures, HTTP 408, or 5xx by default. Opt in with `retry_writes` / `SAMSARA_RETRY_WRITES` (default `false`). HTTP 429 remains retryable for every method within `attempts` and `retry_after_max_seconds`. HTTP-date `Retry-After` is honored; `RateLimitException::getRetryAfter()` returns seconds, and `getContext()['retry_after_header']` retains the raw header.
+- **Client copies:** `useBaseUrl`, `useUsEndpoint`, `useEuEndpoint`, and `useCanadaEndpoint` are removed. Retain the copies returned by `withBaseUrl(string $url)` and `withRegion(string $region)` (`us`, `eu`, `ca`). Unknown regions throw `InvalidArgumentException`.
+- **Fakes:** `Samsara::fake([...])` accepts exact path-to-response stubs containing the inner `data` value. Replace `fakeDrivers`, `fakeVehicles`, and `fakeVehicleStats` with path stubs or `fakeResponse()`. Staging and recorded history are shared across `withToken()` / `withRegion()` clones.
+- **Queries:** replace `Builder::getWithPagination()` with `paginate()`. `Cursor` is final with readonly `endCursor` and `hasNextPage` properties; its getters are removed. `QueryBuilderInterface` is removed. `Builder` adds Laravel `Conditionable` (`when` / `unless`); `types()` and `withDecorations()` accept individual `VehicleStatType` cases and mixed enum/string arrays. Repeated or cyclic cursors throw `SamsaraException`. `first()` does not inject a limit when automatic page sizing is disabled.
+- **Factories and webhooks:** `SamsaraException::make()`, `VerifyWebhookSignature::make()`, and the `Makeable` trait are removed. Construct exceptions directly and register webhook middleware by class string or alias. Empty route/constructor secrets fall back to config. Missing-header exceptions expose the exact header through `getContext()['header']`.
+- **DTOs:** `new DataInput($attributes)` hydrates nested points just like `DataInput::make($attributes)`; `toArray()` exports those points as arrays. Driver auth-token and live-share expiry checks use Laravel's clock; freeze it with `Illuminate\Support\Carbon::setTestNow()`.
+- **Resources:** `all()` is removed everywhere; use the documented endpoint builder and its required filters. CRUD is composed from `FindsEntities`, `CreatesEntities`, `UpdatesEntities`, and `DeletesEntities` traits so unsupported methods are absent, rather than callable methods throwing `UnsupportedOperationException`. `ResourceInterface` is removed, as is `supportedGenericOperations()`. Entity return contracts use `Samsara\Data\Entity` and concrete domain subclasses instead of `Fluent`; update custom overrides and type declarations.
+
+| Resource | Removed methods in addition to `all()` |
+| --- | --- |
+| Drivers | `delete` |
+| Equipment | `create`, `update`, `delete` |
+| Vehicles | `create`, `delete` |
+| Assets, Industrial, LiveSharingLinks | `find` |
+| Gateways, CarrierProposedAssignments | `find`, `update` |
+| Alerts, DriverTrailerAssignments, DriverVehicleAssignments, Forms, Issues, WorkOrders | `find`, `update`, `delete` |
+| CameraMedia, FuelAndEnergy, Hubs, Idling, Ifta, RouteEvents, Settings, Speeding, Tachograph, TrailerAssignments, Beta, Sensors, Legacy, Organization, Preview, HoursOfService, Maintenance, SafetyEvents, Trips, VehicleLocations, VehicleStats | `find`, `create`, `update`, `delete` |
+
+Names above omit the `Resource` suffix; `LiveSharingLinksResource` is reached through `liveShares()`, and organization reads through `me()`. Addresses, Contacts, Routes, Tags, Trailers, Users, and Webhooks retain `find`, `create`, `update`, and `delete`; their `all()` method is also removed.
+
 ### Added
 
 - **Lifecycle coverage**: Added contract-backed issue, work-order, driver-assignment, DVIR, and defect mutations and item reads without enabling fabricated generic item paths.
 - **Typed legacy and organization reads**: Added typed `/me`, machine, vision-camera, defect-type, and all-trailer-assignment access.
 - **Upgrade documentation**: Added a canonical v1.1.0-to-v2.0.0 guide with executable migrations, exact before/after wire contracts, an agent completion record, and a machine-checked disposition for all final release paths.
-- **Laravel Boost guidance**: Added package-discovered Agent Skills for current v2 application development and v1.1-to-v2 migration work, with focused references for integration, querying, responses, testing, and webhooks.
+- **Laravel Boost guidance**: Added package-discovered Agent Skills for current v2 application development and v1.1-to-v2 migration work, with concise routing and non-obvious integration pitfalls.
 - **Form submissions**: Added seven exact current-status predicates: `isNotStarted()`, `isCompleted()`, `isArchived()`, `isInProgress()`, `needsReview()`, `hasChangesRequested()`, and `isApproved()`.
 - **Route stops**: Added six exact state predicates plus actual/planned distance conversion helpers for kilometers and miles.
 - **Trips**: Added `isCompleted()` and `isInProgress()` for the current completion-status contract.
@@ -23,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation**: Added a contract-evidenced catalog covering all 73 concrete DTOs, 96 valid proposals, and 27 explicit no-helper decisions.
 - **Pagination flexibility**: Added nested response collection selectors and custom cursor parameter names for extension authors, plus cursor builders for Camera Media, fuel/energy reports, IFTA vehicle reports, and legacy asset locations/reefers without changing the raw-envelope methods.
 - **Enums**: Aligned `VehicleStatType` exactly with the 63 values accepted by the pinned vehicle-stats `types` parameters, documented the 49-value feed/history `decorations` subset, and aligned `SafetyEventType` with the current `SafetyEventBehaviorLabelType` wire values.
-- **Client configuration**: Added `useBaseUrl()` for compatible proxies, gateways, and test servers.
+- **Client configuration**: Added copy-returning `withBaseUrl()` for compatible proxies, gateways, and test servers.
 
 ### Changed
 
@@ -42,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Hours of Service**: `DutyStatus::SLEEPER_BERTH` now uses the upstream `sleeperBed` backing value, allowing `HosLog::getDutyStatus()` to hydrate current sleeper-berth rows. This changes the enum's serialized value; see `BREAKING_CHANGES.md`.
 - **Core quality**: UTC formatting no longer mutates caller-owned dates; collection IDs retain `"0"`; paginator navigation rejects inconsistent cursor metadata; generic item IDs remain one encoded path segment; malformed webhook timestamps use `InvalidSignatureException`.
 - **Testing fixtures**: Reconciled all 13 shipped fake-response fixtures with their current DTO and endpoint contracts and added recursive envelope and item-shape assertions.
-- **Runtime safety**: `SamsaraFake` now rejects unfaked requests, matches and asserts exact paths, preserves recorded history when new responses are staged, and isolates overlapping endpoint stubs; retries are limited to connection failures, 408, 429, and 5xx responses; collection and manual response boundaries now raise `SamsaraException` for malformed successful bodies instead of leaking `TypeError`, emitting warnings, hydrating envelopes, or silently looking empty.
+- **Runtime safety**: `SamsaraFake` now rejects unfaked requests, matches and asserts exact paths, preserves recorded history when new responses are staged, and isolates overlapping endpoint stubs; read retries cover connection failures, 408, 429, and 5xx responses, while write retries default to 429 only; collection reads raise `SamsaraException` when the collection value is present but not a list, or the body is not JSON; individual list items are not validated.
 - **Legacy reads**: Corrected seven GET-only v1 helpers and the `messages()` read helper to use GET, restored message sending as explicit `sendMessage()`, and removed the dead `dispatchRoutes()` collection path.
 - **Query encoding**: OpenAPI `explode=true` Asset parameters now use repeated keys and booleans serialize as `true` / `false`; dedicated CSV helpers and arbitrary Laravel arrays retain their distinct encodings.
 - **Distribution**: Composer and Git archives exclude repository-only contracts, tests, scripts, docs, dependency trees, and development configuration; the dated snapshot remains the sole contract authority for maintenance checks.
@@ -57,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- **Unsupported generic operations**: Capability-gated inherited CRUD methods that have no represented upstream operation now fail locally with `UnsupportedOperationException`; use the exact matrix and migrations in the v2 guide.
+- **Unsupported generic operations**: Inherited CRUD methods that have no represented upstream operation are removed; use the exact matrix and migrations in the v2 guide.
 - **DTO helpers**: Removed 17 helpers whose source fields are absent, renamed, semantically different, or owned by another endpoint. The upgrade guide lists every replacement or explicit no-equivalent decision.
 - **Enum values**: Removed 18 unsupported `VehicleStatType` values and replaced the historical `SafetyEventType` case set with the pinned behavior-label schema. Eleven Safety case names are removed; retained `NEAR_COLLISION` changes backing value from `nearCollision` to upstream `nearCollison`. Update persisted enum names and values before upgrading.
 - **Legacy dispatch routes**: Removed `LegacyResource::dispatchRoutes()` because neither the pinned nor current live contract declares its path.

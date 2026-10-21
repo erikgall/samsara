@@ -64,14 +64,14 @@ Set `SAMSARA_REGION=eu` for EU customers or `SAMSARA_REGION=ca` for Canada. See 
 ```php
 use Samsara\Facades\Samsara;
 
-$drivers = Samsara::drivers()->all();
+$drivers = Samsara::drivers()->query()->get();
 
 foreach ($drivers as $driver) {
     logger()->info("{$driver->name} ({$driver->id})");
 }
 ```
 
-Every resource accessor on the facade returns a resource object. Resources expose verbs like `all()`, `find()`, and `query()`, plus resource-specific helpers. The fluent query builder layers on filters, time windows, pagination, and lazy iteration:
+Every resource accessor on the facade returns a resource object. Resources expose only supported CRUD methods, collection builders, and resource-specific helpers. `all()` is removed. The fluent query builder layers on filters, time windows, pagination, and lazy iteration:
 
 ```php
 $stats = Samsara::vehicleStats()

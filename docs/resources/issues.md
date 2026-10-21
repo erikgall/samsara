@@ -16,7 +16,7 @@ permalink: /resources/issues
 
 ## Introduction
 
-The `Samsara::issues()` resource exposes the `/issues/stream` feed of vehicle and equipment fault data. Stream rows are generic `Entity` instances. Generic `create()` and the dedicated collection-level `updateIssue()` method are supported; `all`, `find`, `update`, and `delete` are rejected because their inherited item paths do not match this API.
+The `Samsara::issues()` resource exposes the `/issues/stream` feed of vehicle and equipment fault data. Stream rows are generic `Entity` instances. Generic `create()` and the dedicated collection-level `updateIssue()` method are supported; `all`, `find`, `update`, and `delete` are removed because their signatures do not match this API.
 
 ## Retrieving Records
 

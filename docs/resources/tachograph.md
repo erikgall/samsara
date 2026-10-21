@@ -18,7 +18,7 @@ permalink: /resources/tachograph
 
 Tachograph endpoints expose the EU regulatory data captured by tachograph-equipped vehicles — driver activity (driving, rest, work, available), and the periodic driver- and vehicle-card files used to satisfy member-state audits.
 
-The three explicit helpers are the supported public surface. They use `/fleet/drivers/tachograph-activity/history`, `/fleet/drivers/tachograph-files/history`, and `/fleet/vehicles/tachograph-files/history`. Generic CRUD is capability-gated and unsupported. Each builder suppresses the implicit page size because its cursor operation has no official `limit`.
+The three explicit helpers are the supported public surface. They use `/fleet/drivers/tachograph-activity/history`, `/fleet/drivers/tachograph-files/history`, and `/fleet/vehicles/tachograph-files/history`. Generic CRUD methods are absent. Each builder suppresses the implicit page size because its cursor operation has no official `limit`.
 
 ## Driver Activity History
 
