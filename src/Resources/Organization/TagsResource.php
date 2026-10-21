@@ -40,8 +40,6 @@ class TagsResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Tag>
      */
     protected string $entity = Tag::class;
 

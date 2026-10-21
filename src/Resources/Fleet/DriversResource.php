@@ -40,8 +40,6 @@ class DriversResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Driver>
      */
     protected string $entity = Driver::class;
 

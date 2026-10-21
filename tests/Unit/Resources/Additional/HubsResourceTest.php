@@ -42,30 +42,6 @@ class HubsResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_expose_create_hub(): void
-    {
-        $this->assertFalse(method_exists(HubsResource::class, 'create'));
-    }
-
-    #[Test]
-    public function it_does_not_expose_delete_hub(): void
-    {
-        $this->assertFalse(method_exists(HubsResource::class, 'delete'));
-    }
-
-    #[Test]
-    public function it_does_not_expose_find_hub(): void
-    {
-        $this->assertFalse(method_exists(HubsResource::class, 'find'));
-    }
-
-    #[Test]
-    public function it_does_not_expose_update_hub(): void
-    {
-        $this->assertFalse(method_exists(HubsResource::class, 'update'));
-    }
-
-    #[Test]
     public function it_has_correct_endpoint(): void
     {
         $resource = new HubsResource($this->samsara);

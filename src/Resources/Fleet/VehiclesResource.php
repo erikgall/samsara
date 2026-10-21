@@ -36,8 +36,6 @@ class VehiclesResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Vehicle>
      */
     protected string $entity = Vehicle::class;
 

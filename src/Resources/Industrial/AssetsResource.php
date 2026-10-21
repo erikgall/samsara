@@ -30,8 +30,6 @@ class AssetsResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Asset>
      */
     protected string $entity = Asset::class;
 

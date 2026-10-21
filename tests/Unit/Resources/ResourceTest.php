@@ -104,6 +104,29 @@ class ResourceTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('entityClassOperations')]
+    public function it_honors_the_resource_entity_class_override_for_single_entities(string $operation): void
+    {
+        $http = new HttpFactory;
+        $http->preventStrayRequests();
+        $http->fake(['*' => $http->response(['data' => [
+            'id'                     => 'driver-1',
+            'driverActivationStatus' => 'active',
+        ]])]);
+        $resource = new TestEntityClassResource(new Samsara('test-token', ['attempts' => 1], $http));
+
+        $driver = match ($operation) {
+            'find'   => $resource->find('driver-1'),
+            'create' => $resource->create(['name' => 'Driver']),
+        };
+
+        $this->assertInstanceOf(Driver::class, $driver);
+        $this->assertSame('driver-1', $driver->id);
+        $this->assertTrue($driver->isActive());
+        $http->assertSentCount(1);
+    }
+
+    #[Test]
     public function it_honors_the_resource_entity_class_override_when_querying(): void
     {
         $http = new HttpFactory;
@@ -303,8 +326,11 @@ class ResourceTest extends TestCase
 
     #[Test]
     #[DataProvider('rateLimitHeaders')]
-    public function it_maps_retry_after_onto_rate_limit_exceptions(?string $header, ?int $expected): void
-    {
+    public function it_maps_retry_after_onto_rate_limit_exceptions(
+        ?string $header,
+        ?int $expected,
+        ?string $expectedHeader,
+    ): void {
         Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00 UTC'));
         Sleep::fake();
         $http = new HttpFactory;
@@ -323,7 +349,7 @@ class ResourceTest extends TestCase
                 'status'             => 429,
                 'endpoint'           => '/test-endpoint',
                 'body'               => $body,
-                'retry_after_header' => $header ?? '',
+                'retry_after_header' => $expectedHeader,
             ], $exception->getContext());
         } finally {
             Carbon::setTestNow();
@@ -517,9 +543,7 @@ class ResourceTest extends TestCase
         ];
     }
 
-    /**
-     * @return array<string, array{string, string}>
-     */
+    /** @return array<string, array{string, string}> */
     public static function encodedPathOperations(): array
     {
         return [
@@ -527,6 +551,14 @@ class ResourceTest extends TestCase
             'update' => ['update', 'PATCH'],
             'delete' => ['delete', 'DELETE'],
         ];
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function entityClassOperations(): array
+    {
+        return ['find' => ['find'], 'create' => ['create']];
     }
 
     /**
@@ -579,16 +611,18 @@ class ResourceTest extends TestCase
     }
 
     /**
-     * @return array<string, array{?string, ?int}>
+     * @return array<string, array{?string, ?int, ?string}>
      */
     public static function rateLimitHeaders(): array
     {
         return [
-            'future date'  => ['Wed, 21 Oct 2026 13:00:00 GMT', 3600],
-            'expired date' => ['Wed, 21 Oct 2026 11:00:00 GMT', 0],
-            'numeric'      => ['2', 2],
-            'invalid'      => ['invalid', null],
-            'missing'      => [null, null],
+            'future date'  => ['Wed, 21 Oct 2026 13:00:00 GMT', 3600, 'Wed, 21 Oct 2026 13:00:00 GMT'],
+            'expired date' => ['Wed, 21 Oct 2026 11:00:00 GMT', 0, 'Wed, 21 Oct 2026 11:00:00 GMT'],
+            'numeric'      => ['2', 2, '2'],
+            'zero'         => ['0', 0, '0'],
+            'invalid'      => ['invalid', null, 'invalid'],
+            'missing'      => [null, null, null],
+            'empty'        => ['', null, null],
         ];
     }
 

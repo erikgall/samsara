@@ -101,9 +101,7 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
      */
     public function hasMorePages(): bool
     {
-        return $this->cursor->hasNextPage
-            && $this->cursor->endCursor !== null
-            && $this->cursor->endCursor !== '';
+        return $this->cursor->next() !== null;
     }
 
     /**
@@ -123,11 +121,8 @@ class CursorPaginator implements Arrayable, Countable, IteratorAggregate
      */
     public function nextPage(): ?self
     {
-        if (! $this->hasMorePages()) {
-            return null;
-        }
+        $endCursor = $this->cursor->next();
 
-        $endCursor = $this->cursor->endCursor;
         if ($endCursor === null) {
             return null;
         }

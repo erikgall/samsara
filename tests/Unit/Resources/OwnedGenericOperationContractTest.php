@@ -7,6 +7,7 @@ use Samsara\Data\Entity;
 use Samsara\Data\Tag\Tag;
 use Samsara\Data\User\User;
 use Samsara\Tests\TestCase;
+use Samsara\Data\Asset\Asset;
 use Samsara\Data\Route\Route;
 use Samsara\Data\Driver\Driver;
 use Samsara\Data\Address\Address;
@@ -18,8 +19,12 @@ use Samsara\Data\Webhook\Webhook;
 use Samsara\Data\EntityCollection;
 use Illuminate\Http\Client\Request;
 use Samsara\Data\Equipment\Equipment;
+use Samsara\Data\Form\FormSubmission;
 use Samsara\Data\LiveShare\LiveShare;
 use PHPUnit\Framework\Attributes\Test;
+use Samsara\Data\Maintenance\WorkOrder;
+use Samsara\Data\Alert\AlertConfiguration;
+use Samsara\Data\Industrial\IndustrialAsset;
 use Samsara\Resources\Fleet\DriversResource;
 use Samsara\Resources\Fleet\TrailersResource;
 use Samsara\Resources\Fleet\VehiclesResource;
@@ -27,16 +32,28 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Samsara\Resources\Dispatch\RoutesResource;
 use Samsara\Resources\Fleet\EquipmentResource;
 use Samsara\Data\Vehicle\VehicleLocationResult;
+use Samsara\Resources\Additional\FormsResource;
+use Samsara\Resources\Additional\AlertsResource;
+use Samsara\Resources\Additional\IssuesResource;
+use Samsara\Resources\Industrial\AssetsResource;
 use Samsara\Resources\Organization\TagsResource;
 use Samsara\Resources\Dispatch\AddressesResource;
 use Samsara\Resources\Organization\UsersResource;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Samsara\Resources\Additional\WorkOrdersResource;
+use Samsara\Resources\Industrial\IndustrialResource;
 use Samsara\Resources\Integrations\GatewaysResource;
 use Samsara\Resources\Integrations\WebhooksResource;
 use Samsara\Resources\Organization\ContactsResource;
 use Samsara\Resources\Telematics\VehicleLocationsResource;
 use Samsara\Resources\Integrations\LiveSharingLinksResource;
+use Samsara\Resources\Additional\DriverTrailerAssignmentsResource;
+use Samsara\Resources\Additional\DriverVehicleAssignmentsResource;
+use Samsara\Resources\Additional\CarrierProposedAssignmentsResource;
 
+/**
+ * @author Erik Galloway <erik@erikgall.com>
+ */
 class OwnedGenericOperationContractTest extends TestCase
 {
     /**
@@ -72,6 +89,7 @@ class OwnedGenericOperationContractTest extends TestCase
         if ($operation === 'query') {
             $this->assertInstanceOf(EntityCollection::class, $result);
             $this->assertInstanceOf($entityClass, $result->first());
+            $this->assertSame('entity-id', $result->first()->id);
         }
 
         if ($operation === 'delete') {
@@ -80,8 +98,13 @@ class OwnedGenericOperationContractTest extends TestCase
 
         if (! in_array($operation, ['query', 'delete'], true)) {
             $this->assertInstanceOf($entityClass, $result);
+            $this->assertSame(
+                $resourceClass === DriverVehicleAssignmentsResource::class ? ['message' => 'assignment-created'] : ['id' => 'entity-id'],
+                $result->toArray(),
+            );
         }
 
+        $http->assertSentCount(1);
         $http->assertSent(function (Request $request) use ($endpoint, $operation, $resourceClass): bool {
             [$expectedMethod, $expectedPath, $expectedQuery, $expectedData] = $this->expectedRequest(
                 $resourceClass,
@@ -120,19 +143,28 @@ class OwnedGenericOperationContractTest extends TestCase
     public static function resources(): array
     {
         return [
-            'addresses'         => [AddressesResource::class, Address::class, '/addresses', ['query', 'find', 'create', 'update', 'delete']],
-            'routes'            => [RoutesResource::class, Route::class, '/fleet/routes', ['find', 'create', 'update', 'delete']],
-            'drivers'           => [DriversResource::class, Driver::class, '/fleet/drivers', ['query', 'find', 'create', 'update']],
-            'equipment'         => [EquipmentResource::class, Equipment::class, '/fleet/equipment', ['query', 'find']],
-            'trailers'          => [TrailersResource::class, Trailer::class, '/fleet/trailers', ['query', 'find', 'create', 'update', 'delete']],
-            'vehicles'          => [VehiclesResource::class, Vehicle::class, '/fleet/vehicles', ['query', 'find', 'update']],
-            'gateways'          => [GatewaysResource::class, Gateway::class, '/gateways', ['query', 'create', 'delete']],
-            'live shares'       => [LiveSharingLinksResource::class, LiveShare::class, '/live-shares', ['query', 'create', 'update', 'delete']],
-            'webhooks'          => [WebhooksResource::class, Webhook::class, '/webhooks', ['query', 'find', 'create', 'update', 'delete']],
-            'contacts'          => [ContactsResource::class, Contact::class, '/contacts', ['query', 'find', 'create', 'update', 'delete']],
-            'tags'              => [TagsResource::class, Tag::class, '/tags', ['query', 'find', 'create', 'update', 'delete']],
-            'users'             => [UsersResource::class, User::class, '/users', ['query', 'find', 'create', 'update', 'delete']],
-            'vehicle locations' => [VehicleLocationsResource::class, VehicleLocationResult::class, '/fleet/vehicles/locations', ['query']],
+            'alerts'                       => [AlertsResource::class, AlertConfiguration::class, '/alerts/configurations', ['create']],
+            'carrier proposed assignments' => [CarrierProposedAssignmentsResource::class, Entity::class, '/fleet/carrier-proposed-assignments', ['create', 'delete']],
+            'driver trailer assignments'   => [DriverTrailerAssignmentsResource::class, Entity::class, '/driver-trailer-assignments', ['create']],
+            'driver vehicle assignments'   => [DriverVehicleAssignmentsResource::class, Entity::class, '/fleet/driver-vehicle-assignments', ['create']],
+            'forms'                        => [FormsResource::class, FormSubmission::class, '/form-submissions', ['create']],
+            'issues'                       => [IssuesResource::class, Entity::class, '/issues', ['create']],
+            'work orders'                  => [WorkOrdersResource::class, WorkOrder::class, '/maintenance/work-orders', ['create']],
+            'assets'                       => [AssetsResource::class, Asset::class, '/assets', ['create']],
+            'industrial'                   => [IndustrialResource::class, IndustrialAsset::class, '/industrial/assets', ['create', 'update', 'delete']],
+            'addresses'                    => [AddressesResource::class, Address::class, '/addresses', ['query', 'find', 'create', 'update', 'delete']],
+            'routes'                       => [RoutesResource::class, Route::class, '/fleet/routes', ['find', 'create', 'update', 'delete']],
+            'drivers'                      => [DriversResource::class, Driver::class, '/fleet/drivers', ['query', 'find', 'create', 'update']],
+            'equipment'                    => [EquipmentResource::class, Equipment::class, '/fleet/equipment', ['query', 'find']],
+            'trailers'                     => [TrailersResource::class, Trailer::class, '/fleet/trailers', ['query', 'find', 'create', 'update', 'delete']],
+            'vehicles'                     => [VehiclesResource::class, Vehicle::class, '/fleet/vehicles', ['query', 'find', 'update']],
+            'gateways'                     => [GatewaysResource::class, Gateway::class, '/gateways', ['query', 'create', 'delete']],
+            'live shares'                  => [LiveSharingLinksResource::class, LiveShare::class, '/live-shares', ['query', 'create', 'update', 'delete']],
+            'webhooks'                     => [WebhooksResource::class, Webhook::class, '/webhooks', ['query', 'find', 'create', 'update', 'delete']],
+            'contacts'                     => [ContactsResource::class, Contact::class, '/contacts', ['query', 'find', 'create', 'update', 'delete']],
+            'tags'                         => [TagsResource::class, Tag::class, '/tags', ['query', 'find', 'create', 'update', 'delete']],
+            'users'                        => [UsersResource::class, User::class, '/users', ['query', 'find', 'create', 'update', 'delete']],
+            'vehicle locations'            => [VehicleLocationsResource::class, VehicleLocationResult::class, '/fleet/vehicles/locations', ['query']],
         ];
     }
 
@@ -182,6 +214,10 @@ class OwnedGenericOperationContractTest extends TestCase
                     ],
                 ]],
             ];
+        }
+
+        if ($resourceClass === DriverVehicleAssignmentsResource::class) {
+            return ['data' => ['message' => 'assignment-created']];
         }
 
         $data = $operation === 'query'

@@ -41,8 +41,6 @@ class RoutesResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Route>
      */
     protected string $entity = Route::class;
 

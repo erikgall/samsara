@@ -1,14 +1,14 @@
 # Samsara API final integrated contract reconciliation
 
-Audit date: 2026-08-10
-Authoritative package worktree: `/Users/erikgall/Code/samsara` (`dev`, dirty working tree preserved)
+Reconciled: 2026-10-21 (pinned upstream snapshot: 2026-08-10)
+Authoritative package worktree: `/Users/erikgall/Code/samsara` (`dev`, final v2 integration)
 Authoritative official contract: `contracts/samsara/samsara-api-2026-08-10.json`
 
 ## Verdict
 
 The current package surface contains **206** unique fixed wire operations. All **206** match the pinned contract by normalized HTTP method and path with no classified operation difference. This is transport-contract proof, not strict generated-model equality: request arrays and `Builder::where()` remain open pass-through inputs, and many response types are open `Fluent` entities or raw arrays.
 
-No package-only operation remains. The legacy compatibility helpers now use the pinned verbs, and the undeclared dispatch-list helper was removed. Capability gates leave **69** supported inherited bindings, all official; **0** inherited phantom operation remains.
+No package-only operation remains. The legacy compatibility helpers now use the pinned verbs, and the undeclared dispatch-list helper was removed. Per-operation traits and explicit overrides expose **53** generic method/resource bindings, all official; **0** phantom generic operations remain. Unsupported CRUD methods are absent.
 
 ## Exact counts
 
@@ -16,7 +16,7 @@ No package-only operation remains. The legacy compatibility helpers now use the 
 |---|---:|---|
 | Official operation declarations | 372 | Every HTTP operation under the pinned OpenAPI `paths` object. |
 | Official unique normalized wire operations | 370 | Placeholder spelling normalized to `{}`; two legacy alias pairs collapse. |
-| Package operations | 206 | Unique fixed method/path operations observed from public resource methods after capability gates. |
+| Package operations | 206 | Unique fixed method/path operations observed from public resource methods after unsupported CRUD methods were removed. |
 | Matched operations | 206 | Same normalized method/path; no duplicate official alias is matched. |
 | Official-only declarations | 166 | 164 unique normalized wire operations. |
 | Package-only operations | 0 | No public helper points at an undeclared normalized wire operation. |
@@ -28,9 +28,9 @@ Arithmetic passed: `206 + 166 = 372` official declarations, `206 + 164 = 370` of
 
 ## Implemented-surface disposition
 
-The audit observed 261 public SDK method request variants and collapsed aliases to 206 wire operations. The runtime probe had zero failures. All 42 concrete resources override `supportedGenericOperations()`; `Resource` checks the gate before HTTP from the generic entry points at `src/Resources/Resource.php:79-225` and the shared item lookup at `:324-339`. The gates permit 69 inherited bindings, and the reconciliation matched all 69 to official operations. Another 137 inherited method/resource combinations throw `UnsupportedOperationException` before HTTP at `src/Resources/Resource.php:443-460`; `EquipmentResource::findByExternalId()` is one additional explicit unsupported alias.
+The current inventory records 241 public SDK method request variants, collapsed to 206 wire operations. Across 42 concrete resources, 49 trait bindings and four explicit collection-query overrides produce 53 effective generic bindings. The traits are `CreatesEntities`, `FindsEntities`, `UpdatesEntities`, and `DeletesEntities` (`src/Resources/Concerns/CreatesEntities.php:36`, `FindsEntities.php:33`, `UpdatesEntities.php:38`, `DeletesEntities.php:33`). Assets and Live Shares supply the four explicit update/delete overrides (`src/Resources/Industrial/AssetsResource.php:39,163`, `src/Resources/Integrations/LiveSharingLinksResource.php:37,63`). `Resource::all()` and `supportedGenericOperations()` are removed; unsupported CRUD methods no longer exist. `EquipmentResource::findByExternalId()` remains an explicit local rejection (`src/Resources/Fleet/EquipmentResource.php:47-56`).
 
-Matched request schemas are supported as transport contracts rather than locally generated validators: generic writes pass caller arrays through, builders allow contract field pass-through, and fixed helpers have exact outbound method/path/query/body tests. Response decoding is either raw JSON, an open entity that retains fields, or an endpoint-specific mapper. `Builder` and direct resources share `RequestExecutor` (`src/Query/Builder.php:572-588`, `src/Resources/Resource.php:308-318`); 400/422, 401, 403, 404, 429, and 5xx map through `src/Resources/Resource.php:355-390`. Cursor pagination and configured page size run through `src/Query/Builder.php:245-311` and `:558-569`.
+Matched request schemas are supported as transport contracts rather than locally generated validators: generic writes pass caller arrays through, builders allow contract field pass-through, and fixed helpers have outbound method/path/query/body tests. Response decoding is either raw JSON, an open entity that retains fields, or an endpoint-specific mapper. `Builder` and direct resources share `RequestExecutor` (`src/Query/Builder.php:603-618`, `src/Resources/Resource.php:185-195`); 400/422, 401, 403, 404, 429, and 5xx map through `src/Resources/Resource.php:233-267`. Supported `find()` methods return `null` on 404 (`src/Resources/Resource.php:203-215`). Cursor traversal and configured page size run through `src/Query/Builder.php:258-301,341-369,589-597`; `first()` applies `limit=1` only when automatic page sizing is enabled (`:218-224`).
 
 These facts do **not** prove server runtime behavior, reject invalid request fields locally, or establish generated-model equality for all 5,157 official schemas. The exhaustive operation parameters, bodies, responses, enums, pagination facts, SDK accessors, response mappers, and proof limits are in `docs/api-sync/contract-inventory.json`.
 
@@ -120,45 +120,27 @@ Leave the tracked root `samsara.json` unchanged as the documented historical com
 
 The files are materially different despite the same `info.version`: root has 308 operations/308 unique wires; the dated snapshot has 372 declarations/370 unique wires; 302 wires overlap, 68 are dated-only, and six are root-only. Recommendation: keep every current checker and completion claim pinned to the dated path plus SHA-256 `a7255e2d5b7a94eea97e11f47db1c7b969931f639366bcae49e4922b02ba3fc6`, fail instead of falling back to root, and never use `info.version` as freshness evidence.
 
-## Validation and independent review
+## Validation and proof limits
 
-The final checker validates the pinned contract digest, current source digest, all operation sets, stage buckets, source evidence, arithmetic, zero inherited phantoms, zero unclassified differences, and the source-derived package enum/DTO catalogs. The inventory also records the exact normalized schemas for all 5,157 official components and all 552 official enum occurrences.
+The read-only reconciliation checker validates the pinned contract digest, current source digest, operation sets, lifecycle buckets, source evidence, arithmetic, zero generic phantoms, zero unclassified differences, and source-derived enum/DTO catalogs. The inventory records normalized schemas for all 5,157 official components and 552 official enum occurrences.
 
-Exact commands and results:
+Read-only verification on 2026-10-21:
 
 ```text
-$ php scripts/check-samsara-contract-reconciliation.php --root /Users/erikgall/Code/samsara
-PASS: 115 reconciliation assertions; unclassified differences = 0.
-Derived: official 372 declarations/370 unique; package 206; matched 206;
-package-only 0; official-only 166 declarations/164 unique; changed 0;
-stages 241 stable/123 Beta/8 Preview; official-only 55/106/5;
-inherited 69, phantoms 0, capability overrides 42/42;
-package enums 12/186 cases; data classes 75/741 annotated properties.
-
-$ env HTTP_PROXY=http://127.0.0.1:9 HTTPS_PROXY=http://127.0.0.1:9 ALL_PROXY=http://127.0.0.1:9 vendor/bin/phpunit --do-not-cache-result
-OK (1706 tests, 5038 assertions)
-
-$ php scripts/validate-samsara-snapshot.php --snapshot contracts/samsara/samsara-api-2026-08-10.json --metadata contracts/samsara/samsara-api-2026-08-10.json.metadata.json
-Snapshot and metadata verified; SHA-256 a7255e2d5b7a94eea97e11f47db1c7b969931f639366bcae49e4922b02ba3fc6; OpenAPI 3.0.1; document 2025-10-23; 260 paths.
-
-$ php tests/Maintenance/ApiSnapshotValidatorTest.php
-15 maintenance validator tests passed.
-
-$ php -l scripts/check-samsara-contract-reconciliation.php
-No syntax errors detected.
-
-$ jq empty docs/api-sync/contract-inventory.json
-exit 0
-
-$ jq -e '<count/arithmetic/unclassified assertions>' docs/api-sync/contract-inventory.json
-true
-
-$ git diff --check -- docs/api-sync/contract-inventory.json docs/api-sync/contract-drift.md scripts/check-samsara-contract-reconciliation.php
-exit 0; no output
-
-$ shasum -a 256 samsara.json contracts/samsara/samsara-api-2026-08-10.json
-6ba5e2befd7e72658db621b3cf91bb958ed985f880c75e94203d1bdbd1217cb9  samsara.json
-a7255e2d5b7a94eea97e11f47db1c7b969931f639366bcae49e4922b02ba3fc6  contracts/samsara/samsara-api-2026-08-10.json
+$ php scripts/check-samsara-contract-reconciliation.php
+Derived official declarations: 372
+Derived official unique wire operations: 370
+Derived package operations from ledger: 206
+Derived matched/package-only/official-only(unique): 206/0/164
+Derived changed operations: 0
+Derived official stages: stable=241, beta=123, preview=8
+Derived official-only stages: stable=55, beta=106, preview=5
+Derived generic operations/phantoms: 53/0
+Derived concrete resources: 42
+Derived src tree: 174 files, SHA-256 ecc80414e40618f2f4ce1c0535948e2e88d64db8b5f251502c5be955299a6d80
+Derived package enums/cases: 12/186
+Derived package data classes/properties: 75/741
+PASS: 402 reconciliation assertions; unclassified differences = 0.
 ```
 
-This tracked reconciliation is current for the uncommitted v2 release tree. The full Round-2 validation and final release gates are recorded in `docs/playgrounds/v2-release-review-round2-devlog.md`; no database state, root `samsara.json`, tag, release, push, or pull request was changed.
+Rerun the checker after source changes and refresh the source evidence and upgrade disposition ledger in the owning maintenance step. This documentation pass does not regenerate JSON ledgers, run the full test suite, or establish live API behavior.

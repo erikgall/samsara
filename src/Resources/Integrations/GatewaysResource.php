@@ -32,8 +32,6 @@ class GatewaysResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Gateway>
      */
     protected string $entity = Gateway::class;
 

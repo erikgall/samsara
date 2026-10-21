@@ -60,7 +60,7 @@ You may obtain a token from the Samsara dashboard under **Settings -> Organizati
 
 ### Region
 
-The Samsara API region your fleet lives in. Use `us`, `eu`, or `ca`. The default is `us`; unknown values throw `InvalidArgumentException`.
+The Samsara API region your fleet lives in. Use `us`, `eu`, or `ca`. An unset or blank `SAMSARA_REGION` defaults to `us`; unknown nonempty values throw `InvalidArgumentException`.
 
 ```php
 // config/samsara.php
@@ -107,7 +107,7 @@ SAMSARA_ATTEMPTS=5
 
 ### Retry Writes
 
-Writes (POST, PATCH, DELETE) do not retry connection failures, HTTP 408, or 5xx by default. Opt in only when replaying an accepted write is safe. HTTP 429 remains retryable for every method, subject to `attempts` and the Retry-After ceiling.
+Writes (POST, PUT, PATCH, DELETE) do not retry connection failures, HTTP 408, or 5xx by default. Opt in only when replaying an accepted write is safe. HTTP 429 remains retryable for every method, subject to `attempts` and the Retry-After ceiling.
 
 ```php
 // config/samsara.php
@@ -120,7 +120,7 @@ SAMSARA_RETRY_WRITES=false
 
 ### Maximum Retry-After Delay
 
-The default ceiling of 30 seconds is the largest `Retry-After` delay the SDK honors synchronously. A 429 response above this ceiling throws `RateLimitException` without another request so your application can reschedule the work. Smaller delta-seconds and HTTP-date values remain honored.
+The default ceiling of 30 seconds is the largest `Retry-After` delay the SDK honors synchronously. A 429 response above this ceiling throws `RateLimitException` without another request so your application can reschedule the work. Only nonnegative integer seconds or an RFC 7231 date such as `Wed, 21 Oct 2026 13:00:00 GMT` are accepted. Other values are ignored and use the normal retry delay; valid delays within the ceiling are honored.
 
 ```php
 // config/samsara.php

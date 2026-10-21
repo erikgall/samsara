@@ -18,6 +18,22 @@ use PHPUnit\Framework\Attributes\DataProvider;
  */
 class EntityContractTest extends TestCase
 {
+    #[Test]
+    public function it_discovers_every_dto_file(): void
+    {
+        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(
+            dirname(__DIR__, 3).'/src/Data/',
+            FilesystemIterator::SKIP_DOTS,
+        ));
+        $fileCount = 0;
+
+        foreach ($files as $file) {
+            $fileCount += (int) ($file->getExtension() === 'php');
+        }
+
+        $this->assertCount($fileCount - 2, iterator_to_array(self::entityClasses()));
+    }
+
     /**
      * @param  class-string<Entity>  $class
      */

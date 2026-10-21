@@ -29,8 +29,6 @@ class FormsResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<FormSubmission>
      */
     protected string $entity = FormSubmission::class;
 
@@ -41,12 +39,7 @@ class FormsResource extends Resource
      */
     public function createSubmission(array $data): FormSubmission
     {
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->post($this->endpoint, $data),
-            $this->endpoint
-        );
-
-        return $this->mapToEntity($this->decodeJsonData($response, $this->endpoint));
+        return $this->create($data);
     }
 
     /**
@@ -111,8 +104,7 @@ class FormsResource extends Resource
     public function submissionsStream(): Builder
     {
         return $this->newQuery('/form-submissions/stream')
-            ->withoutDefaultPageSize()
-            ->usingEntity(FormSubmission::class);
+            ->withoutDefaultPageSize();
     }
 
     /**

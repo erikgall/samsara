@@ -91,7 +91,7 @@ $drivers = $client->drivers()->query()->get();
 
 `withToken()`, `withRegion('us'|'eu'|'ca')`, and `withBaseUrl($url)` return copies. An unknown region throws `InvalidArgumentException`.
 
-Writes (POST, PATCH, DELETE) are not retried on connection failures, HTTP 408, or 5xx by default. Set `SAMSARA_RETRY_WRITES=true` only when replaying accepted writes is safe. HTTP 429 remains retryable for every method within the attempt budget and Retry-After ceiling.
+Writes (POST, PUT, PATCH, DELETE) are not retried on connection failures, HTTP 408, or 5xx by default. Set `SAMSARA_RETRY_WRITES=true` only when replaying accepted writes is safe. HTTP 429 remains retryable for every method within the attempt budget and Retry-After ceiling.
 
 ## Quick Start
 

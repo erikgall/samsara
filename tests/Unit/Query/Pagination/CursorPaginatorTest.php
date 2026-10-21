@@ -23,20 +23,6 @@ use Illuminate\Http\Client\Factory as HttpFactory;
 class CursorPaginatorTest extends TestCase
 {
     #[Test]
-    public function it_can_be_instantiated(): void
-    {
-        $items = new EntityCollection([
-            Entity::make(['id' => '1']),
-        ]);
-        $cursor = new Cursor('abc-123', true);
-        $builder = $this->createBuilder();
-
-        $paginator = new CursorPaginator($items, $cursor, $builder);
-
-        $this->assertInstanceOf(CursorPaginator::class, $paginator);
-    }
-
-    #[Test]
     public function it_checks_has_more_pages(): void
     {
         $items = new EntityCollection([]);

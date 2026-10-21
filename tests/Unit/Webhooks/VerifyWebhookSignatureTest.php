@@ -206,6 +206,21 @@ class VerifyWebhookSignatureTest extends TestCase
     }
 
     #[Test]
+    public function it_falls_back_to_constructor_tolerance_for_an_empty_route_tolerance(): void
+    {
+        $middleware = new VerifyWebhookSignature(self::TEST_SECRET, 500);
+        $timestamp = (string) (Carbon::now()->getTimestamp() - 400);
+        $request = $this->createRequest([
+            'X-Samsara-Signature' => $this->createValidSignature(self::TEST_BODY, $timestamp),
+            'X-Samsara-Timestamp' => $timestamp,
+        ], self::TEST_BODY);
+
+        $response = $middleware->handle($request, fn (Request $request): Response => new Response('OK'), tolerance: '');
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
     public function it_prioritizes_route_params_over_constructor_params(): void
     {
         // Create middleware with one secret via constructor

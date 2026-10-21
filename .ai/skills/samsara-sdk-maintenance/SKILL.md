@@ -1,29 +1,15 @@
 ---
 name: samsara-sdk-maintenance
-description: Maintain the erikgall/samsara package itself against its current v2 contracts. Use when adding or changing SDK resources, DTOs, query builders, pagination, exceptions, webhook support, fakes, fixtures, contract evidence, or package documentation. Do not use for integrating the released SDK into a consuming Laravel application; use the published samsara-sdk-development skill for that work.
+description: Maintain the erikgall/samsara package itself, including resources, DTOs, query builders, exceptions, webhooks, fakes, contract evidence, and package or Boost docs. For integrating the released SDK into an application, use samsara-sdk-development.
 ---
 
 # Samsara SDK Maintenance
 
-Keep the v2 SDK aligned with its pinned contract, explicit resource capabilities, runtime behavior, tests, and consumer documentation.
-
-## Workflow
-
-1. Confirm the current branch, diff, package constraints, and pinned contract evidence before editing.
-2. Trace the existing owner from `src/Samsara.php` through the resource, builder, DTO or raw result, exception boundary, and focused tests.
-3. Verify upstream claims against `contracts/samsara/samsara-api-2026-08-10.json` and the readable ledgers in `docs/api-sync/`. Do not infer an operation from a method name.
-4. Make the smallest coherent contract change. Preserve generic capability gates, exact HTTP method and path, query encoding, response unwrap, mapped entity, return type, and error behavior.
-5. Add or update focused HTTP-fake tests before changing broader documentation.
-6. Update every directly affected consumer page, capability matrix entry, v2 upgrade disposition, and public agent artifact.
-7. Run the focused test, then `composer check` for the full PHPUnit, PHPStan, Pint, and contract-maintenance gate. Run `composer check:v2-upgrade-guide` when the v2 release ledger changes, and `npm run format:check` when agent or contract documentation changed.
-
-## Package Contracts
-
-- `Resource::supportedGenericOperations()` is the authority for inherited CRUD.
-- Builder terminals share the SDK request executor and mapped exception boundary.
-- Typed DTOs must match the endpoint wrapper and payload; do not add convenience helpers without contract evidence and tests.
-- Dedicated comma-separated filters, declared repeated parameters, and arbitrary Laravel query arrays are distinct encodings.
-- `get()`, `paginate()`, `lazy()`, explicit helpers, and generic operations may intentionally return different shapes.
-- Package docs and Boost skills must describe shipped behavior only. Keep the always-loaded guideline small and move detailed procedures into skills or references.
-
-For published consumer guidance, edit `resources/boost/guidelines/` and `resources/boost/skills/`; those are Laravel Boost's third-party package discovery paths.
+- Contract authority: `contracts/samsara/samsara-api-2026-08-10.json` and `docs/api-sync/`. Root `samsara.json` is a historical baseline only.
+- A public behavior change also updates its `docs/resources/*.md` page, `docs/api-sync/documentation-coverage.md`, the v2 upgrade-guide disposition, and any affected `resources/boost/` file.
+- Check every documented request against the pinned contract's required fields and types. `HttpFactory::fake()` accepts any payload, so a passing fake does not validate the request shape.
+- Documented signatures use the source's exact parameter names; callers use them as named arguments.
+- `Route::middleware()` stores middleware entries as strings. Document `VerifyWebhookSignature::class` or `'samsara.webhook:{secret},{tolerance}'`, never an instance.
+- Derive counts such as enum cases and webhook events from source instead of hard-coding them in prose.
+- Editing a file listed in `docs/api-sync/v2-upgrade-disposition.json` stales its hash. Run `composer check:v2-upgrade-guide -- --write` and review the diff.
+- Run `composer check` before calling package work done. After agent or contract doc edits, also run `npm run format:check`.

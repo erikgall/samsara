@@ -29,8 +29,6 @@ class AlertsResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<AlertConfiguration>
      */
     protected string $entity = AlertConfiguration::class;
 
@@ -51,12 +49,7 @@ class AlertsResource extends Resource
      */
     public function createConfiguration(array $data): AlertConfiguration
     {
-        $response = $this->executeSdkRequest(
-            fn () => $this->client()->post($this->endpoint, $data),
-            $this->endpoint
-        );
-
-        return $this->mapToEntity($this->decodeJsonData($response, $this->endpoint));
+        return $this->create($data);
     }
 
     /**

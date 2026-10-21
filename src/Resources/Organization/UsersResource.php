@@ -40,8 +40,6 @@ class UsersResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<User>
      */
     protected string $entity = User::class;
 

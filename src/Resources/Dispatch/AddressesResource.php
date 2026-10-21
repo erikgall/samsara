@@ -40,8 +40,6 @@ class AddressesResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Address>
      */
     protected string $entity = Address::class;
 

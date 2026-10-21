@@ -85,7 +85,7 @@ Commit the changed lockfile only after all remaining migrations pass. Verify the
 
 ## MIG-02 — Only supported resource methods exist
 
-Every resource loses `all()`. CRUD methods are composed only where supported; absent methods raise PHP `Error` if called. Explicit unsupported helpers, such as equipment external-ID lookup, retain `UnsupportedOperationException`. Use the full removal table in `MIG-26` and each endpoint builder for collection reads.
+Every resource loses `all()`. CRUD methods come from the `FindsEntities`, `CreatesEntities`, `UpdatesEntities`, and `DeletesEntities` traits and exist only where the contract supports them; absent methods raise PHP `Error` if called. Explicit unsupported helpers, such as equipment external-ID lookup, retain `UnsupportedOperationException`. Use the full removal table in `MIG-26` and each endpoint builder for collection reads.
 
 First locate files that use this package, then inspect generic CRUD calls only when their receiver is a Samsara resource accessor. The following is a candidate inventory, not a command to rewrite every generic method in the repository:
 
@@ -139,6 +139,8 @@ Do not replace a rejected operation with a raw request unless the application de
 `Resource::all()` and `supportedGenericOperations()` are removed. Custom resources compose only the operations they implement using `FindsEntities`, `CreatesEntities`, `UpdatesEntities`, and `DeletesEntities` from `Samsara\Resources\Concerns`. Override `newQuery()` for custom builder construction; retain endpoint-specific mapping and pagination configuration.
 
 `Builder` supports `mapUsing()`, `repeatQueryParameters()`, `usingEntity()`, `withoutDefaultPageSize()`, and Laravel `when()` / `unless()`. `types()` and `withDecorations()` accept `VehicleStatType|string|array`; preserve these widened signatures in overrides. Builder and resource entity return contracts use `Entity` subclasses, not arbitrary `Fluent` objects.
+
+The protected `InteractsWithTime` helpers `parseTime()`, `toUnixMilliseconds()`, and `fromUnixMilliseconds()` are removed. Search custom builder subclasses for those calls and implement any required conversions in the application. `formatTime()` and `toUtcString()` remain available for request formatting.
 
 `executeSdkGet()` and `executeSdkRequest()` remain final protected methods. Do not override them. Match every remaining overridden method's exact signature and return type, then instantiate each custom subclass under static analysis and focused fake tests. See `MIG-26` for the final factory and cursor removals.
 
@@ -199,9 +201,9 @@ $page = Samsara::drivers()->query()->paginate();
 $page = Samsara::drivers()->query()->paginate(25);
 ```
 
-Some official cursor endpoints declare `after` but no `limit`. Their resource builders call `withoutDefaultPageSize()`, so `paginate()` and `lazy()` must not add an implicit limit. Audit every operation used from these resource families: Alerts; Driver Trailer and Driver Vehicle Assignments; Forms; Fuel and Energy; Issues; Speeding; Tachograph; Work Orders; Beta; Routes; Equipment; Industrial Assets and Industrial data; Gateways; Hours of Service; Safety Events; Trips; Vehicle Locations; and Vehicle Stats. The opt-out is operation-specific, so inspect the selected helper rather than assuming every endpoint on a resource has the same pagination contract. Do not compensate by adding a limit unless that endpoint explicitly documents it.
+Some official cursor endpoints declare `after` but no `limit`. Their resource builders call `withoutDefaultPageSize()`, so `paginate()`, `lazy()`, and `first()` no longer add an implicit limit. On these endpoints, `first()` reads one page and returns its first entity without injecting `limit=1`. Audit every operation used from these resource families: Alerts; Driver Trailer and Driver Vehicle Assignments; Forms; Fuel and Energy; Issues; Speeding; Tachograph; Work Orders; Beta; Routes; Equipment; Industrial Assets and Industrial data; Gateways; Hours of Service; Safety Events; Trips; Vehicle Locations; and Vehicle Stats. The opt-out is operation-specific, so inspect the selected helper rather than assuming every endpoint on a resource has the same pagination contract. Do not compensate by adding a limit unless that endpoint explicitly documents it.
 
-Update exact URL fakes, request signatures, VCR cassettes, and cache keys. Test `paginate()`, `lazy()`, explicit terminal size, `limit()`, `where('limit')`, and every no-limit endpoint used by the application.
+Update exact URL fakes, request signatures, VCR cassettes, and cache keys. Test `first()`, `paginate()`, `lazy()`, explicit terminal size, `limit()`, `where('limit')`, and every no-limit endpoint used by the application.
 
 <a id="mig-06"></a>
 
@@ -892,7 +894,7 @@ Most items below are optional adoption. Audit the edge behaviors first if your a
 
 The following are additive options with no required migration:
 
-- Canadian organizations may set `SAMSARA_REGION=ca` or retain `withRegion('ca')`.
+- Canadian organizations may set `SAMSARA_REGION=ca` or retain `withRegion('ca')`. An unset or blank `SAMSARA_REGION` falls back to `us`; unknown nonempty regions still throw `InvalidArgumentException`.
 - Compatible proxies and test servers may retain the copy returned by `withBaseUrl()`; a `null` token omits the authorization header.
 - Camera media, fuel/energy reports, IFTA vehicle reports, and legacy asset feeds now expose query builders for cursor traversal while their raw-envelope methods remain unchanged.
 - `VehicleStatType` now matches the complete 63-value pinned `types` contract; feed/history `decorations` remain a 49-value subset. `WebhookEvent` includes all 35 pinned events.
@@ -941,9 +943,9 @@ Version 1 used a fixed retry delay. The staged v2 work began honoring `Retry-Aft
 'retry_after_max_seconds' => env('SAMSARA_RETRY_AFTER_MAX_SECONDS', 30),
 ```
 
-When a 429 requests more than the configured ceiling, the SDK makes no retry and throws `RateLimitException`; `getRetryAfter()` returns the requested delay in seconds for both delta-seconds and HTTP-date headers; `getContext()['retry_after_header']` preserves the raw value so the application can reschedule the operation. Smaller delta-seconds and HTTP-date values still delay the next in-process attempt.
+When a 429 requests more than the configured ceiling, the SDK makes no retry and throws `RateLimitException`; `getRetryAfter()` returns the requested delay in seconds for both delta-seconds and HTTP-date headers; `getContext()['retry_after_header']` preserves the raw value so the application can reschedule the operation. Only nonnegative integer seconds or an RFC 7231 date such as `Wed, 21 Oct 2026 13:00:00 GMT` are accepted. Other values, including fractional seconds, negative numbers, and relative dates such as `tomorrow`, are ignored and `getRetryAfter()` returns `null`; an otherwise retryable request uses the normal retry delay. Valid delays within the ceiling still delay the next in-process attempt.
 
-Successful collection reads require the collection key to decode to a PHP list. A missing key returns an empty collection. A null or scalar value, a non-list array, or a non-JSON or empty body throws `SamsaraException`. An empty JSON object `{}` decodes as an empty list and is accepted. List items are not validated; a null or scalar item raises `TypeError` during hydration.
+Valid `{"data":[...]}` responses are unchanged. Successful collection reads require the collection key to decode to a PHP list. A missing key returns an empty collection. A null or scalar value, a non-list array, or a non-JSON or empty body throws `SamsaraException`. An empty JSON object `{}` decodes as an empty list and is accepted. List items are not validated; a null or scalar item raises `TypeError` during hydration.
 
 Search consumer fakes and exception handling for collection operations, then add cases for a missing key, a valid list, malformed collection data, and rate limits on both sides of the configured ceiling. Catch `RateLimitException` to reschedule long delays and `SamsaraException` to surface invalid successful responses.
 
@@ -1050,10 +1052,11 @@ Classify every `messages()` payload: read filters remain on `messages()`, while 
 
 ## MIG-26 — Final retry, resource, query, factory, and fake migrations
 
-- **Retry policy:** POST/PATCH/DELETE no longer retry connection failures, HTTP 408, or 5xx by default. Opt in with `retry_writes` / `SAMSARA_RETRY_WRITES` (default `false`). HTTP 429 remains retryable for every method within `attempts` and `retry_after_max_seconds`. HTTP-date `Retry-After` is honored; `RateLimitException::getRetryAfter()` returns seconds, and `getContext()['retry_after_header']` retains the raw header.
-- **Client copies:** `useBaseUrl`, `useUsEndpoint`, `useEuEndpoint`, and `useCanadaEndpoint` are removed. Retain the copies returned by `withBaseUrl(string $url)` and `withRegion(string $region)` (`us`, `eu`, `ca`). Unknown regions throw `InvalidArgumentException`.
+- **Retry policy:** POST/PUT/PATCH/DELETE no longer retry connection failures, HTTP 408, or 5xx by default. Opt in with `retry_writes` / `SAMSARA_RETRY_WRITES` (default `false`). HTTP 429 remains retryable for every method within `attempts` and `retry_after_max_seconds`. `Retry-After` accepts only nonnegative integer seconds or an RFC 7231 date (for example, `Wed, 21 Oct 2026 13:00:00 GMT`); other values are ignored. `RateLimitException::getRetryAfter()` returns seconds for valid headers and `null` otherwise, and `getContext()['retry_after_header']` retains the raw header.
+- **Client copies:** `useBaseUrl`, `useUsEndpoint`, `useEuEndpoint`, and `useCanadaEndpoint` are removed. Retain the copies returned by `withBaseUrl(string $url)` and `withRegion(string $region)` (`us`, `eu`, `ca`). An unset or blank `SAMSARA_REGION` falls back to `us`. Unknown nonempty regions throw `InvalidArgumentException`; `withRegion()` still requires `us`, `eu`, or `ca`.
 - **Fakes:** `Samsara::fake([...])` accepts exact path-to-response stubs containing the inner `data` value. Replace `fakeDrivers`, `fakeVehicles`, and `fakeVehicleStats` with path stubs or `fakeResponse()`. Staging and recorded history are shared across `withToken()` / `withRegion()` clones.
 - **Queries:** replace `Builder::getWithPagination()` with `paginate()`. `Cursor` is final with readonly `endCursor` and `hasNextPage` properties; its getters are removed. `QueryBuilderInterface` is removed. `Builder` adds Laravel `Conditionable` (`when` / `unless`); `types()` and `withDecorations()` accept individual `VehicleStatType` cases and mixed enum/string arrays. Repeated or cyclic cursors throw `SamsaraException`. `first()` does not inject a limit when automatic page sizing is disabled.
+- **Builder extensions:** The protected `parseTime()`, `toUnixMilliseconds()`, and `fromUnixMilliseconds()` helpers are removed from `InteractsWithTime`. Move any required parsing or millisecond conversion into the application subclass; `formatTime()` and `toUtcString()` remain for request formatting.
 - **Factories and webhooks:** `SamsaraException::make()`, `VerifyWebhookSignature::make()`, and the `Makeable` trait are removed. Construct exceptions directly and register webhook middleware by class string or alias. Empty route/constructor secrets fall back to config. Missing-header exceptions expose the exact header through `getContext()['header']`.
 - **DTOs:** `new DataInput($attributes)` hydrates nested points just like `DataInput::make($attributes)`; `toArray()` exports those points as arrays. Driver auth-token and live-share expiry checks use Laravel's clock; freeze it with `Illuminate\Support\Carbon::setTestNow()`.
 - **Resources:** `all()` is removed everywhere; use the documented endpoint builder and its required filters. CRUD is composed from `FindsEntities`, `CreatesEntities`, `UpdatesEntities`, and `DeletesEntities` traits so unsupported methods are absent, rather than callable methods throwing `UnsupportedOperationException`. `ResourceInterface` is removed, as is `supportedGenericOperations()`. Entity return contracts use `Samsara\Data\Entity` and concrete domain subclasses instead of `Fluent`; update custom overrides and type declarations.

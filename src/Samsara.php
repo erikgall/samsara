@@ -130,7 +130,7 @@ class Samsara
         $this->config = $config;
         $this->http = $http ?? new HttpFactory;
 
-        $this->baseUrl = $this->regionBaseUrl($config['region'] ?? 'us');
+        $this->baseUrl = $this->regionBaseUrl(($config['region'] ?? null) ?: 'us');
     }
 
     /**
@@ -188,6 +188,7 @@ class Samsara
      */
     public function client(): PendingRequest
     {
+        // Laravel 12.0 does not pass the request method to the retry "when" callback.
         $method = null;
 
         $request = $this->http->baseUrl($this->baseUrl)
@@ -646,12 +647,8 @@ class Samsara
      */
     protected function resource(string $class): object
     {
-        if (! isset($this->resources[$class])) {
-            $this->resources[$class] = new $class($this);
-        }
-
         /** @phpstan-ignore return.type */
-        return $this->resources[$class];
+        return $this->resources[$class] ??= new $class($this);
     }
 
     /**

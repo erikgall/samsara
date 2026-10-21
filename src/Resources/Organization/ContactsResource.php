@@ -40,8 +40,6 @@ class ContactsResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Contact>
      */
     protected string $entity = Contact::class;
 

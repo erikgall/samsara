@@ -54,13 +54,7 @@ class SamsaraFake extends Samsara
      */
     public function assertNothingRequested(): static
     {
-        $recorded = $this->getRecordedRequests();
-
-        Assert::assertEmpty(
-            $recorded,
-            'Expected no requests to be made, but found '
-            .count($recorded).' request(s).'
-        );
+        $this->fakeHttp->assertNothingSent();
 
         return $this;
     }
@@ -130,7 +124,7 @@ class SamsaraFake extends Samsara
     /**
      * Get the recorded requests.
      *
-     * @return array<int, \Illuminate\Http\Client\Request>
+     * @return array<int, Request>
      */
     public function getRecordedRequests(): array
     {

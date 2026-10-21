@@ -21,6 +21,11 @@ final class Cursor implements Arrayable
         public readonly bool $hasNextPage,
     ) {}
 
+    public function next(): ?string
+    {
+        return $this->hasNextPage && $this->endCursor !== '' ? $this->endCursor : null;
+    }
+
     /**
      * Convert the cursor to an array.
      *
@@ -39,7 +44,7 @@ final class Cursor implements Arrayable
      *
      * @param  array<string, mixed>  $data
      */
-    public static function fromResponse(array $data): static
+    public static function fromResponse(array $data): self
     {
         return new self(
             $data['endCursor'] ?? null,

@@ -33,8 +33,6 @@ class EquipmentResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Equipment>
      */
     protected string $entity = Equipment::class;
 

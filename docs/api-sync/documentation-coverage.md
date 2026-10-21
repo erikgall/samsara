@@ -2,7 +2,7 @@
 title: Documentation Coverage and API Sync
 layout: default
 nav_order: 98
-description: Audited package surface, migration map, and upstream deferrals as of 2026-08-10.
+description: Audited package surface, migration map, and upstream deferrals reconciled on 2026-10-21 against the pinned 2026-08-10 contract.
 permalink: /api-sync/documentation-coverage
 ---
 
@@ -10,69 +10,71 @@ permalink: /api-sync/documentation-coverage
 
 This report separates two truths:
 
-- **Package truth** is the integrated source and tests on branch `dev` at the 2026-08-10 documentation reconciliation. It determines what this SDK sends and returns.
+- **Package truth** is the integrated source and tests on branch `dev` at the 2026-10-21 final v2 documentation reconciliation. It determines what this SDK sends and returns.
 - **Upstream truth** is the first-party Samsara OpenAPI and developer guidance retrieved on 2026-08-10. It determines whether an operation is current, legacy, beta, preview, or official-only.
 
 The retrieved OpenAPI is 3.0.1 with `info.version` `2025-10-23`, 260 paths, 372 operations, and US, EU, and Canada servers. The captured bytes have SHA-256 `a7255e2d5b7a94eea97e11f47db1c7b969931f639366bcae49e4922b02ba3fc6`, `Last-Modified: 2026-08-10T14:51:20.878Z`, and `ETag: W/"40311a-FNzOZFT6SXU1AULxdChC0l9RNhU"`. An upstream operation absent from the matrices below is not silently implemented.
 
 ## Shared public behavior
 
-- `SAMSARA_REGION` accepts `us`, `eu`, and `ca`; runtime switches are `useUsEndpoint()`, `useEuEndpoint()`, and `useCanadaEndpoint()`.
+- `SAMSARA_REGION` accepts `us`, `eu`, and `ca`. Retain the client copies returned by `withRegion(string $region)` and `withBaseUrl(string $url)`; neither mutates the original client. An unset or blank `SAMSARA_REGION` falls back to `us`; unknown nonempty regions throw `InvalidArgumentException`. `withRegion()` requires `us`, `eu`, or `ca`.
 - `paginate()` and `lazy()` apply configured `per_page` when no explicit limit exists. Explicit terminal arguments, `limit()`, and `where('limit', ...)` win.
-- Resource helpers call `withoutDefaultPageSize()` for cursor operations that have `after` but no official `limit`. The builder preserves caller-supplied limits, but callers must omit them on operations whose contract does not declare `limit`; the opt-out persists across cursor traversal.
+- Resource helpers call `withoutDefaultPageSize()` for cursor operations that have `after` but no official `limit`. The builder preserves caller-supplied limits, but callers must omit them on operations whose contract does not declare `limit`; the opt-out persists across cursor traversal. `first()` adds `limit=1` only when automatic page sizing is enabled.
 - Dedicated list helpers use CSV values. OpenAPI form/`explode=true` arrays explicitly declared by a resource use repeated query keys. Arbitrary arrays passed to `where()` retain Laravel's standard encoding.
-- `get()` returns one HTTP response page; `paginate()` returns one page plus cursor metadata; `lazy()` walks the cursor sequence. A short or empty page does not end traversal when `hasNextPage` is true.
+- `get()` returns one HTTP response page; `paginate()` returns one page plus cursor metadata; `lazy()` walks the cursor sequence. A short or empty page continues when `hasNextPage` is true and `endCursor` is nonempty. `Cursor` is final with readonly `endCursor` and `hasNextPage` properties. Repeated or cyclic continuation cursors throw `SamsaraException` with `endpoint` and `cursor` context.
 - `usingEntity()` and `mapUsing()` retain endpoint-specific mapping across `get`, `paginate`, `nextPage`, and `lazy`.
-- Supported generic operations, custom helpers, and all Builder terminals use the shared typed request executor. HTTP 400/422 map to `ValidationException`; 401/403/404/429/5xx use status-specific SDK exceptions. `find()` returns `null` for 404. Unsupported generic calls fail before HTTP with operation context.
-- `Samsara::fake()` swaps the facade root, the `Samsara\Samsara` binding, and the `samsara` alias to the same fake.
+- Supported generic operations, custom helpers, and all Builder terminals use the shared typed request executor. HTTP 400/422 map to `ValidationException`; 401/403/404/429/5xx use status-specific SDK exceptions. `find()` returns `null` for 404. Unsupported CRUD methods are absent. Explicit unsupported helpers, such as equipment external-ID lookup, still throw `UnsupportedOperationException` before HTTP.
+- POST/PUT/PATCH/DELETE do not retry connection failures, HTTP 408, or 5xx by default. `retry_writes` / `SAMSARA_RETRY_WRITES` opts in (default `false`). HTTP 429 remains retryable for every method within the attempt budget and Retry-After ceiling. `Retry-After` accepts nonnegative integer seconds or an RFC 7231 date; other values are ignored.
+- `Samsara::fake([...])` installs exact path-to-inner-data stubs and swaps the facade root, the `Samsara\Samsara` binding, and the `samsara` alias to the same fake. Add stubs with `fakeResponse()`; staged responses and request history are shared across client copies.
 
 ## Exact generic capability matrix
 
-“None” means every inherited `all`, `find`, `create`, `update`, and `delete` call is rejected unless the notes name an explicit override. Introspection (`client`, `getEndpoint`, `getEntityClass`) remains public but is not an upstream operation.
+`all()` is removed from every resource. “None” means `find`, `create`, `update`, and `delete` are absent. Supported CRUD methods come from the per-operation `FindsEntities`, `CreatesEntities`, `UpdatesEntities`, and `DeletesEntities` traits or explicit overrides. Introspection (`client`, `getEndpoint`, `getEntityClass`) remains public but is not an upstream operation.
 
 | Accessor | Resource page | Supported generic operations | Explicit boundary |
 |---|---|---|---|
-| `drivers()` | [Drivers](../resources/drivers.html) | all, find, create, update | delete rejected; custom token/QR/sign-out operations |
-| `vehicles()` | [Vehicles](../resources/vehicles.html) | all, find, update | create/delete rejected |
-| `trailers()` | [Trailers](../resources/trailers.html) | all, find, create, update, delete | external item lookup uses `key:value` |
-| `equipment()` | [Equipment](../resources/equipment.html) | all, find | create/update/delete and external lookup rejected |
+| `drivers()` | [Drivers](../resources/drivers.html) | find, create, update | delete absent; custom token/QR/sign-out operations |
+| `vehicles()` | [Vehicles](../resources/vehicles.html) | find, update | create/delete absent |
+| `trailers()` | [Trailers](../resources/trailers.html) | find, create, update, delete | external item lookup uses `key:value` |
+| `equipment()` | [Equipment](../resources/equipment.html) | find | create/update/delete absent; external lookup explicitly rejected |
 | `vehicleStats()` | [Vehicle Stats](../resources/vehicle-stats.html) | none | current/feed/history builders only |
-| `vehicleLocations()` | [Vehicle Locations](../resources/vehicle-locations.html) | all | query/current/feed/history builders |
+| `vehicleLocations()` | [Vehicle Locations](../resources/vehicle-locations.html) | none | query/current/feed/history builders |
 | `trips()` | [Trips](../resources/trips.html) | none | stream builders only |
-| `hoursOfService()` | [Hours of Service](../resources/hours-of-service.html) | all | logs/clocks/daily logs/violations builders |
+| `hoursOfService()` | [Hours of Service](../resources/hours-of-service.html) | none | logs/clocks/daily logs/violations builders |
 | `maintenance()` | [Maintenance](../resources/maintenance.html) | none | create/find/resolve DVIR helpers, defect find/update, defect types, and DVIR/defect builders |
 | `safetyEvents()` | [Safety Events](../resources/safety-events.html) | none | event and activity builders; implemented paths are upstream legacy |
 | `routes()` | [Routes](../resources/routes.html) | find, create, update, delete | collection reads use `query()->between(...)` |
-| `addresses()` | [Addresses](../resources/addresses.html) | all, find, create, update, delete | query builder also available |
-| `users()` | [Users](../resources/users.html) | all, find, create, update, delete | query builder also available |
-| `tags()` | [Tags](../resources/tags.html) | all, find, create, update, delete | query builder also available |
-| `contacts()` | [Contacts](../resources/contacts.html) | all, find, create, update, delete | query builder also available |
-| `assets()` | [Assets](../resources/assets.html) | all, create | explicit `update`/`delete` overrides use `/assets?id=`; find rejected |
-| `industrial()` | [Industrial](../resources/industrial.html) | all, create, update, delete | endpoint-specific asset/data-input builders |
+| `addresses()` | [Addresses](../resources/addresses.html) | find, create, update, delete | query builder also available |
+| `users()` | [Users](../resources/users.html) | find, create, update, delete | query builder also available |
+| `tags()` | [Tags](../resources/tags.html) | find, create, update, delete | query builder also available |
+| `contacts()` | [Contacts](../resources/contacts.html) | find, create, update, delete | query builder also available |
+| `assets()` | [Assets](../resources/assets.html) | create, update, delete | explicit `update`/`delete` overrides use `/assets?id=`; find absent |
+| `industrial()` | [Industrial](../resources/industrial.html) | create, update, delete | endpoint-specific asset/data-input builders |
 | `sensors()` | [Sensors](../resources/sensors.html) | none | legacy explicit methods only |
-| `gateways()` | [Gateways](../resources/gateways.html) | all, create, delete | find/update rejected |
-| `liveShares()` | [Live Shares](../resources/live-shares.html) | all, create, update, delete | update/delete use collection query ID; find rejected |
-| `webhooks()` | [Webhooks](../resources/webhooks.html) | all, find, create, update, delete | query builder also available |
-| `alerts()` | [Alerts](../resources/alerts.html) | all, create | explicit collection update/delete plus two builders |
+| `gateways()` | [Gateways](../resources/gateways.html) | create, delete | find/update absent |
+| `liveShares()` | [Live Shares](../resources/live-shares.html) | create, update, delete | update/delete use collection query ID; find absent |
+| `webhooks()` | [Webhooks](../resources/webhooks.html) | find, create, update, delete | query builder also available |
+| `alerts()` | [Alerts](../resources/alerts.html) | create | explicit collection update/delete plus two builders |
 | `cameraMedia()` | [Camera Media](../resources/camera-media.html) | none | explicit raw-envelope media/retrieval helpers |
-| `carrierProposedAssignments()` | [Carrier Proposed Assignments](../resources/carrier-proposed-assignments.html) | all, create, delete | query builder; find/update rejected |
-| `driverTrailerAssignments()` | [Assignments](../resources/assignments.html) | create | query builder plus dedicated collection update; other generic verbs rejected |
-| `driverVehicleAssignments()` | [Assignments](../resources/assignments.html) | create | query builder plus dedicated collection update/delete; other generic verbs rejected |
+| `carrierProposedAssignments()` | [Carrier Proposed Assignments](../resources/carrier-proposed-assignments.html) | create, delete | query builder; find/update absent |
+| `driverTrailerAssignments()` | [Assignments](../resources/assignments.html) | create | query builder plus dedicated collection update; other generic verbs absent |
+| `driverVehicleAssignments()` | [Assignments](../resources/assignments.html) | create | query builder plus dedicated collection update/delete; other generic verbs absent |
 | `forms()` | [Forms](../resources/forms.html) | create | explicit update, PDF, submission/template builders |
 | `fuelAndEnergy()` | [Fuel and Energy](../resources/fuel-and-energy.html) | none | explicit report/efficiency/purchase helpers |
-| `hubs()` | [Hubs](../resources/hubs.html) | all | query builder; other generic verbs rejected |
+| `hubs()` | [Hubs](../resources/hubs.html) | none | query builder; other generic verbs absent |
 | `idling()` | [Idling](../resources/idling.html) | none | events builder only |
 | `ifta()` | [IFTA](../resources/ifta.html) | none | four raw-array report/export helpers |
-| `issues()` | [Issues](../resources/issues.html) | create | stream builder plus dedicated collection update; other generic verbs rejected |
-| `routeEvents()` | [Route Events](../resources/route-events.html) | all | stream query builder |
+| `issues()` | [Issues](../resources/issues.html) | create | stream builder plus dedicated collection update; other generic verbs absent |
+| `routeEvents()` | [Route Events](../resources/route-events.html) | none | stream query builder |
 | `settings()` | [Settings](../resources/settings.html) | none | five explicit raw-array helpers |
 | `speeding()` | [Speeding](../resources/speeding.html) | none | intervals stream builder |
 | `tachograph()` | [Tachograph](../resources/tachograph.html) | none | three history builders |
 | `trailerAssignments()` | [Assignments](../resources/assignments.html) | none | typed collection query and `forTrailer(int, array): Trailer` |
-| `workOrders()` | [Work Orders](../resources/work-orders.html) | all, create | query/stream/service-task/invoice helpers plus dedicated collection update/delete |
+| `workOrders()` | [Work Orders](../resources/work-orders.html) | create | query/stream/service-task/invoice helpers plus dedicated collection update/delete |
 | `beta()` | [Beta](../resources/beta.html) | none | explicit mixed-stage operations only |
 | `preview()` | [Preview](../resources/preview.html) | none | three contract-stage methods only |
 | `legacy()` | [Legacy](../resources/legacy.html) | none | explicit legacy methods only |
+| `me()` | [Organization](../resources/organization.html) | none | returns the current organization directly |
 
 ## Consumer migration map
 
@@ -83,7 +85,7 @@ The retrieved OpenAPI is 3.0.1 with `info.version` `2025-10-23`, 260 paths, 372 
 | `per_page` had no effect | Expect it as the implicit `limit` for `paginate()`/`lazy()`, or set an explicit limit. |
 | Builder errors could become empty results or Laravel request exceptions | Catch the same typed SDK exceptions for Builder and resource calls; validation may be HTTP 400 or 422. |
 | List helpers used mixed PHP-array encoding | Expect CSV for dedicated list helpers. Use resource-declared repeated keys only for `explode=true` operations. |
-| No Canada selection | Use `SAMSARA_REGION=ca` or `useCanadaEndpoint()`. |
+| No Canada selection | Use `SAMSARA_REGION=ca` or retain `withRegion('ca')`. |
 | `Samsara::fake()` returned an isolated object | Subsequent facade and container resolution now uses the installed fake. |
 | Resource-wide entity mapping | Expect endpoint-specific DTOs listed below. |
 
@@ -96,7 +98,7 @@ The retrieved OpenAPI is 3.0.1 with `info.version` `2025-10-23`, 260 paths, 372 
 | `deleteQrCode(string)` deleted a path ID | `deleteQrCode(int $driverId): bool`; `driverId` is in the DELETE body. |
 | Remote sign-out was untyped/item-path | `remoteSignOut(string): DriverRemoteSignOutResult`; POST collection body `driverId`. |
 | External item lookup encoded `externalIds[key]` | Driver, trailer, and vehicle lookups pass item ID `key:value`; equipment external lookup is unsupported. |
-| `routes()->all()` | `routes()->query()->between(...)->get()`; generic all is rejected. |
+| `routes()->all()` | `routes()->query()->between(...)->get()`; `all()` is removed. |
 | `trips()->all()` or an unbounded bare query | `trips()->query()->startTime(...)->where('ids', 'id1,id2')->get()`. |
 | `vehicleStats()->all()` | `current()->types(...)`, `feed()`, or `history()` typed builders. |
 | Live-share `find()` | No single-item operation; query the collection. Update/delete use `/live-shares?id=`. |
@@ -126,7 +128,7 @@ Repeated-key arrays are declared for alert configuration `ids`, incident `config
 | Before | Current method / wire contract / return |
 |---|---|
 | Asset fields `assetType`, `serial` | `type`, `serialNumber`. |
-| Asset `find()` and item mutation paths | find is rejected; update/delete use `/assets?id={id}`. |
+| Asset `find()` and item mutation paths | `find()` is removed; update/delete use `/assets?id={id}`. |
 | `sensors()->list($data)` | `sensors()->list(): EntityCollection`. |
 | `aempFleet()` returned a builder | `aempFleet(string $pageNumber): array`; raw `/beta/aemp/Fleet/{pageNumber}` wrapper. |
 | Industrial data points omitted `data-inputs` | `/industrial/data-inputs/data-points[/feed\|/history]`, returning `DataInput` with nested `DataPoint`. |
@@ -142,11 +144,10 @@ Repeated-key arrays are declared for alert configuration `ids`, incident `config
 | `README.md` | install, config, regions, resources, query, errors, testing | Reconciled |
 | `docs/index.md`, `getting-started.md`, `configuration.md` | entry path, config keys, Canada, active page-size default | Reconciled |
 | `docs/query-builder.md` | query encoding, one-page vs lazy traversal, no-limit opt-out, endpoint mappers | Reconciled |
-| `docs/error-handling.md`, `testing.md` | shared typed boundary, 400/422, capability errors, facade fake | Reconciled |
+| `docs/error-handling.md`, `testing.md` | shared typed boundary, 400/422, absent CRUD methods, explicit unsupported helpers, facade fake | Reconciled |
 | `docs/enums.md` | package enum surface and upstream caveats | Reconciled; vehicle-stat and webhook additions are complete for the pinned contract |
 | `docs/api-maintenance.md` | snapshot and maintenance process | Reconciled |
 | 39 topical resource pages | all 41 resource accessors plus `me()`; Assignments covers three accessors | Reconciled against integrated source/tests |
-| `DEVELOPMENT_CHANGELOG.md` | engineering sequence and evidence | Reconciled |
 | `BREAKING_CHANGES.md` | consumer migration actions | Reconciled |
 
 ## Deferred official-only operations

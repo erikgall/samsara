@@ -63,12 +63,10 @@ class VerifyWebhookSignature
         int|string|null $tolerance = null
     ): Response {
         // Priority: route params > constructor > config
-        $webhookSecret = ($secret === '' ? null : $secret)
-            ?? ($this->secret === '' ? null : $this->secret)
-            ?? config('samsara.webhook_secret');
-        $timestampTolerance = $tolerance !== null ? (int) $tolerance : $this->tolerance;
+        $webhookSecret = $secret ?: $this->secret ?: config('samsara.webhook_secret');
+        $timestampTolerance = filled($tolerance) ? (int) $tolerance : $this->tolerance;
 
-        if ($webhookSecret === null || $webhookSecret === '') {
+        if (blank($webhookSecret)) {
             throw InvalidSignatureException::missingWebhookSecret();
         }
 

@@ -25,8 +25,6 @@ class VehicleLocationsResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<VehicleLocationResult>
      */
     protected string $entity = VehicleLocationResult::class;
 

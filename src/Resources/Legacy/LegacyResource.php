@@ -24,8 +24,6 @@ class LegacyResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Entity>
      */
     protected string $entity = Entity::class;
 

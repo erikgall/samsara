@@ -40,8 +40,6 @@ class TrailersResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Trailer>
      */
     protected string $entity = Trailer::class;
 

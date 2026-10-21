@@ -29,6 +29,10 @@ use Samsara\Data\Entity;
  */
 class DataInput extends Entity
 {
+    private const POINT_KEYS = ['fftSpectraPoint', 'j1939D1StatusPoint', 'locationPoint', 'numberPoint', 'stringPoint'];
+
+    private const POINT_LIST_KEYS = ['fftSpectraPoints', 'j1939D1StatusPoints', 'locationPoints', 'numberPoints', 'stringPoints'];
+
     /**
      * Hydrate the point envelopes used by current industrial data endpoints.
      *
@@ -38,13 +42,13 @@ class DataInput extends Entity
     {
         parent::__construct($attributes);
 
-        foreach (['fftSpectraPoint', 'j1939D1StatusPoint', 'locationPoint', 'numberPoint', 'stringPoint'] as $key) {
+        foreach (self::POINT_KEYS as $key) {
             if (is_array($this->attributes[$key] ?? null)) {
                 $this->attributes[$key] = DataPoint::make($this->attributes[$key]);
             }
         }
 
-        foreach (['fftSpectraPoints', 'j1939D1StatusPoints', 'locationPoints', 'numberPoints', 'stringPoints'] as $key) {
+        foreach (self::POINT_LIST_KEYS as $key) {
             if (is_array($this->attributes[$key] ?? null)) {
                 $this->attributes[$key] = array_map(
                     static fn (mixed $point): mixed => is_array($point) ? DataPoint::make($point) : $point,
@@ -59,13 +63,13 @@ class DataInput extends Entity
      */
     public function hasDataPoints(): bool
     {
-        foreach (['fftSpectraPoint', 'j1939D1StatusPoint', 'locationPoint', 'numberPoint', 'stringPoint'] as $key) {
+        foreach (self::POINT_KEYS as $key) {
             if ($this->get($key) !== null) {
                 return true;
             }
         }
 
-        foreach (['fftSpectraPoints', 'j1939D1StatusPoints', 'locationPoints', 'numberPoints', 'stringPoints'] as $key) {
+        foreach (self::POINT_LIST_KEYS as $key) {
             $points = $this->get($key);
 
             if (is_array($points) && $points !== []) {
@@ -85,13 +89,13 @@ class DataInput extends Entity
     {
         $attributes = parent::toArray();
 
-        foreach (['fftSpectraPoint', 'j1939D1StatusPoint', 'locationPoint', 'numberPoint', 'stringPoint'] as $key) {
+        foreach (self::POINT_KEYS as $key) {
             if (($attributes[$key] ?? null) instanceof DataPoint) {
                 $attributes[$key] = $attributes[$key]->toArray();
             }
         }
 
-        foreach (['fftSpectraPoints', 'j1939D1StatusPoints', 'locationPoints', 'numberPoints', 'stringPoints'] as $key) {
+        foreach (self::POINT_LIST_KEYS as $key) {
             if (is_array($attributes[$key] ?? null)) {
                 $attributes[$key] = array_map(
                     static fn (mixed $point): mixed => $point instanceof DataPoint ? $point->toArray() : $point,

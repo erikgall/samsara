@@ -40,8 +40,6 @@ class WebhooksResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Webhook>
      */
     protected string $entity = Webhook::class;
 

@@ -24,8 +24,6 @@ class TripsResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Trip>
      */
     protected string $entity = Trip::class;
 

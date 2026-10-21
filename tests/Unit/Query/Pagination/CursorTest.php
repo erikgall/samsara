@@ -6,6 +6,7 @@ use Error;
 use Samsara\Tests\TestCase;
 use Samsara\Query\Pagination\Cursor;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Unit tests for the Cursor class.
@@ -26,14 +27,6 @@ class CursorTest extends TestCase
 
         $this->assertSame('cursor-xyz-789', $cursor->endCursor);
         $this->assertTrue($cursor->hasNextPage);
-    }
-
-    #[Test]
-    public function it_can_be_instantiated(): void
-    {
-        $cursor = new Cursor('abc-123', true);
-
-        $this->assertInstanceOf(Cursor::class, $cursor);
     }
 
     #[Test]
@@ -111,5 +104,23 @@ class CursorTest extends TestCase
         $cursor = new Cursor('abc-123', true);
 
         $this->assertTrue($cursor->hasNextPage);
+    }
+
+    #[Test]
+    #[DataProvider('nextCursors')]
+    public function it_returns_only_a_continuing_cursor(?string $endCursor, bool $hasNextPage, ?string $expected): void
+    {
+        $this->assertSame($expected, (new Cursor($endCursor, $hasNextPage))->next());
+    }
+
+    /** @return array<string, array{?string, bool, ?string}> */
+    public static function nextCursors(): array
+    {
+        return [
+            'continuing' => ['next', true, 'next'],
+            'terminal'   => ['next', false, null],
+            'empty'      => ['', true, null],
+            'missing'    => [null, true, null],
+        ];
     }
 }

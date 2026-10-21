@@ -41,8 +41,6 @@ class IndustrialResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<IndustrialAsset>
      */
     protected string $entity = IndustrialAsset::class;
 

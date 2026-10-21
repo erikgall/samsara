@@ -26,8 +26,6 @@ class MaintenanceResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<Dvir>
      */
     protected string $entity = Dvir::class;
 

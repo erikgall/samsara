@@ -267,7 +267,7 @@ class Builder
         return LazyCollection::make(function () use ($template): Generator {
             $builder = clone $template;
             $initialCursor = $builder->buildQuery()[$builder->cursorParameter] ?? null;
-            $seen = is_string($initialCursor) ? [$initialCursor] : [];
+            $seen = is_string($initialCursor) ? [$initialCursor => true] : [];
             $cursor = null;
 
             do {
@@ -281,14 +281,9 @@ class Builder
                     $builder->getEndpoint(),
                     $builder->responseCollectionKey,
                 );
-                $pagination = Pagination\Cursor::fromResponse($response->json('pagination', []));
-                $cursor = $pagination->hasNextPage ? $pagination->endCursor : null;
+                $cursor = Pagination\Cursor::fromResponse($response->json('pagination', []))->next();
 
-                if ($cursor === '') {
-                    $cursor = null;
-                }
-
-                if ($cursor !== null && in_array($cursor, $seen, true)) {
+                if ($cursor !== null && isset($seen[$cursor])) {
                     throw new SamsaraException('Pagination cursor did not advance.', context: [
                         'endpoint' => $builder->getEndpoint(),
                         'cursor'   => $cursor,
@@ -296,7 +291,7 @@ class Builder
                 }
 
                 if ($cursor !== null) {
-                    $seen[] = $cursor;
+                    $seen[$cursor] = true;
                 }
 
                 foreach ($data as $item) {
@@ -563,12 +558,10 @@ class Builder
      */
     protected function mapToEntities(array $data): EntityCollection
     {
-        $entities = array_map(
+        return new EntityCollection(array_map(
             fn (array $item): Entity => $this->mapToEntity($item),
             $data
-        );
-
-        return new EntityCollection($entities);
+        ));
     }
 
     /**
@@ -583,6 +576,7 @@ class Builder
             return ($this->responseMapper)($data);
         }
 
+        // Resource::newQuery() always sets a mapper; direct builders use the resource's entity class.
         /** @var class-string<TEntity> $entityClass */
         $entityClass = $this->resource->getEntityClass();
 

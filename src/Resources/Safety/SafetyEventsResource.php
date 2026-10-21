@@ -25,8 +25,6 @@ class SafetyEventsResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<SafetyEvent>
      */
     protected string $entity = SafetyEvent::class;
 

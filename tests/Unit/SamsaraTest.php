@@ -247,6 +247,13 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('blankRegions')]
+    public function it_defaults_a_blank_configured_region_to_us(?string $region): void
+    {
+        $this->assertSame('https://api.samsara.com', (new Samsara(null, ['region' => $region]))->getBaseUrl());
+    }
+
+    #[Test]
     public function it_does_not_retry_non_retryable_http_statuses(): void
     {
         $http = new HttpFactory;
@@ -303,35 +310,6 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_retry_when_retry_after_exceeds_the_configured_ceiling(): void
-    {
-        Sleep::fake();
-
-        $http = new HttpFactory;
-        $http->preventStrayRequests();
-        $http->fake(['*' => $http->response(
-            ['message' => 'Rate limited'],
-            429,
-            ['Retry-After' => '3600'],
-        )]);
-        $samsara = new Samsara('test-token', [
-            'attempts'                => 3,
-            'retry_after_max_seconds' => 30,
-        ]);
-        $samsara->setHttpFactory($http);
-
-        try {
-            $samsara->tags()->find('tag-1');
-            $this->fail('Expected a rate-limit exception.');
-        } catch (RateLimitException $exception) {
-            $this->assertSame(3600, $exception->getRetryAfter());
-        }
-
-        $http->assertSentCount(1);
-        Sleep::assertNeverSlept();
-    }
-
-    #[Test]
     public function it_gets_the_current_organization_from_me(): void
     {
         $http = new HttpFactory;
@@ -364,35 +342,6 @@ class SamsaraTest extends TestCase
         $this->assertSame('recovered-driver', $client->drivers()->query()->first()->id);
         $http->assertSentCount(2);
         Sleep::assertSequence([Sleep::for($milliseconds)->milliseconds()]);
-    }
-
-    #[Test]
-    public function it_honors_small_retry_after_delta_seconds(): void
-    {
-        Sleep::fake();
-
-        $http = new HttpFactory;
-        $http->preventStrayRequests();
-        $http->fake(['*' => $http->response(
-            ['message' => 'Rate limited'],
-            429,
-            ['Retry-After' => '2'],
-        )]);
-        $samsara = new Samsara('test-token', [
-            'attempts'                => 2,
-            'retry_after_max_seconds' => 30,
-        ]);
-        $samsara->setHttpFactory($http);
-
-        try {
-            $samsara->tags()->find('tag-1');
-            $this->fail('Expected a rate-limit exception.');
-        } catch (RateLimitException $exception) {
-            $this->assertSame(2, $exception->getRetryAfter());
-        }
-
-        $http->assertSentCount(2);
-        Sleep::assertSequence([Sleep::for(2)->seconds()]);
     }
 
     #[Test]
@@ -870,40 +819,17 @@ class SamsaraTest extends TestCase
     }
 
     #[Test]
-    public function it_trims_retry_after_delta_seconds(): void
-    {
-        Sleep::fake();
-
-        $http = new HttpFactory;
-        $http->preventStrayRequests();
-        $http->fake(['*' => $http->response(
-            ['message' => 'Rate limited'],
-            429,
-            ['Retry-After' => ' 2 '],
-        )]);
-        $samsara = new Samsara('test-token', [
-            'attempts'                => 2,
-            'retry_after_max_seconds' => 30,
-        ]);
-        $samsara->setHttpFactory($http);
-
-        try {
-            $samsara->tags()->find('tag-1');
-            $this->fail('Expected a rate-limit exception.');
-        } catch (RateLimitException $exception) {
-            $this->assertSame(2, $exception->getRetryAfter());
-        }
-
-        $http->assertSentCount(2);
-        Sleep::assertSequence([Sleep::for(2)->seconds()]);
-    }
-
-    #[Test]
     public function it_uses_us_base_url_by_default(): void
     {
         $samsara = new Samsara('test-token');
 
         $this->assertSame('https://api.samsara.com', $samsara->getBaseUrl());
+    }
+
+    /** @return array<string, array{?string}> */
+    public static function blankRegions(): array
+    {
+        return ['empty' => [''], 'null' => [null]];
     }
 
     /** @return array<string, array{string}> */

@@ -214,9 +214,7 @@ abstract class Resource
             return null;
         }
 
-        $data = $this->decodeJsonData($response, $endpoint);
-
-        return $this->mapToEntity($data);
+        return $this->mapToEntity($this->decodeJsonData($response, $endpoint));
     }
 
     /**
@@ -239,6 +237,7 @@ abstract class Resource
         $status = $response->status();
         $body = $response->json();
         $message = $body['message'] ?? $response->body();
+        $retryAfterHeader = $response->header('Retry-After');
         $context = [
             'status'   => $status,
             'endpoint' => $this->endpoint,
@@ -258,9 +257,9 @@ abstract class Resource
             ),
             429 => throw new RateLimitException(
                 $message,
-                RetryAfter::seconds($response->header('Retry-After')),
+                RetryAfter::seconds($retryAfterHeader),
                 null,
-                $context + ['retry_after_header' => $response->header('Retry-After')]
+                $context + ['retry_after_header' => $retryAfterHeader === '' ? null : $retryAfterHeader]
             ),
             default => $status >= 500
                 ? throw new ServerException($message, $status, null, $context)
@@ -292,7 +291,7 @@ abstract class Resource
      */
     protected function mapToEntity(array $data): Entity
     {
-        $entityClass = $this->entity;
+        $entityClass = $this->getEntityClass();
 
         return $entityClass::make($data);
     }

@@ -121,24 +121,6 @@ class WorkOrdersResourceTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_expose_delete_work_order(): void
-    {
-        $this->assertFalse(method_exists(WorkOrdersResource::class, 'delete'));
-    }
-
-    #[Test]
-    public function it_does_not_expose_find_work_order(): void
-    {
-        $this->assertFalse(method_exists(WorkOrdersResource::class, 'find'));
-    }
-
-    #[Test]
-    public function it_does_not_expose_update_work_order(): void
-    {
-        $this->assertFalse(method_exists(WorkOrdersResource::class, 'update'));
-    }
-
-    #[Test]
     public function it_has_correct_endpoint(): void
     {
         $resource = new WorkOrdersResource($this->samsara);

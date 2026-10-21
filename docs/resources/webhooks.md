@@ -312,7 +312,7 @@ if ($webhook->hasEventType('VehicleCreated')) {
 
 The current response contains no lifecycle status. Removed `isActive()` and `isPaused()` calls have no direct replacement.
 
-An empty secret in `'samsara.webhook:,600'` falls back to configuration. An explicit alias secret is stored in the route definition, so `route:cache` writes it to disk. To keep the default 300-second tolerance, use `VerifyWebhookSignature::class`.
+An empty secret in `'samsara.webhook:,600'` falls back to configuration, and an empty tolerance in `'samsara.webhook:secret,'` falls back to the default 300 seconds. An explicit alias secret is stored in the route definition, so `route:cache` writes it to disk. To keep the default 300-second tolerance, use `VerifyWebhookSignature::class`.
 
 ## Related Resources
 

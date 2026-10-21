@@ -28,8 +28,6 @@ class LiveSharingLinksResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<LiveShare>
      */
     protected string $entity = LiveShare::class;
 

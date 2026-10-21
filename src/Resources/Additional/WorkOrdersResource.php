@@ -29,8 +29,6 @@ class WorkOrdersResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<WorkOrder>
      */
     protected string $entity = WorkOrder::class;
 
@@ -82,8 +80,7 @@ class WorkOrdersResource extends Resource
     {
         return $this->newQuery('/maintenance/work-orders/stream')
             ->withoutDefaultPageSize()
-            ->repeatQueryParameters('workOrderStatuses', 'assetIds', 'assignedUserIds')
-            ->usingEntity(WorkOrder::class);
+            ->repeatQueryParameters('workOrderStatuses', 'assetIds', 'assignedUserIds');
     }
 
     /**

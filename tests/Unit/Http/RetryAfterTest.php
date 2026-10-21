@@ -32,14 +32,25 @@ class RetryAfterTest extends TestCase
     public static function retryAfterValues(): array
     {
         return [
-            'numeric'      => ['2', 2],
-            'whitespace'   => [' 2 ', 2],
-            'zero'         => ['0', 0],
-            'future date'  => ['Wed, 21 Oct 2026 13:00:00 GMT', 3600],
-            'expired date' => ['Wed, 21 Oct 2026 11:00:00 GMT', 0],
-            'missing'      => [null, null],
-            'invalid'      => ['invalid', null],
-            'empty'        => ['', null],
+            'numeric'               => ['2', 2],
+            'whitespace'            => [' 2 ', 2],
+            'zero'                  => ['0', 0],
+            'future date'           => ['Wed, 21 Oct 2026 13:00:00 GMT', 3600],
+            'expired date'          => ['Wed, 21 Oct 2026 11:00:00 GMT', 0],
+            'missing'               => [null, null],
+            'invalid'               => ['invalid', null],
+            'empty'                 => ['', null],
+            'negative seconds'      => ['-5', null],
+            'negative offset'       => ['-1', null],
+            'relative day'          => ['tomorrow', null],
+            'relative hour'         => ['+1 hour', null],
+            'relative seconds'      => ['5 seconds', null],
+            'current time'          => ['now', null],
+            'fractional seconds'    => ['1.5', null],
+            'invalid calendar date' => ['Tue, 31 Feb 2026 13:00:00 GMT', null],
+            'incorrect weekday'     => ['Thu, 21 Oct 2026 13:00:00 GMT', null],
+            'non-GMT timezone'      => ['Wed, 21 Oct 2026 13:00:00 UTC', null],
+            'null byte'             => ["Wed, 21 Oct 2026 13:00:00 GMT\0", null],
         ];
     }
 }

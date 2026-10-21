@@ -27,8 +27,6 @@ class HoursOfServiceResource extends Resource
 
     /**
      * The entity class for this resource.
-     *
-     * @var class-string<HosLogsForDriver>
      */
     protected string $entity = HosLogsForDriver::class;
 

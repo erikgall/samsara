@@ -2,6 +2,8 @@
 
 namespace Samsara\Http;
 
+use DateTimeZone;
+use DateTimeImmutable;
 use Illuminate\Support\Carbon;
 
 /**
@@ -13,7 +15,7 @@ final class RetryAfter
 {
     public static function seconds(?string $header): ?int
     {
-        if ($header === null) {
+        if ($header === null || str_contains($header, "\0")) {
             return null;
         }
 
@@ -23,8 +25,13 @@ final class RetryAfter
             return (int) $header;
         }
 
-        $timestamp = strtotime($header);
+        $format = 'D, d M Y H:i:s \\G\\M\\T';
+        $date = DateTimeImmutable::createFromFormat($format, $header, new DateTimeZone('UTC'));
 
-        return $timestamp === false ? null : max(0, $timestamp - Carbon::now()->getTimestamp());
+        if ($date === false || $date->format($format) !== $header) {
+            return null;
+        }
+
+        return max(0, $date->getTimestamp() - Carbon::now()->getTimestamp());
     }
 }

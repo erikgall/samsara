@@ -165,10 +165,7 @@ try {
 
 ### RateLimitException
 
-Thrown when Samsara returns a `429`. `getRetryAfter()` returns an integer when
-the header uses the delta-seconds form, or `null` when the header is missing or
-uses an HTTP date. The client still honors either valid form before an automatic
-retry.
+Thrown when Samsara returns a `429`. `getRetryAfter()` returns the requested delay in seconds for nonnegative integer headers and RFC 7231 dates such as `Wed, 21 Oct 2026 13:00:00 GMT`. It returns `null` for missing or invalid headers. Other formats, including fractional seconds, negative numbers, and relative dates, are ignored; an otherwise retryable request uses the normal retry delay.
 
 ```php
 use Samsara\Exceptions\RateLimitException;
@@ -254,13 +251,13 @@ The SDK retries transient HTTP failures automatically. Configure the maximum num
 
 The value includes the initial request: `1` makes one request without retries, while `3` permits up to two retries.
 
-Writes (POST, PATCH, DELETE) do not retry connection failures, HTTP 408, or 5xx by default. A failed response can follow an accepted mutation; enable `retry_writes` only when replaying it is safe. HTTP 429 remains retryable for every method within the attempt budget and ceiling.
+Writes (POST, PUT, PATCH, DELETE) do not retry connection failures, HTTP 408, or 5xx by default. A failed response can follow an accepted mutation; enable `retry_writes` only when replaying it is safe. HTTP 429 remains retryable for every method within the attempt budget and ceiling.
 
 ```php
 $writeClient = \Samsara\Samsara::make($token, ['retry_writes' => true]);
 ```
 
-`getRetryAfter()` returns the requested delay in seconds for both delta-seconds and HTTP-date headers. `getContext()['retry_after_header']` preserves the raw header. The retry-after ceiling limits synchronous rate-limit waits. The SDK honors smaller delta-seconds and HTTP-date values. When Samsara asks for a longer delay, the SDK sends no retry and throws `RateLimitException` with the original delay so a queue or application scheduler can reschedule the work.
+`getRetryAfter()` returns the requested delay in seconds for both delta-seconds and HTTP-date headers. `getContext()['retry_after_header']` preserves the raw header, including a literal `"0"`, and is `null` when the header is missing or empty. Values that are neither delta-seconds nor an RFC 7231 date are ignored, so `getRetryAfter()` returns `null` for them. The retry-after ceiling limits synchronous rate-limit waits. The SDK honors smaller delta-seconds and HTTP-date values. When Samsara asks for a longer delay, the SDK sends no retry and throws `RateLimitException` with the original delay so a queue or application scheduler can reschedule the work.
 
 For application-level retry with exponential backoff — for example, when a long-running job hits a rate limit — wrap the call in a small helper:
 
