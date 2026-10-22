@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [2.0.0] - 2026-10-22
+
 ### Final v2 compatibility changes
 
 - **Retry policy:** POST/PUT/PATCH/DELETE no longer retry connection failures, HTTP 408, or 5xx by default. Opt in with `retry_writes` / `SAMSARA_RETRY_WRITES` (default `false`). HTTP 429 remains retryable for every method within `attempts` and `retry_after_max_seconds`. GET requests no longer retry other 4xx responses (400, 401, 403, 404, 422); v1.1.0 retried every failure. `Retry-After` accepts only nonnegative integer seconds or an HTTP-date in the `Wed, 21 Oct 2026 13:00:00 GMT` form (RFC 850 and asctime forms are ignored); other values are ignored. `RateLimitException::getRetryAfter()` returns seconds for valid headers and `null` otherwise, and `getContext()['retry_after_header']` retains the raw header.

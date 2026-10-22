@@ -74,7 +74,7 @@ class DistributionArchiveTest extends TestCase
         }
 
         $this->assertStringContainsString(
-            'https://github.com/erikgall/samsara/blob/dev/docs/upgrade-guide-v2.md',
+            'https://github.com/erikgall/samsara/blob/main/docs/upgrade-guide-v2.md',
             (string) file_get_contents($root.'/UPGRADE.md'),
         );
     }

@@ -4,7 +4,7 @@ This file lists verified consumer actions for the integrated staged-v2 behavior.
 
 For an executable, agent-oriented migration sequence with before/after code, exact searches, endpoint-path tables, verification steps, and a content-verified final release ledger, use the canonical [v1.1.0 to v2.0.0 upgrade guide](UPGRADE.md). This file is the compact release record; the upgrade guide is the migration authority.
 
-## Unreleased — staged v2
+## 2.0.0 — 2026-10-22
 
 Resources now expose only supported methods. Review every removed call below before adopting the final v2 API.
 
@@ -399,7 +399,7 @@ Samsara describes Preview endpoints as nonfunctional and unsuitable for business
 
 ### Exact generic capability action
 
-Unsupported inherited CRUD methods and every `all()` method are removed. Audit every consumer call to `all`, `find`, `create`, `update`, and `delete` against the [capability matrix](https://github.com/erikgall/samsara/blob/dev/docs/api-sync/documentation-coverage.md#exact-generic-capability-matrix). Do not substitute a raw request unless your application intentionally owns that unsupported or official-only contract.
+Unsupported inherited CRUD methods and every `all()` method are removed. Audit every consumer call to `all`, `find`, `create`, `update`, and `delete` against the [capability matrix](https://github.com/erikgall/samsara/blob/main/docs/api-sync/documentation-coverage.md#exact-generic-capability-matrix). Do not substitute a raw request unless your application intentionally owns that unsupported or official-only contract.
 
 ### Deferred official-only operations
 

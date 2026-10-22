@@ -1271,8 +1271,8 @@ Copy this table into the consuming repository's upgrade pull request. One row pe
 
 ## Package-maintainer evidence
 
-- Compact release record: [Breaking Changes](https://github.com/erikgall/samsara/blob/dev/BREAKING_CHANGES.md)
-- Engineering history: [Development Changelog](https://github.com/erikgall/samsara/blob/dev/DEVELOPMENT_CHANGELOG.md)
+- Compact release record: [Breaking Changes](https://github.com/erikgall/samsara/blob/main/BREAKING_CHANGES.md)
+- Engineering history: [Development Changelog](https://github.com/erikgall/samsara/blob/main/DEVELOPMENT_CHANGELOG.md)
 - Capability and operation audit: [Documentation Coverage](api-sync/documentation-coverage.html)
 - Contract drift and runtime evidence: [Contract Drift](api-sync/contract-drift.md)
 - DTO helper audit: [DTO Helper Catalog](api-sync/dto-helper-catalog.html)

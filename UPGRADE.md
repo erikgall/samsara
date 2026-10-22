@@ -4,14 +4,14 @@ Version 2 is a contract-alignment release. It changes public method signatures, 
 
 Do not upgrade a production application by changing only the Composer constraint.
 
-Use the canonical [v1.1.0 to v2.0.0 upgrade guide](https://github.com/erikgall/samsara/blob/dev/docs/upgrade-guide-v2.md). It contains:
+Use the canonical [v1.1.0 to v2.0.0 upgrade guide](https://github.com/erikgall/samsara/blob/main/docs/upgrade-guide-v2.md). It contains:
 
 - ordered, mandatory migration steps;
 - before-and-after PHP for every developer-facing break;
 - exact searches for removed calls, fields, values, and paths;
 - HTTP-fake, cache, proxy, serializer, and persistence checks;
 - an agent completion record and release checklist; and
-- a [machine-checkable disposition ledger](https://github.com/erikgall/samsara/blob/dev/docs/api-sync/v2-upgrade-disposition.json) covering the frozen 239-file implementation baseline plus all integrated quality, test, documentation, and publication paths.
+- a [machine-checkable disposition ledger](https://github.com/erikgall/samsara/blob/main/docs/api-sync/v2-upgrade-disposition.json) covering the frozen 239-file implementation baseline plus all integrated quality, test, documentation, and publication paths.
 
 `BREAKING_CHANGES.md` is the compact release record. The upgrade guide is the migration authority.
 

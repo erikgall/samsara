@@ -111,7 +111,7 @@
         {
             "path": "BREAKING_CHANGES.md",
             "content_state": "present",
-            "content_sha256": "a6a374a18021d89e577083ca3f75dbeac15e91e28e5720b3eec390be154b6120",
+            "content_sha256": "2d0189596710d2dcf40065a64db69a377d1a2af24879413318a8b4d5b159d5e9",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -121,7 +121,7 @@
         {
             "path": "CHANGELOG.md",
             "content_state": "present",
-            "content_sha256": "f1985a93dd21c96d2284e422781bc17742369340105940e43a1a9765b0193e56",
+            "content_sha256": "43bee4dc7d986efb09728c993ee46637f0003478c67f5748980ea93237d8e36a",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -153,7 +153,7 @@
         {
             "path": "README.md",
             "content_state": "present",
-            "content_sha256": "869f1dbd3da8ddfea2e3a5a011bd3f50c436aecf21bfa7eabd7f67e8d1e3eafd",
+            "content_sha256": "ea201481e086d95a1b93f73f08c99c627ec7eb8f2c198d030ee49866e2f190d1",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -163,7 +163,7 @@
         {
             "path": "UPGRADE.md",
             "content_state": "present",
-            "content_sha256": "daa10161d6c2bc44b9a438b62daa12324ea049cdf943eec026160bf3068042b7",
+            "content_sha256": "93650d908a531ed86d3421230fcd013fc01501d547637d0d63685a63fcd0f6ca",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -802,7 +802,7 @@
         {
             "path": "docs/upgrade-guide-v2.md",
             "content_state": "present",
-            "content_sha256": "08225f46d25062ec9f7f877abdce039384cb2dc356626f80991e811125b91bc0",
+            "content_sha256": "cba4e80f7def7cdabfaf414d730d0bdcf9874716633a685e38d7128ae453c903",
             "disposition": "documentation_only",
             "guide_sections": [],
             "consumer_action": null,
@@ -3672,7 +3672,7 @@
         {
             "path": "tests/Unit/DistributionArchiveTest.php",
             "content_state": "present",
-            "content_sha256": "6a81b1cd696be1239df0403e4333af7f46444dfe540b4a629323b88b3ea17107",
+            "content_sha256": "b4611864c5d32cc3e6f9531c46c35078cd78d79b5b330d64a8504453b826d966",
             "disposition": "supporting_evidence",
             "guide_sections": [
                 "package-maintainer-evidence"
